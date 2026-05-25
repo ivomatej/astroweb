@@ -1,0 +1,273 @@
+---
+import { site } from "../../config/site";
+import type { FooterCategoryContext, FooterColumn } from "../../types/site";
+import Newsletter from "./Newsletter.astro";
+
+interface Props {
+  /**
+   * Optional context from a category or article page.
+   * When present, replaces the first `categoryContext.columns.length`
+   * default columns with category-specific ones; persistent columns
+   * (typically Komunita / Redakce) are preserved at the end.
+   */
+  categoryContext?: FooterCategoryContext;
+}
+
+const { categoryContext } = Astro.props;
+
+const defaults = site.footer.columns;
+const columns: FooterColumn[] =
+  categoryContext && categoryContext.columns.length > 0
+    ? [
+        ...categoryContext.columns,
+        ...defaults.slice(categoryContext.columns.length),
+      ]
+    : defaults;
+
+const currentYear = new Date().getFullYear();
+---
+
+<footer class="foot">
+  <Newsletter />
+
+  <div class="foot-inner">
+    <div class="foot-brand">
+      <a href="/" class="brand">
+        <span class="brand-name">{site.brand.name}</span>
+      </a>
+      <p>{site.footer.brandTagline}</p>
+      <div class="foot-social">
+        {
+          site.footer.socials.map((social) => (
+            <a href={social.href} aria-label={social.label} rel="noopener">
+              {social.icon === "facebook" && (
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  aria-hidden="true"
+                >
+                  <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" />
+                </svg>
+              )}
+              {social.icon === "youtube" && (
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  aria-hidden="true"
+                >
+                  <path d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33A2.78 2.78 0 0 0 3.4 19c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2 29 29 0 0 0 .46-5.25 29 29 0 0 0-.46-5.33z" />
+                  <polygon points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02" />
+                </svg>
+              )}
+              {social.icon === "rss" && (
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  aria-hidden="true"
+                >
+                  <path d="M4 11a9 9 0 0 1 9 9" />
+                  <path d="M4 4a16 16 0 0 1 16 16" />
+                  <circle cx="5" cy="19" r="1" />
+                </svg>
+              )}
+            </a>
+          ))
+        }
+      </div>
+    </div>
+
+    {
+      columns.map((column) => (
+        <div class="foot-col">
+          <h5>{column.heading}</h5>
+          <ul>
+            {column.links.map((link) => (
+              <li>
+                <a href={link.href}>{link.label}</a>
+              </li>
+            ))}
+          </ul>
+        </div>
+      ))
+    }
+  </div>
+
+  <div class="foot-legal">
+    <div class="foot-legal-inner">
+      {
+        site.footer.legal.map((link) => (
+          <a href={link.href}>{link.label}</a>
+        ))
+      }
+    </div>
+  </div>
+
+  <div class="foot-bottom">
+    <span>
+      © {site.brand.foundedYear}–{currentYear} {site.brand.name}
+    </span>
+  </div>
+</footer>
+
+<style>
+  .foot {
+    background: var(--ink);
+    color: rgba(255, 255, 255, 0.7);
+  }
+
+  .foot-inner {
+    max-width: var(--max-w);
+    margin: 0 auto;
+    padding: 3rem var(--gutter) 2rem;
+    display: grid;
+    grid-template-columns: 1.4fr repeat(4, 1fr);
+    gap: 2.25rem;
+  }
+
+  .foot-brand .brand {
+    display: inline-block;
+    color: #fff;
+    margin-bottom: 0.75rem;
+  }
+
+  .foot-brand .brand:hover,
+  .foot-brand .brand:focus-visible {
+    color: var(--p-300);
+  }
+
+  .brand-name {
+    font-weight: 800;
+    font-size: 22px;
+    letter-spacing: -0.035em;
+    line-height: 1;
+    color: #fff;
+  }
+
+  .foot-brand p {
+    font-size: 13.5px;
+    line-height: 1.6;
+    color: rgba(255, 255, 255, 0.6);
+    max-width: 28ch;
+    margin-bottom: 1rem;
+  }
+
+  .foot-social {
+    display: flex;
+    gap: 0.5rem;
+  }
+
+  .foot-social a {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.08);
+    color: rgba(255, 255, 255, 0.75);
+    transition: background 0.15s, color 0.15s;
+  }
+
+  .foot-social a:hover,
+  .foot-social a:focus-visible {
+    background: var(--p-700);
+    color: #fff;
+  }
+
+  .foot-social svg {
+    width: 15px;
+    height: 15px;
+  }
+
+  .foot-col h5 {
+    font-family: var(--mono);
+    font-size: 11.5px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: #fff;
+    margin-bottom: 0.75rem;
+  }
+
+  .foot-col ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+  }
+
+  .foot-col a {
+    color: rgba(255, 255, 255, 0.65);
+    font-size: 13.5px;
+    text-decoration: none;
+    transition: color 0.15s;
+  }
+
+  .foot-col a:hover,
+  .foot-col a:focus-visible {
+    color: #fff;
+  }
+
+  .foot-legal {
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  .foot-legal-inner {
+    max-width: var(--max-w);
+    margin: 0 auto;
+    padding: 1.25rem var(--gutter);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 1.5rem;
+  }
+
+  .foot-legal a {
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 12.5px;
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.15s;
+  }
+
+  .foot-legal a:hover,
+  .foot-legal a:focus-visible {
+    color: #fff;
+  }
+
+  .foot-bottom {
+    max-width: var(--max-w);
+    margin: 0 auto;
+    padding: 1rem var(--gutter) 2rem;
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+    color: rgba(255, 255, 255, 0.4);
+    font-size: 12.5px;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+  }
+
+  @media (max-width: 1080px) {
+    .foot-inner {
+      grid-template-columns: 1.4fr repeat(2, 1fr);
+    }
+  }
+
+  @media (max-width: 640px) {
+    .foot-inner {
+      grid-template-columns: 1fr 1fr;
+      padding-top: 2rem;
+    }
+    .foot-brand {
+      grid-column: 1 / -1;
+    }
+  }
+</style>

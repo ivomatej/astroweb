@@ -1,0 +1,229 @@
+---
+import type { Person } from "../../types/article";
+import PostSectionHead from "./PostSectionHead.astro";
+
+interface Props {
+  author: Person;
+  garant?: Person;
+}
+
+const { author, garant } = Astro.props;
+
+const people = garant
+  ? [
+      { person: author, kind: "author" as const, label: "Autor článku" },
+      { person: garant, kind: "garant" as const, label: "Odborný garant" },
+    ]
+  : [{ person: author, kind: "author" as const, label: "Autor článku" }];
+---
+
+<section class="post-section credibility-stack" id="garant">
+  <PostSectionHead
+    eyebrow="Lidé za článkem"
+    title={garant ? "Autor a odborný garant" : "Autor"}
+    icon="people"
+  />
+
+  <div class="person-stack">
+    {
+      people.map(({ person, kind, label }) => (
+        <article class:list={["person", kind]}>
+          <div class="person-eyebrow">{label}</div>
+          <div class="person-head">
+            <div class:list={["person-avatar", kind, { "has-photo": !!person.photoUrl }]}>
+              {
+                person.photoUrl ? (
+                  <img src={person.photoUrl} alt={person.name} />
+                ) : (
+                  <span>{person.initials ?? person.name.slice(0, 2)}</span>
+                )
+              }
+            </div>
+            <div>
+              <div class="person-name">{person.name}</div>
+              <div class="person-role">{person.role}</div>
+            </div>
+          </div>
+          <p class="person-bio" set:html={person.bioHtml} />
+          {
+            person.credentials.length > 0 && (
+              <ul class="person-creds">
+                {person.credentials.map((c) => (
+                  <li set:html={c} />
+                ))}
+              </ul>
+            )
+          }
+          {
+            person.links && person.links.length > 0 && (
+              <div class="person-links">
+                {person.links.map((link) => (
+                  <a href={link.href} class="person-link">{link.label}</a>
+                ))}
+              </div>
+            )
+          }
+        </article>
+      ))
+    }
+  </div>
+</section>
+
+<style>
+  .post-section { margin: 2.5rem 0; }
+
+  .person-stack {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+  }
+
+  .person {
+    background: var(--bg);
+    border: 1px solid var(--line);
+    border-left: 3px solid var(--p-400);
+    border-radius: var(--r-lg);
+    padding: 1.5rem;
+  }
+
+  .person.garant {
+    border-left-color: var(--amber);
+  }
+
+  .person-eyebrow {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--p-700);
+    font-weight: 700;
+    margin-bottom: 0.85rem;
+  }
+
+  .person.garant .person-eyebrow {
+    color: var(--amber);
+  }
+
+  .person-head {
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+    margin-bottom: 0.85rem;
+  }
+
+  .person-avatar {
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 15px;
+    flex-shrink: 0;
+    overflow: hidden;
+  }
+
+  .person-avatar.author {
+    background: var(--p-100);
+    color: var(--p-700);
+  }
+
+  .person-avatar.garant {
+    background: var(--amber-bg);
+    color: var(--amber);
+  }
+
+  .person-avatar.has-photo {
+    background: transparent;
+  }
+
+  .person-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .person-name {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--ink);
+    letter-spacing: -0.01em;
+    line-height: 1.2;
+  }
+
+  .person-role {
+    font-size: 13px;
+    color: var(--muted);
+    margin-top: 2px;
+  }
+
+  .person-bio {
+    font-size: 14px;
+    line-height: 1.6;
+    color: var(--ink-soft);
+    margin-bottom: 0.85rem;
+  }
+
+  .person-bio :global(strong) {
+    color: var(--ink);
+    font-weight: 700;
+  }
+
+  .person-creds {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 0.85rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+    font-size: 13px;
+    color: var(--muted);
+  }
+
+  .person-creds li {
+    padding-left: 1.25rem;
+    position: relative;
+  }
+
+  .person-creds li::before {
+    content: "✓";
+    position: absolute;
+    left: 0;
+    color: var(--p-600);
+    font-weight: 700;
+  }
+
+  .person-creds :global(strong) {
+    color: var(--ink-soft);
+    font-weight: 600;
+  }
+
+  .person-links {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
+
+  .person-link {
+    padding: 0.35rem 0.75rem;
+    border: 1px solid var(--line);
+    border-radius: var(--r-sm);
+    font-size: 12.5px;
+    font-weight: 500;
+    color: var(--ink-soft);
+    background: var(--bg);
+  }
+
+  .person-link:hover,
+  .person-link:focus-visible {
+    border-color: var(--p-400);
+    color: var(--p-700);
+    background: var(--p-50);
+  }
+
+  @media (max-width: 880px) {
+    .person-stack {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

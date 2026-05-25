@@ -1,0 +1,191 @@
+---
+import type { NextCtaData } from "../../types/article";
+
+interface Props {
+  cta: NextCtaData;
+}
+
+const { cta } = Astro.props;
+---
+
+<section class="next-cta" aria-labelledby="next-cta-title">
+  <div class="next-cta-inner">
+    <div class="next-cta-text">
+      <div class="next-cta-eyebrow">{cta.eyebrow}</div>
+      <h2 id="next-cta-title" class="next-cta-title" set:html={cta.title}></h2>
+      <p class="next-cta-sub">{cta.description}</p>
+      <div class="next-cta-actions">
+        <a href={cta.primary.href} class="btn-cta-primary">
+          {cta.primary.label}
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+            <line x1="5" y1="12" x2="19" y2="12" />
+            <polyline points="12 5 19 12 12 19" />
+          </svg>
+        </a>
+        {
+          cta.secondary && (
+            <a href={cta.secondary.href} class="btn-cta-secondary">
+              {cta.secondary.label}
+            </a>
+          )
+        }
+      </div>
+    </div>
+
+    <ul class="next-cta-stats">
+      {
+        cta.stats.map((stat, i) => (
+          <>
+            {i > 0 && <li class="ncs-divider" aria-hidden="true" />}
+            <li class="ncs-item">
+              <strong>{stat.value}</strong>
+              <span>{stat.label}</span>
+            </li>
+          </>
+        ))
+      }
+    </ul>
+  </div>
+</section>
+
+<style>
+  .next-cta {
+    margin: 3rem 0;
+    background: var(--p-900);
+    color: #fff;
+    border-radius: var(--r-xl);
+    overflow: hidden;
+  }
+
+  .next-cta-inner {
+    padding: 2rem;
+    display: grid;
+    grid-template-columns: 1.4fr 1fr;
+    gap: 2rem;
+    align-items: center;
+  }
+
+  .next-cta-eyebrow {
+    font-size: 11.5px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--p-300);
+    font-weight: 700;
+    margin-bottom: 0.75rem;
+  }
+
+  .next-cta-title {
+    font-size: clamp(1.5rem, 3vw, 2.1rem);
+    font-weight: 800;
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+    margin-bottom: 0.75rem;
+    color: #fff;
+  }
+
+  .next-cta-sub {
+    font-size: 14.5px;
+    line-height: 1.55;
+    color: rgba(255, 255, 255, 0.78);
+    margin-bottom: 1.25rem;
+    max-width: 50ch;
+  }
+
+  .next-cta-actions {
+    display: flex;
+    gap: 0.6rem;
+    flex-wrap: wrap;
+  }
+
+  .btn-cta-primary {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0.75rem 1.25rem;
+    background: var(--accent);
+    color: #fff;
+    border-radius: var(--r);
+    font-weight: 600;
+    font-size: 14.5px;
+    text-decoration: none;
+    transition: background 0.15s;
+  }
+
+  .btn-cta-primary:hover,
+  .btn-cta-primary:focus-visible {
+    background: #e04500;
+    color: #fff;
+  }
+
+  .btn-cta-primary svg {
+    width: 14px;
+    height: 14px;
+  }
+
+  .btn-cta-secondary {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.75rem 1.25rem;
+    background: rgba(255, 255, 255, 0.08);
+    color: #fff;
+    border-radius: var(--r);
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    font-weight: 500;
+    font-size: 14.5px;
+    text-decoration: none;
+    transition: background 0.15s, border-color 0.15s;
+  }
+
+  .btn-cta-secondary:hover,
+  .btn-cta-secondary:focus-visible {
+    background: rgba(255, 255, 255, 0.16);
+    border-color: rgba(255, 255, 255, 0.28);
+    color: #fff;
+  }
+
+  .next-cta-stats {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    align-items: stretch;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+
+  .ncs-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    flex: 1;
+    min-width: 80px;
+  }
+
+  .ncs-item strong {
+    font-size: clamp(1.4rem, 2.5vw, 1.85rem);
+    font-weight: 800;
+    color: #fff;
+    letter-spacing: -0.015em;
+    line-height: 1.1;
+  }
+
+  .ncs-item span {
+    font-size: 11.5px;
+    color: rgba(255, 255, 255, 0.65);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+
+  .ncs-divider {
+    width: 1px;
+    background: rgba(255, 255, 255, 0.18);
+    align-self: stretch;
+  }
+
+  @media (max-width: 780px) {
+    .next-cta-inner {
+      grid-template-columns: 1fr;
+      gap: 1.5rem;
+    }
+  }
+</style>

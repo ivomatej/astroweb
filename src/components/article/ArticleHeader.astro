@@ -1,0 +1,58 @@
+---
+interface Props {
+  kicker: string;
+  /** HTML allowed for inline <em>, <strong> */
+  title: string;
+  /** HTML allowed for inline <strong> */
+  perex: string;
+}
+
+const { kicker, title, perex } = Astro.props;
+---
+
+<header class="article-header">
+  <div class="kicker">{kicker}</div>
+  <h1 class="article-title" set:html={title}></h1>
+  <p class="article-perex" set:html={perex}></p>
+</header>
+
+<style>
+  .article-header {
+    padding-top: 1.5rem;
+  }
+
+  .kicker {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--p-700);
+    font-weight: 700;
+    margin-bottom: 1.25rem;
+  }
+
+  .article-title {
+    font-size: clamp(2rem, 5vw, 3.25rem);
+    font-weight: 800;
+    line-height: 1.08;
+    letter-spacing: -0.025em;
+    color: var(--ink);
+    margin-bottom: 1.25rem;
+  }
+
+  .article-title :global(em) {
+    font-style: italic;
+    color: var(--p-700);
+    font-weight: 800;
+  }
+
+  .article-perex {
+    font-size: clamp(1.05rem, 1.5vw, 1.2rem);
+    line-height: 1.55;
+    color: var(--ink-soft);
+  }
+
+  .article-perex :global(strong) {
+    color: var(--ink);
+    font-weight: 700;
+  }
+</style>

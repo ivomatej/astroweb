@@ -1,0 +1,149 @@
+---
+interface Props {
+  href: string;
+}
+
+const { href } = Astro.props;
+---
+
+<section class="post-section report-error-section">
+  <div class="report-error">
+    <div class="re-ic" aria-hidden="true">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
+        <line x1="12" y1="9" x2="12" y2="13" />
+        <line x1="12" y1="17" x2="12.01" y2="17" />
+      </svg>
+    </div>
+    <div class="re-body">
+      <div class="re-eyebrow">Pomozte nám zlepšit článek</div>
+      <h3 class="re-title">Našli jste chybu v článku?</h3>
+      <p class="re-text">
+        Nepřesné informace, zastaralá data, špatný odkaz, gramatická chyba?
+        Nahlaste nám to a my to opravíme — obvykle do 48 hodin.
+      </p>
+    </div>
+    <a href={href} class="re-btn">
+      Nahlásit chybu
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+        <line x1="5" y1="12" x2="19" y2="12" />
+        <polyline points="12 5 19 12 12 19" />
+      </svg>
+    </a>
+  </div>
+</section>
+
+<style>
+  .post-section { margin: 2.5rem 0; }
+
+  .report-error {
+    display: grid;
+    grid-template-columns: 44px 1fr auto;
+    gap: 1.25rem;
+    align-items: center;
+    padding: 1.35rem 1.5rem;
+    background: var(--ink);
+    color: #fff;
+    border-radius: var(--r-lg);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .report-error::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(
+      400px circle at 100% 50%,
+      rgba(255, 79, 0, 0.25),
+      transparent 60%
+    );
+    pointer-events: none;
+  }
+
+  .re-ic {
+    position: relative;
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    background: var(--accent);
+    color: #fff;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .re-ic svg {
+    width: 22px;
+    height: 22px;
+  }
+
+  .re-body {
+    position: relative;
+    min-width: 0;
+  }
+
+  .re-eyebrow {
+    font-family: var(--mono);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--p-300);
+    font-weight: 700;
+    margin-bottom: 0.3rem;
+  }
+
+  .re-title {
+    font-size: 17px;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    color: #fff;
+    margin-bottom: 0.3rem;
+  }
+
+  .re-text {
+    font-size: 14.5px;
+    color: rgba(255, 255, 255, 0.7);
+    line-height: 1.6;
+    margin: 0;
+  }
+
+  .re-btn {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 11px 20px;
+    background: #fff;
+    color: var(--ink);
+    border-radius: 999px;
+    font-size: 13.5px;
+    font-weight: 700;
+    text-decoration: none;
+    white-space: nowrap;
+    transition: background 0.15s, color 0.15s, transform 0.15s;
+  }
+
+  .re-btn:hover,
+  .re-btn:focus-visible {
+    background: var(--accent);
+    color: #fff;
+    transform: translateY(-1px);
+  }
+
+  .re-btn svg {
+    width: 13px;
+    height: 13px;
+  }
+
+  @media (max-width: 640px) {
+    .report-error {
+      grid-template-columns: 44px 1fr;
+    }
+
+    .re-btn {
+      grid-column: 1 / -1;
+      justify-self: flex-start;
+    }
+  }
+</style>

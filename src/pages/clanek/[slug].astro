@@ -1,0 +1,131 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import "../../styles/article-content.css";
+
+import { articles, getArticleBySlug } from "../../data/articles";
+
+import Breadcrumbs from "../../components/article/Breadcrumbs.astro";
+import ArticleHeader from "../../components/article/ArticleHeader.astro";
+import ByLine from "../../components/article/ByLine.astro";
+import TrustRow from "../../components/article/TrustRow.astro";
+import AffiliateDisclosure from "../../components/article/AffiliateDisclosure.astro";
+import TLDR from "../../components/article/TLDR.astro";
+import Figure from "../../components/article/Figure.astro";
+import ArticleSection from "../../components/article/ArticleSection.astro";
+import TableOfContents from "../../components/article/TableOfContents.astro";
+import NextCta from "../../components/article/NextCta.astro";
+import RelatedArticles from "../../components/article/RelatedArticles.astro";
+import MethodologySection from "../../components/article/MethodologySection.astro";
+import RatingSection from "../../components/article/RatingSection.astro";
+import HistorySection from "../../components/article/HistorySection.astro";
+import GarantSection from "../../components/article/GarantSection.astro";
+import CommentsSection from "../../components/article/CommentsSection.astro";
+import ReportErrorSection from "../../components/article/ReportErrorSection.astro";
+import MakingSection from "../../components/article/MakingSection.astro";
+
+export function getStaticPaths() {
+  return articles
+    .filter((a) => a.status === "published")
+    .map((a) => ({ params: { slug: a.slug } }));
+}
+
+const { slug } = Astro.params;
+const article = getArticleBySlug(slug!);
+
+if (!article) {
+  return Astro.redirect("/404");
+}
+---
+
+<BaseLayout
+  title={article.seo.title ?? `${article.title.replace(/<[^>]+>/g, "")} | Recenzer`}
+  description={article.seo.description}
+  canonical={article.seo.canonical}
+  ogImage={article.seo.ogImage}
+  noIndex={article.seo.noIndex}
+>
+  <Breadcrumbs items={article.breadcrumbs} />
+
+  <div class="article-wrap">
+    <div class="article-main">
+      <ArticleHeader
+        kicker={article.kicker}
+        title={article.title}
+        perex={article.perex}
+      />
+
+      <ByLine
+        author={article.author}
+        garant={article.garant}
+        dates={article.dates}
+      />
+
+      <TrustRow pills={article.trustPills} />
+
+      <AffiliateDisclosure disclosure={article.affiliateDisclosure} />
+
+      <article class="article-body">
+        <TLDR tldr={article.tldr} />
+
+        <Figure figure={article.cover} hero />
+
+        {
+          article.sections.map((section) => (
+            <ArticleSection section={section} />
+          ))
+        }
+      </article>
+
+      {article.nextCta && <NextCta cta={article.nextCta} />}
+
+      {
+        article.relatedArticles.length > 0 && (
+          <RelatedArticles items={article.relatedArticles} />
+        )
+      }
+
+      {article.methodology && <MethodologySection methodology={article.methodology} />}
+
+      {article.rating && <RatingSection rating={article.rating} />}
+
+      {article.history.length > 0 && <HistorySection history={article.history} />}
+
+      <GarantSection author={article.author} garant={article.garant} />
+
+      {article.comments.enabled && <CommentsSection comments={article.comments} />}
+
+      {article.reportErrorHref && (
+        <ReportErrorSection href={article.reportErrorHref} />
+      )}
+    </div>
+
+    <TableOfContents sections={article.sections} />
+  </div>
+
+  <MakingSection stats={article.credibilityStats} />
+</BaseLayout>
+
+<style>
+  .article-wrap {
+    max-width: var(--max-w);
+    margin: 0 auto;
+    padding: 0 var(--gutter) 2rem;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 280px;
+    gap: 2.5rem;
+  }
+
+  .article-main {
+    min-width: 0;
+  }
+
+  .article-body {
+    margin-top: 0;
+  }
+
+  @media (max-width: 1080px) {
+    .article-wrap {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

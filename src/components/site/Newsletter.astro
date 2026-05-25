@@ -1,0 +1,226 @@
+---
+import { site } from "../../config/site";
+
+const { newsletter } = site;
+---
+
+<section class="newsletter-band" aria-labelledby="newsletter-title">
+  <div class="newsletter-inner">
+    <div class="newsletter-text">
+      <div class="newsletter-eyebrow">{newsletter.eyebrow}</div>
+      <h3 id="newsletter-title" class="newsletter-title">{newsletter.title}</h3>
+      <p class="newsletter-sub">{newsletter.description}</p>
+    </div>
+
+    <form
+      class="newsletter-form"
+      method="post"
+      action="/api/newsletter/subscribe"
+      novalidate
+    >
+      <label class="visually-hidden" for="newsletter-email">E-mail</label>
+      <input
+        id="newsletter-email"
+        name="email"
+        type="email"
+        placeholder="vase@email.cz"
+        required
+        autocomplete="email"
+      />
+      <button type="submit" class="newsletter-btn">
+        <span>Odebírat</span>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+          <line x1="5" y1="12" x2="19" y2="12" />
+          <polyline points="12 5 19 12 12 19" />
+        </svg>
+      </button>
+      <label class="newsletter-consent">
+        <input type="checkbox" name="consent" required />
+        <span>
+          {newsletter.consentText} (
+          <a href={newsletter.consentLinkHref}>více</a>
+          )
+        </span>
+      </label>
+    </form>
+  </div>
+</section>
+
+<style>
+  .newsletter-band {
+    background: linear-gradient(135deg, var(--p-900), var(--p-800));
+    color: #fff;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  .newsletter-inner {
+    max-width: var(--max-w);
+    margin: 0 auto;
+    padding: 3rem var(--gutter);
+    display: grid;
+    grid-template-columns: 1.1fr 1fr;
+    gap: 3rem;
+    align-items: center;
+  }
+
+  .newsletter-eyebrow {
+    font-family: var(--mono);
+    font-size: 10.5px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--p-300);
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+  }
+
+  .newsletter-title {
+    font-size: clamp(1.4rem, 2.6vw, 1.85rem);
+    font-weight: 800;
+    line-height: 1.2;
+    color: #fff;
+    letter-spacing: -0.03em;
+    margin-bottom: 0.55rem;
+  }
+
+  .newsletter-sub {
+    color: rgba(255, 255, 255, 0.75);
+    font-size: 15px;
+    line-height: 1.55;
+    max-width: 50ch;
+  }
+
+  .newsletter-form {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    grid-template-areas:
+      "input button"
+      "consent consent";
+    gap: 0.6rem;
+  }
+
+  .newsletter-form input[type="email"] {
+    grid-area: input;
+    padding: 12px 18px;
+    font-size: 14px;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.08);
+    color: #fff;
+    transition: border-color 0.15s, background 0.15s;
+  }
+
+  .newsletter-form input[type="email"]::placeholder {
+    color: rgba(255, 255, 255, 0.55);
+  }
+
+  .newsletter-form input[type="email"]:focus-visible {
+    outline: none;
+    background: rgba(255, 255, 255, 0.14);
+    border-color: var(--p-300);
+  }
+
+  .newsletter-btn {
+    grid-area: button;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 12px 22px;
+    background: #fff;
+    color: var(--p-800);
+    border-radius: 999px;
+    font-weight: 700;
+    font-size: 14px;
+    transition: background 0.15s, transform 0.15s;
+  }
+
+  .newsletter-btn:hover,
+  .newsletter-btn:focus-visible {
+    background: var(--p-100);
+    transform: translateY(-1px);
+  }
+
+  .newsletter-btn svg {
+    width: 13px;
+    height: 13px;
+  }
+
+  .newsletter-consent {
+    grid-area: consent;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 12.5px;
+    color: rgba(255, 255, 255, 0.6);
+    line-height: 1.5;
+    margin-top: 0.2rem;
+  }
+
+  .newsletter-consent input[type="checkbox"] {
+    appearance: none;
+    width: 14px;
+    height: 14px;
+    border: 1.5px solid rgba(255, 255, 255, 0.35);
+    border-radius: 3px;
+    background: transparent;
+    cursor: pointer;
+    position: relative;
+    flex-shrink: 0;
+  }
+
+  .newsletter-consent input[type="checkbox"]:checked {
+    background: var(--p-300);
+    border-color: var(--p-300);
+  }
+
+  .newsletter-consent input[type="checkbox"]:checked::after {
+    content: "";
+    position: absolute;
+    left: 3px;
+    top: 0;
+    width: 4px;
+    height: 7px;
+    border: solid var(--p-900);
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+  }
+
+  .newsletter-consent a {
+    color: rgba(255, 255, 255, 0.85);
+    text-decoration: underline;
+  }
+
+  .newsletter-consent a:hover,
+  .newsletter-consent a:focus-visible {
+    color: #fff;
+  }
+
+  .visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  @media (max-width: 780px) {
+    .newsletter-inner {
+      grid-template-columns: 1fr;
+      gap: 1.5rem;
+      padding: 2rem var(--gutter);
+    }
+  }
+
+  @media (max-width: 420px) {
+    .newsletter-form {
+      grid-template-columns: 1fr;
+      grid-template-areas:
+        "input"
+        "button"
+        "consent";
+    }
+  }
+</style>

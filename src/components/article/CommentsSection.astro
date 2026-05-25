@@ -1,0 +1,467 @@
+---
+import type { CommentsData, Comment } from "../../types/article";
+import PostSectionHead from "./PostSectionHead.astro";
+
+interface Props {
+  comments: CommentsData;
+}
+
+const { comments } = Astro.props;
+
+const badgeLabels: Record<NonNullable<Comment["badge"]>, string> = {
+  "verified-purchase": "Ověřený nákup",
+  pro: "Profi",
+  staff: "Autor",
+};
+
+function avatarTone(idx: number): string {
+  return `tone-${(idx % 3) + 1}`;
+}
+---
+
+<section class="post-section comments-section" id="komentare">
+  <PostSectionHead
+    eyebrow="Diskuse"
+    title=""
+    icon="comments"
+  >
+    <span slot="title">Komentáře <span class="comments-count">{comments.total}</span></span>
+  </PostSectionHead>
+
+  <form class="comment-form" method="post" action="/api/comments">
+    <div class="comment-form-head">
+      <div class="comment-avatar tone-1">Vy</div>
+      <div class="comment-form-meta">
+        <strong>Napište komentář</strong>
+        <span>Buďte konkrétní — ostatním pomůže váš zážitek nebo otázka.</span>
+      </div>
+    </div>
+    <label class="visually-hidden" for="comment-body">Komentář</label>
+    <textarea
+      id="comment-body"
+      name="body"
+      placeholder="Sdílejte svou zkušenost, položte otázku, nebo komentujte článek…"
+      required
+    ></textarea>
+    <div class="comment-form-foot">
+      <label class="comment-checkbox">
+        <input type="checkbox" name="notify" />
+        <span>Informovat e-mailem o odpovědích</span>
+      </label>
+      <div class="comment-form-actions">
+        <button type="button" class="btn-ghost">Náhled</button>
+        <button type="submit" class="btn-primary">Odeslat komentář</button>
+      </div>
+    </div>
+  </form>
+
+  <div class="comments-sort">
+    <span class="comments-sort-label">Řadit podle</span>
+    <button class="chip active" type="button">Nejnovější</button>
+    <button class="chip" type="button">Nejlepší</button>
+    <button class="chip" type="button">Nejstarší</button>
+  </div>
+
+  <ol class="comment-list">
+    {
+      comments.visible.map((c, idx) => (
+        <li class="comment">
+          <div class:list={["comment-avatar", avatarTone(idx), { "tone-staff": c.isStaff, "has-photo": !!c.authorPhotoUrl }]}>
+            {
+              c.authorPhotoUrl ? (
+                <img src={c.authorPhotoUrl} alt={c.authorName} />
+              ) : (
+                <span>{c.authorInitials ?? c.authorName.slice(0, 2)}</span>
+              )
+            }
+          </div>
+          <div class="comment-body">
+            <div class="comment-meta">
+              <strong>{c.authorName}</strong>
+              {c.badge && (
+                <span class:list={["comment-badge", c.badge === "staff" ? "staff" : ""]}>
+                  {badgeLabels[c.badge]}
+                </span>
+              )}
+              <span class="comment-date">{c.relativeTime}</span>
+            </div>
+            <p class="comment-text" set:html={c.bodyHtml} />
+            <div class="comment-actions">
+              <button class="comment-action" type="button">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                  <path d="M7 10v12" />
+                  <path d="M15 5.88 14 10h5.83a2 2 0 0 1 1.92 2.56l-2.33 8A2 2 0 0 1 17.5 22H7" />
+                </svg>
+                {c.likes}
+              </button>
+              <button class="comment-action" type="button">Odpovědět</button>
+              <button class="comment-action" type="button">Nahlásit</button>
+            </div>
+
+            {
+              c.replies && c.replies.length > 0 && (
+                <ol class="comment-replies">
+                  {c.replies.map((reply, r) => (
+                    <li class="comment reply">
+                      <div class:list={["comment-avatar", reply.isStaff ? "tone-staff" : avatarTone(r), { "has-photo": !!reply.authorPhotoUrl }]}>
+                        {
+                          reply.authorPhotoUrl ? (
+                            <img src={reply.authorPhotoUrl} alt={reply.authorName} />
+                          ) : (
+                            <span>{reply.authorInitials ?? reply.authorName.slice(0, 2)}</span>
+                          )
+                        }
+                      </div>
+                      <div class="comment-body">
+                        <div class="comment-meta">
+                          <strong>{reply.authorName}</strong>
+                          {reply.badge && (
+                            <span class:list={["comment-badge", reply.badge === "staff" ? "staff" : ""]}>
+                              {badgeLabels[reply.badge]}
+                            </span>
+                          )}
+                          <span class="comment-date">{reply.relativeTime}</span>
+                        </div>
+                        <p class="comment-text" set:html={reply.bodyHtml} />
+                        <div class="comment-actions">
+                          <button class="comment-action" type="button">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                              <path d="M7 10v12" />
+                              <path d="M15 5.88 14 10h5.83a2 2 0 0 1 1.92 2.56l-2.33 8A2 2 0 0 1 17.5 22H7" />
+                            </svg>
+                            {reply.likes}
+                          </button>
+                          <button class="comment-action" type="button">Odpovědět</button>
+                        </div>
+                      </div>
+                    </li>
+                  ))}
+                </ol>
+              )
+            }
+          </div>
+        </li>
+      ))
+    }
+  </ol>
+
+  {
+    comments.hiddenCount > 0 && (
+      <button class="comments-more" type="button">
+        Zobrazit dalších {comments.hiddenCount} komentář{comments.hiddenCount === 1 ? "" : comments.hiddenCount < 5 ? "e" : "ů"}
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+          <polyline points="6 9 12 15 18 9" />
+        </svg>
+      </button>
+    )
+  }
+</section>
+
+<style>
+  .post-section { margin: 2.5rem 0; }
+
+  .comments-section { margin-top: 3rem; }
+
+  .visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+  }
+
+  .comment-form {
+    background: var(--bg);
+    border: 1px solid var(--line);
+    border-radius: var(--r-lg);
+    padding: 1.25rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .comment-form-head {
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+    margin-bottom: 1rem;
+  }
+
+  .comment-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 12.5px;
+    flex-shrink: 0;
+    overflow: hidden;
+  }
+
+  .comment-avatar.tone-1 { background: var(--p-100); color: var(--p-700); }
+  .comment-avatar.tone-2 { background: var(--amber-bg); color: var(--amber); }
+  .comment-avatar.tone-3 { background: var(--green-bg); color: var(--green); }
+  .comment-avatar.tone-staff { background: var(--p-700); color: #fff; }
+  .comment-avatar.has-photo { background: transparent; }
+
+  .comment-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .comment-form-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .comment-form-meta strong {
+    font-size: 14.5px;
+    color: var(--ink);
+  }
+
+  .comment-form-meta span {
+    font-size: 12.5px;
+    color: var(--muted);
+  }
+
+  .comment-form textarea {
+    width: 100%;
+    min-height: 100px;
+    padding: 0.75rem;
+    border: 1px solid var(--line);
+    border-radius: var(--r);
+    font-family: inherit;
+    font-size: 14.5px;
+    resize: vertical;
+    margin-bottom: 0.85rem;
+    color: var(--ink);
+    background: var(--bg);
+  }
+
+  .comment-form textarea:focus-visible {
+    outline: none;
+    border-color: var(--p-500);
+    box-shadow: 0 0 0 3px rgba(122, 79, 227, 0.15);
+  }
+
+  .comment-form-foot {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+
+  .comment-checkbox {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 13px;
+    color: var(--muted);
+  }
+
+  .comment-checkbox input {
+    accent-color: var(--p-700);
+  }
+
+  .comment-form-actions {
+    display: flex;
+    gap: 0.5rem;
+  }
+
+  .btn-ghost,
+  .btn-primary {
+    padding: 0.5rem 0.95rem;
+    border-radius: var(--r);
+    font-size: 13.5px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  .btn-ghost {
+    background: var(--bg);
+    border: 1px solid var(--line);
+    color: var(--ink-soft);
+  }
+
+  .btn-ghost:hover,
+  .btn-ghost:focus-visible {
+    border-color: var(--p-400);
+    color: var(--p-700);
+  }
+
+  .btn-primary {
+    background: var(--p-700);
+    border: 1px solid var(--p-700);
+    color: #fff;
+  }
+
+  .btn-primary:hover,
+  .btn-primary:focus-visible {
+    background: var(--p-800);
+    border-color: var(--p-800);
+  }
+
+  .comments-sort {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+  }
+
+  .comments-sort-label {
+    font-size: 12.5px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    font-weight: 600;
+  }
+
+  .chip {
+    padding: 0.35rem 0.85rem;
+    border-radius: 999px;
+    background: var(--bg);
+    border: 1px solid var(--line);
+    font-size: 12.5px;
+    font-weight: 500;
+    color: var(--muted);
+    cursor: pointer;
+  }
+
+  .chip:hover,
+  .chip:focus-visible {
+    border-color: var(--p-400);
+    color: var(--p-700);
+  }
+
+  .chip.active {
+    background: var(--p-700);
+    border-color: var(--p-700);
+    color: #fff;
+  }
+
+  .comment-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+  }
+
+  .comment {
+    display: grid;
+    grid-template-columns: 36px 1fr;
+    gap: 0.85rem;
+  }
+
+  .comment-meta {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.4rem;
+    flex-wrap: wrap;
+  }
+
+  .comment-meta strong {
+    font-size: 14px;
+    color: var(--ink);
+  }
+
+  .comment-badge {
+    font-size: 10.5px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    font-weight: 700;
+    padding: 1px 6px;
+    border-radius: 3px;
+    background: var(--green-bg);
+    color: var(--green);
+  }
+
+  .comment-badge.staff {
+    background: var(--p-700);
+    color: #fff;
+  }
+
+  .comment-date {
+    font-size: 12px;
+    color: var(--muted-2);
+  }
+
+  .comment-text {
+    font-size: 14.5px;
+    line-height: 1.6;
+    color: var(--ink-soft);
+    margin: 0 0 0.5rem;
+  }
+
+  .comment-actions {
+    display: flex;
+    gap: 1rem;
+    font-size: 12.5px;
+  }
+
+  .comment-action {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    background: transparent;
+    border: 0;
+    color: var(--muted);
+    font-weight: 500;
+    cursor: pointer;
+    padding: 4px 0;
+  }
+
+  .comment-action:hover,
+  .comment-action:focus-visible {
+    color: var(--p-700);
+  }
+
+  .comment-action svg {
+    width: 13px;
+    height: 13px;
+  }
+
+  .comment-replies {
+    list-style: none;
+    padding-left: 1.25rem;
+    margin-top: 1rem;
+    border-left: 2px solid var(--line);
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .comments-more {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    margin-top: 1.25rem;
+    padding: 0.6rem 1rem;
+    background: var(--bg-warm);
+    border: 1px solid var(--line);
+    border-radius: var(--r);
+    font-size: 13.5px;
+    font-weight: 500;
+    color: var(--ink-soft);
+    cursor: pointer;
+  }
+
+  .comments-more:hover,
+  .comments-more:focus-visible {
+    border-color: var(--p-400);
+    color: var(--p-700);
+  }
+
+  .comments-more svg {
+    width: 12px;
+    height: 12px;
+  }
+</style>

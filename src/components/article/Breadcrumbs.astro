@@ -1,0 +1,67 @@
+---
+import type { BreadcrumbItem } from "../../types/article";
+
+interface Props {
+  items: BreadcrumbItem[];
+}
+
+const { items } = Astro.props;
+---
+
+<nav class="breadcrumbs" aria-label="Drobečková navigace">
+  <ol>
+    {
+      items.map((item, i) => (
+        <li>
+          {item.href ? <a href={item.href}>{item.label}</a> : <span>{item.label}</span>}
+          {i < items.length - 1 && <span class="sep" aria-hidden="true">›</span>}
+        </li>
+      ))
+    }
+  </ol>
+</nav>
+
+<style>
+  .breadcrumbs {
+    max-width: var(--max-w);
+    margin: 0 auto;
+    padding: 1rem var(--gutter) 0;
+    font-size: 13px;
+    color: var(--muted);
+  }
+
+  .breadcrumbs ol {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.4rem;
+  }
+
+  .breadcrumbs li {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+
+  .breadcrumbs a {
+    color: var(--muted);
+    text-decoration: none;
+  }
+
+  .breadcrumbs a:hover,
+  .breadcrumbs a:focus-visible {
+    color: var(--p-700);
+  }
+
+  .breadcrumbs li:last-child span:not(.sep) {
+    color: var(--ink);
+    font-weight: 500;
+  }
+
+  .sep {
+    color: var(--muted-2);
+  }
+</style>

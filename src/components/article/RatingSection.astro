@@ -1,0 +1,267 @@
+---
+import type { RatingData } from "../../types/article";
+
+interface Props {
+  rating: RatingData;
+}
+
+const { rating } = Astro.props;
+
+const fullStars = Math.floor(rating.average);
+const hasHalf = rating.average - fullStars >= 0.25 && rating.average - fullStars < 0.75;
+const emptyStars = 5 - fullStars - (hasHalf ? 1 : 0);
+const formattedAvg = rating.average.toFixed(1).replace(".", ",");
+---
+
+<section class="post-section rating-section">
+  <div class="rating-card">
+    <div class="rating-card-left">
+      <div class="post-section-eyebrow">Vaše hodnocení</div>
+      <h2 class="rating-title">Byl pro vás článek užitečný?</h2>
+      <p class="rating-sub">
+        Vaše hodnocení nám pomáhá poznat, které průvodce se daří a které
+        potřebují aktualizaci.
+      </p>
+      <div class="rating-actions">
+        <button class="rating-thumb" type="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <path d="M7 10v12" />
+            <path d="M15 5.88 14 10h5.83a2 2 0 0 1 1.92 2.56l-2.33 8A2 2 0 0 1 17.5 22H7" />
+          </svg>
+          Užitečné
+        </button>
+        <button class="rating-thumb down" type="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <path d="M17 14V2" />
+            <path d="M9 18.12 10 14H4.17a2 2 0 0 1-1.92-2.56l2.33-8A2 2 0 0 1 6.5 2H17" />
+          </svg>
+          Mohlo být lepší
+        </button>
+        <button class="rating-share" type="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <circle cx="18" cy="5" r="3" />
+            <circle cx="6" cy="12" r="3" />
+            <circle cx="18" cy="19" r="3" />
+            <line x1="8.59" y1="13.51" x2="15.42" y2="17.49" />
+            <line x1="15.41" y1="6.51" x2="8.59" y2="10.49" />
+          </svg>
+          Sdílet
+        </button>
+      </div>
+    </div>
+
+    <div class="rating-card-right">
+      <div class="rating-stars" aria-label={`Hodnocení ${formattedAvg} z 5`}>
+        {
+          Array.from({ length: fullStars }).map(() => (
+            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+            </svg>
+          ))
+        }
+        {
+          hasHalf && (
+            <svg viewBox="0 0 24 24" fill="currentColor" class="half" aria-hidden="true">
+              <defs>
+                <linearGradient id="half-star">
+                  <stop offset="50%" stop-color="currentColor" />
+                  <stop offset="50%" stop-color="rgba(0,0,0,0.12)" />
+                </linearGradient>
+              </defs>
+              <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" fill="url(#half-star)" />
+            </svg>
+          )
+        }
+        {
+          Array.from({ length: emptyStars }).map(() => (
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+              <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+            </svg>
+          ))
+        }
+      </div>
+
+      <div class="rating-score">
+        <div class="rating-score-num">{formattedAvg} <span class="of">/ 5</span></div>
+        <div class="rating-score-meta">{rating.total} hodnocení čtenářů</div>
+      </div>
+
+      <ul class="rating-bars">
+        {
+          rating.buckets.map((b) => (
+            <li class="rb">
+              <span class="rb-l">{b.stars}</span>
+              <div class="rb-track">
+                <div class="rb-fill" style={`width:${b.percent}%`} />
+              </div>
+              <span class="rb-n">{b.count}</span>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </div>
+</section>
+
+<style>
+  .post-section { margin: 2.5rem 0; }
+
+  .rating-card {
+    background: var(--bg);
+    border: 1px solid var(--line);
+    border-radius: var(--r-lg);
+    padding: 1.5rem;
+    display: grid;
+    grid-template-columns: 1.1fr 1fr;
+    gap: 2rem;
+  }
+
+  .post-section-eyebrow {
+    font-size: 11.5px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--p-700);
+    font-weight: 700;
+    margin-bottom: 0.4rem;
+  }
+
+  .rating-title {
+    font-size: 1.4rem;
+    font-weight: 800;
+    color: var(--ink);
+    letter-spacing: -0.015em;
+    margin-bottom: 0.5rem;
+  }
+
+  .rating-sub {
+    font-size: 14px;
+    color: var(--muted);
+    line-height: 1.55;
+    margin-bottom: 1rem;
+    max-width: 38ch;
+  }
+
+  .rating-actions {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
+
+  .rating-thumb,
+  .rating-share {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.5rem 0.9rem;
+    background: var(--bg-warm);
+    border: 1px solid var(--line);
+    border-radius: var(--r);
+    font-size: 13.5px;
+    color: var(--ink-soft);
+    cursor: pointer;
+    transition: border-color 0.15s, color 0.15s;
+  }
+
+  .rating-thumb:hover,
+  .rating-share:hover,
+  .rating-thumb:focus-visible,
+  .rating-share:focus-visible {
+    border-color: var(--p-400);
+    color: var(--p-700);
+  }
+
+  .rating-thumb.on {
+    border-color: var(--p-600);
+    color: var(--p-700);
+    background: var(--p-50);
+  }
+
+  .rating-thumb svg,
+  .rating-share svg {
+    width: 14px;
+    height: 14px;
+  }
+
+  .rating-card-right {
+    display: flex;
+    flex-direction: column;
+    gap: 0.85rem;
+    align-items: flex-start;
+  }
+
+  .rating-stars {
+    display: flex;
+    gap: 2px;
+    color: var(--amber);
+  }
+
+  .rating-stars svg {
+    width: 22px;
+    height: 22px;
+  }
+
+  .rating-score-num {
+    font-size: 1.85rem;
+    font-weight: 800;
+    color: var(--ink);
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+  }
+
+  .rating-score-num .of {
+    font-size: 0.55em;
+    color: var(--muted-2);
+    font-weight: 500;
+  }
+
+  .rating-score-meta {
+    font-size: 12.5px;
+    color: var(--muted);
+    margin-top: 2px;
+  }
+
+  .rating-bars {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .rb {
+    display: grid;
+    grid-template-columns: 12px 1fr 36px;
+    gap: 8px;
+    align-items: center;
+    font-size: 12px;
+    color: var(--muted);
+  }
+
+  .rb-track {
+    height: 6px;
+    background: var(--line);
+    border-radius: 999px;
+    overflow: hidden;
+  }
+
+  .rb-fill {
+    height: 100%;
+    background: var(--p-500);
+  }
+
+  .rb-n {
+    text-align: right;
+    font-family: var(--mono);
+    font-size: 11.5px;
+    color: var(--muted-2);
+  }
+
+  @media (max-width: 780px) {
+    .rating-card {
+      grid-template-columns: 1fr;
+      gap: 1.5rem;
+    }
+  }
+</style>

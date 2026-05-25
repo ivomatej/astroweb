@@ -1,0 +1,70 @@
+---
+import type { TrustPill } from "../../types/article";
+
+interface Props {
+  pills: TrustPill[];
+}
+
+const { pills } = Astro.props;
+---
+
+<div class="trust-row" role="list" aria-label="Záruky kvality článku">
+  {
+    pills.map((pill) => (
+      <span class:list={["trust-pill", pill.kind]} role="listitem">
+        {pill.kind === "verified-by-expert" && (
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+            <polyline points="20 6 9 17 4 12" />
+          </svg>
+        )}
+        {pill.kind === "tested-in-lab" && (
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+            <path d="M9 2v6.5L3 21h18l-6-12.5V2" />
+            <line x1="9" y1="2" x2="15" y2="2" />
+          </svg>
+        )}
+        {pill.kind === "sources" && (
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+            <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
+            <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
+          </svg>
+        )}
+        {pill.kind === "no-sponsorship" && (
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+            <circle cx="12" cy="12" r="10" />
+            <line x1="4.93" y1="4.93" x2="19.07" y2="19.07" />
+          </svg>
+        )}
+        {pill.label}
+      </span>
+    ))
+  }
+</div>
+
+<style>
+  .trust-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem 1rem;
+    margin: 1rem 0;
+  }
+
+  .trust-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--muted);
+    letter-spacing: 0;
+  }
+
+  .trust-pill svg {
+    width: 12px;
+    height: 12px;
+    color: var(--muted-2);
+  }
+</style>

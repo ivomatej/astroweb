@@ -1,0 +1,88 @@
+---
+import type { CredibilityStat } from "../../types/article";
+
+interface Props {
+  stats: CredibilityStat[];
+}
+
+const { stats } = Astro.props;
+---
+
+<div class="cred-strip">
+  <ul class="cred-stats">
+    {
+      stats.map((stat) => (
+        <li class="cred-stat">
+          <span class="cred-stat-label">{stat.label}</span>
+          <span class="cred-stat-value">
+            {stat.value}
+            {stat.unit && <span class="u">{stat.unit}</span>}
+          </span>
+        </li>
+      ))
+    }
+  </ul>
+</div>
+
+<style>
+  .cred-strip {
+    margin: 1.75rem 0;
+    padding: 1rem 1.25rem;
+    background: var(--bg-warm);
+    border: 1px solid var(--line);
+    border-radius: var(--r-lg);
+  }
+
+  .cred-stats {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1rem;
+  }
+
+  .cred-stat {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+  }
+
+  .cred-stat + .cred-stat {
+    border-left: 1px solid var(--line);
+    padding-left: 1rem;
+  }
+
+  .cred-stat-label {
+    font-size: 11.5px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--muted);
+    font-weight: 600;
+  }
+
+  .cred-stat-value {
+    font-size: clamp(1.4rem, 2.5vw, 1.85rem);
+    font-weight: 800;
+    color: var(--ink);
+    line-height: 1.1;
+    letter-spacing: -0.015em;
+  }
+
+  .u {
+    font-size: 0.6em;
+    font-weight: 500;
+    color: var(--muted);
+    margin-left: 0.25rem;
+  }
+
+  @media (max-width: 720px) {
+    .cred-stats {
+      grid-template-columns: repeat(2, 1fr);
+    }
+    .cred-stat + .cred-stat:nth-child(odd) {
+      border-left: 0;
+      padding-left: 0;
+    }
+  }
+</style>

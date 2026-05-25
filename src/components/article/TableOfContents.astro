@@ -1,0 +1,169 @@
+---
+import type { ArticleSectionData } from "../../types/article";
+
+interface Props {
+  sections: ArticleSectionData[];
+}
+
+const { sections } = Astro.props;
+---
+
+<aside class="toc-aside">
+  <div class="side-card">
+    <div class="side-card-head">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+        <line x1="8" y1="6" x2="21" y2="6" />
+        <line x1="8" y1="12" x2="21" y2="12" />
+        <line x1="8" y1="18" x2="21" y2="18" />
+        <line x1="3" y1="6" x2="3.01" y2="6" />
+        <line x1="3" y1="12" x2="3.01" y2="12" />
+        <line x1="3" y1="18" x2="3.01" y2="18" />
+      </svg>
+      <span class="side-card-title">V tomto článku</span>
+    </div>
+    <ol class="toc-list">
+      {
+        sections.map((section) => (
+          <li>
+            <a href={`#${section.id}`} data-toc-target={section.id}>
+              <span class="toc-num">{section.num}</span>
+              <span class="toc-label">{section.tocLabel ?? section.title}</span>
+            </a>
+          </li>
+        ))
+      }
+    </ol>
+  </div>
+</aside>
+
+<script>
+  // Scroll-spy for the table of contents.
+  // Highlights the TOC link whose section is currently in view.
+  function initScrollSpy(): void {
+    const links = document.querySelectorAll<HTMLAnchorElement>("a[data-toc-target]");
+    if (links.length === 0) return;
+
+    const linkMap = new Map<string, HTMLAnchorElement>();
+    links.forEach((link) => {
+      const targetId = link.dataset.tocTarget;
+      if (targetId) linkMap.set(targetId, link);
+    });
+
+    const sections = Array.from(linkMap.keys())
+      .map((id) => document.getElementById(id))
+      .filter((el): el is HTMLElement => el !== null);
+
+    if (sections.length === 0) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            links.forEach((l) => l.classList.remove("active"));
+            const matchingLink = linkMap.get(entry.target.id);
+            if (matchingLink) matchingLink.classList.add("active");
+          }
+        });
+      },
+      { rootMargin: "-20% 0px -70% 0px" }
+    );
+
+    sections.forEach((section) => observer.observe(section));
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initScrollSpy);
+  } else {
+    initScrollSpy();
+  }
+</script>
+
+<style>
+  .toc-aside {
+    min-width: 0;
+    align-self: start;
+  }
+
+  .side-card {
+    background: var(--bg-warm);
+    border: 1px solid var(--line);
+    border-radius: var(--r-lg);
+    padding: 1.25rem;
+  }
+
+  .side-card-head {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+    color: var(--ink);
+  }
+
+  .side-card-head svg {
+    width: 16px;
+    height: 16px;
+    color: var(--p-700);
+  }
+
+  .side-card-title {
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--ink);
+  }
+
+  .toc-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+  }
+
+  .toc-list a {
+    display: flex;
+    align-items: baseline;
+    gap: 0.65rem;
+    padding: 0.4rem 0.5rem;
+    color: var(--muted);
+    font-size: 13.5px;
+    line-height: 1.4;
+    border-radius: var(--r-sm);
+    border-left: 2px solid transparent;
+    transition: color 0.15s, background 0.15s, border-color 0.15s;
+  }
+
+  .toc-num {
+    flex-shrink: 0;
+    width: 1.75rem;
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--muted-2);
+    text-align: right;
+  }
+
+  .toc-label {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .toc-list a:hover,
+  .toc-list a:focus-visible {
+    color: var(--ink);
+    background: var(--bg);
+  }
+
+  .toc-list a.active {
+    color: var(--p-700);
+    background: var(--bg);
+    border-left-color: var(--p-500);
+    font-weight: 600;
+  }
+
+  .toc-list a.active .toc-num {
+    color: var(--p-600);
+  }
+</style>

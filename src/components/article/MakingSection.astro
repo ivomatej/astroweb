@@ -1,0 +1,273 @@
+---
+interface MakingStat {
+  value: string;
+  label: string;
+  unit?: string;
+}
+
+interface MakingCard {
+  href: string;
+  title: string;
+  subtitle: string;
+  icon: "check" | "shield" | "doc" | "verify" | "search";
+}
+
+interface Props {
+  stats?: MakingStat[];
+}
+
+const defaultStats: MakingStat[] = [
+  { value: "86", label: "Hodin v laboratoři" },
+  { value: "23", label: "Testovaných modelů" },
+  { value: "47", label: "Citovaných zdrojů" },
+];
+
+const { stats = defaultStats } = Astro.props;
+
+const cards: MakingCard[] = [
+  {
+    href: "/metodika/",
+    title: "Metodika testů",
+    subtitle: "12 měřených parametrů · 7 disciplín",
+    icon: "check",
+  },
+  {
+    href: "/eticky-kodex/",
+    title: "Etický kodex",
+    subtitle: "6 pilířů editoriální etiky",
+    icon: "shield",
+  },
+  {
+    href: "/redakcni-zasady/",
+    title: "Redakční zásady",
+    subtitle: "Procesní pravidla redakce",
+    icon: "doc",
+  },
+  {
+    href: "/overovani-faktu/",
+    title: "Ověřování faktů",
+    subtitle: "Fact-checking ve 3 krocích",
+    icon: "verify",
+  },
+  {
+    href: "/duveryhodne-zdroje/",
+    title: "Důvěryhodné zdroje",
+    subtitle: "47 zdrojů — normy, studie, granty",
+    icon: "search",
+  },
+];
+---
+
+<section class="making" aria-labelledby="making-title">
+  <div class="making-inner">
+    <header class="making-head">
+      <div>
+        <div class="making-eyebrow">Transparentnost · Editorial Standards</div>
+        <h2 id="making-title" class="making-title">Jak vznikal tento průvodce</h2>
+        <p class="making-sub">
+          Hloubková analýza není sepsání obecností. Co stojí za tímto článkem:
+        </p>
+      </div>
+      <ul class="making-stats">
+        {
+          stats.map((stat) => (
+            <li>
+              <div class="making-stat-num">{stat.value}</div>
+              <div class="making-stat-lbl">{stat.label}</div>
+            </li>
+          ))
+        }
+      </ul>
+    </header>
+
+    <div class="making-grid">
+      {
+        cards.map((card) => (
+          <a href={card.href} class="making-card">
+            <div class="making-card-ic" aria-hidden="true">
+              {card.icon === "check" && (
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="9 11 12 14 22 4" />
+                  <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" />
+                </svg>
+              )}
+              {card.icon === "shield" && (
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                </svg>
+              )}
+              {card.icon === "doc" && (
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                  <polyline points="14 2 14 8 20 8" />
+                </svg>
+              )}
+              {card.icon === "verify" && (
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="12" cy="12" r="10" />
+                  <polyline points="9 12 11 14 15 10" />
+                </svg>
+              )}
+              {card.icon === "search" && (
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="11" cy="11" r="8" />
+                  <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                </svg>
+              )}
+            </div>
+            <div class="making-card-title">{card.title}</div>
+            <div class="making-card-sub">{card.subtitle}</div>
+          </a>
+        ))
+      }
+    </div>
+  </div>
+</section>
+
+<style>
+  .making {
+    background: var(--bg-warm);
+    border-top: 1px solid var(--line);
+    margin-top: 4rem;
+  }
+
+  .making-inner {
+    max-width: var(--max-w);
+    margin: 0 auto;
+    padding: 3rem var(--gutter);
+  }
+
+  .making-head {
+    display: grid;
+    grid-template-columns: 1.2fr 1fr;
+    gap: 2.5rem;
+    align-items: center;
+    margin-bottom: 2rem;
+  }
+
+  .making-eyebrow {
+    font-size: 11.5px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--p-700);
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+  }
+
+  .making-title {
+    font-size: clamp(1.6rem, 3vw, 2.1rem);
+    font-weight: 800;
+    color: var(--ink);
+    letter-spacing: -0.02em;
+    margin-bottom: 0.5rem;
+  }
+
+  .making-sub {
+    font-size: 14.5px;
+    color: var(--muted);
+    line-height: 1.55;
+    max-width: 50ch;
+  }
+
+  .making-stats {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.75rem;
+  }
+
+  .making-stats li {
+    text-align: center;
+  }
+
+  .making-stat-num {
+    font-size: clamp(1.4rem, 2vw, 1.85rem);
+    font-weight: 800;
+    color: var(--p-700);
+    letter-spacing: -0.015em;
+    line-height: 1.1;
+  }
+
+  .making-stat-lbl {
+    font-size: 11.5px;
+    color: var(--muted);
+    margin-top: 0.3rem;
+    line-height: 1.3;
+  }
+
+  .making-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 0.85rem;
+  }
+
+  .making-card {
+    background: var(--bg);
+    border: 1px solid var(--line);
+    border-radius: var(--r);
+    padding: 1.1rem;
+    text-decoration: none;
+    color: var(--ink);
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    transition: border-color 0.15s, transform 0.15s;
+  }
+
+  .making-card:hover,
+  .making-card:focus-visible {
+    border-color: var(--p-400);
+    transform: translateY(-2px);
+  }
+
+  .making-card-ic {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    background: var(--p-50);
+    color: var(--p-700);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 0.4rem;
+  }
+
+  .making-card-ic svg {
+    width: 16px;
+    height: 16px;
+  }
+
+  .making-card-title {
+    font-size: 14.5px;
+    font-weight: 700;
+    color: var(--ink);
+    line-height: 1.3;
+  }
+
+  .making-card-sub {
+    font-size: 12.5px;
+    color: var(--muted);
+    line-height: 1.4;
+  }
+
+  @media (max-width: 980px) {
+    .making-head {
+      grid-template-columns: 1fr;
+      gap: 1.5rem;
+    }
+    .making-grid {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+
+  @media (max-width: 580px) {
+    .making-stats {
+      grid-template-columns: repeat(2, 1fr);
+    }
+    .making-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+</style>

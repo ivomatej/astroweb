@@ -1,0 +1,132 @@
+---
+import type { TLDR } from "../../types/article";
+
+interface Props {
+  tldr: TLDR;
+}
+
+const { tldr } = Astro.props;
+---
+
+<aside class="tldr" aria-labelledby="tldr-title">
+  <div class="tldr-head">
+    <div class="tldr-eyebrow">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+        <polyline points="9 11 12 14 22 4" />
+        <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" />
+      </svg>
+      Rychlé shrnutí
+    </div>
+  </div>
+  <div id="tldr-title" class="tldr-title">{tldr.title}</div>
+  <ol class="tldr-list">
+    {tldr.bullets.map((bullet) => <li set:html={bullet}></li>)}
+  </ol>
+</aside>
+
+<style>
+  .tldr {
+    position: relative;
+    overflow: hidden;
+    margin: 2rem 0 2.5rem;
+    padding: 2rem 2.25rem;
+    background: var(--ink);
+    color: #fff;
+    border-radius: var(--r-xl);
+  }
+
+  .tldr::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(800px circle at 100% 0%, rgba(149, 114, 240, 0.3), transparent 50%),
+      radial-gradient(500px circle at 0% 100%, rgba(99, 50, 204, 0.25), transparent 50%);
+    pointer-events: none;
+  }
+
+  .tldr-head {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+    margin-bottom: 1rem;
+  }
+
+  .tldr-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    font-family: var(--mono);
+    font-size: 10.5px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--p-300);
+  }
+
+  .tldr-eyebrow svg {
+    width: 12px;
+    height: 12px;
+  }
+
+  .tldr-title {
+    position: relative;
+    font-size: 1.45rem;
+    font-weight: 800;
+    color: #fff;
+    margin-bottom: 1.4rem;
+    letter-spacing: -0.025em;
+    line-height: 1.2;
+  }
+
+  .tldr-list {
+    position: relative;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    counter-reset: tldr-counter;
+    display: grid;
+    gap: 0.4rem;
+  }
+
+  .tldr-list li {
+    counter-increment: tldr-counter;
+    position: relative;
+    padding: 0.8rem 0 0.8rem 3rem;
+    font-size: 15.5px;
+    line-height: 1.55;
+    color: rgba(255, 255, 255, 0.85);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .tldr-list li:last-child {
+    border-bottom: 0;
+  }
+
+  .tldr-list li::before {
+    content: counter(tldr-counter, decimal-leading-zero);
+    position: absolute;
+    left: 0;
+    top: 0.8rem;
+    width: 30px;
+    height: 30px;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    border-radius: 8px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--p-200);
+  }
+
+  .tldr-list :global(strong) {
+    color: #fff;
+    font-weight: 700;
+  }
+</style>

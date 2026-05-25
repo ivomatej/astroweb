@@ -1,0 +1,48 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+---
+
+<BaseLayout
+  title="Kontakt — Recenzer"
+  description="Tipy, opravy, spolupráce — jak nás kontaktovat."
+>
+  <section class="placeholder">
+    <div class="placeholder-inner">
+      <p class="eyebrow">Kontakt</p>
+      <h1>Napište nám.</h1>
+      <p>
+        Tipy na nové testy, opravy faktů, dotazy k metodice — uvítáme vše.
+        Tato stránka je zatím placeholder; finální formulář a kontaktní
+        informace doplníme v další iteraci.
+      </p>
+      <ul class="links">
+        <li>E-mail: <a href="mailto:redakce@recenzer.cz">redakce@recenzer.cz</a></li>
+        <li>Nahlásit chybu: <a href="/oprava-chyb/">/oprava-chyb/</a></li>
+      </ul>
+    </div>
+  </section>
+
+  <style>
+    .placeholder { padding: 4rem var(--gutter); }
+    .placeholder-inner { max-width: var(--max-w-text); margin: 0 auto; }
+    .eyebrow {
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--p-700);
+      font-weight: 600;
+      margin-bottom: 1rem;
+    }
+    h1 {
+      font-size: clamp(1.8rem, 4vw, 2.4rem);
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      color: var(--ink);
+      line-height: 1.2;
+      margin-bottom: 1rem;
+    }
+    p { color: var(--muted); max-width: 60ch; margin-bottom: 1rem; }
+    .links { list-style: none; padding: 0; }
+    .links li { padding: 0.4rem 0; color: var(--muted); }
+  </style>
+</BaseLayout>

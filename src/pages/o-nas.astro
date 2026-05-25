@@ -1,0 +1,42 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+---
+
+<BaseLayout
+  title="O nás — Recenzer"
+  description="Kdo jsme, jak testujeme a proč věříme tomu, že nezávislé recenze pomáhají lépe nakupovat."
+>
+  <section class="placeholder">
+    <div class="placeholder-inner">
+      <p class="eyebrow">O nás</p>
+      <h1>Nezávislá redakce, která testuje, než doporučí.</h1>
+      <p>
+        Tato stránka je zatím placeholder. Skutečný obsah — kdo redakci tvoří,
+        čím se Recenzer odlišuje od ostatních recenzních webů a jak je
+        zajištěna nezávislost — doplníme v další iteraci.
+      </p>
+    </div>
+  </section>
+
+  <style>
+    .placeholder { padding: 4rem var(--gutter); }
+    .placeholder-inner { max-width: var(--max-w-text); margin: 0 auto; }
+    .eyebrow {
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--p-700);
+      font-weight: 600;
+      margin-bottom: 1rem;
+    }
+    h1 {
+      font-size: clamp(1.8rem, 4vw, 2.4rem);
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      color: var(--ink);
+      line-height: 1.2;
+      margin-bottom: 1rem;
+    }
+    p { color: var(--muted); max-width: 60ch; }
+  </style>
+</BaseLayout>

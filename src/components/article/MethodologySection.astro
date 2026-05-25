@@ -1,0 +1,115 @@
+---
+import type { MethodologyData } from "../../types/article";
+import PostSectionHead from "./PostSectionHead.astro";
+
+interface Props {
+  methodology: MethodologyData;
+}
+
+const { methodology } = Astro.props;
+---
+
+<section class="post-section methodology" id="metodika">
+  <PostSectionHead
+    eyebrow={methodology.eyebrow}
+    title={methodology.title}
+    icon="lab"
+  />
+  <p class="post-section-lede">{methodology.lede}</p>
+
+  <ul class="meth-grid">
+    {
+      methodology.tiles.map((tile) => (
+        <li class="meth-tile">
+          <div class="meth-tile-num">{tile.value}</div>
+          <div class="meth-tile-lbl">{tile.label}</div>
+        </li>
+      ))
+    }
+  </ul>
+
+  <a class="post-section-link" href={methodology.link.href}>
+    {methodology.link.label}
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+      <line x1="5" y1="12" x2="19" y2="12" />
+      <polyline points="12 5 19 12 12 19" />
+    </svg>
+  </a>
+</section>
+
+<style>
+  .post-section {
+    margin: 2.5rem 0;
+  }
+
+  .post-section-lede {
+    font-size: 14.5px;
+    line-height: 1.6;
+    color: var(--muted);
+    margin-bottom: 1.25rem;
+    max-width: 70ch;
+  }
+
+  .meth-grid {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 1.25rem;
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 0.5rem;
+  }
+
+  .meth-tile {
+    padding: 1rem;
+    background: var(--bg-warm);
+    border: 1px solid var(--line);
+    border-radius: var(--r);
+    text-align: center;
+  }
+
+  .meth-tile-num {
+    font-size: clamp(1.4rem, 2vw, 1.85rem);
+    font-weight: 800;
+    color: var(--p-700);
+    letter-spacing: -0.015em;
+    line-height: 1.1;
+  }
+
+  .meth-tile-lbl {
+    margin-top: 0.4rem;
+    font-size: 12px;
+    color: var(--muted);
+    line-height: 1.3;
+  }
+
+  .post-section-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--p-700);
+  }
+
+  .post-section-link svg {
+    width: 14px;
+    height: 14px;
+  }
+
+  .post-section-link:hover,
+  .post-section-link:focus-visible {
+    color: var(--p-900);
+  }
+
+  @media (max-width: 880px) {
+    .meth-grid {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+
+  @media (max-width: 480px) {
+    .meth-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+</style>

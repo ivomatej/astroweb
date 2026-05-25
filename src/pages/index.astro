@@ -1,21 +1,98 @@
 ---
-import Layout from "../layouts/Layout.astro";
+import BaseLayout from "../layouts/BaseLayout.astro";
 ---
 
-<Layout title="ivomatej — domovská stránka" description="Osobní stránka — vývojář a tvůrce">
-  <section>
-    <h1>Ahoj, jsem ivomatej 👋</h1>
-    <p>
-      Jsem vývojář, který rád staví rychlé, jednoduché a přístupné weby. Tahle
-      stránka je můj malý kout internetu — místo na poznámky, projekty a věci,
-      co mě baví. Postaveno na Astro a TypeScriptu.
-    </p>
-    <p>
-      Pokud tě zajímá, kdo jsem nebo jak mě kontaktovat, mrkni níž.
-    </p>
-    <div class="cta-row">
-      <a href="/about" class="btn btn-primary">O mně</a>
-      <a href="/contact" class="btn">Kontakt</a>
+<BaseLayout
+  title="Recenzer — nezávislý průvodce nákupem"
+  description="Hloubkové testy, srozumitelná doporučení, bez sponzoringu. Recenzer pomáhá vybrat to nejlepší od roku 2017."
+>
+  <section class="placeholder">
+    <div class="placeholder-inner">
+      <p class="eyebrow">Vývojový prototyp · krok 1</p>
+      <h1>Editorial shell je nasazený</h1>
+      <p>
+        Tahle stránka zatím slouží jen jako prostor pro ověření, že top bar,
+        masthead, footer a fonty fungují tak, jak mají. Skutečná domovská
+        stránka — výpis nejnovějších testů, doporučená témata, žebříčky —
+        přijde v dalším kroku.
+      </p>
+      <div class="row">
+        <a href="/o-nas/" class="btn">O nás</a>
+        <a href="/kontakt/" class="btn btn-primary">Kontakt</a>
+      </div>
     </div>
   </section>
-</Layout>
+
+  <style>
+    .placeholder {
+      padding: 4rem var(--gutter);
+    }
+
+    .placeholder-inner {
+      max-width: var(--max-w-text);
+      margin: 0 auto;
+    }
+
+    .eyebrow {
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--p-700);
+      font-weight: 600;
+      margin-bottom: 1rem;
+    }
+
+    h1 {
+      font-size: clamp(2rem, 5vw, 2.75rem);
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      color: var(--ink);
+      line-height: 1.15;
+      margin-bottom: 1rem;
+    }
+
+    p {
+      color: var(--muted);
+      margin-bottom: 1rem;
+      max-width: 60ch;
+    }
+
+    .row {
+      display: flex;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+      margin-top: 1.5rem;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      padding: 0.6rem 1.1rem;
+      border-radius: var(--r);
+      border: 1px solid var(--line);
+      background: var(--bg);
+      color: var(--ink);
+      font-weight: 500;
+      font-size: 14.5px;
+    }
+
+    .btn:hover,
+    .btn:focus-visible {
+      border-color: var(--p-300);
+      color: var(--p-700);
+    }
+
+    .btn-primary {
+      background: var(--p-700);
+      border-color: var(--p-700);
+      color: #fff;
+    }
+
+    .btn-primary:hover,
+    .btn-primary:focus-visible {
+      background: var(--p-800);
+      border-color: var(--p-800);
+      color: #fff;
+    }
+  </style>
+</BaseLayout>

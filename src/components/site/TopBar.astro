@@ -1,0 +1,90 @@
+---
+import { site } from "../../config/site";
+
+const { topBar } = site;
+---
+
+<div class="top-bar">
+  <div class="top-bar-inner">
+    <span class="top-bar-flag">
+      <span class="dot" aria-hidden="true"></span>
+      {topBar.flag}
+    </span>
+    <nav class="top-bar-links" aria-label="Editorial standards">
+      {
+        topBar.links.map((link) => (
+          <a href={link.href}>{link.label}</a>
+        ))
+      }
+    </nav>
+  </div>
+</div>
+
+<style>
+  .top-bar {
+    background: var(--p-900);
+    color: #fff;
+    font-size: 13px;
+    letter-spacing: 0.01em;
+  }
+
+  .top-bar-inner {
+    max-width: var(--max-w);
+    margin: 0 auto;
+    padding: 9px var(--gutter);
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+  }
+
+  .top-bar-flag {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    font-weight: 600;
+    color: #fff;
+  }
+
+  .dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--p-300);
+    box-shadow: 0 0 0 3px rgba(184, 155, 255, 0.18);
+    animation: pulse 2.4s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.45; }
+  }
+
+  .top-bar-links {
+    margin-left: auto;
+    display: flex;
+    gap: 1.25rem;
+    font-size: 12.5px;
+    font-weight: 500;
+  }
+
+  .top-bar-links a {
+    color: rgba(255, 255, 255, 0.7);
+    text-decoration: none;
+  }
+
+  .top-bar-links a:hover,
+  .top-bar-links a:focus-visible {
+    color: #fff;
+  }
+
+  @media (max-width: 720px) {
+    .top-bar-links {
+      display: none;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .dot { animation: none; }
+  }
+</style>
