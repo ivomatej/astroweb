@@ -1,0 +1,546 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import PageBreadcrumbs from "../components/page/PageBreadcrumbs.astro";
+import PageHero from "../components/page/PageHero.astro";
+import StatStrip from "../components/page/StatStrip.astro";
+
+const stats = [
+  { value: "50+", label: "ověřených zdrojů" },
+  { value: "4", label: "kategorie podle typu" },
+  { value: "2", label: "nezávislé zdroje na fakt" },
+  { value: "5 let", label: "max stáří zdroje" },
+];
+
+const criteria = [
+  {
+    title: "Nezávislost",
+    text: "Zdroj nesmí být placen nebo vlastněn značkou, o které píše. Národní spotřebitelské organizace, akademické instituce, neziskové testovací laboratoře.",
+    icon: "shield",
+  },
+  {
+    title: "Metodologie",
+    text: "Veřejně publikovaný postup testování. Jak měřili, jaké přístroje, kolik opakování. Bez metodiky = bez důvěry.",
+    icon: "lab",
+  },
+  {
+    title: "Historie",
+    text: "Konzistentní výstupy 5+ let. Nová značka s leskem může být marketingový experiment — preferujeme zavedené značky s reputací.",
+    icon: "clock",
+  },
+  {
+    title: "Ověřitelnost",
+    text: "Citujeme primární zdroje, nikdy ne zprostředkované. Když zdroj cituje jiný zdroj, jdeme k původnímu — řetězec citací zvyšuje šanci na zkreslení.",
+    icon: "check",
+  },
+];
+
+const groups = [
+  {
+    title: "Nezávislé testovací organizace",
+    eyebrow: "Tier 1 · Primární",
+    accent: "purple",
+    items: [
+      { name: "Stiftung Warentest", region: "Německo", note: "Nejcitovanější. Předplatné má redakce." },
+      { name: "ADAC", region: "Německo", note: "Auto, motocykly, autobaterie, GPS." },
+      { name: "dTest", region: "ČR", note: "Český spotřebitelský magazín." },
+      { name: "Öko-Test", region: "Německo", note: "Ekologické a zdravotní aspekty." },
+      { name: "Which?", region: "Velká Británie", note: "Britská spotřebitelská asociace." },
+      { name: "Komputer Świat", region: "Polsko", note: "IT, foto, elektronika." },
+      { name: "Consumer Reports", region: "USA", note: "Velký test trh USA." },
+      { name: "Guter Rat", region: "Německo", note: "Generický spotřebitelský magazín." },
+    ],
+  },
+  {
+    title: "Odborné weby a tech magazíny",
+    eyebrow: "Tier 2 · Sekundární",
+    accent: "amber",
+    items: [
+      { name: "Wirecutter (NY Times)", region: "USA", note: "Hloubková testovací redakce." },
+      { name: "RTINGS.com", region: "Kanada", note: "Specializovaný na displeje, sluchátka." },
+      { name: "DPReview", region: "USA", note: "Fotoaparáty a foto vybavení." },
+      { name: "Tom's Guide", region: "USA", note: "Konzumní elektronika." },
+      { name: "CNET", region: "USA", note: "Smartphone, laptopy, smart home." },
+      { name: "Computer Hoy", region: "Španělsko", note: "EU trh, smartphone testy." },
+    ],
+  },
+  {
+    title: "Srovnávače a velké e-shopy",
+    eyebrow: "Tier 3 · Ceny a dostupnost",
+    accent: "blue",
+    items: [
+      { name: "Heureka.cz", region: "ČR", note: "Hlavní zdroj cen a uživatelských hodnocení." },
+      { name: "Alza.cz", region: "ČR/SK", note: "Široký sortiment, ceny, dostupnost." },
+      { name: "Mountfield", region: "ČR", note: "Zahrada, elektronářadí." },
+      { name: "Hornbach", region: "EU", note: "Stavební a kutilské zboží." },
+      { name: "Datart", region: "ČR/SK", note: "Spotřebiče, elektronika." },
+    ],
+  },
+  {
+    title: "Odborné instituce a organizace",
+    eyebrow: "Tier 1 · Oficiální",
+    accent: "green",
+    items: [
+      { name: "Česká národní banka", region: "ČR", note: "Finanční sektor, kurzy, statistiky." },
+      { name: "SÚKL", region: "ČR", note: "Léčiva, zdravotnické prostředky." },
+      { name: "Státní zdravotní ústav", region: "ČR", note: "Hygiena, bezpečnost potravin." },
+      { name: "Spotřebitel.eu", region: "EU", note: "EU spotřebitelská práva a normy." },
+      { name: "WHO", region: "Globální", note: "Zdravotní doporučení." },
+      { name: "Evropská komise", region: "EU", note: "Ekodesign, energetické štítky, GDPR." },
+    ],
+  },
+];
+
+const avoid = [
+  {
+    title: "Bulvární a clickbait weby",
+    text: "„Top 10 nejlepších“ bez metodiky, „Tato bruska zničila Bosch!“ — emocionální titulky bez faktů.",
+  },
+  {
+    title: "Anonymní diskuzní fóra",
+    text: "Heureka recenze a Facebook skupiny jako sekundární signál ano (s opatrností). Jako primární zdroj nikdy.",
+  },
+  {
+    title: "Sponzorovaný obsah vydávaný za nezávislý",
+    text: "Pozor na weby, kde každý článek končí stejnou doporučenou značkou. Hledejte v patičce „Tento článek vznikl ve spolupráci s…“.",
+  },
+  {
+    title: "Bloggeři s nejasnou motivací",
+    text: "YouTuber, který testuje 5 modelů a 4 z nich jsou jedné značky? Pravděpodobně sponzoring. Vyžadujeme transparentní disclosure.",
+  },
+  {
+    title: "Zastaralé zdroje (5+ let)",
+    text: "U technologií se trh za 5 let kompletně promění. Test pračky z roku 2019 dnes téměř neplatí.",
+  },
+];
+
+const lastUpdated = "2026-04-15";
+---
+
+<BaseLayout
+  title="Důvěryhodné zdroje — Recenzer"
+  description="50+ ověřených zdrojů, ze kterých čerpáme. 4 kritéria pro vyhodnocení, 4 kategorie zdrojů a seznam těch, kterým se vyhýbáme."
+>
+  <PageBreadcrumbs items={[{ href: "/", label: "Recenzer" }, { label: "Důvěryhodné zdroje" }]} />
+
+  <PageHero
+    eyebrow="Editorial standards · zdroje"
+    eyebrowIcon="check"
+    title="Důvěryhodné<br/><em>zdroje</em>"
+    subtitle="Více než <strong>50 ověřených zdrojů</strong>, ze kterých čerpáme fakta do našich článků. Roztříděno do 4 kategorií podle typu — a 5 typů, kterým se naopak vyhýbáme."
+  />
+
+  <StatStrip label="Klíčová čísla" stats={stats} />
+
+  <!-- Criteria -->
+  <section class="src-criteria">
+    <div class="inner">
+      <header class="section-head">
+        <p class="eyebrow">Kritéria</p>
+        <h2>Jak rozlišujeme dobrý zdroj od špatného</h2>
+        <p class="lead">
+          Než zdroj zařadíme do paletu, musí projít čtyřmi testy. Žádný osamocený zdroj nestačí — výsledky vždy křížově ověřujeme.
+        </p>
+      </header>
+      <ul class="criteria-grid">
+        {
+          criteria.map((c) => (
+            <li class="criteria-card">
+              <div class="criteria-ic" aria-hidden="true">
+                {c.icon === "shield" && (<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>)}
+                {c.icon === "lab" && (<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 2v7.31"/><path d="M14 9.3V2"/><path d="M8.5 2h7"/><path d="M14 9.3a6.5 6.5 0 1 1-4 0"/></svg>)}
+                {c.icon === "clock" && (<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>)}
+                {c.icon === "check" && (<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>)}
+              </div>
+              <h3>{c.title}</h3>
+              <p>{c.text}</p>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <!-- Source groups -->
+  {
+    groups.map((group) => (
+      <section class:list={["src-group", `accent-${group.accent}`]}>
+        <div class="inner">
+          <header class="section-head">
+            <p class="eyebrow">{group.eyebrow}</p>
+            <h2>{group.title}</h2>
+          </header>
+          <ul class="src-list">
+            {group.items.map((s) => (
+              <li>
+                <div class="src-head">
+                  <strong>{s.name}</strong>
+                  <span class="src-region">{s.region}</span>
+                </div>
+                <p>{s.note}</p>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </section>
+    ))
+  }
+
+  <!-- Avoid -->
+  <section class="src-avoid">
+    <div class="inner">
+      <header class="section-head">
+        <p class="eyebrow">Negativní seznam</p>
+        <h2>Kterým zdrojům se vyhýbáme</h2>
+        <p class="lead">
+          Když na tyto narazíme jako na jediný dostupný zdroj, prostě o tématu zatím nepíšeme. Lepší žádný článek než nepodložený.
+        </p>
+      </header>
+      <ul class="avoid-list">
+        {
+          avoid.map((a) => (
+            <li>
+              <div class="avoid-ic" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <circle cx="12" cy="12" r="10" />
+                  <line x1="4.93" y1="4.93" x2="19.07" y2="19.07" />
+                </svg>
+              </div>
+              <div>
+                <h3>{a.title}</h3>
+                <p>{a.text}</p>
+              </div>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <!-- Footer CTA -->
+  <section class="src-end">
+    <div class="inner">
+      <div class="src-end-card">
+        <h2>Máte tip na zdroj, který bychom měli zařadit?</h2>
+        <p>
+          Sledujeme i menší specializované magazíny — pokud znáte testovací redakci, která má veřejnou metodiku a 5+ let historie, napište nám.
+        </p>
+        <div class="end-actions">
+          <a href="mailto:redakce@recenzer.cz" class="btn-primary">
+            redakce@recenzer.cz
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+              <line x1="5" y1="12" x2="19" y2="12" />
+              <polyline points="12 5 19 12 12 19" />
+            </svg>
+          </a>
+          <a href="/overovani-faktu/" class="btn-ghost">Ověřování faktů</a>
+          <a href="/metodika/" class="btn-ghost">Metodika</a>
+        </div>
+      </div>
+      <p class="src-meta">
+        Platnost od <strong>2016</strong>, poslední revize <time datetime={lastUpdated}>{lastUpdated}</time>.
+      </p>
+    </div>
+  </section>
+
+  <style>
+    .inner {
+      max-width: var(--max-w);
+      margin: 0 auto;
+      padding: clamp(2.5rem, 5vw, 4rem) var(--gutter);
+    }
+
+    .section-head {
+      max-width: 65ch;
+      margin: 0 0 2rem;
+    }
+
+    .eyebrow {
+      font-family: var(--mono);
+      font-size: 11.5px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--p-700);
+      font-weight: 700;
+      margin: 0 0 0.5rem;
+    }
+
+    .section-head h2 {
+      font-size: clamp(1.5rem, 3vw, 2.1rem);
+      font-weight: 800;
+      letter-spacing: -0.025em;
+      color: var(--ink);
+      line-height: 1.2;
+      margin-bottom: 0.6rem;
+    }
+
+    .section-head .lead {
+      font-size: 15px;
+      line-height: 1.6;
+      color: var(--muted);
+      margin: 0;
+    }
+
+    /* Criteria */
+    .src-criteria {
+      background: var(--bg);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .criteria-grid {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 0.85rem;
+    }
+
+    @media (max-width: 980px) { .criteria-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 560px) { .criteria-grid { grid-template-columns: 1fr; } }
+
+    .criteria-card {
+      padding: 1.5rem;
+      background: var(--bg-warm);
+      border: 1px solid var(--line);
+      border-radius: var(--r-lg);
+    }
+
+    .criteria-ic {
+      width: 40px;
+      height: 40px;
+      border-radius: 11px;
+      background: var(--p-50);
+      color: var(--p-700);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 0.85rem;
+    }
+
+    .criteria-ic svg { width: 20px; height: 20px; }
+
+    .criteria-card h3 {
+      font-size: 1rem;
+      font-weight: 800;
+      color: var(--ink);
+      letter-spacing: -0.015em;
+      margin-bottom: 0.35rem;
+    }
+
+    .criteria-card p {
+      font-size: 13px;
+      line-height: 1.6;
+      color: var(--muted);
+      margin: 0;
+    }
+
+    /* Source groups */
+    .src-group {
+      border-bottom: 1px solid var(--line);
+    }
+
+    .src-group.accent-purple { background: var(--bg); }
+    .src-group.accent-amber { background: var(--bg-warm); }
+    .src-group.accent-blue { background: var(--bg); }
+    .src-group.accent-green { background: var(--bg-warm); }
+
+    .src-group.accent-purple .eyebrow { color: var(--p-700); }
+    .src-group.accent-amber .eyebrow { color: var(--amber); }
+    .src-group.accent-blue .eyebrow { color: #1d4ed8; }
+    .src-group.accent-green .eyebrow { color: var(--green); }
+
+    .src-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 0.6rem;
+    }
+
+    @media (max-width: 720px) { .src-list { grid-template-columns: 1fr; } }
+
+    .src-list li {
+      padding: 1.1rem 1.25rem;
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: var(--r);
+    }
+
+    .src-group.accent-purple .src-list li { border-left: 3px solid var(--p-500); }
+    .src-group.accent-amber .src-list li { border-left: 3px solid var(--amber); }
+    .src-group.accent-blue .src-list li { border-left: 3px solid #1d4ed8; }
+    .src-group.accent-green .src-list li { border-left: 3px solid var(--green); }
+
+    .src-head {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 0.85rem;
+      flex-wrap: wrap;
+      margin-bottom: 0.35rem;
+    }
+
+    .src-head strong {
+      font-size: 14.5px;
+      color: var(--ink);
+    }
+
+    .src-region {
+      font-family: var(--mono);
+      font-size: 10.5px;
+      color: var(--muted);
+      background: var(--bg-warm);
+      padding: 2px 7px;
+      border-radius: 4px;
+      letter-spacing: 0.04em;
+      white-space: nowrap;
+      border: 1px solid var(--line);
+    }
+
+    .src-list p {
+      font-size: 13px;
+      line-height: 1.55;
+      color: var(--muted);
+      margin: 0;
+    }
+
+    /* Avoid */
+    .src-avoid {
+      background: var(--red-bg);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .src-avoid .eyebrow { color: var(--red); }
+
+    .avoid-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 0.6rem;
+    }
+
+    .avoid-list li {
+      display: grid;
+      grid-template-columns: 36px 1fr;
+      gap: 1rem;
+      padding: 1.25rem 1.5rem;
+      background: #fff;
+      border: 1px solid rgba(185, 28, 28, 0.15);
+      border-radius: var(--r);
+    }
+
+    .avoid-ic {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: var(--red-bg);
+      color: var(--red);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .avoid-ic svg { width: 18px; height: 18px; }
+
+    .avoid-list h3 {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--ink);
+      margin-bottom: 0.3rem;
+    }
+
+    .avoid-list p {
+      font-size: 14px;
+      line-height: 1.6;
+      color: var(--muted);
+      margin: 0;
+    }
+
+    /* End */
+    .src-end { background: var(--bg); }
+
+    .src-end-card {
+      max-width: 760px;
+      margin: 0 auto;
+      padding: 2.25rem 2rem;
+      background: var(--p-50);
+      border: 1px solid rgba(99, 50, 204, 0.18);
+      border-radius: var(--r-xl);
+      text-align: center;
+    }
+
+    .src-end-card h2 {
+      font-size: clamp(1.4rem, 2.5vw, 1.85rem);
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      color: var(--ink);
+      margin-bottom: 0.6rem;
+    }
+
+    .src-end-card p {
+      font-size: 15px;
+      line-height: 1.6;
+      color: var(--ink-soft);
+      max-width: 56ch;
+      margin: 0 auto 1.5rem;
+    }
+
+    .end-actions {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .src-meta {
+      margin-top: 1.5rem;
+      font-size: 12.5px;
+      color: var(--muted);
+      text-align: center;
+    }
+
+    .src-meta strong { color: var(--ink); font-weight: 700; }
+
+    .btn-primary,
+    .btn-ghost {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      padding: 0.75rem 1.25rem;
+      border-radius: var(--r);
+      font-size: 14px;
+      font-weight: 600;
+      text-decoration: none;
+    }
+
+    .btn-primary {
+      background: var(--p-700);
+      color: #fff;
+      border: 1px solid var(--p-700);
+    }
+
+    .btn-primary:hover,
+    .btn-primary:focus-visible {
+      background: var(--p-800);
+      border-color: var(--p-800);
+      color: #fff;
+    }
+
+    .btn-primary svg { width: 14px; height: 14px; }
+
+    .btn-ghost {
+      background: #fff;
+      color: var(--ink);
+      border: 1px solid var(--line);
+    }
+
+    .btn-ghost:hover,
+    .btn-ghost:focus-visible {
+      border-color: var(--p-400);
+      color: var(--p-700);
+    }
+  </style>
+</BaseLayout>

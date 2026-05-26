@@ -1,0 +1,1116 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import PageBreadcrumbs from "../components/page/PageBreadcrumbs.astro";
+
+const stats = [
+  { value: "5 600+", label: "aktivních odběratelů" },
+  { value: "1× měsíčně", label: "frekvence vydání" },
+  { value: "0 spamu", label: "garantujeme" },
+  { value: "1 klik", label: "odhlášení" },
+];
+
+const contentTypes = [
+  {
+    icon: "star",
+    title: "Recenze měsíce",
+    text: "Hloubková recenze jednoho hlavního produktu — typicky pračka, sušička, aku nářadí nebo zimní pneumatiky. Vždy s vlastním měřením v laboratoři.",
+  },
+  {
+    icon: "tag",
+    title: "TOP slevy a akce",
+    text: "Reálné slevy na produkty, které doporučujeme. Bez kliky, bez urgency. Když není dobrá sleva, do mailu nepatří — měsíc bez nich není problém.",
+  },
+  {
+    icon: "guide",
+    title: "Praktické návody",
+    text: "Jak vybrat, jak používat, jak opravit. Krátký formát 5–7 minut čtení, vždy s odkazem na detailní průvodce na webu.",
+  },
+  {
+    icon: "tip",
+    title: "Insider tipy",
+    text: "Co jsme zjistili v laboratoři, ale do plné recenze se to nevejde. Drobné poznámky o značkách, ekosystémech a tendencích trhu.",
+  },
+];
+
+const issuePreview = {
+  number: 47,
+  month: "Květen 2026",
+  feature: {
+    title: "Pračky 2026: nejlepší modely do 20 000 Kč",
+    excerpt: "Čtyři měsíce v laboratoři, 31 testovaných modelů. Vybrali jsme 5 modelů s nejlepším poměrem cena / životnost / účinnost. Tip 1 je překvapení.",
+  },
+  items: [
+    { type: "Recenze", title: "Sušičky 2026: tepelné čerpadlo vs. kondenzační" },
+    { type: "TOP slevy", title: "Bosch Serie 8 (-18 %), Stihl FS 56 (-22 %), Garmin Fenix 8 (-15 %)" },
+    { type: "Návod", title: "Jak rozpoznat falešnou recenzi na Heurece — 5 znaků" },
+    { type: "Insider", title: "Co nás překvapilo u nového Makita XGT akumulátorového systému" },
+  ],
+};
+
+const promises = [
+  {
+    icon: "calendar",
+    title: "1× za měsíc",
+    text: "Vychází vždy první středu v měsíci. Pokud měsíc bude bez kvalitního obsahu, raději mail nepošleme než ho naplnit balastem.",
+  },
+  {
+    icon: "no-spam",
+    title: "Žádný spam, žádné automaty",
+    text: "Píše vždy člověk z redakce. Žádné „chytré\" automatické sekvence. Pokud nereagujete, neposíláme „připomínky\".",
+  },
+  {
+    icon: "lock",
+    title: "Žádné prodávání e-mailů",
+    text: "Vaše adresa zůstává jen u nás. Žádné předávání partnerům ani affiliate sítím. Detail v Zásadách ochrany osobních údajů.",
+  },
+  {
+    icon: "exit",
+    title: "Odhlášení jedním klikem",
+    text: "V každém mailu je odhlašovací odkaz. Klik a jste pryč okamžitě — bez „proč odcházíte\" formuláře.",
+  },
+];
+
+const faqs = [
+  {
+    q: "Jak často newsletter chodí?",
+    a: "Jednou měsíčně, vždy první středu v měsíci. Občas vynecháváme — pokud nemáme dost dobrý obsah, nesnažíme se ho \"vymáčknout\" do mailu.",
+  },
+  {
+    q: "Mohu si vybrat jen některé kategorie?",
+    a: "Aktuálně ne. Newsletter je jeden — kombinujeme nejlepší z celé redakce. Specifické kategorie budeme rozdělovat v 2027.",
+  },
+  {
+    q: "Co když chci jen slevy?",
+    a: "Slevy jsou jen jedna sekce v každém mailu. Pokud čekáte denní deal-alert, Recenzer newsletter to není.",
+  },
+  {
+    q: "Můžu se kdykoli odhlásit?",
+    a: "Ano, jedním klikem v každém mailu. Žádné formuláře, žádné e-maily \"jste si jistí\".",
+  },
+  {
+    q: "Jste GDPR-compliant?",
+    a: "Ano. Double opt-in při registraci, žádné předávání třetím stranám, kdykoli můžete požádat o export nebo výmaz dat (viz Zásady osobních údajů).",
+  },
+];
+---
+
+<BaseLayout
+  title="Newsletter — nejlepší recenze v jednom mailu | Recenzer"
+  description="Nezávislé recenze, praktické návody a TOP slevy 1× měsíčně přímo do vaší schránky. 5 600+ odběratelů. Žádný spam, odhlášení jedním klikem."
+>
+  <PageBreadcrumbs items={[{ href: "/", label: "Recenzer" }, { label: "Newsletter" }]} />
+
+  <!-- Hero with signup -->
+  <section class="nl-hero">
+    <div class="inner">
+      <div class="hero-grid">
+        <div class="hero-text">
+          <p class="hero-eyebrow">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+              <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
+              <polyline points="22,6 12,13 2,6" />
+            </svg>
+            Newsletter Recenzer · 5 600+ odběratelů
+          </p>
+          <h1 class="hero-title">
+            Nejlepší recenze<br/>v&nbsp;<em>jednom mailu</em>.
+          </h1>
+          <p class="hero-sub">
+            Jedno vydání měsíčně. Hloubková recenze, TOP slevy, praktický návod a insider tip z redakce. <strong>Nic víc, nic míň</strong>.
+          </p>
+
+          <form class="hero-form" method="post" action="/api/newsletter/subscribe" novalidate>
+            <label class="visually-hidden" for="hero-email">E-mail</label>
+            <input
+              id="hero-email"
+              type="email"
+              name="email"
+              required
+              autocomplete="email"
+              placeholder="vase@email.cz"
+            />
+            <button type="submit" class="btn-primary">
+              Přihlásit se k odběru
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+                <line x1="5" y1="12" x2="19" y2="12" />
+                <polyline points="12 5 19 12 12 19" />
+              </svg>
+            </button>
+            <label class="hero-consent">
+              <input type="checkbox" required />
+              <span>Souhlasím se <a href="/zasady-osobnich-udaju/">zpracováním osobních údajů</a> a posláním <strong>potvrzovacího e-mailu</strong>.</span>
+            </label>
+          </form>
+        </div>
+
+        <aside class="hero-preview">
+          <div class="preview-card">
+            <div class="preview-head">
+              <span class="preview-from">Recenzer.cz Newsletter</span>
+              <span class="preview-date">15. 5. 2026</span>
+            </div>
+            <p class="preview-subject">Pračky 2026: nejlepší modely do 20 000 Kč</p>
+            <p class="preview-line">Šest měsíců testů, 31 modelů, jasné doporučení. Plus: TOP 3 slevy týdne a praktický návod…</p>
+            <div class="preview-actions">
+              <span class="preview-btn">Přečíst</span>
+              <span class="preview-mute">Odhlásit jedním klikem</span>
+            </div>
+          </div>
+          <p class="hero-tag">Ukázka subjektu a perexu</p>
+        </aside>
+      </div>
+
+      <ul class="hero-stats">
+        {
+          stats.map((s) => (
+            <li>
+              <strong>{s.value}</strong>
+              <span>{s.label}</span>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <!-- Content types -->
+  <section class="nl-content">
+    <div class="inner">
+      <header class="section-head">
+        <p class="eyebrow">Co v mailu najdete</p>
+        <h2>4 typy obsahu v každém vydání</h2>
+        <p class="lead">
+          Pevná struktura, kterou držíme každý měsíc. Vždy mix testů, slevu, návod a něco z laboratoře, co se do plné recenze nevešlo.
+        </p>
+      </header>
+      <ul class="content-grid">
+        {
+          contentTypes.map((c) => (
+            <li>
+              <div class="content-ic" aria-hidden="true">
+                {c.icon === "star" && (<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>)}
+                {c.icon === "tag" && (<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>)}
+                {c.icon === "guide" && (<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>)}
+                {c.icon === "tip" && (<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18h6"/><path d="M10 22h4"/><path d="M15.09 14c.18-.98.65-1.74 1.41-2.5A4.65 4.65 0 0 0 18 8 6 6 0 0 0 6 8c0 1 .23 2.23 1.5 3.5A4.61 4.61 0 0 1 8.91 14"/></svg>)}
+              </div>
+              <h3>{c.title}</h3>
+              <p>{c.text}</p>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <!-- Issue preview -->
+  <section class="nl-issue">
+    <div class="inner">
+      <header class="section-head">
+        <p class="eyebrow">Ukázka vydání</p>
+        <h2>Jak vypadá konkrétní vydání</h2>
+        <p class="lead">
+          Plný obsah vydání #{issuePreview.number} — abyste věděli, co skutečně do schránky dostanete.
+        </p>
+      </header>
+
+      <article class="issue-card">
+        <header class="issue-head">
+          <p class="issue-num">Vydání #{issuePreview.number}</p>
+          <p class="issue-month">{issuePreview.month}</p>
+        </header>
+
+        <div class="issue-feature">
+          <p class="feature-eyebrow">Hlavní recenze</p>
+          <h3>{issuePreview.feature.title}</h3>
+          <p>{issuePreview.feature.excerpt}</p>
+        </div>
+
+        <ul class="issue-items">
+          {
+            issuePreview.items.map((item) => (
+              <li>
+                <span class="item-type">{item.type}</span>
+                <span class="item-title">{item.title}</span>
+              </li>
+            ))
+          }
+        </ul>
+
+        <footer class="issue-foot">
+          <span>Délka: 5–7 minut čtení</span>
+          <span>Žádné autoplay videa, žádný JS, mobile-friendly</span>
+        </footer>
+      </article>
+    </div>
+  </section>
+
+  <!-- Promises -->
+  <section class="nl-promises">
+    <div class="inner">
+      <header class="section-head">
+        <p class="eyebrow">Co garantujeme</p>
+        <h2>Žádný spam. Žádné agresivní e-maily.</h2>
+        <p class="lead">
+          Newsletter je luxus — vy ho nečtete, my vás ztrácíme. Proto držíme čtyři pravidla.
+        </p>
+      </header>
+      <ul class="promises-grid">
+        {
+          promises.map((p) => (
+            <li>
+              <div class="promise-ic" aria-hidden="true">
+                {p.icon === "calendar" && (<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>)}
+                {p.icon === "no-spam" && (<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><line x1="2" y1="2" x2="22" y2="22"/></svg>)}
+                {p.icon === "lock" && (<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>)}
+                {p.icon === "exit" && (<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>)}
+              </div>
+              <h3>{p.title}</h3>
+              <p>{p.text}</p>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <!-- Privacy -->
+  <section class="nl-privacy">
+    <div class="inner">
+      <div class="privacy-card">
+        <div>
+          <p class="eyebrow">GDPR a soukromí</p>
+          <h2>Co s vaším e-mailem děláme (a neděláme)</h2>
+          <p>
+            Váš e-mail uchováváme jen v naší databázi přes SmartEmailing (poskytovatel hostovaný v ČR).
+            <strong>Nepředáváme ho nikomu</strong> — ani affiliate sítím, ani partnerům.
+            Při odhlášení e-mail z databáze trvale mažeme do 7 dnů.
+          </p>
+        </div>
+        <div class="privacy-links">
+          <a href="/zasady-osobnich-udaju/" class="btn-ghost">Zásady osobních údajů</a>
+          <a href="/zasady-cookies/" class="btn-ghost">Zásady cookies</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section class="nl-faq">
+    <div class="inner">
+      <header class="section-head">
+        <p class="eyebrow">FAQ</p>
+        <h2>Otázky o newsletteru</h2>
+      </header>
+      <ul class="faq-list">
+        {
+          faqs.map((f) => (
+            <li>
+              <details>
+                <summary>{f.q}</summary>
+                <div class="faq-body">{f.a}</div>
+              </details>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <!-- Final CTA -->
+  <section class="nl-final">
+    <div class="inner">
+      <div class="final-card">
+        <p class="final-eyebrow">5 600+ odběratelů</p>
+        <h2>Připojte se k těm, co rozhodují bez stresu</h2>
+        <p>
+          Jedno vydání měsíčně. Žádný spam, žádné prodávání e-mailů, odhlášení jedním klikem.
+        </p>
+        <form class="final-form" method="post" action="/api/newsletter/subscribe" novalidate>
+          <label class="visually-hidden" for="final-email">E-mail</label>
+          <input
+            id="final-email"
+            type="email"
+            name="email"
+            required
+            autocomplete="email"
+            placeholder="vase@email.cz"
+          />
+          <button type="submit" class="btn-primary">
+            Přihlásit se k odběru
+          </button>
+        </form>
+        <p class="final-fine">
+          <a href="/zasady-osobnich-udaju/">Zásady osobních údajů</a> ·
+          <a href="/zasady-cookies/">Zásady cookies</a> ·
+          <a href="/podminky-pouziti/">Podmínky použití</a>
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <style>
+    .inner {
+      max-width: var(--max-w);
+      margin: 0 auto;
+      padding: clamp(2rem, 4vw, 3rem) var(--gutter);
+    }
+
+    .section-head {
+      max-width: 65ch;
+      margin: 0 0 2rem;
+    }
+
+    .eyebrow {
+      font-family: var(--mono);
+      font-size: 11.5px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--p-700);
+      font-weight: 700;
+      margin: 0 0 0.5rem;
+    }
+
+    .section-head h2 {
+      font-size: clamp(1.5rem, 3vw, 2.1rem);
+      font-weight: 800;
+      letter-spacing: -0.025em;
+      color: var(--ink);
+      line-height: 1.2;
+      margin-bottom: 0.6rem;
+    }
+
+    .section-head .lead {
+      font-size: 15px;
+      line-height: 1.6;
+      color: var(--muted);
+      margin: 0;
+    }
+
+    .section-head .lead :global(strong) { color: var(--ink); font-weight: 700; }
+
+    .visually-hidden {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    /* Hero */
+    .nl-hero {
+      background:
+        radial-gradient(900px circle at 90% 0%, rgba(149, 114, 240, 0.18), transparent 55%),
+        radial-gradient(700px circle at 10% 110%, rgba(99, 50, 204, 0.12), transparent 55%),
+        var(--bg);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .nl-hero .inner {
+      padding: clamp(2.5rem, 5vw, 4rem) var(--gutter);
+    }
+
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 1.3fr 1fr;
+      gap: 3rem;
+      align-items: center;
+      margin-bottom: 2.5rem;
+    }
+
+    @media (max-width: 880px) {
+      .hero-grid { grid-template-columns: 1fr; gap: 2rem; }
+    }
+
+    .hero-eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      font-family: var(--mono);
+      font-size: 11.5px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--p-700);
+      font-weight: 700;
+      margin: 0 0 1.25rem;
+    }
+
+    .hero-eyebrow svg { width: 13px; height: 13px; }
+
+    .hero-title {
+      font-size: clamp(2rem, 5vw, 3.25rem);
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      color: var(--ink);
+      line-height: 1.1;
+      margin: 0 0 1rem;
+    }
+
+    .hero-title em {
+      font-style: italic;
+      color: var(--p-700);
+    }
+
+    .hero-sub {
+      font-size: clamp(1rem, 1.4vw, 1.15rem);
+      line-height: 1.55;
+      color: var(--ink-soft);
+      max-width: 50ch;
+      margin: 0 0 1.75rem;
+    }
+
+    .hero-sub strong { color: var(--ink); font-weight: 700; }
+
+    .hero-form {
+      max-width: 480px;
+      display: flex;
+      flex-direction: column;
+      gap: 0.6rem;
+    }
+
+    .hero-form input[type="email"] {
+      padding: 0.85rem 1rem;
+      font-size: 15px;
+      border: 1px solid var(--line);
+      border-radius: var(--r);
+      background: #fff;
+      color: var(--ink);
+    }
+
+    .hero-form input[type="email"]:focus-visible {
+      outline: none;
+      border-color: var(--p-500);
+      box-shadow: 0 0 0 3px rgba(122, 79, 227, 0.15);
+    }
+
+    .hero-form .btn-primary {
+      width: 100%;
+      justify-content: center;
+    }
+
+    .hero-consent {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.55rem;
+      font-size: 12.5px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .hero-consent input[type="checkbox"] {
+      margin-top: 3px;
+      accent-color: var(--p-700);
+    }
+
+    .hero-consent a {
+      color: var(--p-700);
+      text-decoration: underline;
+    }
+
+    .hero-consent strong { color: var(--ink); font-weight: 700; }
+
+    /* Preview card */
+    .hero-preview {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .preview-card {
+      padding: 1.5rem;
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: var(--r-lg);
+      box-shadow: 0 14px 36px -16px rgba(46, 20, 102, 0.22);
+    }
+
+    .preview-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 1rem;
+      padding-bottom: 0.85rem;
+      margin-bottom: 0.85rem;
+      border-bottom: 1px dashed var(--line);
+    }
+
+    .preview-from {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--p-700);
+    }
+
+    .preview-date {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--muted);
+    }
+
+    .preview-subject {
+      font-size: 1rem;
+      font-weight: 800;
+      color: var(--ink);
+      letter-spacing: -0.015em;
+      margin: 0 0 0.5rem;
+      line-height: 1.3;
+    }
+
+    .preview-line {
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.5;
+      margin: 0 0 1rem;
+    }
+
+    .preview-actions {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .preview-btn {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--p-700);
+      padding: 5px 12px;
+      background: var(--p-50);
+      border-radius: 999px;
+    }
+
+    .preview-mute {
+      font-size: 11px;
+      color: var(--muted-2);
+    }
+
+    .hero-tag {
+      text-align: center;
+      font-family: var(--mono);
+      font-size: 10.5px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--muted);
+      margin: 0;
+    }
+
+    /* Hero stats */
+    .hero-stats {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1rem;
+    }
+
+    @media (max-width: 720px) {
+      .hero-stats { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    .hero-stats li {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      padding-top: 0.75rem;
+      border-top: 2px solid var(--p-200);
+    }
+
+    .hero-stats strong {
+      font-size: clamp(1.5rem, 2.6vw, 2rem);
+      font-weight: 800;
+      color: var(--ink);
+      letter-spacing: -0.02em;
+      line-height: 1;
+    }
+
+    .hero-stats span {
+      font-size: 12.5px;
+      color: var(--muted);
+    }
+
+    /* Content types */
+    .nl-content {
+      background: var(--bg);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .content-grid {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 0.85rem;
+    }
+
+    @media (max-width: 980px) { .content-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 480px) { .content-grid { grid-template-columns: 1fr; } }
+
+    .content-grid li {
+      padding: 1.5rem;
+      background: var(--bg-warm);
+      border: 1px solid var(--line);
+      border-radius: var(--r-lg);
+    }
+
+    .content-ic {
+      width: 40px;
+      height: 40px;
+      border-radius: 11px;
+      background: var(--p-50);
+      color: var(--p-700);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 0.85rem;
+    }
+
+    .content-ic svg { width: 20px; height: 20px; }
+
+    .content-grid h3 {
+      font-size: 1rem;
+      font-weight: 800;
+      color: var(--ink);
+      letter-spacing: -0.015em;
+      margin-bottom: 0.4rem;
+    }
+
+    .content-grid p {
+      font-size: 13.5px;
+      line-height: 1.6;
+      color: var(--muted);
+      margin: 0;
+    }
+
+    /* Issue preview */
+    .nl-issue {
+      background: var(--bg-warm);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .issue-card {
+      max-width: 760px;
+      margin: 0 auto;
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: var(--r-xl);
+      padding: 2rem;
+    }
+
+    .issue-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 1rem;
+      padding-bottom: 1rem;
+      margin-bottom: 1.5rem;
+      border-bottom: 1px dashed var(--line);
+    }
+
+    .issue-num {
+      font-family: var(--mono);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--p-700);
+      font-weight: 700;
+      margin: 0;
+    }
+
+    .issue-month {
+      font-family: var(--mono);
+      font-size: 12px;
+      color: var(--muted);
+      margin: 0;
+    }
+
+    .issue-feature {
+      padding: 1.5rem;
+      background: var(--p-50);
+      border-radius: var(--r-lg);
+      margin-bottom: 1.5rem;
+    }
+
+    .feature-eyebrow {
+      font-family: var(--mono);
+      font-size: 10.5px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--p-700);
+      font-weight: 700;
+      margin: 0 0 0.5rem;
+    }
+
+    .issue-feature h3 {
+      font-size: 1.25rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      color: var(--ink);
+      margin: 0 0 0.5rem;
+      line-height: 1.3;
+    }
+
+    .issue-feature p {
+      font-size: 14.5px;
+      line-height: 1.6;
+      color: var(--ink-soft);
+      margin: 0;
+    }
+
+    .issue-items {
+      list-style: none;
+      padding: 0;
+      margin: 0 0 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+    }
+
+    .issue-items li {
+      display: grid;
+      grid-template-columns: 90px 1fr;
+      gap: 0.85rem;
+      padding: 0.75rem 1rem;
+      background: var(--bg-warm);
+      border-radius: var(--r-sm);
+      align-items: baseline;
+    }
+
+    @media (max-width: 560px) {
+      .issue-items li { grid-template-columns: 1fr; gap: 0.25rem; }
+    }
+
+    .item-type {
+      font-family: var(--mono);
+      font-size: 10.5px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--p-700);
+      font-weight: 700;
+    }
+
+    .item-title {
+      font-size: 14px;
+      color: var(--ink-soft);
+      line-height: 1.4;
+    }
+
+    .issue-foot {
+      display: flex;
+      justify-content: space-between;
+      gap: 1rem;
+      flex-wrap: wrap;
+      padding-top: 1rem;
+      border-top: 1px dashed var(--line);
+      font-size: 11.5px;
+      color: var(--muted-2);
+    }
+
+    /* Promises */
+    .nl-promises {
+      background: var(--bg);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .promises-grid {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 0.85rem;
+    }
+
+    @media (max-width: 720px) { .promises-grid { grid-template-columns: 1fr; } }
+
+    .promises-grid li {
+      display: grid;
+      grid-template-columns: 44px 1fr;
+      gap: 1rem;
+      padding: 1.5rem;
+      background: var(--bg-warm);
+      border: 1px solid var(--line);
+      border-radius: var(--r-lg);
+    }
+
+    .promise-ic {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      background: var(--green-bg);
+      color: var(--green);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .promise-ic svg { width: 22px; height: 22px; }
+
+    .promises-grid h3 {
+      font-size: 1rem;
+      font-weight: 800;
+      color: var(--ink);
+      letter-spacing: -0.015em;
+      margin-bottom: 0.35rem;
+    }
+
+    .promises-grid p {
+      font-size: 13.5px;
+      line-height: 1.6;
+      color: var(--muted);
+      margin: 0;
+    }
+
+    /* Privacy */
+    .nl-privacy {
+      background: var(--p-50);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .privacy-card {
+      display: grid;
+      grid-template-columns: 1.4fr 1fr;
+      gap: 2rem;
+      align-items: center;
+      max-width: 880px;
+      margin: 0 auto;
+    }
+
+    @media (max-width: 780px) { .privacy-card { grid-template-columns: 1fr; } }
+
+    .privacy-card h2 {
+      font-size: clamp(1.3rem, 2vw, 1.6rem);
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      color: var(--ink);
+      margin-bottom: 0.6rem;
+    }
+
+    .privacy-card p {
+      font-size: 14.5px;
+      line-height: 1.6;
+      color: var(--ink-soft);
+      margin: 0;
+    }
+
+    .privacy-card strong { color: var(--ink); font-weight: 700; }
+
+    .privacy-links {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    /* FAQ */
+    .nl-faq {
+      background: var(--bg);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .faq-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      max-width: 760px;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .faq-list details {
+      background: var(--bg-warm);
+      border: 1px solid var(--line);
+      border-radius: var(--r-lg);
+      padding: 1rem 1.25rem;
+    }
+
+    .faq-list summary {
+      cursor: pointer;
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--ink);
+      list-style: none;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .faq-list summary::-webkit-details-marker { display: none; }
+
+    .faq-list summary::after {
+      content: "+";
+      font-family: var(--mono);
+      font-weight: 700;
+      color: var(--p-700);
+      font-size: 1.2rem;
+    }
+
+    .faq-list details[open] summary::after { content: "−"; }
+
+    .faq-body {
+      padding-top: 0.85rem;
+      font-size: 14.5px;
+      line-height: 1.6;
+      color: var(--ink-soft);
+    }
+
+    /* Final CTA */
+    .nl-final {
+      background: var(--ink);
+      color: #fff;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .nl-final::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(800px circle at 100% 0%, rgba(149, 114, 240, 0.22), transparent 55%),
+        radial-gradient(600px circle at 0% 100%, rgba(99, 50, 204, 0.18), transparent 55%);
+      pointer-events: none;
+    }
+
+    .nl-final .inner {
+      position: relative;
+      padding: clamp(3rem, 6vw, 5rem) var(--gutter);
+    }
+
+    .final-card {
+      max-width: 600px;
+      margin: 0 auto;
+      text-align: center;
+    }
+
+    .final-eyebrow {
+      font-family: var(--mono);
+      font-size: 11.5px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--p-300);
+      font-weight: 700;
+      margin: 0 0 1rem;
+    }
+
+    .final-card h2 {
+      font-size: clamp(1.6rem, 3.5vw, 2.4rem);
+      font-weight: 800;
+      letter-spacing: -0.025em;
+      color: #fff;
+      line-height: 1.15;
+      margin-bottom: 1rem;
+    }
+
+    .final-card > p {
+      font-size: 16px;
+      line-height: 1.55;
+      color: rgba(255, 255, 255, 0.75);
+      margin: 0 auto 2rem;
+      max-width: 48ch;
+    }
+
+    .final-form {
+      display: flex;
+      gap: 0.5rem;
+      max-width: 460px;
+      margin: 0 auto 1.25rem;
+    }
+
+    @media (max-width: 540px) {
+      .final-form { flex-direction: column; }
+    }
+
+    .final-form input[type="email"] {
+      flex: 1;
+      padding: 0.85rem 1rem;
+      font-size: 15px;
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      border-radius: var(--r);
+      background: rgba(255, 255, 255, 0.08);
+      color: #fff;
+    }
+
+    .final-form input[type="email"]::placeholder {
+      color: rgba(255, 255, 255, 0.5);
+    }
+
+    .final-form input[type="email"]:focus-visible {
+      outline: none;
+      background: rgba(255, 255, 255, 0.14);
+      border-color: var(--p-300);
+    }
+
+    .final-form .btn-primary {
+      background: #fff;
+      color: var(--p-800);
+      border-color: #fff;
+    }
+
+    .final-form .btn-primary:hover,
+    .final-form .btn-primary:focus-visible {
+      background: var(--p-100);
+      border-color: var(--p-100);
+      color: var(--p-800);
+    }
+
+    .final-fine {
+      font-size: 12px;
+      color: rgba(255, 255, 255, 0.5);
+      margin: 0;
+    }
+
+    .final-fine a {
+      color: rgba(255, 255, 255, 0.75);
+      text-decoration: underline;
+    }
+
+    .final-fine a:hover { color: #fff; }
+
+    /* Buttons */
+    .btn-primary,
+    .btn-ghost {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      padding: 0.85rem 1.25rem;
+      border-radius: var(--r);
+      font-size: 14.5px;
+      font-weight: 600;
+      text-decoration: none;
+      cursor: pointer;
+      border: 1px solid transparent;
+      font-family: inherit;
+    }
+
+    .btn-primary {
+      background: var(--p-700);
+      color: #fff;
+      border-color: var(--p-700);
+    }
+
+    .btn-primary:hover,
+    .btn-primary:focus-visible {
+      background: var(--p-800);
+      border-color: var(--p-800);
+      color: #fff;
+    }
+
+    .btn-primary svg { width: 14px; height: 14px; }
+
+    .btn-ghost {
+      background: #fff;
+      color: var(--ink);
+      border-color: var(--line);
+    }
+
+    .btn-ghost:hover,
+    .btn-ghost:focus-visible {
+      border-color: var(--p-400);
+      color: var(--p-700);
+    }
+  </style>
+</BaseLayout>

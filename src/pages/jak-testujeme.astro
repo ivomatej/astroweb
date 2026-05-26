@@ -1,0 +1,562 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import PageBreadcrumbs from "../components/page/PageBreadcrumbs.astro";
+import PageHero from "../components/page/PageHero.astro";
+import StatStrip from "../components/page/StatStrip.astro";
+
+const stats = [
+  { value: "23", label: "testovacích protokolů" },
+  { value: "12", label: "parametrů na test" },
+  { value: "5×", label: "opakování měření" },
+  { value: "2× ročně", label: "revize protokolů" },
+];
+
+const principles = [
+  {
+    icon: "anonym",
+    title: "Anonymní nákup nebo transparentní zápůjčka",
+    text: "Modely kupujeme jako běžný spotřebitel — bez upozornění výrobce. Když výrobce model zapůjčí, vždy to v článku transparentně přiznáváme, hodnocení tím neovlivníme.",
+  },
+  {
+    icon: "scale",
+    title: "Pevné váhy hodnocení, ne dojmy",
+    text: "Každý protokol má fixní bodový systém s veřejně publikovanými váhami. Subjektivní dojem nikdy nepřeváží objektivně naměřené hodnoty.",
+  },
+  {
+    icon: "shield",
+    title: "Garant kategorie schvaluje data",
+    text: "Před publikací článek prochází kontrolou odborného garanta. Bez jeho podpisu článek neopouští redakci — i kdyby měl být zítra deadline.",
+  },
+  {
+    icon: "history",
+    title: "Verzování a auditovatelnost",
+    text: "Každý protokol má verzi (např. v3.2) a datum platnosti. Pokud změníme metodiku, staré články přeznačíme a vysvětlíme, co se změnilo.",
+  },
+];
+
+const protocols = [
+  // Elektronářadí
+  { slug: "pracky", category: "Domácí spotřebiče", title: "Pračky", version: "v3.2", since: "03/26", params: 14, articles: 18 },
+  { slug: "susicky", category: "Domácí spotřebiče", title: "Sušičky", version: "v2.1", since: "01/26", params: 12, articles: 9 },
+  { slug: "mycky", category: "Domácí spotřebiče", title: "Myčky", version: "v2.0", since: "11/25", params: 11, articles: 7 },
+  { slug: "lednicky", category: "Domácí spotřebiče", title: "Ledničky a mrazáky", version: "v2.4", since: "12/25", params: 13, articles: 14 },
+  { slug: "trouby", category: "Domácí spotřebiče", title: "Trouby", version: "v1.6", since: "09/25", params: 10, articles: 5 },
+  { slug: "kavovary", category: "Domácí spotřebiče", title: "Kávovary", version: "v1.3", since: "08/25", params: 9, articles: 4 },
+
+  { slug: "brusky", category: "Elektronářadí", title: "Aku brusky", version: "v3.2", since: "03/26", params: 12, articles: 8 },
+  { slug: "vrtacky", category: "Elektronářadí", title: "Aku vrtačky", version: "v3.0", since: "02/26", params: 11, articles: 11 },
+  { slug: "pily", category: "Elektronářadí", title: "Aku pily", version: "v2.4", since: "10/25", params: 10, articles: 6 },
+
+  { slug: "sekacky", category: "Zahrada", title: "Aku sekačky", version: "v2.7", since: "04/26", params: 13, articles: 7 },
+  { slug: "foukace", category: "Zahrada", title: "Foukače listí", version: "v1.5", since: "10/25", params: 9, articles: 3 },
+  { slug: "plotostrihy", category: "Zahrada", title: "Plotostříhače", version: "v1.3", since: "09/25", params: 8, articles: 2 },
+
+  { slug: "pneumatiky", category: "Auto", title: "Pneumatiky", version: "v4.1", since: "04/26", params: 15, articles: 6 },
+  { slug: "autobaterie", category: "Auto", title: "Autobaterie", version: "v2.0", since: "01/26", params: 10, articles: 4 },
+  { slug: "dashkamery", category: "Auto", title: "Dashkamery", version: "v1.4", since: "11/25", params: 11, articles: 3 },
+
+  { slug: "notebooky", category: "Elektronika", title: "Notebooky", version: "v3.5", since: "02/26", params: 14, articles: 22 },
+  { slug: "sluchatka", category: "Elektronika", title: "Sluchátka", version: "v2.8", since: "01/26", params: 12, articles: 14 },
+  { slug: "smartphone", category: "Elektronika", title: "Smartphone", version: "v3.1", since: "03/26", params: 15, articles: 16 },
+  { slug: "monitory", category: "Elektronika", title: "Monitory", version: "v2.2", since: "12/25", params: 13, articles: 9 },
+
+  { slug: "autosedacky", category: "Děti", title: "Autosedačky", version: "v2.5", since: "02/26", params: 12, articles: 8 },
+  { slug: "kocarky", category: "Děti", title: "Kočárky", version: "v1.8", since: "11/25", params: 11, articles: 5 },
+
+  { slug: "behecke-hodinky", category: "Sport", title: "Běžecké hodinky", version: "v2.0", since: "01/26", params: 13, articles: 7 },
+  { slug: "trenazery", category: "Sport", title: "Domácí trenažéry", version: "v1.6", since: "10/25", params: 10, articles: 4 },
+];
+
+const protocolStructure = [
+  { title: "Hodnotící kritéria s váhami", text: "Tabulka parametrů s vahami v procentech (např. Výkon 30 %, Bezpečnost 25 %, Výdrž 20 %…). Souhrn vždy 100 %." },
+  { title: "Vzorová karta testu", text: "Vzorová „karta testu jednoho modelu\" s vyplněnými hodnotami — abyste viděli, jak by váš model vypadal v naší databázi." },
+  { title: "Limity protokolu", text: "Co protokol konkrétně neměří. Čím přesněji víte, co protokol nezvládne, tím lépe pochopíte, kdy se na náš test můžete spolehnout a kdy ne." },
+];
+
+const accentByCategory: Record<string, string> = {
+  "Domácí spotřebiče": "amber",
+  Elektronářadí: "purple",
+  Zahrada: "green",
+  Auto: "red",
+  Elektronika: "blue",
+  Děti: "amber",
+  Sport: "green",
+};
+
+const grouped = protocols.reduce((acc: Record<string, typeof protocols>, p) => {
+  (acc[p.category] = acc[p.category] || []).push(p);
+  return acc;
+}, {});
+
+const lastUpdated = "2026-04-15";
+---
+
+<BaseLayout
+  title="Jak testujeme — Recenzer"
+  description="23 testovacích protokolů, 4 principy napříč kategoriemi. Detailní popis metodiky pro každou kategorii produktů."
+>
+  <PageBreadcrumbs items={[{ href: "/", label: "Recenzer" }, { label: "Jak testujeme" }]} />
+
+  <PageHero
+    eyebrow="Editorial standards · testovací protokoly"
+    eyebrowIcon="lab"
+    title="Jak<br/><em>testujeme</em>"
+    subtitle="<strong>23 testovacích protokolů</strong> pro každou kategorii produktů. Detailní popis, co měříme, jak a s jakou váhou. Pojďte se podívat do strojovny našich recenzí."
+  />
+
+  <StatStrip label="Klíčová čísla" stats={stats} />
+
+  <!-- Principles -->
+  <section class="jt-principles">
+    <div class="inner">
+      <header class="section-head">
+        <p class="eyebrow">Univerzální principy</p>
+        <h2>4 principy, které platí napříč všemi kategoriemi</h2>
+        <p class="lead">
+          Než půjdete do detailů protokolu pro konkrétní kategorii, vyplatí se znát čtyři principy, které platí <strong>vždy</strong> — ať testujeme pračku nebo zimní pneumatiku.
+        </p>
+      </header>
+      <ul class="principles-grid">
+        {
+          principles.map((p) => (
+            <li class="principle-card">
+              <div class="principle-ic" aria-hidden="true">
+                {p.icon === "anonym" && (<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>)}
+                {p.icon === "scale" && (<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6-7 6 7"/><path d="M12 2v20"/><path d="M2 9c0 2 2 4 4 4s4-2 4-4"/><path d="M14 9c0 2 2 4 4 4s4-2 4-4"/></svg>)}
+                {p.icon === "shield" && (<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>)}
+                {p.icon === "history" && (<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>)}
+              </div>
+              <h3>{p.title}</h3>
+              <p>{p.text}</p>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <!-- Protocols list -->
+  <section class="jt-protocols">
+    <div class="inner">
+      <header class="section-head">
+        <p class="eyebrow">Protokoly</p>
+        <h2>Všech 23 protokolů</h2>
+        <p class="lead">
+          Každý protokol je živý dokument s verzí a datem platnosti. Klikněte na konkrétní kategorii, abyste viděli vážení parametrů, vzorovou kartu testu a limity protokolu.
+        </p>
+      </header>
+
+      {
+        Object.entries(grouped).map(([category, items]) => (
+          <div class:list={["proto-group", `accent-${accentByCategory[category] ?? "purple"}`]}>
+            <h3 class="proto-group-title">{category}</h3>
+            <ul class="proto-grid">
+              {items.map((p) => (
+                <li>
+                  <a href={`/jak-testujeme/${p.slug}/`} class="proto-card">
+                    <div class="proto-head">
+                      <strong>{p.title}</strong>
+                      <span class="proto-ver">{p.version}</span>
+                    </div>
+                    <div class="proto-meta">
+                      <span><b>{p.params}</b> parametrů</span>
+                      <span class="dot">·</span>
+                      <span><b>{p.articles}</b> článků</span>
+                      <span class="dot">·</span>
+                      <span>od {p.since}</span>
+                    </div>
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))
+      }
+    </div>
+  </section>
+
+  <!-- Protocol structure -->
+  <section class="jt-structure">
+    <div class="inner">
+      <header class="section-head">
+        <p class="eyebrow">Anatomie protokolu</p>
+        <h2>Co najdete v každém z 23 protokolů</h2>
+        <p class="lead">
+          Všechny protokoly mají stejnou strukturu. Jakmile si přečtete jeden, ostatní budete navigovat hned.
+        </p>
+      </header>
+      <ol class="struct-list">
+        {
+          protocolStructure.map((s, i) => (
+            <li>
+              <span class="struct-num">{String(i + 1).padStart(2, "0")}</span>
+              <div>
+                <h3>{s.title}</h3>
+                <p>{s.text}</p>
+              </div>
+            </li>
+          ))
+        }
+      </ol>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="jt-end">
+    <div class="inner">
+      <div class="jt-end-card">
+        <h2>Chcete, abychom otestovali váš produkt?</h2>
+        <p>
+          Tipy na konkrétní modely vítáme. Stačí napsat — pokud zapadá do existujícího protokolu a model je dostupný v ČR, zařadíme ho do nejbližšího kola testů.
+        </p>
+        <div class="end-actions">
+          <a href="mailto:redakce@recenzer.cz" class="btn-primary">
+            Poslat tip na test
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+              <line x1="5" y1="12" x2="19" y2="12" />
+              <polyline points="12 5 19 12 12 19" />
+            </svg>
+          </a>
+          <a href="/testovaci-laborator/" class="btn-ghost">Naše laboratoř</a>
+          <a href="/metodika/" class="btn-ghost">Metodika</a>
+        </div>
+      </div>
+      <p class="jt-meta">
+        Souhrnný přehled protokolů, poslední aktualizace <time datetime={lastUpdated}>{lastUpdated}</time>.
+      </p>
+    </div>
+  </section>
+
+  <style>
+    .inner {
+      max-width: var(--max-w);
+      margin: 0 auto;
+      padding: clamp(2.5rem, 5vw, 4rem) var(--gutter);
+    }
+
+    .section-head {
+      max-width: 65ch;
+      margin: 0 0 2rem;
+    }
+
+    .eyebrow {
+      font-family: var(--mono);
+      font-size: 11.5px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--p-700);
+      font-weight: 700;
+      margin: 0 0 0.5rem;
+    }
+
+    .section-head h2 {
+      font-size: clamp(1.5rem, 3vw, 2.1rem);
+      font-weight: 800;
+      letter-spacing: -0.025em;
+      color: var(--ink);
+      line-height: 1.2;
+      margin-bottom: 0.6rem;
+    }
+
+    .section-head .lead {
+      font-size: 15px;
+      line-height: 1.6;
+      color: var(--muted);
+      margin: 0;
+    }
+
+    .section-head .lead :global(strong) {
+      color: var(--ink);
+      font-weight: 700;
+    }
+
+    /* Principles */
+    .jt-principles {
+      background: var(--bg);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .principles-grid {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1rem;
+    }
+
+    @media (max-width: 720px) { .principles-grid { grid-template-columns: 1fr; } }
+
+    .principle-card {
+      padding: 1.75rem;
+      background: var(--bg-warm);
+      border: 1px solid var(--line);
+      border-top: 3px solid var(--p-500);
+      border-radius: var(--r-lg);
+    }
+
+    .principle-ic {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      background: var(--p-50);
+      color: var(--p-700);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 0.85rem;
+    }
+
+    .principle-ic svg { width: 22px; height: 22px; }
+
+    .principle-card h3 {
+      font-size: 1.05rem;
+      font-weight: 800;
+      color: var(--ink);
+      letter-spacing: -0.015em;
+      margin-bottom: 0.4rem;
+    }
+
+    .principle-card p {
+      font-size: 14px;
+      line-height: 1.6;
+      color: var(--muted);
+      margin: 0;
+    }
+
+    /* Protocols */
+    .jt-protocols {
+      background: var(--bg-warm);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .proto-group {
+      margin-bottom: 1.5rem;
+    }
+
+    .proto-group:last-child { margin-bottom: 0; }
+
+    .proto-group-title {
+      font-family: var(--mono);
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--p-700);
+      font-weight: 700;
+      margin: 0 0 0.75rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px dashed var(--line);
+    }
+
+    .proto-group.accent-purple .proto-group-title { color: var(--p-700); }
+    .proto-group.accent-amber .proto-group-title { color: var(--amber); }
+    .proto-group.accent-green .proto-group-title { color: var(--green); }
+    .proto-group.accent-red .proto-group-title { color: var(--red); }
+    .proto-group.accent-blue .proto-group-title { color: #1d4ed8; }
+
+    .proto-grid {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.6rem;
+    }
+
+    @media (max-width: 880px) { .proto-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 560px) { .proto-grid { grid-template-columns: 1fr; } }
+
+    .proto-card {
+      display: block;
+      padding: 1rem 1.25rem;
+      background: #fff;
+      border: 1px solid var(--line);
+      border-left: 3px solid var(--p-500);
+      border-radius: var(--r);
+      color: var(--ink);
+      text-decoration: none;
+      transition: border-color 0.15s, transform 0.15s, box-shadow 0.15s;
+    }
+
+    .proto-group.accent-amber .proto-card { border-left-color: var(--amber); }
+    .proto-group.accent-green .proto-card { border-left-color: var(--green); }
+    .proto-group.accent-red .proto-card { border-left-color: var(--red); }
+    .proto-group.accent-blue .proto-card { border-left-color: #1d4ed8; }
+
+    .proto-card:hover,
+    .proto-card:focus-visible {
+      border-color: var(--p-400);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px -10px rgba(46, 20, 102, 0.18);
+    }
+
+    .proto-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 0.6rem;
+      margin-bottom: 0.4rem;
+    }
+
+    .proto-head strong {
+      font-size: 14.5px;
+      color: var(--ink);
+    }
+
+    .proto-ver {
+      font-family: var(--mono);
+      font-size: 10.5px;
+      color: var(--p-700);
+      background: var(--p-50);
+      padding: 2px 6px;
+      border-radius: 4px;
+      letter-spacing: 0.04em;
+    }
+
+    .proto-meta {
+      display: flex;
+      gap: 0.4rem;
+      flex-wrap: wrap;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .proto-meta b {
+      color: var(--ink);
+      font-weight: 700;
+    }
+
+    .proto-meta .dot {
+      color: var(--muted-2);
+    }
+
+    /* Structure */
+    .jt-structure {
+      background: var(--bg);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .struct-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .struct-list li {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 1.25rem;
+      padding: 1.5rem;
+      background: var(--bg-warm);
+      border: 1px solid var(--line);
+      border-radius: var(--r-lg);
+    }
+
+    .struct-num {
+      font-family: var(--mono);
+      font-size: 1.4rem;
+      font-weight: 800;
+      color: var(--p-700);
+      line-height: 1;
+    }
+
+    .struct-list h3 {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--ink);
+      margin-bottom: 0.3rem;
+    }
+
+    .struct-list p {
+      font-size: 14px;
+      line-height: 1.6;
+      color: var(--muted);
+      margin: 0;
+    }
+
+    /* End */
+    .jt-end { background: var(--bg); }
+
+    .jt-end-card {
+      max-width: 760px;
+      margin: 0 auto;
+      padding: 2.25rem 2rem;
+      background: var(--p-50);
+      border: 1px solid rgba(99, 50, 204, 0.18);
+      border-radius: var(--r-xl);
+      text-align: center;
+    }
+
+    .jt-end-card h2 {
+      font-size: clamp(1.4rem, 2.5vw, 1.85rem);
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      color: var(--ink);
+      margin-bottom: 0.6rem;
+    }
+
+    .jt-end-card p {
+      font-size: 15px;
+      line-height: 1.6;
+      color: var(--ink-soft);
+      max-width: 56ch;
+      margin: 0 auto 1.5rem;
+    }
+
+    .end-actions {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .jt-meta {
+      margin-top: 1.5rem;
+      font-size: 12.5px;
+      color: var(--muted);
+      text-align: center;
+    }
+
+    .btn-primary,
+    .btn-ghost {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      padding: 0.75rem 1.25rem;
+      border-radius: var(--r);
+      font-size: 14px;
+      font-weight: 600;
+      text-decoration: none;
+    }
+
+    .btn-primary {
+      background: var(--p-700);
+      color: #fff;
+      border: 1px solid var(--p-700);
+    }
+
+    .btn-primary:hover,
+    .btn-primary:focus-visible {
+      background: var(--p-800);
+      border-color: var(--p-800);
+      color: #fff;
+    }
+
+    .btn-primary svg { width: 14px; height: 14px; }
+
+    .btn-ghost {
+      background: #fff;
+      color: var(--ink);
+      border: 1px solid var(--line);
+    }
+
+    .btn-ghost:hover,
+    .btn-ghost:focus-visible {
+      border-color: var(--p-400);
+      color: var(--p-700);
+    }
+  </style>
+</BaseLayout>

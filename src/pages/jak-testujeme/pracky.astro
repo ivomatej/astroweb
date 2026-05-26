@@ -1,0 +1,1149 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import PageBreadcrumbs from "../../components/page/PageBreadcrumbs.astro";
+import PageHero from "../../components/page/PageHero.astro";
+import StatStrip from "../../components/page/StatStrip.astro";
+
+const stats = [
+  { value: "14", label: "měřených parametrů" },
+  { value: "4", label: "testovací programy" },
+  { value: "5×", label: "opakování praní" },
+  { value: "v3.2", label: "verze protokolu" },
+];
+
+const criteria = [
+  { name: "Účinnost praní", weight: 30, note: "Stupeň odstranění 5 standardizovaných skvrn (IEC 60456)." },
+  { name: "Spotřeba a ekonomika", weight: 20, note: "Voda + elektřina za 1 cyklus, přepočet na 220 cyklů ročně." },
+  { name: "Šetrnost k prádlu", weight: 15, note: "Měření drhnutí vláken, deformace, výpočet úbytku hmotnosti tkaniny." },
+  { name: "Hluk a vibrace", weight: 15, note: "Praní + ždímání podle ISO 3744, akustická komora." },
+  { name: "Rychlost a kapacita", weight: 10, note: "Doba programu, reálná kapacita vs. uváděná." },
+  { name: "Ovládání, software, stavba", weight: 10, note: "UX, mobilní aplikace, kvalita materiálů, životnost." },
+];
+
+const programs = [
+  {
+    title: "Eco 40-60",
+    sub: "Etalonový program podle EU normy",
+    note: "Hodnotíme zde spotřebu a účinnost. 80 % cyklů domácností u nás je právě tento program.",
+    accent: "green",
+  },
+  {
+    title: "Bavlna 60 °C",
+    sub: "Plná účinnost na nejnáročnější skvrny",
+    note: "Test 5 standardních skvrn + kapacita 7 kg. Hluk při ždímání. Doba programu.",
+    accent: "purple",
+  },
+  {
+    title: "Rychlé praní 30",
+    sub: "Krátký cyklus, rychlovka",
+    note: "Spotřeba vs. účinnost. Šetří čas, ale jak dobře pere? Kontrola odpadní vody.",
+    accent: "amber",
+  },
+  {
+    title: "Jemné / Vlna",
+    sub: "Šetrnost na delikátní materiály",
+    note: "Mikroskopická analýza vláken po 30 cyklech. Měření smrštění a barevné stálosti.",
+    accent: "blue",
+  },
+];
+
+const stains = [
+  { name: "Skupina A · Krev a bílek", desc: "Bílkovinné skvrny, kritické při 40+ °C — nesmí se zafixovat." },
+  { name: "Skupina B · Červené víno a borůvky", desc: "Polyfenoly, oxidují — testujeme prach po 24h schnutí." },
+  { name: "Skupina C · Olej a make-up", desc: "Tuky bez emulze. Závisí na pracím prostředku, ne jen na pračce." },
+  { name: "Skupina D · Sazí a uhlí", desc: "Pigment v mechanickém praní. Test pro vlnu a delikátní cykly." },
+  { name: "Skupina E · Tráva a zelenina", desc: "Chlorofyl + buněčná tkáň. Bavlna 60 °C standardní." },
+];
+
+const workflow = [
+  { num: "01", title: "Příjem a kontrola", text: "Pračka přijde z e-shopu jako běžná zásilka. Vyfotíme stav obalu, dokumentaci a sériová čísla. Ujistíme se, že jde o produkční vzorek, ne prototyp." },
+  { num: "02", title: "Instalace a kalibrační praní", text: "Pračku zapojíme do referenčního zdroje vody (15 °C, tvrdost 8 °dH) a 3× spustíme prázdný cyklus. Eliminujeme rezidua z výroby." },
+  { num: "03", title: "Test 4 programů (3 kg plnění)", text: "Eco 40-60, Bavlna 60, Rychlé 30, Jemné — vždy se standardizovanou 3kg zátěží. Měříme čas, spotřebu, hluk a teplotu." },
+  { num: "04", title: "Účinnost praní (Bavlna 60, 5 kg)", text: "Standardizované skvrny + 5 kg suchého prádla. Spektrofotometrické vyhodnocení čistoty každého vzorku." },
+  { num: "05", title: "Plné testy se 7 kg zátěží", text: "Test maximální kapacity. Vyvážení bubnu, vibrace, hluk při ždímání 1400 rpm, doba schnutí." },
+  { num: "06", title: "UX, aplikace, stavba", text: "Hodnotí 3 reální uživatelé bez vlivu redakce — ovládání, displej, hlasitost signálu, intuitivnost." },
+  { num: "07", title: "Vyhodnocení a recenze", text: "Vážený součet podle vah. Garant kategorie schvaluje. Publikace s plnou kartou testu a historií revizí." },
+];
+
+const instruments = [
+  { name: "Yokogawa WT310E", purpose: "Spotřeba el. energie, přesnost 0,1 %" },
+  { name: "Endress+Hauser PMD75", purpose: "Spotřeba vody, průtok v reálném čase" },
+  { name: "Brüel & Kjær 2245", purpose: "Hluk podle ISO 3744" },
+  { name: "PCE-VT 204", purpose: "Vibrace bubnu během ždímání" },
+  { name: "Konica Minolta CM-2300d", purpose: "Spektrofotometr — měření čistoty skvrn" },
+  { name: "Mitutoyo 547-401", purpose: "Tloušťkoměr — měření drhnutí vláken" },
+];
+
+const sampleCard = [
+  { label: "Účinnost praní", score: "94 / 100", note: "Skvrny A–E nad 90 % odstranění" },
+  { label: "Spotřeba a ekonomika", score: "88 / 100", note: "44 l / 0,82 kWh na Eco 40-60" },
+  { label: "Šetrnost k prádlu", score: "82 / 100", note: "Mírný úbytek vláken (0,4 % / cyklus)" },
+  { label: "Hluk a vibrace", score: "78 / 100", note: "63 dB(A) při ždímání 1400 rpm" },
+  { label: "Rychlost a kapacita", score: "76 / 100", note: "215 min Eco, kapacita 7 kg / 7,8 kg uvedeno" },
+  { label: "Ovládání, software, stavba", score: "85 / 100", note: "Intuitivní display, slušná aplikace, kovový buben" },
+];
+
+const notTested = [
+  "Specifické alergeny — testujeme proti běžným bílkovinám, ne alergenní extrakty.",
+  "Dlouhodobá životnost motoru — naše testy jsou max 6 měsíců, ne 10 let.",
+  "Spotřeba prášku / kapslí — sledujeme jen vodu a elektřinu.",
+  "Smart home integrace mimo Matter, HomeKit, Google Home — zde testujeme jen ty tři.",
+];
+
+const limits = [
+  "Tvrdost vody — testujeme jen pří 8 °dH (Brno). Pro tvrdou vodu nad 20 °dH jsou výsledky orientační.",
+  "Sušicí kombinace — neděláme integrované test pračky se sušičkou, jen pračku samotnou.",
+  "Komerční modely (XL kapacita 12+ kg) — náš protokol je pro domácnost, ne hotely.",
+];
+
+const history = [
+  { ver: "v3.2", date: "2026-03-15", change: "Přidán Konica Minolta CM-2300d pro spektrofotometrickou analýzu skvrn." },
+  { ver: "v3.0", date: "2025-11-02", change: "Změna vah — UX/software z 5 % na 10 %, hluk z 10 % na 15 %." },
+  { ver: "v2.5", date: "2024-09-18", change: "Doplněn test Eco 40-60 jako etalon (nová EU norma)." },
+  { ver: "v2.0", date: "2023-04-22", change: "První publikace s ISO 3744 hluk + 5 standardních skvrn." },
+];
+
+const faqs = [
+  {
+    q: "Proč vážíte šetrnost k prádlu tak nízko?",
+    a: "Šetrnost je důležitá, ale účinnost praní je pro většinu domácností hlavní motivace. Pokud pračka neumyje skvrny, šetrnost vám nepomůže. Proto 30 % účinnost, 15 % šetrnost.",
+  },
+  {
+    q: "Test je 5×, ale s jedním modelem. Co druhý kus?",
+    a: "Pět opakování na stejném kusu — pro statistickou významnost měření. Druhý kus stejného modelu testujeme pouze u kategorií, kde tovární variabilita je vysoká (zatím to nezahrnuje pračky).",
+  },
+  {
+    q: "Co když Eco 40-60 nemá pračka?",
+    a: "Měříme nejbližší ekvivalent (typicky „Bavlna eco\" nebo „Mix 40\"). V článku to označíme s vysvětlením, jak se srovnává s normou.",
+  },
+];
+
+const otherProtocols = [
+  { slug: "susicky", title: "Sušičky", count: 9 },
+  { slug: "mycky", title: "Myčky", count: 7 },
+  { slug: "lednicky", title: "Ledničky a mrazáky", count: 14 },
+  { slug: "trouby", title: "Trouby", count: 5 },
+];
+
+const lastUpdated = "2026-04-15";
+---
+
+<BaseLayout
+  title="Jak testujeme pračky — protokol v3.2 | Recenzer"
+  description="Detailní protokol testování praček. 6 kritérií, 14 parametrů, 4 testovací programy, 5 standardizovaných skvrn. Plná metodika v3.2."
+>
+  <PageBreadcrumbs items={[{ href: "/", label: "Recenzer" }, { href: "/jak-testujeme/", label: "Jak testujeme" }, { label: "Pračky" }]} />
+
+  <PageHero
+    eyebrow="Protokol v3.2 · platí od 03/26 · Domácí spotřebiče"
+    eyebrowIcon="lab"
+    title="Jak testujeme<br/><em>pračky</em>"
+    subtitle="14 parametrů, 4 testovací programy, 5 standardizovaných skvrn. <strong>Každý model projde stejným procesem</strong> — od příjmu krabice po finální skóre."
+  />
+
+  <StatStrip label="Klíčová čísla protokolu" stats={stats} />
+
+  <!-- Criteria -->
+  <section class="pp-criteria">
+    <div class="inner">
+      <header class="section-head">
+        <p class="eyebrow">Hodnocení</p>
+        <h2>6 kritérií, podle kterých skórujeme pračku</h2>
+        <p class="lead">
+          Skóre v recenzi je <strong>vážený průměr</strong> šesti kritérií. Váhy jsou pevné, ne dojmy — jakmile zveřejníme verzi protokolu, vážený systém se nemění.
+        </p>
+      </header>
+      <ul class="rubric">
+        {
+          criteria.map((c) => (
+            <li>
+              <div class="rubric-row">
+                <div class="rubric-name">
+                  <strong>{c.name}</strong>
+                  <span>{c.note}</span>
+                </div>
+                <div class="rubric-track">
+                  <div class="rubric-fill" style={`width:${c.weight}%`} />
+                </div>
+                <div class="rubric-weight">{c.weight} %</div>
+              </div>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <!-- Programs -->
+  <section class="pp-programs">
+    <div class="inner">
+      <header class="section-head">
+        <p class="eyebrow">Testovací programy</p>
+        <h2>4 programy, na kterých pračku skutečně mučíme</h2>
+        <p class="lead">
+          Každý program měří jiný aspekt — od ekonomiky přes účinnost po šetrnost.
+        </p>
+      </header>
+      <ul class="programs-grid">
+        {
+          programs.map((p) => (
+            <li class:list={["program-card", `accent-${p.accent}`]}>
+              <div class="program-title">{p.title}</div>
+              <div class="program-sub">{p.sub}</div>
+              <p>{p.note}</p>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <!-- Stains -->
+  <section class="pp-stains">
+    <div class="inner">
+      <header class="section-head">
+        <p class="eyebrow">Standardizace</p>
+        <h2>5 standardizovaných skvrn</h2>
+        <p class="lead">
+          Skvrny aplikujeme na stejné tkaniny, ve stejných koncentracích, podle IEC 60456. Tím dosáhneme reprodukovatelnosti měření mezi modely.
+        </p>
+      </header>
+      <ol class="stains-list">
+        {
+          stains.map((s, i) => (
+            <li>
+              <span class="stain-num">{String(i + 1).padStart(2, "0")}</span>
+              <div>
+                <h3>{s.name}</h3>
+                <p>{s.desc}</p>
+              </div>
+            </li>
+          ))
+        }
+      </ol>
+    </div>
+  </section>
+
+  <!-- Workflow -->
+  <section class="pp-workflow">
+    <div class="inner">
+      <header class="section-head">
+        <p class="eyebrow">Postup</p>
+        <h2>Co se stane od dorazení pračky po skóre v recenzi</h2>
+        <p class="lead">
+          Sedm kroků, kterými každá pračka prochází. Celkem trvá 4–6 týdnů na jeden model — proto vždy testujeme více modelů paralelně.
+        </p>
+      </header>
+      <ol class="workflow-list">
+        {
+          workflow.map((w) => (
+            <li>
+              <span class="work-num">{w.num}</span>
+              <div>
+                <h3>{w.title}</h3>
+                <p>{w.text}</p>
+              </div>
+            </li>
+          ))
+        }
+      </ol>
+    </div>
+  </section>
+
+  <!-- Instruments -->
+  <section class="pp-instruments">
+    <div class="inner">
+      <header class="section-head">
+        <p class="eyebrow">Čím měříme</p>
+        <h2>Klíčové přístroje pro test pračky</h2>
+        <p class="lead">
+          Detail laboratoře a všech přístrojů najdete na <a href="/testovaci-laborator/">Testovací laboratoř</a>.
+        </p>
+      </header>
+      <ul class="instr-grid">
+        {
+          instruments.map((i) => (
+            <li>
+              <strong>{i.name}</strong>
+              <p>{i.purpose}</p>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <!-- Sample card -->
+  <section class="pp-sample">
+    <div class="inner">
+      <header class="section-head">
+        <p class="eyebrow">Vzor</p>
+        <h2>Takhle vypadá karta testu na konci</h2>
+        <p class="lead">
+          Ukázka výstupu pro fiktivní model „Bosch Serie 8 WGB256X0BY" — abyste věděli, co od recenze čekat.
+        </p>
+      </header>
+      <div class="sample-card">
+        <header class="sample-head">
+          <div>
+            <div class="sample-eyebrow">Karta testu · vzor</div>
+            <h3>Bosch Serie 8 WGB256X0BY</h3>
+          </div>
+          <div class="sample-score">
+            <div class="sample-score-num">84 <span>/ 100</span></div>
+            <div class="sample-score-lbl">Celkové vážené skóre</div>
+          </div>
+        </header>
+        <ul class="sample-rows">
+          {
+            sampleCard.map((c) => (
+              <li>
+                <span class="sample-row-name">{c.label}</span>
+                <span class="sample-row-score">{c.score}</span>
+                <span class="sample-row-note">{c.note}</span>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- Limits -->
+  <section class="pp-limits">
+    <div class="inner">
+      <header class="section-head">
+        <p class="eyebrow">Hranice</p>
+        <h2>Co u praček netestujeme</h2>
+        <p class="lead">
+          Žádný protokol nepokryje všechno. Tady je seznam věcí, které vědomě <strong>nezahrnujeme</strong>.
+        </p>
+      </header>
+      <ul class="not-tested">
+        {notTested.map((n) => <li>{n}</li>)}
+      </ul>
+
+      <header class="section-head" style="margin-top: 2rem;">
+        <p class="eyebrow">Limity</p>
+        <h2 class="sub-h2">A v čem jsme limitovaní</h2>
+      </header>
+      <ul class="not-tested">
+        {limits.map((l) => <li>{l}</li>)}
+      </ul>
+    </div>
+  </section>
+
+  <!-- History -->
+  <section class="pp-history">
+    <div class="inner">
+      <header class="section-head">
+        <p class="eyebrow">Verzování</p>
+        <h2>Historie změn protokolu</h2>
+        <p class="lead">
+          Když změníme metodiku, staré články zůstávají, ale vyznačujeme u nich verzi protokolu, podle které byly testovány.
+        </p>
+      </header>
+      <ol class="history-line">
+        {
+          history.map((h) => (
+            <li>
+              <span class="hist-ver">{h.ver}</span>
+              <time datetime={h.date}>{h.date}</time>
+              <span class="hist-change">{h.change}</span>
+            </li>
+          ))
+        }
+      </ol>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section class="pp-faq">
+    <div class="inner">
+      <header class="section-head">
+        <p class="eyebrow">FAQ</p>
+        <h2>Co se k protokolu lidé ptají</h2>
+      </header>
+      <ul class="faq-list">
+        {
+          faqs.map((f) => (
+            <li>
+              <details>
+                <summary>{f.q}</summary>
+                <div class="faq-body">{f.a}</div>
+              </details>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <!-- Other categories -->
+  <section class="pp-other">
+    <div class="inner">
+      <header class="section-head">
+        <p class="eyebrow">Další protokoly</p>
+        <h2>Jak testujeme další kategorie</h2>
+      </header>
+      <ul class="other-grid">
+        {
+          otherProtocols.map((o) => (
+            <li>
+              <a href={`/jak-testujeme/${o.slug}/`}>
+                <strong>{o.title}</strong>
+                <span>{o.count} článků</span>
+              </a>
+            </li>
+          ))
+        }
+        <li>
+          <a href="/jak-testujeme/" class="other-all">
+            <strong>Všech 23 protokolů</strong>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+              <line x1="5" y1="12" x2="19" y2="12" />
+              <polyline points="12 5 19 12 12 19" />
+            </svg>
+          </a>
+        </li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- Related -->
+  <section class="pp-related">
+    <div class="inner">
+      <div class="related-card">
+        <h2>Související dokumenty</h2>
+        <p>Tento protokol je součástí širší editorial transparentnosti Recenzeru.</p>
+        <div class="end-actions">
+          <a href="/metodika/" class="btn-primary">Metodika obecně</a>
+          <a href="/testovaci-laborator/" class="btn-ghost">Naše laboratoř</a>
+          <a href="/overovani-faktu/" class="btn-ghost">Ověřování faktů</a>
+          <a href="/eticky-kodex/" class="btn-ghost">Etický kodex</a>
+        </div>
+      </div>
+      <p class="pp-meta">
+        Protokol verze <strong>v3.2</strong>, platnost od 03/2026, poslední revize <time datetime={lastUpdated}>{lastUpdated}</time>.
+      </p>
+    </div>
+  </section>
+
+  <style>
+    .inner {
+      max-width: var(--max-w);
+      margin: 0 auto;
+      padding: clamp(2.5rem, 5vw, 4rem) var(--gutter);
+    }
+
+    .section-head {
+      max-width: 65ch;
+      margin: 0 0 2rem;
+    }
+
+    .eyebrow {
+      font-family: var(--mono);
+      font-size: 11.5px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--p-700);
+      font-weight: 700;
+      margin: 0 0 0.5rem;
+    }
+
+    .section-head h2,
+    .sub-h2 {
+      font-size: clamp(1.5rem, 3vw, 2.1rem);
+      font-weight: 800;
+      letter-spacing: -0.025em;
+      color: var(--ink);
+      line-height: 1.2;
+      margin-bottom: 0.6rem;
+    }
+
+    .section-head .lead {
+      font-size: 15px;
+      line-height: 1.6;
+      color: var(--muted);
+      margin: 0;
+    }
+
+    .section-head .lead :global(strong) { color: var(--ink); font-weight: 700; }
+    .section-head .lead :global(a) { color: var(--p-700); text-decoration: underline; }
+
+    /* Criteria — rubric */
+    .pp-criteria {
+      background: var(--bg);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .rubric {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .rubric li {
+      padding: 1rem 1.25rem;
+      background: var(--bg-warm);
+      border: 1px solid var(--line);
+      border-radius: var(--r);
+    }
+
+    .rubric-row {
+      display: grid;
+      grid-template-columns: 1.4fr 1.4fr auto;
+      gap: 1.25rem;
+      align-items: center;
+    }
+
+    @media (max-width: 720px) {
+      .rubric-row { grid-template-columns: 1fr; gap: 0.4rem; }
+    }
+
+    .rubric-name {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .rubric-name strong {
+      font-size: 14.5px;
+      color: var(--ink);
+    }
+
+    .rubric-name span {
+      font-size: 12.5px;
+      color: var(--muted);
+      line-height: 1.4;
+    }
+
+    .rubric-track {
+      height: 8px;
+      background: var(--line);
+      border-radius: 999px;
+      overflow: hidden;
+    }
+
+    .rubric-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--p-500), var(--p-700));
+    }
+
+    .rubric-weight {
+      font-family: var(--mono);
+      font-size: 14px;
+      font-weight: 800;
+      color: var(--p-700);
+      min-width: 48px;
+      text-align: right;
+    }
+
+    /* Programs */
+    .pp-programs {
+      background: var(--bg-warm);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .programs-grid {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 0.85rem;
+    }
+
+    @media (max-width: 980px) { .programs-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 560px) { .programs-grid { grid-template-columns: 1fr; } }
+
+    .program-card {
+      padding: 1.25rem;
+      background: #fff;
+      border: 1px solid var(--line);
+      border-top: 3px solid var(--p-500);
+      border-radius: var(--r-lg);
+    }
+
+    .program-card.accent-amber { border-top-color: var(--amber); }
+    .program-card.accent-green { border-top-color: var(--green); }
+    .program-card.accent-blue { border-top-color: #1d4ed8; }
+
+    .program-title {
+      font-size: 1.05rem;
+      font-weight: 800;
+      color: var(--ink);
+      letter-spacing: -0.015em;
+      margin-bottom: 0.25rem;
+    }
+
+    .program-sub {
+      font-family: var(--mono);
+      font-size: 10.5px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--p-700);
+      font-weight: 700;
+      margin-bottom: 0.75rem;
+    }
+
+    .program-card.accent-amber .program-sub { color: var(--amber); }
+    .program-card.accent-green .program-sub { color: var(--green); }
+    .program-card.accent-blue .program-sub { color: #1d4ed8; }
+
+    .program-card p {
+      font-size: 13px;
+      line-height: 1.55;
+      color: var(--muted);
+      margin: 0;
+    }
+
+    /* Stains */
+    .pp-stains {
+      background: var(--bg);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .stains-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: grid;
+      gap: 0.5rem;
+    }
+
+    .stains-list li {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 1.25rem;
+      padding: 1rem 1.25rem;
+      background: var(--bg-warm);
+      border: 1px solid var(--line);
+      border-radius: var(--r);
+    }
+
+    .stain-num {
+      font-family: var(--mono);
+      font-size: 1.1rem;
+      font-weight: 800;
+      color: var(--p-700);
+    }
+
+    .stains-list h3 {
+      font-size: 14.5px;
+      font-weight: 700;
+      color: var(--ink);
+      margin-bottom: 0.2rem;
+    }
+
+    .stains-list p {
+      font-size: 13px;
+      line-height: 1.55;
+      color: var(--muted);
+      margin: 0;
+    }
+
+    /* Workflow */
+    .pp-workflow {
+      background: var(--bg-warm);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .workflow-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .workflow-list li {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 1.25rem;
+      padding: 1.25rem 1.5rem;
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: var(--r-lg);
+    }
+
+    .work-num {
+      font-family: var(--mono);
+      font-size: 1.4rem;
+      font-weight: 800;
+      color: var(--p-700);
+      line-height: 1;
+    }
+
+    .workflow-list h3 {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--ink);
+      margin-bottom: 0.3rem;
+    }
+
+    .workflow-list p {
+      font-size: 14px;
+      line-height: 1.6;
+      color: var(--muted);
+      margin: 0;
+    }
+
+    /* Instruments */
+    .pp-instruments {
+      background: var(--bg);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .instr-grid {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.6rem;
+    }
+
+    @media (max-width: 880px) { .instr-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 560px) { .instr-grid { grid-template-columns: 1fr; } }
+
+    .instr-grid li {
+      padding: 1rem 1.1rem;
+      background: var(--bg-warm);
+      border: 1px solid var(--line);
+      border-left: 3px solid var(--p-500);
+      border-radius: var(--r);
+    }
+
+    .instr-grid strong {
+      display: block;
+      font-size: 13.5px;
+      color: var(--ink);
+      margin-bottom: 0.3rem;
+    }
+
+    .instr-grid p {
+      font-size: 12.5px;
+      line-height: 1.55;
+      color: var(--muted);
+      margin: 0;
+    }
+
+    /* Sample card */
+    .pp-sample {
+      background: var(--bg-warm);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .sample-card {
+      background: var(--ink);
+      color: #fff;
+      border-radius: var(--r-xl);
+      padding: 1.75rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .sample-card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(700px circle at 100% 0%, rgba(149, 114, 240, 0.22), transparent 55%),
+        radial-gradient(500px circle at 0% 100%, rgba(99, 50, 204, 0.16), transparent 55%);
+      pointer-events: none;
+    }
+
+    .sample-head {
+      position: relative;
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 1.5rem;
+      flex-wrap: wrap;
+      margin-bottom: 1.5rem;
+      padding-bottom: 1.25rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+    }
+
+    .sample-eyebrow {
+      font-family: var(--mono);
+      font-size: 10.5px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--p-300);
+      font-weight: 700;
+      margin-bottom: 0.3rem;
+    }
+
+    .sample-head h3 {
+      font-size: 1.3rem;
+      font-weight: 800;
+      color: #fff;
+      letter-spacing: -0.02em;
+      margin: 0;
+    }
+
+    .sample-score {
+      text-align: right;
+    }
+
+    .sample-score-num {
+      font-size: 2.25rem;
+      font-weight: 800;
+      color: #fff;
+      letter-spacing: -0.02em;
+      line-height: 1;
+    }
+
+    .sample-score-num span {
+      font-size: 0.5em;
+      color: var(--p-300);
+      font-weight: 500;
+    }
+
+    .sample-score-lbl {
+      font-size: 11.5px;
+      color: rgba(255, 255, 255, 0.6);
+      font-family: var(--mono);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-top: 0.2rem;
+    }
+
+    .sample-rows {
+      position: relative;
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+    }
+
+    .sample-rows li {
+      display: grid;
+      grid-template-columns: 1.4fr auto 1.6fr;
+      gap: 1rem;
+      padding: 0.6rem 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      align-items: baseline;
+    }
+
+    .sample-rows li:last-child { border-bottom: 0; }
+
+    @media (max-width: 640px) {
+      .sample-rows li {
+        grid-template-columns: 1fr;
+        gap: 0.2rem;
+      }
+    }
+
+    .sample-row-name {
+      font-size: 14px;
+      color: rgba(255, 255, 255, 0.9);
+      font-weight: 600;
+    }
+
+    .sample-row-score {
+      font-family: var(--mono);
+      font-size: 14.5px;
+      color: #fff;
+      font-weight: 800;
+    }
+
+    .sample-row-note {
+      font-size: 12.5px;
+      color: rgba(255, 255, 255, 0.55);
+    }
+
+    /* Limits */
+    .pp-limits {
+      background: var(--amber-bg);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .pp-limits .eyebrow { color: var(--amber); }
+
+    .not-tested {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+    }
+
+    .not-tested li {
+      padding: 0.85rem 1.1rem;
+      background: #fff;
+      border: 1px solid rgba(180, 83, 9, 0.18);
+      border-radius: var(--r);
+      font-size: 14px;
+      color: var(--ink-soft);
+      line-height: 1.55;
+      padding-left: 2.25rem;
+      position: relative;
+    }
+
+    .not-tested li::before {
+      content: "×";
+      position: absolute;
+      left: 1rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--amber);
+      font-weight: 800;
+      font-size: 1.1rem;
+    }
+
+    /* History */
+    .pp-history {
+      background: var(--bg);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .history-line {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      max-width: 760px;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .history-line li {
+      display: grid;
+      grid-template-columns: 60px 110px 1fr;
+      gap: 1rem;
+      padding: 0.85rem 1.25rem;
+      background: var(--bg-warm);
+      border: 1px solid var(--line);
+      border-radius: var(--r);
+      align-items: center;
+    }
+
+    @media (max-width: 640px) {
+      .history-line li { grid-template-columns: 1fr; gap: 0.3rem; }
+    }
+
+    .hist-ver {
+      font-family: var(--mono);
+      font-size: 12.5px;
+      font-weight: 800;
+      color: var(--p-700);
+      background: var(--p-50);
+      padding: 3px 8px;
+      border-radius: 4px;
+      text-align: center;
+    }
+
+    .history-line time {
+      font-family: var(--mono);
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .hist-change {
+      font-size: 14px;
+      line-height: 1.5;
+      color: var(--ink-soft);
+    }
+
+    /* FAQ */
+    .pp-faq {
+      background: var(--bg-warm);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .faq-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      max-width: 760px;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .faq-list details {
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: var(--r-lg);
+      padding: 1rem 1.25rem;
+    }
+
+    .faq-list summary {
+      cursor: pointer;
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--ink);
+      list-style: none;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .faq-list summary::-webkit-details-marker { display: none; }
+
+    .faq-list summary::after {
+      content: "+";
+      font-family: var(--mono);
+      font-weight: 700;
+      color: var(--p-700);
+      font-size: 1.2rem;
+    }
+
+    .faq-list details[open] summary::after { content: "−"; }
+
+    .faq-body {
+      padding-top: 0.85rem;
+      font-size: 14px;
+      line-height: 1.6;
+      color: var(--ink-soft);
+    }
+
+    /* Other */
+    .pp-other {
+      background: var(--bg);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .other-grid {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 0.5rem;
+    }
+
+    @media (max-width: 980px) { .other-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 560px) { .other-grid { grid-template-columns: 1fr; } }
+
+    .other-grid a {
+      display: flex;
+      flex-direction: column;
+      gap: 0.3rem;
+      padding: 1rem 1.1rem;
+      background: var(--bg-warm);
+      border: 1px solid var(--line);
+      border-radius: var(--r);
+      color: var(--ink);
+      text-decoration: none;
+    }
+
+    .other-grid a:hover,
+    .other-grid a:focus-visible {
+      border-color: var(--p-400);
+      color: var(--p-700);
+    }
+
+    .other-grid strong {
+      font-size: 13.5px;
+    }
+
+    .other-grid span {
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .other-all {
+      flex-direction: row !important;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--p-50) !important;
+      border-color: var(--p-400) !important;
+      color: var(--p-700) !important;
+    }
+
+    .other-all svg { width: 14px; height: 14px; }
+
+    /* Related */
+    .pp-related { background: var(--bg-warm); }
+
+    .related-card {
+      max-width: 760px;
+      margin: 0 auto;
+      padding: 2rem;
+      background: var(--p-50);
+      border: 1px solid rgba(99, 50, 204, 0.18);
+      border-radius: var(--r-xl);
+      text-align: center;
+    }
+
+    .related-card h2 {
+      font-size: clamp(1.4rem, 2.5vw, 1.85rem);
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      color: var(--ink);
+      margin-bottom: 0.6rem;
+    }
+
+    .related-card p {
+      font-size: 15px;
+      color: var(--ink-soft);
+      margin: 0 auto 1.5rem;
+      max-width: 56ch;
+    }
+
+    .end-actions {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .pp-meta {
+      margin-top: 1.5rem;
+      font-size: 12.5px;
+      color: var(--muted);
+      text-align: center;
+    }
+
+    .pp-meta strong { color: var(--ink); font-weight: 700; }
+
+    .btn-primary,
+    .btn-ghost {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      padding: 0.7rem 1.2rem;
+      border-radius: var(--r);
+      font-size: 13.5px;
+      font-weight: 600;
+      text-decoration: none;
+    }
+
+    .btn-primary {
+      background: var(--p-700);
+      color: #fff;
+      border: 1px solid var(--p-700);
+    }
+
+    .btn-primary:hover,
+    .btn-primary:focus-visible {
+      background: var(--p-800);
+      border-color: var(--p-800);
+      color: #fff;
+    }
+
+    .btn-ghost {
+      background: #fff;
+      color: var(--ink);
+      border: 1px solid var(--line);
+    }
+
+    .btn-ghost:hover,
+    .btn-ghost:focus-visible {
+      border-color: var(--p-400);
+      color: var(--p-700);
+    }
+  </style>
+</BaseLayout>

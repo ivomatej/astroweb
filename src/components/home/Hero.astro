@@ -1,0 +1,221 @@
+---
+import { site } from "../../config/site";
+
+const yearsActive = new Date().getFullYear() - site.brand.foundedYear;
+
+const stats = [
+  { value: "2 400+", label: "publikovaných recenzí" },
+  { value: "47", label: "expertů a garantů" },
+  { value: `${yearsActive}`, label: "let editoriální nezávislosti" },
+  { value: "0", label: "sponzorovaných článků" },
+];
+---
+
+<section class="home-hero">
+  <div class="home-hero-inner">
+    <p class="hero-eyebrow">
+      <span class="dot" aria-hidden="true"></span>
+      Recenzer · Editorial Standards · od {site.brand.foundedYear}
+    </p>
+
+    <h1 class="hero-title">
+      Co si&nbsp;<em>koupit</em>. A&nbsp;čemu se zdaleka <em>vyhnout</em>.
+    </h1>
+
+    <p class="hero-sub">
+      Nezávislé recenze nářadí, spotřebičů a všeho, co stojí za testování.
+      <strong>Bez sponzoringu, bez affiliate vlivu</strong> na hodnocení.
+      Měříme, srovnáváme a doporučujeme.
+    </p>
+
+    <ul class="hero-stats">
+      {
+        stats.map((s) => (
+          <li>
+            <strong>{s.value}</strong>
+            <span>{s.label}</span>
+          </li>
+        ))
+      }
+    </ul>
+
+    <div class="hero-actions">
+      <a href="#kategorie" class="btn-primary">
+        Vybrat kategorii
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+          <line x1="5" y1="12" x2="19" y2="12" />
+          <polyline points="12 5 19 12 12 19" />
+        </svg>
+      </a>
+      <a href="/metodika/" class="btn-ghost">Jak testujeme</a>
+    </div>
+  </div>
+</section>
+
+<style>
+  .home-hero {
+    position: relative;
+    overflow: hidden;
+    background:
+      radial-gradient(900px circle at 90% 0%, rgba(149, 114, 240, 0.18), transparent 55%),
+      radial-gradient(700px circle at 10% 110%, rgba(99, 50, 204, 0.14), transparent 55%),
+      var(--bg);
+    border-bottom: 1px solid var(--line);
+  }
+
+  .home-hero-inner {
+    max-width: var(--max-w);
+    margin: 0 auto;
+    padding: clamp(3rem, 7vw, 5.5rem) var(--gutter) clamp(3rem, 6vw, 4.5rem);
+    position: relative;
+  }
+
+  .hero-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+    font-family: var(--mono);
+    font-size: 11.5px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--p-700);
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+  }
+
+  .dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--p-500);
+    box-shadow: 0 0 0 3px rgba(122, 79, 227, 0.18);
+    animation: pulse 2.4s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.45; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .dot { animation: none; }
+  }
+
+  .hero-title {
+    font-size: clamp(2.25rem, 6vw, 4.25rem);
+    font-weight: 800;
+    line-height: 1.05;
+    letter-spacing: -0.035em;
+    color: var(--ink);
+    max-width: 22ch;
+    margin-bottom: 1.25rem;
+  }
+
+  .hero-title em {
+    font-style: italic;
+    color: var(--p-700);
+    font-weight: 800;
+  }
+
+  .hero-sub {
+    font-size: clamp(1.05rem, 1.5vw, 1.2rem);
+    line-height: 1.55;
+    color: var(--ink-soft);
+    max-width: 58ch;
+    margin-bottom: 2rem;
+  }
+
+  .hero-sub strong {
+    color: var(--ink);
+    font-weight: 700;
+  }
+
+  .hero-stats {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 2rem;
+    display: grid;
+    grid-template-columns: repeat(4, auto);
+    justify-content: start;
+    gap: 0 2.5rem;
+  }
+
+  .hero-stats li {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: 0.5rem 0;
+    border-top: 2px solid var(--p-200);
+  }
+
+  .hero-stats strong {
+    font-size: clamp(1.65rem, 3vw, 2.25rem);
+    font-weight: 800;
+    color: var(--ink);
+    letter-spacing: -0.02em;
+    line-height: 1;
+  }
+
+  .hero-stats span {
+    font-size: 12.5px;
+    color: var(--muted);
+    line-height: 1.3;
+  }
+
+  .hero-actions {
+    display: flex;
+    gap: 0.6rem;
+    flex-wrap: wrap;
+  }
+
+  .btn-primary,
+  .btn-ghost {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0.85rem 1.4rem;
+    font-size: 15px;
+    font-weight: 600;
+    border-radius: var(--r);
+    text-decoration: none;
+    transition: background 0.15s, color 0.15s, border-color 0.15s, transform 0.15s;
+  }
+
+  .btn-primary {
+    background: var(--p-700);
+    color: #fff;
+    border: 1px solid var(--p-700);
+  }
+
+  .btn-primary:hover,
+  .btn-primary:focus-visible {
+    background: var(--p-800);
+    border-color: var(--p-800);
+    color: #fff;
+    transform: translateY(-1px);
+  }
+
+  .btn-primary svg {
+    width: 14px;
+    height: 14px;
+  }
+
+  .btn-ghost {
+    background: transparent;
+    color: var(--ink);
+    border: 1px solid var(--line);
+  }
+
+  .btn-ghost:hover,
+  .btn-ghost:focus-visible {
+    border-color: var(--p-400);
+    color: var(--p-700);
+  }
+
+  @media (max-width: 720px) {
+    .hero-stats {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1rem;
+    }
+  }
+</style>

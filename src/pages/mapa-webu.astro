@@ -1,0 +1,731 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import PageBreadcrumbs from "../components/page/PageBreadcrumbs.astro";
+import PageHero from "../components/page/PageHero.astro";
+import { categories } from "../data/categories";
+import { articleCards, getArticleCardsByCategory } from "../data/featured";
+
+const topArticles = articleCards.slice(0, 10);
+
+function formatCzechDate(iso: string): string {
+  const d = new Date(iso);
+  return `${d.getDate()}. ${d.getMonth() + 1}. ${d.getFullYear()}`;
+}
+
+const recentArticles = [...articleCards]
+  .sort((a, b) => (a.date < b.date ? 1 : -1))
+  .slice(0, 8);
+
+const editorial = [
+  { href: "/o-nas/", label: "O nás" },
+  { href: "/metodika/", label: "Metodika testů" },
+  { href: "/eticky-kodex/", label: "Etický kodex" },
+  { href: "/redakcni-zasady/", label: "Redakční zásady" },
+  { href: "/overovani-faktu/", label: "Ověřování faktů" },
+  { href: "/duveryhodne-zdroje/", label: "Důvěryhodné zdroje" },
+  { href: "/testovaci-laborator/", label: "Testovací laboratoř" },
+  { href: "/jak-testujeme/", label: "Jak testujeme (rozcestník)" },
+  { href: "/oprava-chyb/", label: "Nahlásit chybu" },
+  { href: "/pristupnost/", label: "Přístupnost" },
+];
+
+const people = [
+  { href: "/autori/", label: "Autoři a odborníci (rozcestník)" },
+  { href: "/autor/ivo-matej/", label: "Ivo Matěj — šéfredaktor" },
+  { href: "/autor/alena-rajnochova/", label: "Alena Rajnochová — hlavní redaktorka" },
+  { href: "/autor/jakub-novak/", label: "Jakub Novák — odborný garant" },
+  { href: "/autori/", label: "Všech 14 členů týmu →" },
+];
+
+const business = [
+  { href: "/kontakt/", label: "Kontakt" },
+  { href: "/pro-znacky-firmy-agentury/", label: "Pro značky, firmy a agentury" },
+  { href: "/kariera/", label: "Kariéra" },
+  { href: "/stante-se-testerem/", label: "Staňte se testerem" },
+  { href: "/kodex-ferove-firmy/", label: "Kodex férové firmy" },
+];
+
+const legal = [
+  { href: "/zasady-osobnich-udaju/", label: "Zásady ochrany osobních údajů" },
+  { href: "/zasady-cookies/", label: "Zásady cookies" },
+  { href: "/podminky-pouziti/", label: "Podmínky použití" },
+  { href: "/affiliate-disclosure/", label: "Affiliate disclosure" },
+];
+---
+
+<BaseLayout
+  title="Mapa webu — Recenzer"
+  description="Kompletní přehled stránek na Recenzer.cz. Kategorie, články, autoři, editoriálnost, kontakt."
+>
+  <PageBreadcrumbs items={[{ href: "/", label: "Recenzer" }, { label: "Mapa webu" }]} />
+
+  <PageHero
+    eyebrow="Sitemap · všechny stránky"
+    eyebrowIcon="doc"
+    title="Mapa<br/><em>webu</em>"
+    subtitle="Kompletní přehled toho, co na Recenzer.cz najdete. <strong>Kategorie, články, autoři, editoriální dokumenty</strong> — vše v jednom přehledu."
+  />
+
+  <!-- Categories -->
+  <section class="sm-categories">
+    <div class="inner">
+      <header class="section-head">
+        <p class="eyebrow">Kategorie</p>
+        <h2>Procházet podle kategorie</h2>
+      </header>
+      <ul class="cat-grid">
+        {
+          categories.map((c) => {
+            const articles = getArticleCardsByCategory(c.slug);
+            return (
+              <li class:list={[`accent-${c.accent}`]}>
+                <a href={c.href} class="cat-card">
+                  <strong>{c.name}</strong>
+                  <span class="cat-tagline">{c.tagline}</span>
+                  <span class="cat-count">{c.articleCount} článků celkem</span>
+                </a>
+                {articles.length > 0 && (
+                  <ul class="cat-articles">
+                    {articles.slice(0, 4).map((a) => (
+                      <li>
+                        <a href={a.href}>{a.title.replace(/<[^>]+>/g, "")}</a>
+                      </li>
+                    ))}
+                    {articles.length > 4 && (
+                      <li class="cat-more">
+                        <a href={c.href}>+ dalších {articles.length - 4} článků</a>
+                      </li>
+                    )}
+                  </ul>
+                )}
+              </li>
+            );
+          })
+        }
+      </ul>
+    </div>
+  </section>
+
+  <!-- TOP 10 -->
+  <section class="sm-top">
+    <div class="inner">
+      <header class="section-head">
+        <p class="eyebrow">Top 10</p>
+        <h2>Nejčtenější články</h2>
+        <p class="lead">
+          Deset článků, které čtou aktuálně nejvíce čtenářů — podle počtu návštěv za poslední 30 dní.
+        </p>
+      </header>
+      <ol class="top-list">
+        {
+          topArticles.map((a, i) => (
+            <li>
+              <a href={a.href}>
+                <span class="top-rank">{String(i + 1).padStart(2, "0")}</span>
+                <div>
+                  <span class="top-cat">{a.category}</span>
+                  <h3 set:html={a.title} />
+                </div>
+                <time datetime={a.date}>{formatCzechDate(a.date)}</time>
+              </a>
+            </li>
+          ))
+        }
+      </ol>
+    </div>
+  </section>
+
+  <!-- Recent -->
+  <section class="sm-recent">
+    <div class="inner">
+      <header class="section-head">
+        <p class="eyebrow">Nové</p>
+        <h2>Nedávno publikované a aktualizované</h2>
+      </header>
+      <ul class="recent-grid">
+        {
+          recentArticles.map((a) => (
+            <li>
+              <a href={a.href}>
+                <time datetime={a.date}>{formatCzechDate(a.date)}</time>
+                <span class:list={["recent-cat", `accent-${a.accent}`]}>{a.category}</span>
+                <h3 set:html={a.title} />
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <!-- Editorial -->
+  <section class="sm-editorial">
+    <div class="inner">
+      <div class="cols-3">
+        <div class="col">
+          <header class="col-head">
+            <p class="eyebrow">Transparentnost</p>
+            <h2>O Recenzeru a transparentnost</h2>
+          </header>
+          <ul class="link-list">
+            {editorial.map((l) => <li><a href={l.href}>{l.label}</a></li>)}
+          </ul>
+        </div>
+
+        <div class="col">
+          <header class="col-head">
+            <p class="eyebrow">Lidé</p>
+            <h2>Důvěryhodnost a redakce</h2>
+          </header>
+          <ul class="link-list">
+            {people.map((l) => <li><a href={l.href}>{l.label}</a></li>)}
+          </ul>
+        </div>
+
+        <div class="col">
+          <header class="col-head">
+            <p class="eyebrow">Spolupráce</p>
+            <h2>Kontakt a právní</h2>
+          </header>
+          <ul class="link-list">
+            {business.map((l) => <li><a href={l.href}>{l.label}</a></li>)}
+          </ul>
+          <ul class="link-list legal">
+            {legal.map((l) => <li><a href={l.href}>{l.label}</a></li>)}
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Brands & eshops -->
+  <section class="sm-counts">
+    <div class="inner">
+      <div class="counts-grid">
+        <div class="count-card">
+          <p class="eyebrow">Připravujeme</p>
+          <strong>187</strong>
+          <span>značek s vlastním průvodcem</span>
+          <p>Sběr přehledů značek včetně historie, ekosystémů a hodnocení. Spustíme v 06/2026.</p>
+        </div>
+        <div class="count-card">
+          <p class="eyebrow">Připravujeme</p>
+          <strong>42</strong>
+          <span>recenzí e-shopů</span>
+          <p>Hodnotíme dopravu, vrácení zboží, zákaznickou podporu a affiliate transparenci e-shopů, se kterými spolupracujeme.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="sm-cta">
+    <div class="inner">
+      <div class="cta-card">
+        <h2>Pomůžeme vám s výběrem</h2>
+        <p>
+          Pokud nevíte, kde začít, napište nám — doporučíme článek, nebo zařadíme vaši kategorii do plánu.
+        </p>
+        <div class="cta-actions">
+          <a href="/" class="btn-primary">Domovská stránka</a>
+          <a href="/kontakt/" class="btn-ghost">Kontakt</a>
+          <a href="/oprava-chyb/" class="btn-ghost">Nahlásit chybu</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <style>
+    .inner {
+      max-width: var(--max-w);
+      margin: 0 auto;
+      padding: clamp(2rem, 4vw, 3rem) var(--gutter);
+    }
+
+    .section-head {
+      max-width: 65ch;
+      margin: 0 0 1.75rem;
+    }
+
+    .eyebrow {
+      font-family: var(--mono);
+      font-size: 11.5px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--p-700);
+      font-weight: 700;
+      margin: 0 0 0.5rem;
+    }
+
+    .section-head h2 {
+      font-size: clamp(1.4rem, 2.5vw, 1.85rem);
+      font-weight: 800;
+      letter-spacing: -0.025em;
+      color: var(--ink);
+      line-height: 1.2;
+      margin-bottom: 0.5rem;
+    }
+
+    .section-head .lead {
+      font-size: 14.5px;
+      line-height: 1.6;
+      color: var(--muted);
+      margin: 0;
+    }
+
+    /* Categories */
+    .sm-categories {
+      background: var(--bg);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .cat-grid {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1.25rem;
+    }
+
+    @media (max-width: 720px) { .cat-grid { grid-template-columns: 1fr; } }
+
+    .cat-grid > li {
+      padding: 1.5rem;
+      background: var(--bg-warm);
+      border: 1px solid var(--line);
+      border-left: 3px solid var(--p-500);
+      border-radius: var(--r-lg);
+    }
+
+    .cat-grid > li.accent-amber { border-left-color: var(--amber); }
+    .cat-grid > li.accent-green { border-left-color: var(--green); }
+    .cat-grid > li.accent-red { border-left-color: var(--red); }
+    .cat-grid > li.accent-blue { border-left-color: #1d4ed8; }
+
+    .cat-card {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+      margin-bottom: 1rem;
+      padding-bottom: 0.85rem;
+      border-bottom: 1px dashed var(--line);
+      text-decoration: none;
+      color: var(--ink);
+    }
+
+    .cat-card strong {
+      font-size: 1.15rem;
+      font-weight: 800;
+      letter-spacing: -0.015em;
+      color: var(--ink);
+    }
+
+    .cat-card:hover strong,
+    .cat-card:focus-visible strong {
+      color: var(--p-700);
+    }
+
+    .cat-tagline {
+      font-size: 13.5px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .cat-count {
+      margin-top: 0.4rem;
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--p-700);
+      font-weight: 700;
+      letter-spacing: 0.04em;
+    }
+
+    .cat-articles {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+    }
+
+    .cat-articles a {
+      font-size: 13.5px;
+      color: var(--ink-soft);
+      text-decoration: none;
+      line-height: 1.45;
+      padding-left: 1.1rem;
+      position: relative;
+      display: block;
+    }
+
+    .cat-articles a::before {
+      content: "→";
+      position: absolute;
+      left: 0;
+      color: var(--p-600);
+      font-weight: 700;
+    }
+
+    .cat-articles a:hover,
+    .cat-articles a:focus-visible {
+      color: var(--p-700);
+    }
+
+    .cat-more a {
+      font-weight: 600;
+      color: var(--p-700);
+    }
+
+    /* TOP 10 */
+    .sm-top {
+      background: var(--bg-warm);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .top-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+    }
+
+    .top-list a {
+      display: grid;
+      grid-template-columns: 50px 1fr auto;
+      gap: 1.25rem;
+      align-items: center;
+      padding: 0.85rem 1.25rem;
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: var(--r);
+      text-decoration: none;
+      color: var(--ink);
+      transition: border-color 0.15s, transform 0.15s;
+    }
+
+    .top-list a:hover,
+    .top-list a:focus-visible {
+      border-color: var(--p-400);
+      transform: translateX(4px);
+    }
+
+    .top-rank {
+      font-family: var(--mono);
+      font-size: 1.1rem;
+      font-weight: 800;
+      color: var(--p-700);
+      line-height: 1;
+    }
+
+    .top-cat {
+      display: block;
+      font-family: var(--mono);
+      font-size: 10.5px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--muted-2);
+      font-weight: 700;
+      margin-bottom: 0.25rem;
+    }
+
+    .top-list h3 {
+      font-size: 14.5px;
+      font-weight: 700;
+      color: var(--ink);
+      line-height: 1.35;
+      margin: 0;
+    }
+
+    .top-list h3 :global(em) {
+      font-style: italic;
+      color: var(--p-700);
+    }
+
+    .top-list time {
+      font-family: var(--mono);
+      font-size: 12px;
+      color: var(--muted);
+      white-space: nowrap;
+    }
+
+    @media (max-width: 600px) {
+      .top-list a { grid-template-columns: auto 1fr; }
+      .top-list time { display: none; }
+    }
+
+    /* Recent */
+    .sm-recent {
+      background: var(--bg);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .recent-grid {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 0.6rem;
+    }
+
+    @media (max-width: 880px) { .recent-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 480px) { .recent-grid { grid-template-columns: 1fr; } }
+
+    .recent-grid a {
+      display: block;
+      padding: 1.1rem 1.25rem;
+      background: var(--bg-warm);
+      border: 1px solid var(--line);
+      border-radius: var(--r);
+      text-decoration: none;
+      color: var(--ink);
+      transition: border-color 0.15s, transform 0.15s;
+    }
+
+    .recent-grid a:hover,
+    .recent-grid a:focus-visible {
+      border-color: var(--p-400);
+      transform: translateY(-2px);
+    }
+
+    .recent-grid time {
+      display: block;
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--muted);
+      margin-bottom: 0.35rem;
+    }
+
+    .recent-cat {
+      display: inline-block;
+      font-family: var(--mono);
+      font-size: 9.5px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--p-700);
+      background: var(--p-50);
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+    }
+
+    .recent-cat.accent-amber { color: var(--amber); background: var(--amber-bg); }
+    .recent-cat.accent-green { color: var(--green); background: var(--green-bg); }
+    .recent-cat.accent-red { color: var(--red); background: var(--red-bg); }
+    .recent-cat.accent-blue { color: #1e40af; background: #e8eeff; }
+
+    .recent-grid h3 {
+      font-size: 13.5px;
+      font-weight: 700;
+      color: var(--ink);
+      line-height: 1.4;
+      margin: 0;
+    }
+
+    /* Editorial cols */
+    .sm-editorial {
+      background: var(--bg-warm);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .cols-3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.5rem;
+    }
+
+    @media (max-width: 880px) { .cols-3 { grid-template-columns: 1fr; } }
+
+    .col {
+      padding: 1.5rem;
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: var(--r-lg);
+    }
+
+    .col-head {
+      margin-bottom: 1rem;
+      padding-bottom: 0.75rem;
+      border-bottom: 1px dashed var(--line);
+    }
+
+    .col-head h2 {
+      font-size: 1rem;
+      font-weight: 800;
+      color: var(--ink);
+      letter-spacing: -0.01em;
+      margin: 0;
+    }
+
+    .link-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 0.3rem;
+    }
+
+    .link-list.legal {
+      margin-top: 0.85rem;
+      padding-top: 0.75rem;
+      border-top: 1px dashed var(--line);
+    }
+
+    .link-list a {
+      display: block;
+      padding: 0.4rem 0;
+      padding-left: 1.1rem;
+      position: relative;
+      font-size: 13.5px;
+      color: var(--ink-soft);
+      text-decoration: none;
+      line-height: 1.4;
+    }
+
+    .link-list a::before {
+      content: "→";
+      position: absolute;
+      left: 0;
+      color: var(--p-600);
+      font-weight: 700;
+    }
+
+    .link-list a:hover,
+    .link-list a:focus-visible {
+      color: var(--p-700);
+    }
+
+    /* Counts */
+    .sm-counts {
+      background: var(--bg);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .counts-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+
+    @media (max-width: 720px) { .counts-grid { grid-template-columns: 1fr; } }
+
+    .count-card {
+      padding: 1.75rem;
+      background: var(--bg-warm);
+      border: 1px solid var(--line);
+      border-top: 3px solid var(--p-500);
+      border-radius: var(--r-lg);
+    }
+
+    .count-card .eyebrow {
+      color: var(--muted);
+      margin-bottom: 0.5rem;
+    }
+
+    .count-card strong {
+      display: block;
+      font-size: clamp(2rem, 4vw, 3rem);
+      font-weight: 800;
+      color: var(--ink);
+      letter-spacing: -0.025em;
+      line-height: 1;
+      margin-bottom: 0.25rem;
+    }
+
+    .count-card span {
+      display: block;
+      font-size: 14.5px;
+      font-weight: 600;
+      color: var(--p-700);
+      margin-bottom: 0.75rem;
+    }
+
+    .count-card p {
+      font-size: 13.5px;
+      line-height: 1.55;
+      color: var(--muted);
+      margin: 0;
+    }
+
+    /* CTA */
+    .sm-cta {
+      background: var(--bg);
+    }
+
+    .cta-card {
+      max-width: 760px;
+      margin: 0 auto;
+      padding: 2.25rem 2rem;
+      background: var(--p-50);
+      border: 1px solid rgba(99, 50, 204, 0.18);
+      border-radius: var(--r-xl);
+      text-align: center;
+    }
+
+    .cta-card h2 {
+      font-size: clamp(1.4rem, 2.5vw, 1.85rem);
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      color: var(--ink);
+      margin-bottom: 0.6rem;
+    }
+
+    .cta-card p {
+      font-size: 15px;
+      line-height: 1.6;
+      color: var(--ink-soft);
+      max-width: 56ch;
+      margin: 0 auto 1.5rem;
+    }
+
+    .cta-actions {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .btn-primary,
+    .btn-ghost {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      padding: 0.7rem 1.2rem;
+      border-radius: var(--r);
+      font-size: 13.5px;
+      font-weight: 600;
+      text-decoration: none;
+    }
+
+    .btn-primary {
+      background: var(--p-700);
+      color: #fff;
+      border: 1px solid var(--p-700);
+    }
+
+    .btn-primary:hover,
+    .btn-primary:focus-visible {
+      background: var(--p-800);
+      border-color: var(--p-800);
+      color: #fff;
+    }
+
+    .btn-ghost {
+      background: #fff;
+      color: var(--ink);
+      border: 1px solid var(--line);
+    }
+
+    .btn-ghost:hover,
+    .btn-ghost:focus-visible {
+      border-color: var(--p-400);
+      color: var(--p-700);
+    }
+  </style>
+</BaseLayout>

@@ -1,0 +1,91 @@
+---
+interface Stat {
+  value: string;
+  label: string;
+}
+
+interface Props {
+  stats: Stat[];
+  /** Optional label shown above the stat row, e.g. "Klíčová čísla". */
+  label?: string;
+}
+
+const { stats, label } = Astro.props;
+---
+
+<section class="stat-strip" aria-label={label ?? "Klíčová čísla"}>
+  <div class="stat-strip-inner">
+    {label && <p class="stat-strip-label">{label}</p>}
+    <ul class="stat-strip-grid">
+      {
+        stats.map((stat) => (
+          <li class="stat-strip-item">
+            <div class="stat-strip-value">{stat.value}</div>
+            <div class="stat-strip-lbl">{stat.label}</div>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</section>
+
+<style>
+  .stat-strip {
+    background: var(--bg);
+    border-bottom: 1px solid var(--line);
+  }
+
+  .stat-strip-inner {
+    max-width: var(--max-w);
+    margin: 0 auto;
+    padding: clamp(2rem, 3.5vw, 3rem) var(--gutter);
+  }
+
+  .stat-strip-label {
+    font-family: var(--mono);
+    font-size: 11.5px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--muted);
+    font-weight: 700;
+    margin: 0 0 1rem;
+  }
+
+  .stat-strip-grid {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.5rem;
+  }
+
+  .stat-strip-item {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding-top: 0.75rem;
+    border-top: 2px solid var(--p-200);
+  }
+
+  .stat-strip-value {
+    font-size: clamp(1.85rem, 3.5vw, 2.6rem);
+    font-weight: 800;
+    color: var(--ink);
+    letter-spacing: -0.02em;
+    line-height: 1;
+  }
+
+  .stat-strip-lbl {
+    font-size: 12.5px;
+    color: var(--muted);
+    line-height: 1.3;
+  }
+
+  @media (max-width: 720px) {
+    .stat-strip-grid {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1rem;
+    }
+  }
+</style>

@@ -6,12 +6,12 @@ export const site: SiteConfig = {
     tagline:
       "Nezávislý průvodce nákupem. Bez sponzoringu, bez affiliate vlivu na hodnocení.",
     domain: "recenzer.cz",
-    foundedYear: 2017,
+    foundedYear: 2016,
     versionLabel: "Verze 3.2 · poslední audit 04/2026",
   },
 
   topBar: {
-    flag: "Editorial Standards · Recenzer",
+    flag: "Pomáháme s výběrem od roku 2016. S námi se rozhodnete.",
     links: [
       { href: "/metodika/", label: "Metodika" },
       { href: "/eticky-kodex/", label: "Etický kodex" },
@@ -38,7 +38,7 @@ export const site: SiteConfig = {
 
   footer: {
     brandTagline:
-      "Nezávislý průvodce nákupem. Bez sponzoringu, bez affiliate vlivu na hodnocení. Od 2017.",
+      "Nezávislý průvodce nákupem. Bez sponzoringu, bez affiliate vlivu na hodnocení. Od 2016.",
 
     socials: [
       { href: "#", label: "Facebook", icon: "facebook" },

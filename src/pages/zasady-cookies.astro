@@ -1,0 +1,865 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import PageBreadcrumbs from "../components/page/PageBreadcrumbs.astro";
+import PageHero from "../components/page/PageHero.astro";
+
+const tldr = [
+  "Nezbytné cookies běží bez vašeho souhlasu — bez nich web nefunguje.",
+  "Funkční, analytické a marketingové cookies zapínáme jen se souhlasem.",
+  "Souhlas můžete kdykoli odvolat tlačítkem dole na stránce.",
+  "Konkrétní seznam cookies a jejich životnosti najdete v Listě cookies.",
+];
+
+const categories = [
+  {
+    badge: "Vždy aktivní",
+    badgeTone: "green",
+    title: "Nezbytné cookies",
+    text: "Drží přihlášení, ukládají souhlas s cookies, brání útokům (CSRF). Bez nich web nefunguje. Právní důvod: oprávněný zájem (čl. 6 odst. 1 písm. f GDPR).",
+    examples: ["session_id", "csrf_token", "cookie_consent"],
+    lifetime: "Session — 1 rok",
+  },
+  {
+    badge: "Volitelné",
+    badgeTone: "amber",
+    title: "Funkční cookies",
+    text: "Pamatují si vaše preference — preferovanou variantu zobrazení, naposledy navštívené kategorie. Web bez nich funguje, ale méně pohodlně.",
+    examples: ["pref_theme", "pref_view", "last_category"],
+    lifetime: "30 dní — 1 rok",
+  },
+  {
+    badge: "Volitelné",
+    badgeTone: "amber",
+    title: "Analytické cookies",
+    text: "Anonymizovaně sledují, které články jsou populární a kde čtenáři odpadávají. Pomáhá nám vylepšovat obsah. IP adresy maskujeme, individuální uživatele nesledujeme.",
+    examples: ["_ga", "_ga_*", "_hjSessionUser_*"],
+    lifetime: "Až 2 roky",
+  },
+  {
+    badge: "Volitelné",
+    badgeTone: "red",
+    title: "Marketingové cookies",
+    text: "Aktuálně nepoužíváme. Pokud bychom v budoucnu spustili remarketingovou kampaň, budou tu vypsané a aktivuje je jen váš výslovný souhlas.",
+    examples: ["— žádné —"],
+    lifetime: "—",
+  },
+];
+
+const thirdParty = [
+  {
+    name: "Google Analytics 4",
+    purpose: "Anonymizovaná analytika návštěvnosti — kolik lidí čte které články.",
+    region: "EU / USA (SCC)",
+    optOut: "tools.google.com/dlpage/gaoptout",
+  },
+  {
+    name: "Hotjar",
+    purpose: "Tepelné mapy a session replay. Spouštíme jen na ~5 % návštěv, IP zamaskovaná.",
+    region: "EU (Malta)",
+    optOut: "hotjar.com/legal/compliance/opt-out",
+  },
+  {
+    name: "Heureka.cz",
+    purpose: "Affiliate tracking — když přejdete na Heureku, předá ji ID zdroje (Recenzer).",
+    region: "ČR",
+    optOut: "Heureka cookies banner",
+  },
+  {
+    name: "Cloudflare",
+    purpose: "Bot ochrana a CDN. Nezbytný cookie __cf_bm pro filtrování útoků.",
+    region: "Globální CDN",
+    optOut: "Není možné — nezbytný cookie",
+  },
+];
+
+const browsers = [
+  { name: "Chrome", path: "Nastavení → Soukromí a bezpečnost → Cookies a další data webu" },
+  { name: "Firefox", path: "Nastavení → Soukromí a zabezpečení → Cookies a data stránek" },
+  { name: "Safari", path: "Předvolby → Ochrana soukromí → Spravovat data webových stránek" },
+  { name: "Edge", path: "Nastavení → Soubory cookie a oprávnění stránek → Soubory cookie" },
+];
+
+const lastUpdated = "2026-04-15";
+---
+
+<BaseLayout
+  title="Zásady cookies — Recenzer"
+  description="Jak používáme cookies. 4 kategorie, cookies třetích stran, jak spravovat souhlas a smazat data."
+>
+  <PageBreadcrumbs items={[{ href: "/", label: "Recenzer" }, { label: "Zásady cookies" }]} />
+
+  <PageHero
+    eyebrow={`Cookies & ePrivacy · revize ${lastUpdated}`}
+    eyebrowIcon="shield"
+    title="Zásady<br/><em>cookies</em>"
+    subtitle="Co jsou cookies, které z nich používáme a jak je můžete spravovat. <strong>Marketingové cookies nezapínáme bez souhlasu</strong> — a aktuálně je ani žádné nepoužíváme."
+  />
+
+  <!-- Top action -->
+  <section class="cookie-action">
+    <div class="inner">
+      <button type="button" class="btn-primary" onclick="window.dispatchEvent(new CustomEvent('open-cookie-settings'));">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+          <circle cx="12" cy="12" r="3"/>
+          <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+        </svg>
+        Změnit nastavení cookies
+      </button>
+      <p class="action-note">Tlačítkem otevřete cookie banner a můžete znovu vybrat, co povolíte.</p>
+    </div>
+  </section>
+
+  <!-- TLDR -->
+  <section class="legal-tldr">
+    <div class="inner">
+      <div class="tldr-card">
+        <p class="tldr-eyebrow">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+            <polyline points="9 11 12 14 22 4" />
+            <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" />
+          </svg>
+          Cookies za 30 vteřin
+        </p>
+        <ul class="tldr-list">
+          {tldr.map((p) => <li>{p}</li>)}
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- WHAT -->
+  <section class="cookie-what">
+    <div class="inner">
+      <header class="section-head">
+        <p class="eyebrow">01 · Základy</p>
+        <h2>Co jsou cookies a jak fungují</h2>
+      </header>
+      <div class="what-grid">
+        <article>
+          <h3>Co to je?</h3>
+          <p>Malý textový soubor (max ~4 kB), který si web uloží ve vašem prohlížeči. Obsahuje pár písmen — typicky identifikátor relace, jazykovou preferenci nebo souhlas s cookies.</p>
+        </article>
+        <article>
+          <h3>Kde jsou uložené?</h3>
+          <p>Ve vašem prohlížeči (Chrome, Firefox, Safari, Edge). Recenzer.cz k cookies přistupuje jen u návštěvy našeho webu — nemůžeme je číst, když jste jinde.</p>
+        </article>
+        <article>
+          <h3>K čemu slouží?</h3>
+          <p>Drží přihlášení, pamatují si nastavení, anonymizovaně počítají návštěvy. Bez cookies by web vypadal jako prvonávštěvník při každém kliku.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- CATEGORIES -->
+  <section class="cookie-cats">
+    <div class="inner">
+      <header class="section-head">
+        <p class="eyebrow">02 · Kategorie</p>
+        <h2>4 kategorie cookies podle účelu</h2>
+        <p class="lead">Třídění odpovídá pokynům Úřadu pro ochranu osobních údajů a směrnici ePrivacy.</p>
+      </header>
+      <ul class="cats-list">
+        {
+          categories.map((c) => (
+            <li class:list={["cat-card", `tone-${c.badgeTone}`]}>
+              <div class="cat-head">
+                <span class="cat-badge">{c.badge}</span>
+                <h3>{c.title}</h3>
+              </div>
+              <p class="cat-text">{c.text}</p>
+              <dl class="cat-meta">
+                <dt>Příklady cookies</dt>
+                <dd>
+                  {c.examples.map((e, i) => (
+                    <>
+                      <code>{e}</code>
+                      {i < c.examples.length - 1 && <span class="dot">·</span>}
+                    </>
+                  ))}
+                </dd>
+                <dt>Životnost</dt>
+                <dd>{c.lifetime}</dd>
+              </dl>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <!-- THIRD-PARTY -->
+  <section class="cookie-third">
+    <div class="inner">
+      <header class="section-head">
+        <p class="eyebrow">03 · Třetí strany</p>
+        <h2>Cookies třetích stran</h2>
+        <p class="lead">Některé cookies neukládáme my, ale služby, které používáme. Všichni partneři dodržují GDPR.</p>
+      </header>
+      <ul class="third-list">
+        {
+          thirdParty.map((tp) => (
+            <li>
+              <div class="third-head">
+                <strong>{tp.name}</strong>
+                <span class="third-region">{tp.region}</span>
+              </div>
+              <p class="third-purpose">{tp.purpose}</p>
+              <p class="third-opt">Odhlášení: <code>{tp.optOut}</code></p>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <!-- CONSENT -->
+  <section class="cookie-consent">
+    <div class="inner">
+      <header class="section-head">
+        <p class="eyebrow">04 · Souhlas</p>
+        <h2>Jak fungují souhlas a odvolání</h2>
+      </header>
+      <ol class="consent-steps">
+        <li>
+          <span class="step-num">01</span>
+          <div>
+            <h3>První návštěva</h3>
+            <p>Při příchodu vám zobrazíme cookie banner s detailní volbou. Můžete potvrdit vše, jen nezbytné, nebo individuálně zvolit kategorie.</p>
+          </div>
+        </li>
+        <li>
+          <span class="step-num">02</span>
+          <div>
+            <h3>Záznam souhlasu</h3>
+            <p>Vaši volbu si uložíme do cookies <code>cookie_consent</code>. Drží 1 rok. Bez něj se banner zobrazí znovu.</p>
+          </div>
+        </li>
+        <li>
+          <span class="step-num">03</span>
+          <div>
+            <h3>Odvolání</h3>
+            <p>Kdykoli klikněte na tlačítko „Změnit nastavení cookies" v patičce nebo nahoře této stránky. Otevře se banner a můžete volbu změnit nebo zcela odvolat.</p>
+          </div>
+        </li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- BROWSERS -->
+  <section class="cookie-browsers">
+    <div class="inner">
+      <header class="section-head">
+        <p class="eyebrow">05 · Prohlížeč</p>
+        <h2>Jak smazat cookies ručně</h2>
+        <p class="lead">Pokud chcete smazat veškeré cookies (i ty nezbytné), použijte nastavení svého prohlížeče. Pozor — přijdete tím o vše uložené napříč weby.</p>
+      </header>
+      <ul class="browser-list">
+        {
+          browsers.map((b) => (
+            <li>
+              <strong>{b.name}</strong>
+              <span>{b.path}</span>
+            </li>
+          ))
+        }
+      </ul>
+      <div class="callout warn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+          <path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+          <line x1="12" y1="9" x2="12" y2="13"/>
+          <line x1="12" y1="17" x2="12.01" y2="17"/>
+        </svg>
+        <div>
+          <strong>Pozor:</strong> Smazáním cookies přijdete o nastavení napříč všemi weby, ne jen Recenzer.cz. Pro správu pouze našich cookies použijte tlačítko „Změnit nastavení cookies" nahoře.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <article class="cookie-end">
+    <div class="inner">
+      <h2>Vaše práva ohledně cookies</h2>
+      <p>
+        Souhlas s nepoinzbýtnými cookies můžete <strong>kdykoli odvolat</strong> tlačítkem v patičce.
+        Kompletní práva podle GDPR (přístup, oprava, výmaz, námitka) najdete v <a href="/zasady-osobnich-udaju/#prava">Zásadách ochrany osobních údajů</a>.
+      </p>
+      <p>
+        Konkrétní seznam aktuálně použitých cookies s jejich názvy, doménami a životnostmi je v <a href="/cookies-listy/">Listě cookies</a>.
+      </p>
+
+      <div class="end-footer">
+        <p class="end-meta">
+          Platnost těchto zásad od <strong>2016</strong>, poslední revize <time datetime={lastUpdated}>{lastUpdated}</time>.
+          Otázky k cookies: <a href="mailto:gdpr@recenzer.cz">gdpr@recenzer.cz</a>.
+        </p>
+        <div class="end-actions">
+          <a href="/cookies-listy/" class="btn-primary">Seznam cookies</a>
+          <a href="/zasady-osobnich-udaju/" class="btn-ghost">Zásady osobních údajů</a>
+        </div>
+      </div>
+    </div>
+  </article>
+
+  <style>
+    .inner {
+      max-width: var(--max-w);
+      margin: 0 auto;
+      padding: clamp(2rem, 4vw, 3rem) var(--gutter);
+    }
+
+    /* Top action */
+    .cookie-action {
+      background: var(--p-50);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .cookie-action .inner {
+      padding: 1.25rem var(--gutter);
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .action-note {
+      font-size: 13px;
+      color: var(--muted);
+      margin: 0;
+    }
+
+    /* TLDR (shared with legal pages) */
+    .legal-tldr { background: var(--bg); border-bottom: 1px solid var(--line); }
+
+    .tldr-card {
+      max-width: 760px;
+      margin: 0 auto;
+      padding: 2rem;
+      background: var(--ink);
+      color: #fff;
+      border-radius: var(--r-xl);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .tldr-card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(700px circle at 100% 0%, rgba(149, 114, 240, 0.28), transparent 55%),
+        radial-gradient(500px circle at 0% 100%, rgba(99, 50, 204, 0.2), transparent 55%);
+      pointer-events: none;
+    }
+
+    .tldr-eyebrow {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-family: var(--mono);
+      font-size: 11.5px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--p-300);
+      font-weight: 700;
+      margin: 0 0 1.25rem;
+    }
+
+    .tldr-eyebrow svg { width: 14px; height: 14px; }
+
+    .tldr-list {
+      position: relative;
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      counter-reset: tldr;
+      display: grid;
+      gap: 0.4rem;
+    }
+
+    .tldr-list li {
+      counter-increment: tldr;
+      padding: 0.65rem 0 0.65rem 3rem;
+      position: relative;
+      font-size: 15px;
+      line-height: 1.5;
+      color: rgba(255, 255, 255, 0.9);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .tldr-list li:last-child { border-bottom: 0; }
+
+    .tldr-list li::before {
+      content: counter(tldr, decimal-leading-zero);
+      position: absolute;
+      left: 0;
+      top: 0.65rem;
+      width: 28px;
+      height: 28px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      border-radius: 7px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--mono);
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--p-200);
+    }
+
+    /* Section heads (shared) */
+    .section-head {
+      max-width: 65ch;
+      margin: 0 0 1.75rem;
+    }
+
+    .eyebrow {
+      font-family: var(--mono);
+      font-size: 11.5px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--p-700);
+      font-weight: 700;
+      margin: 0 0 0.5rem;
+    }
+
+    .section-head h2 {
+      font-size: clamp(1.4rem, 2.5vw, 1.85rem);
+      font-weight: 800;
+      letter-spacing: -0.025em;
+      color: var(--ink);
+      line-height: 1.2;
+      margin-bottom: 0.6rem;
+    }
+
+    .section-head .lead {
+      font-size: 15px;
+      line-height: 1.6;
+      color: var(--muted);
+      margin: 0;
+    }
+
+    /* WHAT */
+    .cookie-what {
+      background: var(--bg-warm);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .what-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1rem;
+    }
+
+    @media (max-width: 880px) { .what-grid { grid-template-columns: 1fr; } }
+
+    .what-grid article {
+      padding: 1.5rem;
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: var(--r-lg);
+    }
+
+    .what-grid h3 {
+      font-size: 1.05rem;
+      font-weight: 800;
+      color: var(--ink);
+      margin-bottom: 0.4rem;
+    }
+
+    .what-grid p {
+      font-size: 14px;
+      line-height: 1.6;
+      color: var(--muted);
+      margin: 0;
+    }
+
+    /* Categories */
+    .cookie-cats {
+      background: var(--bg);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .cats-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+
+    @media (max-width: 720px) { .cats-list { grid-template-columns: 1fr; } }
+
+    .cat-card {
+      padding: 1.5rem;
+      background: var(--bg-warm);
+      border: 1px solid var(--line);
+      border-top: 3px solid var(--p-500);
+      border-radius: var(--r-lg);
+    }
+
+    .cat-card.tone-green { border-top-color: var(--green); }
+    .cat-card.tone-amber { border-top-color: var(--amber); }
+    .cat-card.tone-red { border-top-color: var(--red); }
+
+    .cat-head {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+      margin-bottom: 0.6rem;
+    }
+
+    .cat-badge {
+      font-family: var(--mono);
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 4px;
+      background: var(--p-50);
+      color: var(--p-700);
+    }
+
+    .tone-green .cat-badge { background: var(--green-bg); color: var(--green); }
+    .tone-amber .cat-badge { background: var(--amber-bg); color: var(--amber); }
+    .tone-red .cat-badge { background: var(--red-bg); color: var(--red); }
+
+    .cat-card h3 {
+      font-size: 1.1rem;
+      font-weight: 800;
+      color: var(--ink);
+      letter-spacing: -0.015em;
+      margin: 0;
+    }
+
+    .cat-text {
+      font-size: 14px;
+      line-height: 1.6;
+      color: var(--muted);
+      margin: 0 0 0.85rem;
+    }
+
+    .cat-meta {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 0.4rem 0.85rem;
+      margin: 0;
+      padding-top: 0.75rem;
+      border-top: 1px solid var(--line);
+    }
+
+    .cat-meta dt {
+      font-family: var(--mono);
+      font-size: 10.5px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--muted-2);
+      font-weight: 700;
+    }
+
+    .cat-meta dd {
+      margin: 0;
+      font-size: 12.5px;
+      color: var(--ink-soft);
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.35rem;
+    }
+
+    .cat-meta code {
+      font-family: var(--mono);
+      font-size: 11.5px;
+      background: var(--bg);
+      padding: 2px 5px;
+      border-radius: 3px;
+      border: 1px solid var(--line);
+      color: var(--ink);
+    }
+
+    .cat-meta .dot {
+      color: var(--muted-2);
+    }
+
+    /* Third party */
+    .cookie-third {
+      background: var(--bg-warm);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .third-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: grid;
+      gap: 0.6rem;
+    }
+
+    .third-list li {
+      padding: 1.1rem 1.25rem;
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: var(--r);
+    }
+
+    .third-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 1rem;
+      flex-wrap: wrap;
+      margin-bottom: 0.3rem;
+    }
+
+    .third-head strong {
+      font-size: 15px;
+      color: var(--ink);
+    }
+
+    .third-region {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--p-700);
+      background: var(--p-50);
+      padding: 2px 7px;
+      border-radius: 3px;
+      letter-spacing: 0.04em;
+    }
+
+    .third-purpose {
+      font-size: 13.5px;
+      line-height: 1.55;
+      color: var(--muted);
+      margin: 0 0 0.4rem;
+    }
+
+    .third-opt {
+      font-size: 12.5px;
+      color: var(--muted-2);
+      margin: 0;
+    }
+
+    .third-opt code {
+      font-family: var(--mono);
+      font-size: 11.5px;
+      color: var(--ink-soft);
+    }
+
+    /* Consent steps */
+    .cookie-consent {
+      background: var(--bg);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .consent-steps {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: grid;
+      gap: 0.85rem;
+    }
+
+    .consent-steps li {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 1rem;
+      padding: 1.25rem 1.5rem;
+      background: var(--bg-warm);
+      border: 1px solid var(--line);
+      border-radius: var(--r-lg);
+      align-items: start;
+    }
+
+    .step-num {
+      font-family: var(--mono);
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: var(--p-700);
+      letter-spacing: -0.02em;
+      line-height: 1;
+    }
+
+    .consent-steps h3 {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--ink);
+      margin-bottom: 0.3rem;
+    }
+
+    .consent-steps p {
+      font-size: 14px;
+      line-height: 1.6;
+      color: var(--muted);
+      margin: 0;
+    }
+
+    .consent-steps p code {
+      font-family: var(--mono);
+      font-size: 12px;
+      background: var(--bg);
+      padding: 2px 5px;
+      border-radius: 3px;
+      border: 1px solid var(--line);
+      color: var(--ink);
+    }
+
+    /* Browsers */
+    .cookie-browsers {
+      background: var(--bg-warm);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .browser-list {
+      list-style: none;
+      padding: 0;
+      margin: 0 0 1.5rem;
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 0.5rem;
+    }
+
+    @media (max-width: 600px) { .browser-list { grid-template-columns: 1fr; } }
+
+    .browser-list li {
+      padding: 0.85rem 1rem;
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: var(--r);
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .browser-list strong {
+      font-size: 14px;
+      color: var(--ink);
+    }
+
+    .browser-list span {
+      font-size: 12.5px;
+      color: var(--muted);
+    }
+
+    .callout.warn {
+      display: grid;
+      grid-template-columns: 32px 1fr;
+      gap: 0.85rem;
+      padding: 1rem 1.25rem;
+      background: var(--amber-bg);
+      border: 1px solid rgba(180, 83, 9, 0.2);
+      border-radius: var(--r);
+      align-items: start;
+    }
+
+    .callout.warn svg {
+      width: 20px;
+      height: 20px;
+      color: var(--amber);
+      margin-top: 1px;
+    }
+
+    .callout.warn strong { color: var(--ink); font-weight: 700; }
+
+    .callout.warn > div {
+      font-size: 14px;
+      line-height: 1.6;
+      color: var(--ink-soft);
+    }
+
+    /* End */
+    .cookie-end {
+      background: var(--bg);
+    }
+
+    .cookie-end .inner {
+      max-width: 760px;
+    }
+
+    .cookie-end h2 {
+      font-size: clamp(1.4rem, 2.5vw, 1.85rem);
+      font-weight: 800;
+      letter-spacing: -0.025em;
+      color: var(--ink);
+      line-height: 1.2;
+      margin-bottom: 0.85rem;
+    }
+
+    .cookie-end p {
+      font-size: 16px;
+      line-height: 1.7;
+      color: var(--ink-soft);
+      margin-bottom: 0.85rem;
+    }
+
+    .cookie-end strong { color: var(--ink); font-weight: 700; }
+    .cookie-end a { color: var(--p-700); text-decoration: underline; }
+
+    .end-footer {
+      margin-top: 2rem;
+      padding: 1.5rem;
+      background: var(--bg-warm);
+      border: 1px solid var(--line);
+      border-radius: var(--r-lg);
+    }
+
+    .end-meta {
+      font-size: 13.5px;
+      color: var(--muted);
+      margin-bottom: 1rem;
+    }
+
+    .end-actions {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    .btn-primary,
+    .btn-ghost {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      padding: 0.7rem 1.2rem;
+      border-radius: var(--r);
+      font-size: 13.5px;
+      font-weight: 600;
+      text-decoration: none;
+      cursor: pointer;
+      border: 1px solid transparent;
+      font-family: inherit;
+    }
+
+    .btn-primary {
+      background: var(--p-700);
+      color: #fff;
+      border-color: var(--p-700);
+    }
+
+    .btn-primary:hover,
+    .btn-primary:focus-visible {
+      background: var(--p-800);
+      border-color: var(--p-800);
+      color: #fff;
+    }
+
+    .btn-primary svg { width: 14px; height: 14px; }
+
+    .btn-ghost {
+      background: #fff;
+      color: var(--ink);
+      border-color: var(--line);
+    }
+
+    .btn-ghost:hover,
+    .btn-ghost:focus-visible {
+      border-color: var(--p-400);
+      color: var(--p-700);
+    }
+  </style>
+</BaseLayout>

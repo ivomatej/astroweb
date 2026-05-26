@@ -1,0 +1,693 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import { categories } from "../data/categories";
+import { getFeaturedArticleCards } from "../data/featured";
+
+const featured = getFeaturedArticleCards().slice(0, 3);
+
+const quickPaths = [
+  { href: "/", title: "Domovská stránka", note: "Začněte odznova", icon: "home" },
+  { href: "/mapa-webu/", title: "Mapa webu", note: "Všechny stránky pohromadě", icon: "map" },
+  { href: "/nejlepsi/", title: "TOP žebříčky", note: "Doporučované modely", icon: "trophy" },
+  { href: "/kontakt/", title: "Kontakt", note: "Napište nám", icon: "mail" },
+];
+
+const reasons = [
+  {
+    title: "Překlep v adrese",
+    text: "Zkontrolujte URL — někdy stačí písmenko špatně a stránka zmizí. Zkuste smazat poslední část a začít procházet od kořene.",
+  },
+  {
+    title: "Stránka byla přesunuta",
+    text: "Když měníme strukturu, někdy nestihneme všechny staré odkazy přesměrovat. Použijte vyhledávání nebo Mapu webu.",
+  },
+  {
+    title: "Starý odkaz",
+    text: "Pokud jste sem přišli ze starší stránky (Google, jiný web), může jít o článek, který už neexistuje. Pomůžeme vám najít náhradu.",
+  },
+];
+---
+
+<BaseLayout
+  title="Stránka nenalezena (404) — Recenzer"
+  description="Tato stránka neexistuje. Pojďme vám pomoci najít, co hledáte."
+  noIndex
+>
+  <!-- Hero -->
+  <section class="nf-hero">
+    <div class="inner">
+      <p class="nf-code">404</p>
+      <h1 class="nf-title">Ups, tady nic&nbsp;není.<br/><em>Pomůžeme</em> vám najít, co hledáte.</h1>
+      <p class="nf-subtitle">
+        Stránka, na kterou jste se snažili dostat, neexistuje, byla přesunuta, nebo má překlep v adrese.
+        Žádný stres — máme pro vás <strong>4 rychlé cesty dál</strong>.
+      </p>
+
+      <div class="nf-search">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+          <circle cx="11" cy="11" r="8" />
+          <line x1="21" y1="21" x2="16.65" y2="16.65" />
+        </svg>
+        <input
+          type="search"
+          placeholder="Hledat recenzi, návod nebo téma…"
+          aria-label="Vyhledávání"
+        />
+        <kbd>⌘K</kbd>
+      </div>
+    </div>
+  </section>
+
+  <!-- Quick paths -->
+  <section class="nf-quick">
+    <div class="inner">
+      <h2 class="section-title">Vyberte si rychlou cestu</h2>
+      <ul class="quick-grid">
+        {
+          quickPaths.map((p) => (
+            <li>
+              <a href={p.href}>
+                <div class="quick-ic" aria-hidden="true">
+                  {p.icon === "home" && (<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>)}
+                  {p.icon === "map" && (<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg>)}
+                  {p.icon === "trophy" && (<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg>)}
+                  {p.icon === "mail" && (<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>)}
+                </div>
+                <h3>{p.title}</h3>
+                <p>{p.note}</p>
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <!-- Featured suggestions -->
+  <section class="nf-featured">
+    <div class="inner">
+      <h2 class="section-title">Možná hledáte něco z tohoto</h2>
+      <ul class="featured-list">
+        {
+          featured.map((article) => (
+            <li>
+              <a href={article.href} class:list={["feat-card", `accent-${article.accent}`]}>
+                <div class="feat-media">
+                  {article.coverSrc ? (
+                    <img src={article.coverSrc} alt="" loading="lazy" />
+                  ) : (
+                    <div class="feat-pattern">
+                      <span>{article.coverPlaceholder ?? article.category}</span>
+                    </div>
+                  )}
+                  {article.badge && <span class="feat-badge">{article.badge}</span>}
+                </div>
+                <div class="feat-body">
+                  <p class="feat-cat">{article.category}</p>
+                  <h3 set:html={article.title} />
+                  <p class="feat-perex">{article.perex}</p>
+                </div>
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <!-- Categories -->
+  <section class="nf-categories">
+    <div class="inner">
+      <h2 class="section-title">Nebo začněte od kategorie</h2>
+      <ul class="cat-grid">
+        {
+          categories.map((c) => (
+            <li>
+              <a href={c.href} class:list={[`accent-${c.accent}`]}>
+                <strong>{c.name}</strong>
+                <span>{c.tagline}</span>
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <!-- Reasons -->
+  <section class="nf-reasons">
+    <div class="inner">
+      <header class="section-head">
+        <p class="eyebrow">Diagnostika</p>
+        <h2>Tři typické příčiny chyby 404</h2>
+      </header>
+      <ul class="reasons-list">
+        {
+          reasons.map((r, i) => (
+            <li>
+              <span class="reason-num">{String(i + 1).padStart(2, "0")}</span>
+              <div>
+                <h3>{r.title}</h3>
+                <p>{r.text}</p>
+              </div>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <!-- Report -->
+  <section class="nf-report">
+    <div class="inner">
+      <div class="report-card">
+        <div>
+          <p class="eyebrow">Pomozte nám</p>
+          <h2>Nahlaste rozbitý odkaz</h2>
+          <p>
+            Pokud jste sem přišli z konkrétního odkazu (Google, jiný web, e-mail), <strong>dejte nám vědět, odkud</strong> — opravíme strukturální problém pro další čtenáře.
+          </p>
+        </div>
+        <div class="report-actions">
+          <a href="/oprava-chyb/" class="btn-primary">
+            Nahlásit rozbitý odkaz
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+              <line x1="5" y1="12" x2="19" y2="12" />
+              <polyline points="12 5 19 12 12 19" />
+            </svg>
+          </a>
+          <a href="mailto:redakce@recenzer.cz" class="btn-ghost">redakce@recenzer.cz</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <style>
+    .inner {
+      max-width: var(--max-w);
+      margin: 0 auto;
+      padding: clamp(2rem, 4vw, 3rem) var(--gutter);
+    }
+
+    .section-title {
+      font-size: clamp(1.4rem, 2.5vw, 1.85rem);
+      font-weight: 800;
+      letter-spacing: -0.025em;
+      color: var(--ink);
+      line-height: 1.2;
+      margin: 0 0 1.5rem;
+    }
+
+    /* Hero */
+    .nf-hero {
+      background:
+        radial-gradient(900px circle at 90% 0%, rgba(149, 114, 240, 0.18), transparent 55%),
+        radial-gradient(700px circle at 10% 110%, rgba(99, 50, 204, 0.12), transparent 55%),
+        var(--bg);
+      border-bottom: 1px solid var(--line);
+      text-align: center;
+    }
+
+    .nf-hero .inner {
+      padding: clamp(3rem, 7vw, 5rem) var(--gutter);
+    }
+
+    .nf-code {
+      font-family: var(--mono);
+      font-size: clamp(4rem, 12vw, 8rem);
+      font-weight: 800;
+      color: var(--p-700);
+      line-height: 1;
+      letter-spacing: -0.05em;
+      margin: 0 0 0.5rem;
+      background: linear-gradient(135deg, var(--p-500), var(--p-800));
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .nf-title {
+      font-size: clamp(1.85rem, 4vw, 2.85rem);
+      font-weight: 800;
+      letter-spacing: -0.025em;
+      color: var(--ink);
+      line-height: 1.15;
+      margin: 0 auto 1rem;
+      max-width: 28ch;
+    }
+
+    .nf-title em {
+      font-style: italic;
+      color: var(--p-700);
+    }
+
+    .nf-subtitle {
+      font-size: clamp(1rem, 1.5vw, 1.15rem);
+      line-height: 1.55;
+      color: var(--ink-soft);
+      max-width: 56ch;
+      margin: 0 auto 2rem;
+    }
+
+    .nf-subtitle strong { color: var(--ink); font-weight: 700; }
+
+    .nf-search {
+      max-width: 540px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      padding: 0.4rem 0.6rem 0.4rem 1rem;
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      box-shadow: 0 6px 20px -8px rgba(46, 20, 102, 0.15);
+    }
+
+    .nf-search svg {
+      width: 16px;
+      height: 16px;
+      color: var(--muted-2);
+      flex-shrink: 0;
+    }
+
+    .nf-search input {
+      flex: 1;
+      border: 0;
+      outline: 0;
+      font: inherit;
+      font-size: 14.5px;
+      color: var(--ink);
+      background: transparent;
+      padding: 0.5rem 0;
+      min-width: 0;
+    }
+
+    .nf-search input::placeholder { color: var(--muted-2); }
+
+    .nf-search kbd {
+      font-family: var(--mono);
+      font-size: 11px;
+      padding: 3px 7px;
+      background: var(--bg-warm);
+      border: 1px solid var(--line);
+      border-radius: 4px;
+      color: var(--muted);
+      flex-shrink: 0;
+    }
+
+    /* Quick paths */
+    .nf-quick {
+      background: var(--bg-warm);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .quick-grid {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 0.85rem;
+    }
+
+    @media (max-width: 720px) { .quick-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 420px) { .quick-grid { grid-template-columns: 1fr; } }
+
+    .quick-grid a {
+      display: block;
+      padding: 1.5rem;
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: var(--r-lg);
+      text-decoration: none;
+      color: var(--ink);
+      transition: border-color 0.15s, transform 0.15s, box-shadow 0.15s;
+    }
+
+    .quick-grid a:hover,
+    .quick-grid a:focus-visible {
+      border-color: var(--p-400);
+      transform: translateY(-2px);
+      box-shadow: 0 12px 28px -16px rgba(46, 20, 102, 0.22);
+    }
+
+    .quick-ic {
+      width: 40px;
+      height: 40px;
+      border-radius: 11px;
+      background: var(--p-50);
+      color: var(--p-700);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 0.85rem;
+    }
+
+    .quick-ic svg { width: 20px; height: 20px; }
+
+    .quick-grid h3 {
+      font-size: 1rem;
+      font-weight: 800;
+      color: var(--ink);
+      margin-bottom: 0.25rem;
+    }
+
+    .quick-grid p {
+      font-size: 13px;
+      color: var(--muted);
+      margin: 0;
+    }
+
+    /* Featured */
+    .nf-featured {
+      background: var(--bg);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .featured-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.85rem;
+    }
+
+    @media (max-width: 880px) { .featured-list { grid-template-columns: 1fr; } }
+
+    .feat-card {
+      display: flex;
+      flex-direction: column;
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: var(--r-lg);
+      overflow: hidden;
+      text-decoration: none;
+      color: var(--ink);
+      transition: border-color 0.15s, transform 0.15s;
+    }
+
+    .feat-card.accent-purple { --accent-bg: var(--p-50); --accent-fg: var(--p-700); }
+    .feat-card.accent-amber { --accent-bg: var(--amber-bg); --accent-fg: var(--amber); }
+    .feat-card.accent-green { --accent-bg: var(--green-bg); --accent-fg: var(--green); }
+    .feat-card.accent-red { --accent-bg: var(--red-bg); --accent-fg: var(--red); }
+    .feat-card.accent-blue { --accent-bg: #e8eeff; --accent-fg: #1e40af; }
+
+    .feat-card:hover,
+    .feat-card:focus-visible {
+      border-color: var(--accent-fg);
+      transform: translateY(-3px);
+    }
+
+    .feat-media {
+      position: relative;
+      aspect-ratio: 16 / 10;
+      background: var(--accent-bg);
+      overflow: hidden;
+    }
+
+    .feat-media img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .feat-pattern {
+      width: 100%;
+      height: 100%;
+      background: repeating-linear-gradient(45deg, var(--accent-bg) 0 10px, transparent 10px 20px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+      text-align: center;
+    }
+
+    .feat-pattern span {
+      font-family: var(--mono);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--accent-fg);
+      font-weight: 600;
+    }
+
+    .feat-badge {
+      position: absolute;
+      top: 0.85rem;
+      left: 0.85rem;
+      padding: 3px 9px;
+      background: rgba(15, 19, 30, 0.85);
+      color: #fff;
+      font-family: var(--mono);
+      font-size: 10.5px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      font-weight: 700;
+      border-radius: var(--r-sm);
+    }
+
+    .feat-body {
+      padding: 1.25rem 1.4rem 1.5rem;
+    }
+
+    .feat-cat {
+      font-family: var(--mono);
+      font-size: 10.5px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--accent-fg);
+      font-weight: 700;
+      margin: 0 0 0.5rem;
+    }
+
+    .feat-card h3 {
+      font-size: 1.05rem;
+      font-weight: 800;
+      color: var(--ink);
+      letter-spacing: -0.015em;
+      line-height: 1.3;
+      margin: 0 0 0.5rem;
+    }
+
+    .feat-card h3 :global(em) {
+      font-style: italic;
+      color: var(--accent-fg);
+    }
+
+    .feat-perex {
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.55;
+      margin: 0;
+    }
+
+    /* Categories */
+    .nf-categories {
+      background: var(--bg-warm);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .cat-grid {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 0.5rem;
+    }
+
+    @media (max-width: 880px) { .cat-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 480px) { .cat-grid { grid-template-columns: 1fr; } }
+
+    .cat-grid a {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+      padding: 1rem 1.1rem;
+      background: #fff;
+      border: 1px solid var(--line);
+      border-left: 3px solid var(--p-500);
+      border-radius: var(--r);
+      text-decoration: none;
+      color: var(--ink);
+    }
+
+    .cat-grid a.accent-amber { border-left-color: var(--amber); }
+    .cat-grid a.accent-green { border-left-color: var(--green); }
+    .cat-grid a.accent-red { border-left-color: var(--red); }
+    .cat-grid a.accent-blue { border-left-color: #1d4ed8; }
+
+    .cat-grid a:hover,
+    .cat-grid a:focus-visible {
+      transform: translateY(-2px);
+    }
+
+    .cat-grid strong {
+      font-size: 14px;
+      color: var(--ink);
+    }
+
+    .cat-grid span {
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.4;
+    }
+
+    /* Reasons */
+    .nf-reasons {
+      background: var(--bg);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .section-head {
+      max-width: 65ch;
+      margin: 0 0 2rem;
+    }
+
+    .eyebrow {
+      font-family: var(--mono);
+      font-size: 11.5px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--p-700);
+      font-weight: 700;
+      margin: 0 0 0.5rem;
+    }
+
+    .section-head h2 {
+      font-size: clamp(1.4rem, 2.5vw, 1.85rem);
+      font-weight: 800;
+      letter-spacing: -0.025em;
+      color: var(--ink);
+      line-height: 1.2;
+      margin: 0;
+    }
+
+    .reasons-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.85rem;
+    }
+
+    @media (max-width: 720px) { .reasons-list { grid-template-columns: 1fr; } }
+
+    .reasons-list li {
+      padding: 1.5rem;
+      background: var(--bg-warm);
+      border: 1px solid var(--line);
+      border-radius: var(--r-lg);
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 1rem;
+      align-items: start;
+    }
+
+    .reason-num {
+      font-family: var(--mono);
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: var(--p-700);
+      line-height: 1;
+    }
+
+    .reasons-list h3 {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--ink);
+      margin-bottom: 0.3rem;
+    }
+
+    .reasons-list p {
+      font-size: 13.5px;
+      line-height: 1.55;
+      color: var(--muted);
+      margin: 0;
+    }
+
+    /* Report */
+    .nf-report {
+      background: var(--bg);
+    }
+
+    .report-card {
+      display: grid;
+      grid-template-columns: 1.4fr 1fr;
+      gap: 2rem;
+      align-items: center;
+      padding: 2rem;
+      background: var(--p-50);
+      border: 1px solid rgba(99, 50, 204, 0.18);
+      border-radius: var(--r-xl);
+    }
+
+    @media (max-width: 780px) { .report-card { grid-template-columns: 1fr; } }
+
+    .report-card h2 {
+      font-size: clamp(1.4rem, 2.5vw, 1.85rem);
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      color: var(--ink);
+      margin-bottom: 0.5rem;
+    }
+
+    .report-card p {
+      font-size: 15px;
+      line-height: 1.6;
+      color: var(--ink-soft);
+      margin: 0;
+    }
+
+    .report-card strong { color: var(--ink); font-weight: 700; }
+
+    .report-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .btn-primary,
+    .btn-ghost {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      padding: 0.75rem 1.25rem;
+      border-radius: var(--r);
+      font-size: 14px;
+      font-weight: 600;
+      text-decoration: none;
+      justify-content: center;
+    }
+
+    .btn-primary {
+      background: var(--p-700);
+      color: #fff;
+      border: 1px solid var(--p-700);
+    }
+
+    .btn-primary:hover,
+    .btn-primary:focus-visible {
+      background: var(--p-800);
+      border-color: var(--p-800);
+      color: #fff;
+    }
+
+    .btn-primary svg { width: 14px; height: 14px; }
+
+    .btn-ghost {
+      background: #fff;
+      color: var(--ink);
+      border: 1px solid var(--line);
+    }
+
+    .btn-ghost:hover,
+    .btn-ghost:focus-visible {
+      border-color: var(--p-400);
+      color: var(--p-700);
+    }
+  </style>
+</BaseLayout>

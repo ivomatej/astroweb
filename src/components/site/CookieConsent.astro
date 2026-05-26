@@ -1,0 +1,660 @@
+---
+/**
+ * Cookie consent — minimal bottom bar + granular modal.
+ *
+ * Behavior:
+ *  - Bar shows when no consent stored in localStorage.
+ *  - Three actions: "Odmítnout vše" (only necessary), "Přijmout vše", "Nastavení" (opens modal).
+ *  - Modal allows per-category toggles. Necessary always on.
+ *  - Choice is saved to localStorage under `recenzer:cookie-consent` (JSON: { necessary, functional, analytics, marketing, ts }).
+ *  - Window event `open-cookie-settings` re-opens the modal (used by /zasady-cookies/).
+ */
+---
+
+<aside
+  id="cookie-consent"
+  class="cookie-consent"
+  aria-label="Souhlas s cookies"
+  hidden
+>
+  <!-- Bar (A) -->
+  <div class="cc-bar" role="region" aria-labelledby="cc-bar-title">
+    <div class="cc-bar-inner">
+      <div class="cc-bar-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10" />
+          <circle cx="12" cy="12" r="3" />
+        </svg>
+      </div>
+      <p id="cc-bar-title" class="cc-bar-text">
+        <strong>Web používá cookies.</strong> Některé jsou nezbytné pro fungování, ostatní nám pomáhají vylepšovat obsah. Detail v
+        <a href="/zasady-cookies/">Zásadách cookies</a>.
+      </p>
+      <div class="cc-bar-actions">
+        <button type="button" class="cc-btn cc-btn-ghost" data-cc-action="reject">Odmítnout</button>
+        <button type="button" class="cc-btn cc-btn-ghost" data-cc-action="settings">Nastavení</button>
+        <button type="button" class="cc-btn cc-btn-primary" data-cc-action="accept-all">Přijmout vše</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal (C) -->
+  <div
+    class="cc-modal"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="cc-modal-title"
+    hidden
+  >
+    <div class="cc-modal-backdrop" data-cc-action="close-modal"></div>
+    <div class="cc-modal-card">
+      <header class="cc-modal-head">
+        <div>
+          <p class="cc-modal-eyebrow">Nastavení souhlasu</p>
+          <h2 id="cc-modal-title">Vyberte, co povolíte</h2>
+        </div>
+        <button type="button" class="cc-modal-close" aria-label="Zavřít" data-cc-action="close-modal">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18" />
+            <line x1="6" y1="6" x2="18" y2="18" />
+          </svg>
+        </button>
+      </header>
+
+      <p class="cc-modal-lead">
+        Detail kategorií najdete v <a href="/zasady-cookies/">Zásadách cookies</a>. Nezbytné cookies běží
+        vždy — bez nich web nefunguje.
+      </p>
+
+      <form class="cc-cats" data-cc-form>
+        <label class="cc-cat">
+          <span class="cc-cat-toggle">
+            <input type="checkbox" name="necessary" checked disabled />
+            <span class="cc-switch" aria-hidden="true"></span>
+          </span>
+          <span class="cc-cat-body">
+            <span class="cc-cat-head">
+              <strong>Nezbytné</strong>
+              <span class="cc-cat-badge always">Vždy aktivní</span>
+            </span>
+            <span class="cc-cat-text">Drží přihlášení, ukládají váš souhlas, brání útokům. Bez nich web nefunguje.</span>
+          </span>
+        </label>
+
+        <label class="cc-cat">
+          <span class="cc-cat-toggle">
+            <input type="checkbox" name="functional" />
+            <span class="cc-switch" aria-hidden="true"></span>
+          </span>
+          <span class="cc-cat-body">
+            <span class="cc-cat-head">
+              <strong>Funkční</strong>
+            </span>
+            <span class="cc-cat-text">Pamatují si vaše preference — variantu zobrazení, naposledy navštívené kategorie.</span>
+          </span>
+        </label>
+
+        <label class="cc-cat">
+          <span class="cc-cat-toggle">
+            <input type="checkbox" name="analytics" />
+            <span class="cc-switch" aria-hidden="true"></span>
+          </span>
+          <span class="cc-cat-body">
+            <span class="cc-cat-head">
+              <strong>Analytické</strong>
+            </span>
+            <span class="cc-cat-text">Anonymizovaně počítají návštěvnost — Google Analytics 4 a Hotjar. IP zamaskovaná.</span>
+          </span>
+        </label>
+
+        <label class="cc-cat">
+          <span class="cc-cat-toggle">
+            <input type="checkbox" name="marketing" />
+            <span class="cc-switch" aria-hidden="true"></span>
+          </span>
+          <span class="cc-cat-body">
+            <span class="cc-cat-head">
+              <strong>Marketingové</strong>
+              <span class="cc-cat-badge none">Aktuálně nepoužíváme</span>
+            </span>
+            <span class="cc-cat-text">Vyhrazeno pro budoucí remarketing. Spustí se jen po vašem souhlasu — a oznámíme to.</span>
+          </span>
+        </label>
+      </form>
+
+      <footer class="cc-modal-foot">
+        <button type="button" class="cc-btn cc-btn-ghost" data-cc-action="reject">Jen nezbytné</button>
+        <button type="button" class="cc-btn cc-btn-ghost" data-cc-action="save-selection">Uložit volbu</button>
+        <button type="button" class="cc-btn cc-btn-primary" data-cc-action="accept-all">Přijmout vše</button>
+      </footer>
+    </div>
+  </div>
+</aside>
+
+<script>
+  type Consent = {
+    necessary: true;
+    functional: boolean;
+    analytics: boolean;
+    marketing: boolean;
+    ts: number;
+  };
+
+  const STORAGE_KEY = "recenzer:cookie-consent";
+
+  function load(): Consent | null {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) return null;
+      const parsed = JSON.parse(raw) as Consent;
+      if (typeof parsed !== "object" || parsed === null) return null;
+      return parsed;
+    } catch {
+      return null;
+    }
+  }
+
+  function save(consent: Omit<Consent, "necessary" | "ts">): void {
+    const payload: Consent = {
+      necessary: true,
+      functional: consent.functional,
+      analytics: consent.analytics,
+      marketing: consent.marketing,
+      ts: Date.now(),
+    };
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
+      window.dispatchEvent(
+        new CustomEvent("cookie-consent-changed", { detail: payload })
+      );
+    } catch {
+      // ignore quota errors
+    }
+  }
+
+  function init(): void {
+    const root = document.getElementById("cookie-consent");
+    if (!root) return;
+
+    const bar = root.querySelector<HTMLElement>(".cc-bar")!;
+    const modal = root.querySelector<HTMLElement>(".cc-modal")!;
+    const form = root.querySelector<HTMLFormElement>("[data-cc-form]")!;
+
+    function applyBodyPadding(): void {
+      const h = bar.offsetHeight;
+      document.body.style.paddingBottom = `${h}px`;
+    }
+
+    function clearBodyPadding(): void {
+      document.body.style.paddingBottom = "";
+    }
+
+    function showBar(): void {
+      root!.hidden = false;
+      bar.style.display = "block";
+      // Wait one frame so offsetHeight is correct.
+      requestAnimationFrame(applyBodyPadding);
+    }
+
+    function hideBar(): void {
+      bar.style.display = "none";
+      clearBodyPadding();
+    }
+
+    function openModal(prefill?: Consent | null): void {
+      // Reflect current consent if any
+      const data = prefill ?? load();
+      if (data) {
+        (form.elements.namedItem("functional") as HTMLInputElement).checked = data.functional;
+        (form.elements.namedItem("analytics") as HTMLInputElement).checked = data.analytics;
+        (form.elements.namedItem("marketing") as HTMLInputElement).checked = data.marketing;
+      }
+      root!.hidden = false;
+      modal.hidden = false;
+      document.body.style.overflow = "hidden";
+    }
+
+    function closeModal(): void {
+      modal.hidden = true;
+      document.body.style.overflow = "";
+      // If consent was already saved, hide the whole component
+      if (load()) {
+        hideBar();
+        root!.hidden = true;
+      }
+    }
+
+    function accept(level: "all" | "reject" | "selection"): void {
+      let payload = { functional: false, analytics: false, marketing: false };
+      if (level === "all") {
+        payload = { functional: true, analytics: true, marketing: true };
+      } else if (level === "selection") {
+        const fd = new FormData(form);
+        payload = {
+          functional: fd.get("functional") === "on",
+          analytics: fd.get("analytics") === "on",
+          marketing: fd.get("marketing") === "on",
+        };
+      }
+      save(payload);
+      hideBar();
+      modal.hidden = true;
+      document.body.style.overflow = "";
+      root!.hidden = true;
+    }
+
+    root.addEventListener("click", (event) => {
+      const target = (event.target as HTMLElement).closest<HTMLElement>("[data-cc-action]");
+      if (!target) return;
+      const action = target.dataset.ccAction;
+      switch (action) {
+        case "accept-all":
+          accept("all");
+          break;
+        case "reject":
+          accept("reject");
+          break;
+        case "settings":
+          openModal();
+          break;
+        case "save-selection":
+          accept("selection");
+          break;
+        case "close-modal":
+          closeModal();
+          break;
+      }
+    });
+
+    // Allow other pages (e.g. /zasady-cookies/) to re-open the settings.
+    window.addEventListener("open-cookie-settings", () => openModal(load()));
+
+    // ESC closes the modal.
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape" && !modal.hidden) {
+        closeModal();
+      }
+    });
+
+    if (!load()) {
+      showBar();
+    }
+
+    // Keep body padding in sync when the bar's height changes
+    // (e.g. on viewport resize when the bar wraps).
+    window.addEventListener("resize", () => {
+      if (bar.style.display !== "none") {
+        applyBodyPadding();
+      }
+    });
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", init);
+  } else {
+    init();
+  }
+</script>
+
+<style>
+  .cookie-consent { font-family: var(--sans); }
+
+  /* ---------- Bar ---------- */
+  .cc-bar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 9000;
+    background: var(--ink);
+    color: #fff;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 -8px 32px rgba(15, 19, 30, 0.18);
+  }
+
+  .cc-bar-inner {
+    max-width: var(--max-w);
+    margin: 0 auto;
+    padding: 0.85rem var(--gutter);
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: 1rem;
+    align-items: center;
+  }
+
+  .cc-bar-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 9px;
+    background: rgba(255, 255, 255, 0.08);
+    color: var(--p-300);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .cc-bar-icon svg { width: 16px; height: 16px; }
+
+  .cc-bar-text {
+    margin: 0;
+    font-size: 13.5px;
+    line-height: 1.55;
+    color: rgba(255, 255, 255, 0.85);
+  }
+
+  .cc-bar-text strong { color: #fff; font-weight: 700; }
+
+  .cc-bar-text a {
+    color: var(--p-300);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  .cc-bar-text a:hover,
+  .cc-bar-text a:focus-visible {
+    color: #fff;
+  }
+
+  .cc-bar-actions {
+    display: flex;
+    gap: 0.4rem;
+    flex-shrink: 0;
+  }
+
+  @media (max-width: 880px) {
+    .cc-bar-inner {
+      grid-template-columns: 1fr;
+      gap: 0.85rem;
+    }
+    .cc-bar-actions { justify-content: flex-end; }
+  }
+
+  /* ---------- Modal ---------- */
+  .cc-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 9100;
+    display: grid;
+    place-items: center;
+    padding: 1rem;
+  }
+
+  .cc-modal[hidden] { display: none; }
+
+  .cc-modal-backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(15, 19, 30, 0.65);
+    backdrop-filter: blur(2px);
+  }
+
+  .cc-modal-card {
+    position: relative;
+    width: min(600px, 100%);
+    max-height: calc(100vh - 2rem);
+    overflow-y: auto;
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: var(--r-xl);
+    box-shadow: 0 24px 64px -16px rgba(15, 19, 30, 0.4);
+    padding: 1.75rem;
+  }
+
+  .cc-modal-head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 1rem;
+  }
+
+  .cc-modal-eyebrow {
+    font-family: var(--mono);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--p-700);
+    font-weight: 700;
+    margin: 0 0 0.35rem;
+  }
+
+  .cc-modal-head h2 {
+    font-size: 1.35rem;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    color: var(--ink);
+    margin: 0;
+  }
+
+  .cc-modal-close {
+    width: 34px;
+    height: 34px;
+    border-radius: 9px;
+    background: var(--bg-warm);
+    border: 1px solid var(--line);
+    color: var(--ink);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+  }
+
+  .cc-modal-close:hover,
+  .cc-modal-close:focus-visible {
+    border-color: var(--p-400);
+    color: var(--p-700);
+  }
+
+  .cc-modal-close svg { width: 18px; height: 18px; }
+
+  .cc-modal-lead {
+    font-size: 13.5px;
+    line-height: 1.55;
+    color: var(--muted);
+    margin: 0 0 1.25rem;
+  }
+
+  .cc-modal-lead a {
+    color: var(--p-700);
+    text-decoration: underline;
+  }
+
+  /* Categories */
+  .cc-cats {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-bottom: 1.25rem;
+  }
+
+  .cc-cat {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 0.85rem;
+    padding: 1rem 1.1rem;
+    background: var(--bg-warm);
+    border: 1px solid var(--line);
+    border-radius: var(--r);
+    cursor: pointer;
+  }
+
+  .cc-cat:has(input:checked:not(:disabled)) {
+    border-color: var(--p-400);
+    background: var(--p-50);
+  }
+
+  .cc-cat-toggle {
+    position: relative;
+    width: 38px;
+    height: 22px;
+    flex-shrink: 0;
+    align-self: center;
+  }
+
+  .cc-cat-toggle input {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    margin: 0;
+    cursor: pointer;
+  }
+
+  .cc-switch {
+    display: block;
+    width: 100%;
+    height: 100%;
+    background: var(--muted-2);
+    border-radius: 999px;
+    position: relative;
+    transition: background 0.15s;
+  }
+
+  .cc-switch::after {
+    content: "";
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    width: 16px;
+    height: 16px;
+    background: #fff;
+    border-radius: 50%;
+    transition: transform 0.15s;
+  }
+
+  .cc-cat-toggle input:checked + .cc-switch {
+    background: var(--p-600);
+  }
+
+  .cc-cat-toggle input:checked + .cc-switch::after {
+    transform: translateX(16px);
+  }
+
+  .cc-cat-toggle input:disabled + .cc-switch {
+    background: var(--green);
+    opacity: 0.85;
+  }
+
+  .cc-cat-toggle input:disabled {
+    cursor: not-allowed;
+  }
+
+  .cc-cat-body {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+    min-width: 0;
+  }
+
+  .cc-cat-head {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
+
+  .cc-cat-head strong {
+    font-size: 14.5px;
+    color: var(--ink);
+  }
+
+  .cc-cat-badge {
+    font-family: var(--mono);
+    font-size: 9.5px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-weight: 700;
+    padding: 2px 7px;
+    border-radius: 4px;
+  }
+
+  .cc-cat-badge.always {
+    background: var(--green-bg);
+    color: var(--green);
+  }
+
+  .cc-cat-badge.none {
+    background: var(--bg);
+    color: var(--muted);
+    border: 1px solid var(--line);
+  }
+
+  .cc-cat-text {
+    font-size: 12.5px;
+    line-height: 1.55;
+    color: var(--muted);
+  }
+
+  /* Modal footer */
+  .cc-modal-foot {
+    display: flex;
+    gap: 0.4rem;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+    padding-top: 1rem;
+    border-top: 1px solid var(--line);
+  }
+
+  /* Buttons (shared) */
+  .cc-btn {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.55rem 1rem;
+    border-radius: var(--r);
+    font-size: 13px;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    border: 1px solid transparent;
+    transition: background 0.15s, color 0.15s, border-color 0.15s;
+  }
+
+  .cc-bar .cc-btn-ghost {
+    background: rgba(255, 255, 255, 0.06);
+    color: rgba(255, 255, 255, 0.9);
+    border-color: rgba(255, 255, 255, 0.18);
+  }
+
+  .cc-bar .cc-btn-ghost:hover,
+  .cc-bar .cc-btn-ghost:focus-visible {
+    background: rgba(255, 255, 255, 0.14);
+    border-color: rgba(255, 255, 255, 0.32);
+    color: #fff;
+  }
+
+  .cc-bar .cc-btn-primary {
+    background: #fff;
+    color: var(--p-800);
+    border-color: #fff;
+  }
+
+  .cc-bar .cc-btn-primary:hover,
+  .cc-bar .cc-btn-primary:focus-visible {
+    background: var(--p-100);
+    border-color: var(--p-100);
+  }
+
+  .cc-modal .cc-btn-ghost {
+    background: #fff;
+    color: var(--ink);
+    border-color: var(--line);
+  }
+
+  .cc-modal .cc-btn-ghost:hover,
+  .cc-modal .cc-btn-ghost:focus-visible {
+    border-color: var(--p-400);
+    color: var(--p-700);
+  }
+
+  .cc-modal .cc-btn-primary {
+    background: var(--p-700);
+    color: #fff;
+    border-color: var(--p-700);
+  }
+
+  .cc-modal .cc-btn-primary:hover,
+  .cc-modal .cc-btn-primary:focus-visible {
+    background: var(--p-800);
+    border-color: var(--p-800);
+  }
+</style>

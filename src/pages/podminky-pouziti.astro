@@ -1,0 +1,771 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import PageBreadcrumbs from "../components/page/PageBreadcrumbs.astro";
+import PageHero from "../components/page/PageHero.astro";
+
+const tldr = [
+  "Web Recenzer.cz provozuje Converso Group s.r.o., obsah je chráněn autorským právem.",
+  "Můžete číst, sdílet odkazy, citovat krátké pasáže se zdrojem.",
+  "Nesmíte obsah kopírovat ve velkém, používat ho komerčně bez svolení nebo skrapovat web automaticky.",
+  "Některé odkazy jsou affiliate — provize od e-shopu, vy cenu neplatíte navíc.",
+  "Hodnocení jsou subjektivní názor redakce, ne objektivní pravda.",
+];
+
+const definitions = [
+  {
+    term: "Provozovatel",
+    text: "Converso Group s.r.o., IČ 09876543, Lidická 718/77, 602 00 Brno. V textu také jen <strong>my</strong> nebo <strong>Recenzer</strong>.",
+  },
+  {
+    term: "Návštěvník webu",
+    text: "Jakákoli osoba, která přistupuje na webové stránky <strong>recenzer.cz</strong> nebo <strong>recenzer.sk</strong> — bez ohledu na to, zda je přihlášena nebo ne.",
+  },
+  {
+    term: "Web Recenzer.cz",
+    text: "Soubor stránek, redakčního obsahu, databází a funkcí dostupných na doméně recenzer.cz a všech jejích subdoménách (např. ucet.recenzer.cz).",
+  },
+  {
+    term: "Obsah",
+    text: "Veškeré texty, obrázky, fotografie, grafy, infografiky, srovnání, datové tabulky, video a další materiály zveřejněné na webu.",
+  },
+];
+
+const sections = [
+  {
+    id: "predmet",
+    num: "01",
+    title: "Předmět smluvního vztahu",
+    paragraphs: [
+      "Tyto podmínky upravují vztah mezi <strong>Provozovatelem</strong> a <strong>Návštěvníkem</strong> při návštěvě a používání webu Recenzer.cz. Pouhým otevřením webu vyjadřujete souhlas s těmito podmínkami.",
+      "Pokud s některým bodem nesouhlasíte, prosím opusťte web. Není možné používat web jen částečně — podmínky jsou závazné jako celek.",
+      "Tyto podmínky se mohou v čase měnit (viz sekce Změny podmínek níže). Aktuální verzi vždy najdete na této stránce.",
+    ],
+  },
+  {
+    id: "autorska",
+    num: "02",
+    title: "Autorská práva a licence",
+    paragraphs: [
+      "Veškerý obsah na webu Recenzer.cz je chráněn autorským právem podle zákona č. 121/2000 Sb. <strong>Autorem je Provozovatel</strong> nebo konkrétní jmenovaný autor (vždy uveden u článku). Cokoli, co na webu vidíte, není volně k použití — bez souhlasu Provozovatele nesmíte:",
+    ],
+    list: [
+      "Kopírovat nebo přebírat obsah na jiné weby, blogy, sociální sítě či tiskoviny.",
+      "Používat obsah komerčně (např. zařadit ho do placeného produktu).",
+      "Generovat z obsahu odvozená díla a vydávat je za vlastní práci.",
+      "Skrapovat web automatizovaně (boti, scrapery) bez výslovného svolení.",
+    ],
+    extraParagraphs: [
+      "<strong>Co můžete bez svolení:</strong> sdílet odkazy na konkrétní články, citovat <strong>krátké pasáže</strong> (do 200 slov) s uvedením zdroje a hypertextového odkazu, používat obsah pro osobní, nekomerční potřebu (např. vytisknout si srovnávací tabulku pro vlastní rozhodování).",
+      "Pro většinu jiných způsobů použití nás kontaktujte na <a href=\"mailto:redakce@recenzer.cz\">redakce@recenzer.cz</a>. Studentské nebo nekomerční citace nad rámec citačního zákona typicky povolujeme bez problému.",
+    ],
+  },
+  {
+    id: "pravidla",
+    num: "03",
+    title: "Pravidla užívání webu",
+    paragraphs: [
+      "Web Recenzer.cz je veřejně přístupný, ale jeho používání má svá pravidla. Stručně řečeno: chovejte se tak, jak byste očekávali, že se ostatní chovají k vašemu webu.",
+    ],
+    dosdonts: {
+      dos: [
+        "Číst, sdílet odkazy a doporučovat naše články přátelům.",
+        "Komentovat články a podílet se na diskuzi, pokud dodržujete pravidla.",
+        "Hodnotit produkty a články — pomáhá to ostatním čtenářům.",
+        "Kontaktovat redakci s tipy, opravami nebo dotazy.",
+        "Citovat naše údaje a srovnání s uvedením zdroje (krátké pasáže).",
+      ],
+      donts: [
+        "Skrapovat web automaticky bez svolení (porušuje vás IP může být zablokována).",
+        "Pokoušet se obejít autentizaci, číst data jiných uživatelů nebo měnit databázi.",
+        "Vkládat do komentářů spam, reklamu, urážky nebo nepravdivé informace.",
+        "Vydávat se za jiného uživatele, autora redakce nebo Provozovatele.",
+        "Provádět jakékoli činnosti, které by mohly poškodit web, jeho infrastrukturu nebo dobré jméno.",
+      ],
+    },
+    extraParagraphs: [
+      "Vyhrazujeme si právo zablokovat IP adresu nebo uživatelský účet v případě porušení těchto pravidel — bez nároku na náhradu.",
+    ],
+  },
+  {
+    id: "affiliate",
+    num: "04",
+    title: "Affiliate odkazy a monetizace",
+    paragraphs: [
+      "Web Recenzer.cz je financován převážně z <strong>affiliate provizí</strong>. Když kliknete na některý z odkazů na e-shopy (Heureka, Alza, Mountfield apod.) a uskutečníte nákup, e-shop nám zaplatí malou provizi. <strong>Pro vás se cena nákupu nemění</strong> — provize jde z marže e-shopu.",
+      "Affiliate odkazy nemají vliv na pořadí ani hodnocení produktů v našich recenzích. Pokud nejlepší model je z e-shopu, se kterým nemáme spolupráci, doporučíme ho stejně.",
+      "Detail o tom, jak vyděláváme, najdete na stránce <a href=\"/o-nas/#jak-vydelavame\">O nás → Jak vyděláváme</a>. Detail editoriální oddělenosti v <a href=\"/eticky-kodex/\">Etickém kodexu</a>.",
+    ],
+  },
+  {
+    id: "odpovednost",
+    num: "05",
+    title: "Odpovědnost a limity",
+    paragraphs: [
+      "Veškerý obsah na webu poskytujeme „tak, jak je\" a v dobré víře. Snažíme se o maximální přesnost, aktualizace a ověřování — ale neneseme odpovědnost za případné chyby, zastaralé informace nebo škody vzniklé na základě rozhodnutí učiněných podle informací na webu.",
+    ],
+    cards: [
+      {
+        title: "Aktuálnost",
+        text: "Ceny, dostupnost a parametry produktů se mohou kdykoli změnit. Vždy ověřte aktuální údaje přímo u prodejce.",
+      },
+      {
+        title: "Subjektivita hodnocení",
+        text: "Hodnocení a doporučení jsou <strong>subjektivní názor redakce a garantů</strong>, ne objektivní pravda. Vaše potřeby mohou vyžadovat jiné rozhodnutí.",
+      },
+      {
+        title: "Technické problémy",
+        text: "Snažíme se o nepřetržitý provoz, ale negarantujeme ho. Krátké výpadky pro údržbu nebo nečekané chyby jsou možné.",
+      },
+      {
+        title: "Externí odkazy",
+        text: "Neneseme odpovědnost za obsah ani fungování externích webů, na které z naší stránky odkazujeme.",
+      },
+    ],
+  },
+  {
+    id: "zmeny",
+    num: "06",
+    title: "Změny podmínek",
+    paragraphs: [
+      "Tyto podmínky můžeme změnit. Změny vstoupí v platnost zveřejněním na této stránce. Pokud po změně budete web nadále používat, vyjadřujete tím s novou verzí podmínek souhlas.",
+      "Významné změny (například nový druh zpracování dat nebo platebního modelu) předem oznámíme na hlavní stránce webu nebo na e-mail, pokud jste přihlášeni k odběru novinek.",
+    ],
+  },
+  {
+    id: "spory",
+    num: "07",
+    title: "Řešení sporů",
+    paragraphs: [
+      "Případné spory plynoucí z těchto podmínek se řídí <strong>českým právem</strong>. K projednávání sporů je místně příslušný soud <strong>v Brně</strong> podle obecných pravidel občanského soudního řádu.",
+      "Předtím než se obrátíte na soud, prosím zkuste věc vyřešit přímo s redakcí na <a href=\"mailto:redakce@recenzer.cz\">redakce@recenzer.cz</a>. Většinu situací řešíme dohodou do 5 pracovních dnů.",
+      "Spotřebitelé mohou v případě sporu využít platformu pro online řešení sporů Evropské komise dostupnou na <a href=\"https://ec.europa.eu/consumers/odr\" target=\"_blank\" rel=\"noopener\">ec.europa.eu/consumers/odr</a>.",
+    ],
+  },
+];
+
+const lastUpdated = "2026-04-15";
+---
+
+<BaseLayout
+  title="Podmínky použití — Recenzer"
+  description="Pravidla pro používání webu Recenzer.cz. Autorská práva, affiliate odkazy, odpovědnost a řešení sporů."
+>
+  <PageBreadcrumbs items={[{ href: "/", label: "Recenzer" }, { label: "Podmínky použití" }]} />
+
+  <PageHero
+    eyebrow={`Podmínky · revize ${lastUpdated}`}
+    eyebrowIcon="doc"
+    title="Podmínky<br/><em>použití webu</em>"
+    subtitle="Pravidla pro používání Recenzer.cz. Co smíte, co naopak nikdy, jak fungují affiliate odkazy a kdo nese za co odpovědnost. <strong>Většina věcí je obyčejný selský rozum</strong>."
+  />
+
+  <!-- TLDR -->
+  <section class="legal-tldr">
+    <div class="inner">
+      <div class="tldr-card">
+        <p class="tldr-eyebrow">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+            <polyline points="9 11 12 14 22 4" />
+            <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" />
+          </svg>
+          Co potřebujete vědět za 30 vteřin
+        </p>
+        <ul class="tldr-list">
+          {tldr.map((p) => <li>{p}</li>)}
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- DEFINITIONS -->
+  <section class="legal-defs">
+    <div class="inner">
+      <header class="section-head">
+        <p class="eyebrow">Slovník</p>
+        <h2>Definice použitých pojmů</h2>
+        <p class="lead">
+          V dalším textu používáme zkráceně několik termínů. Pro úplnou jednoznačnost je tady vysvětlujeme.
+        </p>
+      </header>
+      <dl class="defs">
+        {
+          definitions.map((d) => (
+            <>
+              <dt>{d.term}</dt>
+              <dd set:html={d.text} />
+            </>
+          ))
+        }
+      </dl>
+    </div>
+  </section>
+
+  <!-- TOC -->
+  <section class="legal-toc">
+    <div class="inner">
+      <nav aria-label="Obsah">
+        <p class="toc-label">Obsah</p>
+        <ol>
+          {
+            sections.map((s) => (
+              <li>
+                <a href={`#${s.id}`}>
+                  <span class="toc-num">{s.num}</span>
+                  <span>{s.title}</span>
+                </a>
+              </li>
+            ))
+          }
+        </ol>
+      </nav>
+    </div>
+  </section>
+
+  <!-- BODY -->
+  <article class="legal-body">
+    <div class="inner">
+      {
+        sections.map((s) => (
+          <section id={s.id} class="legal-section">
+            <header>
+              <span class="legal-num">{s.num}</span>
+              <h2>{s.title}</h2>
+            </header>
+
+            {s.paragraphs?.map((p) => <p set:html={p} />)}
+
+            {s.list && (
+              <ul class="legal-list">
+                {s.list.map((item) => <li set:html={item} />)}
+              </ul>
+            )}
+
+            {s.cards && (
+              <ul class="liability-cards">
+                {s.cards.map((card) => (
+                  <li>
+                    <h3>{card.title}</h3>
+                    <p set:html={card.text} />
+                  </li>
+                ))}
+              </ul>
+            )}
+
+            {s.dosdonts && (
+              <div class="dosdonts-grid">
+                <div class="dosdonts-col positive">
+                  <h3>
+                    <span class="check" aria-hidden="true">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                        <polyline points="20 6 9 17 4 12" />
+                      </svg>
+                    </span>
+                    Co smíte
+                  </h3>
+                  <ul>
+                    {s.dosdonts.dos.map((item) => <li>{item}</li>)}
+                  </ul>
+                </div>
+                <div class="dosdonts-col negative">
+                  <h3>
+                    <span class="check" aria-hidden="true">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                        <line x1="18" y1="6" x2="6" y2="18" />
+                        <line x1="6" y1="6" x2="18" y2="18" />
+                      </svg>
+                    </span>
+                    Co nesmíte
+                  </h3>
+                  <ul>
+                    {s.dosdonts.donts.map((item) => <li>{item}</li>)}
+                  </ul>
+                </div>
+              </div>
+            )}
+
+            {s.extraParagraphs?.map((p) => <p set:html={p} />)}
+          </section>
+        ))
+      }
+
+      <footer class="legal-footer">
+        <p>
+          Platnost těchto podmínek od <strong>2016</strong>, poslední revize <time datetime={lastUpdated}>{lastUpdated}</time>.
+          Otázky k podmínkám: <a href="mailto:redakce@recenzer.cz">redakce@recenzer.cz</a>.
+        </p>
+        <div class="legal-actions">
+          <a href="/zasady-osobnich-udaju/" class="btn-primary">Zásady osobních údajů</a>
+          <a href="/zasady-cookies/" class="btn-ghost">Zásady cookies</a>
+          <a href="/eticky-kodex/" class="btn-ghost">Etický kodex</a>
+        </div>
+      </footer>
+    </div>
+  </article>
+
+  <style>
+    .inner {
+      max-width: var(--max-w);
+      margin: 0 auto;
+      padding: clamp(2rem, 4vw, 3rem) var(--gutter);
+    }
+
+    /* TLDR shared with other legal pages */
+    .legal-tldr { background: var(--bg); border-bottom: 1px solid var(--line); }
+
+    .tldr-card {
+      max-width: 760px;
+      margin: 0 auto;
+      padding: 2rem;
+      background: var(--ink);
+      color: #fff;
+      border-radius: var(--r-xl);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .tldr-card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(700px circle at 100% 0%, rgba(149, 114, 240, 0.28), transparent 55%),
+        radial-gradient(500px circle at 0% 100%, rgba(99, 50, 204, 0.2), transparent 55%);
+      pointer-events: none;
+    }
+
+    .tldr-eyebrow {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-family: var(--mono);
+      font-size: 11.5px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--p-300);
+      font-weight: 700;
+      margin: 0 0 1.25rem;
+    }
+
+    .tldr-eyebrow svg { width: 14px; height: 14px; }
+
+    .tldr-list {
+      position: relative;
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      counter-reset: tldr;
+      display: grid;
+      gap: 0.4rem;
+    }
+
+    .tldr-list li {
+      counter-increment: tldr;
+      padding: 0.65rem 0 0.65rem 3rem;
+      position: relative;
+      font-size: 15px;
+      line-height: 1.5;
+      color: rgba(255, 255, 255, 0.9);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .tldr-list li:last-child { border-bottom: 0; }
+
+    .tldr-list li::before {
+      content: counter(tldr, decimal-leading-zero);
+      position: absolute;
+      left: 0;
+      top: 0.65rem;
+      width: 28px;
+      height: 28px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      border-radius: 7px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--mono);
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--p-200);
+    }
+
+    /* Section heads */
+    .section-head {
+      max-width: 65ch;
+      margin: 0 0 1.5rem;
+    }
+
+    .eyebrow {
+      font-family: var(--mono);
+      font-size: 11.5px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--p-700);
+      font-weight: 700;
+      margin: 0 0 0.5rem;
+    }
+
+    .section-head h2 {
+      font-size: clamp(1.4rem, 2.5vw, 1.85rem);
+      font-weight: 800;
+      letter-spacing: -0.025em;
+      color: var(--ink);
+      line-height: 1.2;
+      margin-bottom: 0.6rem;
+    }
+
+    .section-head .lead {
+      font-size: 15px;
+      line-height: 1.6;
+      color: var(--muted);
+      margin: 0;
+    }
+
+    /* Definitions */
+    .legal-defs {
+      background: var(--bg-warm);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .defs {
+      display: grid;
+      grid-template-columns: 200px 1fr;
+      gap: 0.85rem 1.5rem;
+      margin: 0;
+      padding: 0;
+    }
+
+    @media (max-width: 640px) {
+      .defs { grid-template-columns: 1fr; gap: 0.3rem 0; }
+      .defs dd { margin-bottom: 0.85rem; }
+    }
+
+    .defs dt {
+      font-weight: 700;
+      color: var(--p-700);
+      font-size: 14.5px;
+    }
+
+    .defs dd {
+      margin: 0;
+      font-size: 14.5px;
+      line-height: 1.6;
+      color: var(--ink-soft);
+    }
+
+    .defs dd :global(strong) {
+      color: var(--ink);
+      font-weight: 700;
+    }
+
+    /* TOC */
+    .legal-toc {
+      background: var(--bg);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .legal-toc .inner { max-width: 760px; }
+
+    .toc-label {
+      font-family: var(--mono);
+      font-size: 11.5px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--p-700);
+      font-weight: 700;
+      margin: 0 0 1rem;
+    }
+
+    .legal-toc ol {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.4rem 1rem;
+    }
+
+    @media (max-width: 720px) { .legal-toc ol { grid-template-columns: 1fr; } }
+
+    .legal-toc a {
+      display: flex;
+      align-items: baseline;
+      gap: 0.6rem;
+      padding: 0.5rem 0;
+      color: var(--ink);
+      font-size: 14.5px;
+      text-decoration: none;
+    }
+
+    .legal-toc a:hover,
+    .legal-toc a:focus-visible {
+      color: var(--p-700);
+    }
+
+    .toc-num {
+      flex-shrink: 0;
+      width: 1.75rem;
+      font-family: var(--mono);
+      font-size: 11.5px;
+      font-weight: 700;
+      color: var(--muted-2);
+    }
+
+    /* Body */
+    .legal-body { background: var(--bg); }
+    .legal-body .inner { max-width: 760px; }
+
+    .legal-section {
+      padding: 1.5rem 0;
+      border-bottom: 1px solid var(--line);
+      scroll-margin-top: 5rem;
+    }
+
+    .legal-section:last-of-type { border-bottom: 0; }
+
+    .legal-section header {
+      display: flex;
+      align-items: baseline;
+      gap: 0.85rem;
+      margin-bottom: 1rem;
+    }
+
+    .legal-num {
+      font-family: var(--mono);
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--p-700);
+      letter-spacing: 0.06em;
+    }
+
+    .legal-section h2 {
+      font-size: clamp(1.25rem, 2vw, 1.5rem);
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      color: var(--ink);
+      line-height: 1.25;
+      margin: 0;
+    }
+
+    .legal-section p {
+      font-size: 16px;
+      line-height: 1.7;
+      color: var(--ink-soft);
+      margin-bottom: 0.85rem;
+    }
+
+    .legal-section p :global(strong) {
+      color: var(--ink);
+      font-weight: 700;
+    }
+
+    .legal-section p :global(a) {
+      color: var(--p-700);
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+
+    /* Legal list */
+    .legal-list {
+      list-style: none;
+      padding: 0;
+      margin: 1rem 0;
+      display: flex;
+      flex-direction: column;
+      gap: 0.6rem;
+    }
+
+    .legal-list li {
+      padding-left: 1.5rem;
+      position: relative;
+      font-size: 15px;
+      line-height: 1.6;
+      color: var(--ink-soft);
+    }
+
+    .legal-list li::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 0.65rem;
+      width: 6px;
+      height: 6px;
+      background: var(--p-500);
+      border-radius: 50%;
+    }
+
+    /* DO / DON'T (shared with eticky-kodex pattern) */
+    .dosdonts-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      margin: 1rem 0;
+    }
+
+    @media (max-width: 720px) { .dosdonts-grid { grid-template-columns: 1fr; } }
+
+    .dosdonts-col {
+      padding: 1.5rem;
+      border: 1px solid var(--line);
+      border-radius: var(--r-lg);
+    }
+
+    .dosdonts-col.positive { background: var(--green-bg); border-color: rgba(21, 128, 61, 0.2); }
+    .dosdonts-col.negative { background: var(--red-bg); border-color: rgba(185, 28, 28, 0.2); }
+
+    .dosdonts-col h3 {
+      display: flex;
+      align-items: center;
+      gap: 0.55rem;
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--ink);
+      margin-bottom: 0.85rem;
+      font-weight: 800;
+    }
+
+    .check {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .positive .check { background: var(--green); color: #fff; }
+    .negative .check { background: var(--red); color: #fff; }
+    .check svg { width: 13px; height: 13px; }
+
+    .dosdonts-col ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .dosdonts-col li {
+      font-size: 13.5px;
+      line-height: 1.55;
+      color: var(--ink-soft);
+      padding-left: 1.2rem;
+      position: relative;
+    }
+
+    .dosdonts-col li::before {
+      content: "•";
+      position: absolute;
+      left: 0;
+      top: 0;
+      color: var(--ink);
+      font-weight: 700;
+    }
+
+    /* Liability cards */
+    .liability-cards {
+      list-style: none;
+      padding: 0;
+      margin: 1rem 0;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.75rem;
+    }
+
+    @media (max-width: 600px) { .liability-cards { grid-template-columns: 1fr; } }
+
+    .liability-cards li {
+      padding: 1.1rem 1.25rem;
+      background: var(--bg-warm);
+      border: 1px solid var(--line);
+      border-left: 3px solid var(--amber);
+      border-radius: var(--r);
+    }
+
+    .liability-cards h3 {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--ink);
+      margin-bottom: 0.35rem;
+    }
+
+    .liability-cards p {
+      font-size: 13.5px;
+      line-height: 1.55;
+      color: var(--muted);
+      margin: 0;
+    }
+
+    .liability-cards :global(strong) {
+      color: var(--ink);
+      font-weight: 700;
+    }
+
+    /* Footer */
+    .legal-footer {
+      margin-top: 2.5rem;
+      padding: 1.75rem;
+      background: var(--bg-warm);
+      border: 1px solid var(--line);
+      border-radius: var(--r-lg);
+    }
+
+    .legal-footer p {
+      font-size: 14px;
+      line-height: 1.6;
+      color: var(--muted);
+      margin: 0 0 1.25rem;
+    }
+
+    .legal-footer strong { color: var(--ink); font-weight: 700; }
+    .legal-footer a {
+      color: var(--p-700);
+      text-decoration: underline;
+    }
+
+    .legal-actions {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    .btn-primary,
+    .btn-ghost {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      padding: 0.65rem 1.1rem;
+      border-radius: var(--r);
+      font-size: 13.5px;
+      font-weight: 600;
+      text-decoration: none;
+    }
+
+    .btn-primary {
+      background: var(--p-700);
+      color: #fff;
+      border: 1px solid var(--p-700);
+    }
+
+    .btn-primary:hover,
+    .btn-primary:focus-visible {
+      background: var(--p-800);
+      border-color: var(--p-800);
+    }
+
+    .btn-ghost {
+      background: #fff;
+      color: var(--ink);
+      border: 1px solid var(--line);
+    }
+
+    .btn-ghost:hover,
+    .btn-ghost:focus-visible {
+      border-color: var(--p-400);
+      color: var(--p-700);
+    }
+  </style>
+</BaseLayout>

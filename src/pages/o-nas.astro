@@ -1,42 +1,942 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
+import PageBreadcrumbs from "../components/page/PageBreadcrumbs.astro";
+import PageHero from "../components/page/PageHero.astro";
+import StatStrip from "../components/page/StatStrip.astro";
+import TrustBar from "../components/page/TrustBar.astro";
+
+const stats = [
+  { value: "10 let", label: "na trhu od 2016" },
+  { value: "4 000+", label: "produktových kategorií" },
+  { value: "8 200+", label: "publikovaných článků" },
+  { value: "99", label: "autorů a odborníků" },
+];
+
+const trustItems = [
+  "Žádné placené recenze",
+  "Transparentní afiliace",
+  "Odborná kontrola každého článku",
+  "Pravidelná aktualizace obsahu",
+];
+
+const team = [
+  { initials: "IM", name: "Ivo Matěj", role: "Šéfredaktor", slug: "ivo-matej" },
+  { initials: "AR", name: "Alena Rajnochová", role: "Hlavní redaktorka", slug: "alena-rajnochova" },
+  { initials: "MM", name: "Marie Müllerová", role: "Redaktorka — elektronika", slug: "marie-mullerova" },
+  { initials: "JN", name: "Jana Nováková", role: "Redaktorka — děti", slug: "jana-novakova" },
+  { initials: "MP", name: "Martin Procházka", role: "Redaktor — sport", slug: "martin-prochazka" },
+  { initials: "TV", name: "Tomáš Veselý", role: "Redaktor — auto-moto", slug: "tomas-vesely" },
+  { initials: "PS", name: "Petr Svoboda", role: "Redaktor — finance", slug: "petr-svoboda" },
+  { initials: "LH", name: "Lucie Horáková", role: "Editorka", slug: "lucie-horakova" },
+];
+
+const pillars = [
+  {
+    icon: "shield",
+    title: "Nezávislost",
+    text: "Žádné placené recenze. Žádný sponzorovaný obsah vydávaný za objektivní hodnocení. Naše doporučení se neřídí výší provize ani přáními výrobců — jen tím, co je pro čtenáře nejlepší.",
+  },
+  {
+    icon: "globe",
+    title: "Transparentnost",
+    text: "Otevřeně přiznáváme, že vyděláváme z affiliate provizí. Říkáme, kdo článek napsal, kdo ho zkontroloval a z jakých zdrojů jsme čerpali. Žádný anonymní obsah, žádné skryté motivace.",
+  },
+  {
+    icon: "check",
+    title: "Ověřená fakta",
+    text: "Parametry kontrolujeme z více zdrojů — od oficiálních webů výrobců po Stiftung Warentest a dTest. U odborných témat zapojujeme externí specialisty. Když si nejsme jistí, raději napíšeme „nevíme“.",
+  },
+];
+
+const methodSteps = [
+  { num: "01", title: "Výběr tématu", text: "Vycházíme z toho, co lidi reálně hledají. Sledujeme prodeje na Heureka.cz a poptávku ve vyhledávačích." },
+  { num: "02", title: "Hluboký research", text: "Projdeme oficiální weby výrobců, testy zahraničních časopisů a recenze od reálných uživatelů." },
+  { num: "03", title: "Psaní článku", text: "Píše autor se specializací v dané oblasti. Reálné parametry, srovnání pěti nejlepších modelů, jasné doporučení." },
+  { num: "04", title: "Odborná kontrola", text: "U odborných témat článek prochází kontrolou externího experta — lékaře, inženýra, řemeslníka z oboru." },
+  { num: "05", title: "Aktualizace", text: "Každý článek aktualizujeme minimálně 2× ročně. Ceny, modely, dostupnost — vše musí být platné." },
+];
+
+const revenueItems = [
+  { name: "Heureka.cz", pct: 72, tier: "primary" },
+  { name: "Přímá partnerství (Alza, TsBohemia, Allegro…)", pct: 21, tier: "secondary" },
+  { name: "Ostatní affiliate sítě (CJ, ehub, Awin)", pct: 6, tier: "tertiary" },
+  { name: "Reklamní bannery (Google AdSense)", pct: 1, tier: "quaternary" },
+];
+
+const sources = [
+  {
+    heading: "Testovací organizace",
+    icon: "shield",
+    items: [
+      { type: "country", text: "Německo" },
+      { text: "Stiftung Warentest" },
+      { text: "ADAC" },
+      { text: "Guter Rat" },
+      { text: "Öko-Test" },
+      { type: "country", text: "Česko a Slovensko" },
+      { text: "dTest" },
+      { text: "Spotřebitelská poradna" },
+      { type: "country", text: "Velká Británie a Polsko" },
+      { text: "Which?" },
+      { text: "Komputer Świat" },
+    ],
+  },
+  {
+    heading: "Trh a specializované weby",
+    icon: "globe",
+    items: [
+      { type: "country", text: "Srovnávače a e-shopy" },
+      { text: "Heureka.cz" },
+      { text: "Alza.cz" },
+      { text: "Mountfield.cz" },
+      { text: "Hornbach.cz" },
+      { text: "Datart.cz" },
+      { type: "country", text: "Odborné magazíny" },
+      { text: "Oficiální weby výrobců" },
+      { text: "Hi-tech časopisy" },
+      { type: "country", text: "Další" },
+      { text: "Doporučení od expertů z oboru" },
+    ],
+  },
+];
+
+const mediaMentions = [
+  "Lupa.cz",
+  "Marketing & Media",
+  "CzechCrunch",
+  "Forbes ČR",
+  "Hospodářské noviny",
+];
 ---
 
 <BaseLayout
-  title="O nás — Recenzer"
-  description="Kdo jsme, jak testujeme a proč věříme tomu, že nezávislé recenze pomáhají lépe nakupovat."
+  title="O nás — nezávislý recenzní magazín | Recenzer"
+  description="Recenzer.cz je nezávislý recenzní magazín. Od 2016 pomáháme s výběrem spotřebičů, elektroniky a dalšího zboží. Bez placených recenzí, transparentně."
 >
-  <section class="placeholder">
-    <div class="placeholder-inner">
-      <p class="eyebrow">O nás</p>
-      <h1>Nezávislá redakce, která testuje, než doporučí.</h1>
-      <p>
-        Tato stránka je zatím placeholder. Skutečný obsah — kdo redakci tvoří,
-        čím se Recenzer odlišuje od ostatních recenzních webů a jak je
-        zajištěna nezávislost — doplníme v další iteraci.
-      </p>
+  <PageBreadcrumbs items={[{ href: "/", label: "Recenzer" }, { label: "O nás" }]} />
+
+  <PageHero
+    eyebrow="Recenzer.cz · od roku 2016"
+    eyebrowIcon="info"
+    title="Pomáháme vám rozhodnout se,<br/><em>nezávisle</em>."
+    subtitle="Recenzer.cz je <strong>nezávislý recenzní magazín</strong>, který od roku 2016 pomáhá Čechům s výběrem spotřebičů, elektroniky a dalšího spotřebního zboží. Píšeme bez marketingových frází, srovnáváme reálné parametry a poctivě přiznáváme, jak vyděláváme."
+  />
+
+  <StatStrip label="Klíčová čísla" stats={stats} />
+
+  <TrustBar items={trustItems} />
+
+  <!-- STORY -->
+  <section class="story" id="pribeh">
+    <div class="story-inner">
+      <aside class="story-quote-aside">
+        <figure class="story-quote">
+          <blockquote>
+            „Recenzer.cz jsem založil, protože mě štvalo, jak málo nezávislých informací o spotřebičích na českém internetu je. Chtěl jsem to dělat jinak."
+          </blockquote>
+          <figcaption>
+            <div class="story-quote-avatar">IM</div>
+            <div>
+              <div class="story-quote-name">Ivo Matěj</div>
+              <div class="story-quote-role">Zakladatel a šéfredaktor</div>
+            </div>
+          </figcaption>
+        </figure>
+      </aside>
+      <div class="story-content">
+        <p class="story-eyebrow">Náš příběh</p>
+        <h2 class="story-title">Začalo to obyčejnou nespokojeností</h2>
+
+        <h3>Proč Recenzer vznikl</h3>
+        <p>
+          V roce 2016 jsem hledal novou pračku. Strávil jsem hodiny na internetu a stále jsem nedokázal najít <strong>poctivé srovnání</strong>, které by mi pomohlo. Většina článků byla buď přepsaná tisková zpráva výrobce, sponzorovaný obsah vydávaný za nezávislé hodnocení, nebo směs neověřených dojmů z diskuzních fór.
+        </p>
+        <p>
+          Jako marketér jsem věděl, jak to funguje — i jak by to mělo fungovat. Tak jsem se rozhodl založit projekt, který nebude lhát. Recenzer.cz vznikl s jasným pravidlem: <strong>žádné placené recenze, jen transparentní affiliate provize</strong>, kde čtenář vidí, jak vyděláváme.
+        </p>
+
+        <h3>Co se za 10 let změnilo</h3>
+        <p>
+          Z osobního projektu se postupně stal magazín, který dnes pokrývá přes 4 000 produktových kategorií a má slovenskou mutaci <a href="https://www.recenzer.sk/" target="_blank" rel="noopener">recenzer.sk</a>. V redakci je dnes 12 interních autorů a spolupracujeme s desítkami externích odborníků z různých oborů — od lékařů přes inženýry až po řemeslníky.
+        </p>
+
+        <h3>Pro koho jsme tady</h3>
+        <p>
+          Pro každého, kdo si chce před nákupem ověřit, jestli kupuje to nejlepší za své peníze. Pro lidi, kteří nechtějí <strong>kupovat zajíce v pytli</strong> — ať už jde o pračku za 25 tisíc, sluchátka za 3 tisíce, nebo autosedačku pro dítě. Naše články jsou zdarma, věcné a píšeme je tak, abyste po deseti minutách čtení věděli, co koupit a proč.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- PILLARS -->
+  <section class="pillars">
+    <div class="pillars-inner">
+      <header class="centered-head">
+        <p class="centered-eyebrow">Naše hodnoty</p>
+        <h2 class="centered-title">Tři principy, na kterých stojíme</h2>
+        <p class="centered-sub">Když ty principy porušíme, ztratíme to nejcennější, co máme — důvěru čtenářů. Proto je nikdy neporušíme.</p>
+      </header>
+      <ul class="pillars-grid">
+        {
+          pillars.map((p) => (
+            <li class="pillar-card">
+              <div class="pillar-icon" aria-hidden="true">
+                {p.icon === "shield" && (
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                )}
+                {p.icon === "globe" && (
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+                )}
+                {p.icon === "check" && (
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                )}
+              </div>
+              <h3>{p.title}</h3>
+              <p>{p.text}</p>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <!-- METHODOLOGY -->
+  <section class="methodology">
+    <div class="methodology-inner">
+      <header class="centered-head">
+        <p class="centered-eyebrow">Metodika</p>
+        <h2 class="centered-title">Jak vznikají naše recenze</h2>
+        <p class="centered-sub">Každý článek na Recenzer.cz prochází stejným procesem — od výběru tématu přes ověřování parametrů až po odbornou kontrolu a publikaci.</p>
+      </header>
+      <ol class="method-steps">
+        {
+          methodSteps.map((step) => (
+            <li class="method-step">
+              <div class="method-step-num">{step.num}</div>
+              <h4>{step.title}</h4>
+              <p>{step.text}</p>
+            </li>
+          ))
+        }
+      </ol>
+    </div>
+  </section>
+
+  <!-- JAK VYDĚLÁVÁME -->
+  <section class="money" id="jak-vydelavame">
+    <div class="money-inner">
+      <header class="centered-head">
+        <p class="centered-eyebrow">Otevřená kniha</p>
+        <h2 class="centered-title">Jak vyděláváme</h2>
+        <p class="centered-sub">Nemáme co skrývat. Tady je přesné rozdělení, odkud jdou peníze, které nás živí.</p>
+      </header>
+
+      <div class="money-grid">
+        <div class="money-text">
+          <p><strong>Recenzer.cz se financuje výhradně z affiliate provizí.</strong> Když kliknete na odkaz v našem článku a něco koupíte, dostaneme malou provizi od daného e-shopu. Pro vás cena zůstává úplně stejná.</p>
+          <p>Většinu příjmů (přes 70 %) získáváme přes srovnávač <strong>Heureka.cz</strong>, který je naším hlavním partnerem od samého začátku. Druhým zdrojem jsou přímé partnerství s e-shopy jako Alza, TsBohemia, Allegro nebo Mountfield.</p>
+          <p>Co <strong>nikdy neděláme</strong>: nepřijímáme platby výměnou za pozitivní recenze. Nevkládáme do textů „sponzorované sekce" vydávané za objektivní obsah. Nepublikujeme PR zprávy výrobců jako autorské články.</p>
+        </div>
+
+        <div class="revenue-chart">
+          <h4>Zdroje příjmů 2025</h4>
+          {
+            revenueItems.map((item) => (
+              <div class="revenue-item">
+                <div class="revenue-item-head">
+                  <span class="revenue-item-name">{item.name}</span>
+                  <span class="revenue-item-pct">{item.pct} %</span>
+                </div>
+                <div class="revenue-bar">
+                  <div class:list={["revenue-bar-fill", item.tier]} style={`width: ${item.pct}%`} />
+                </div>
+              </div>
+            ))
+          }
+          <div class="revenue-note">
+            <strong>Placené recenze a sponzorovaný obsah: 0 %.</strong> Tento podíl byl, je a vždy bude nulový.
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TEAM -->
+  <section class="team">
+    <div class="team-inner">
+      <header class="centered-head">
+        <p class="centered-eyebrow">Tým</p>
+        <h2 class="centered-title">Kdo za Recenzerem stojí</h2>
+        <p class="centered-sub">12 interních redaktorů a 87 externích odborníků z různých oborů. Ti všichni se podílí na tom, aby každý článek dával čtenáři reálnou hodnotu.</p>
+      </header>
+      <ul class="team-grid">
+        {
+          team.map((m) => (
+            <li class="team-card">
+              <div class="team-avatar">{m.initials}</div>
+              <h3 class="team-name"><a href={`/autor/${m.slug}/`}>{m.name}</a></h3>
+              <p class="team-role">{m.role}</p>
+            </li>
+          ))
+        }
+      </ul>
+      <div class="centered-action">
+        <a href="/autori/" class="btn-secondary">
+          Zobrazit všech 99 autorů a odborníků
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- SOURCES -->
+  <section class="sources-section" id="zdroje">
+    <div class="sources-inner">
+      <header class="centered-head">
+        <p class="centered-eyebrow">Zdroje</p>
+        <h2 class="centered-title">Z čeho čerpáme informace</h2>
+        <p class="centered-sub">Více než 50 ověřených zdrojů z Česka i zahraničí. Vše křížově ověřujeme — žádný osamocený zdroj nestačí.</p>
+      </header>
+      <div class="sources-grid">
+        {
+          sources.map((block) => (
+            <div class="sources-block">
+              <h3>
+                {block.icon === "shield" && <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>}
+                {block.icon === "globe" && <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>}
+                {block.heading}
+              </h3>
+              <ul class="sources-list">
+                {block.items.map((it) => (
+                  <li class:list={[it.type === "country" && "country"]}>{it.text}</li>
+                ))}
+              </ul>
+            </div>
+          ))
+        }
+      </div>
+      <div class="centered-action">
+        <a href="/duveryhodne-zdroje/" class="btn-secondary">
+          Kompletní seznam důvěryhodných zdrojů
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- MEDIA -->
+  <section class="media">
+    <div class="media-inner">
+      <p class="media-label">Recenzer.cz citovali</p>
+      <ul class="media-logos">
+        {mediaMentions.map((m) => <li>{m}</li>)}
+      </ul>
+    </div>
+  </section>
+
+  <!-- CONTACT -->
+  <section class="contact-band">
+    <div class="contact-inner">
+      <h2 class="contact-title">Spojte se s námi</h2>
+      <p class="contact-lead">Spolupráce, dotazy k článkům, návrhy na nová témata nebo média — napište nám. Odpovídáme v pracovní dny do 24 hodin.</p>
+      <div class="contact-channels">
+        <a href="mailto:info@recenzer.cz" class="contact-channel">
+          <div class="contact-channel-ic" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+          </div>
+          <div>
+            <div class="contact-channel-name">E-mail</div>
+            <div class="contact-channel-value">info@recenzer.cz</div>
+          </div>
+        </a>
+        <a href="/kontakt/" class="contact-channel">
+          <div class="contact-channel-ic" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          </div>
+          <div>
+            <div class="contact-channel-name">Kontaktní formulář</div>
+            <div class="contact-channel-value">/kontakt/</div>
+          </div>
+        </a>
+      </div>
     </div>
   </section>
 
   <style>
-    .placeholder { padding: 4rem var(--gutter); }
-    .placeholder-inner { max-width: var(--max-w-text); margin: 0 auto; }
-    .eyebrow {
-      font-size: 12px;
+    /* ---------- Shared section helpers ---------- */
+    .centered-head {
+      max-width: 60ch;
+      margin: 0 auto 2.5rem;
+      text-align: center;
+    }
+    .centered-eyebrow {
+      font-family: var(--mono);
+      font-size: 11.5px;
       text-transform: uppercase;
-      letter-spacing: 0.08em;
+      letter-spacing: 0.1em;
       color: var(--p-700);
+      font-weight: 700;
+      margin-bottom: 0.6rem;
+    }
+    .centered-title {
+      font-size: clamp(1.6rem, 3vw, 2.25rem);
+      font-weight: 800;
+      letter-spacing: -0.025em;
+      color: var(--ink);
+      line-height: 1.2;
+      margin-bottom: 0.75rem;
+    }
+    .centered-sub {
+      font-size: clamp(1rem, 1.3vw, 1.1rem);
+      line-height: 1.6;
+      color: var(--muted);
+      margin: 0;
+    }
+    .centered-action {
+      margin-top: 2rem;
+      text-align: center;
+    }
+    .btn-secondary {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      padding: 0.7rem 1.25rem;
+      background: var(--bg);
+      border: 1px solid var(--line);
+      border-radius: var(--r);
+      font-size: 14px;
       font-weight: 600;
+      color: var(--ink);
+      text-decoration: none;
+    }
+    .btn-secondary:hover,
+    .btn-secondary:focus-visible {
+      border-color: var(--p-400);
+      color: var(--p-700);
+    }
+    .btn-secondary svg {
+      width: 14px;
+      height: 14px;
+    }
+
+    /* ---------- Story ---------- */
+    .story {
+      background: var(--bg);
+      border-bottom: 1px solid var(--line);
+    }
+    .story-inner {
+      max-width: var(--max-w);
+      margin: 0 auto;
+      padding: clamp(2.5rem, 5vw, 4rem) var(--gutter);
+      display: grid;
+      grid-template-columns: 340px 1fr;
+      gap: 3rem;
+    }
+    @media (max-width: 880px) {
+      .story-inner { grid-template-columns: 1fr; gap: 2rem; }
+    }
+    .story-quote {
+      margin: 0;
+      padding: 1.5rem;
+      background: var(--bg-warm);
+      border-left: 4px solid var(--p-500);
+      border-radius: var(--r-lg);
+      position: sticky;
+      top: 2rem;
+    }
+    .story-quote blockquote {
+      margin: 0 0 1rem;
+      font-size: 1rem;
+      line-height: 1.55;
+      color: var(--ink);
+      font-style: italic;
+    }
+    .story-quote figcaption {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+    .story-quote-avatar {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: var(--p-100);
+      color: var(--p-700);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 14px;
+    }
+    .story-quote-name {
+      font-size: 14.5px;
+      font-weight: 700;
+      color: var(--ink);
+      line-height: 1.2;
+    }
+    .story-quote-role {
+      font-size: 12.5px;
+      color: var(--muted);
+    }
+    .story-content {
+      min-width: 0;
+    }
+    .story-eyebrow {
+      font-family: var(--mono);
+      font-size: 11.5px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--p-700);
+      font-weight: 700;
+      margin-bottom: 0.6rem;
+    }
+    .story-title {
+      font-size: clamp(1.6rem, 3vw, 2.1rem);
+      font-weight: 800;
+      letter-spacing: -0.025em;
+      color: var(--ink);
+      line-height: 1.2;
+      margin-bottom: 2rem;
+    }
+    .story-content h3 {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--ink);
+      margin: 1.75rem 0 0.6rem;
+    }
+    .story-content p {
+      font-size: 16px;
+      line-height: 1.7;
+      color: var(--ink-soft);
+      margin-bottom: 0.85rem;
+    }
+    .story-content strong {
+      color: var(--ink);
+      font-weight: 700;
+    }
+    .story-content a {
+      color: var(--p-700);
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+
+    /* ---------- Pillars ---------- */
+    .pillars {
+      background: var(--bg-warm);
+      border-bottom: 1px solid var(--line);
+    }
+    .pillars-inner {
+      max-width: var(--max-w);
+      margin: 0 auto;
+      padding: clamp(2.5rem, 5vw, 4rem) var(--gutter);
+    }
+    .pillars-grid {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1rem;
+    }
+    @media (max-width: 880px) {
+      .pillars-grid { grid-template-columns: 1fr; }
+    }
+    .pillar-card {
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: var(--r-lg);
+      padding: 1.75rem;
+    }
+    .pillar-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      background: var(--p-50);
+      color: var(--p-700);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
       margin-bottom: 1rem;
     }
-    h1 {
-      font-size: clamp(1.8rem, 4vw, 2.4rem);
+    .pillar-icon svg { width: 22px; height: 22px; }
+    .pillar-card h3 {
+      font-size: 1.2rem;
+      font-weight: 800;
+      color: var(--ink);
+      letter-spacing: -0.015em;
+      margin-bottom: 0.5rem;
+    }
+    .pillar-card p {
+      font-size: 14.5px;
+      line-height: 1.6;
+      color: var(--muted);
+      margin: 0;
+    }
+
+    /* ---------- Methodology steps ---------- */
+    .methodology {
+      background: var(--bg);
+      border-bottom: 1px solid var(--line);
+    }
+    .methodology-inner {
+      max-width: var(--max-w);
+      margin: 0 auto;
+      padding: clamp(2.5rem, 5vw, 4rem) var(--gutter);
+    }
+    .method-steps {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 0.85rem;
+    }
+    @media (max-width: 960px) { .method-steps { grid-template-columns: repeat(3, 1fr); } }
+    @media (max-width: 600px) { .method-steps { grid-template-columns: 1fr; } }
+
+    .method-step {
+      background: var(--bg-warm);
+      border: 1px solid var(--line);
+      border-top: 3px solid var(--p-500);
+      border-radius: var(--r);
+      padding: 1.25rem;
+    }
+    .method-step-num {
+      font-family: var(--mono);
+      font-size: 11.5px;
+      font-weight: 700;
+      color: var(--p-700);
+      margin-bottom: 0.5rem;
+    }
+    .method-step h4 {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--ink);
+      margin-bottom: 0.35rem;
+    }
+    .method-step p {
+      font-size: 13px;
+      line-height: 1.55;
+      color: var(--muted);
+      margin: 0;
+    }
+
+    /* ---------- Money ---------- */
+    .money {
+      background: var(--ink);
+      color: rgba(255, 255, 255, 0.85);
+      border-bottom: 1px solid var(--line);
+      position: relative;
+      overflow: hidden;
+    }
+    .money::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(800px circle at 90% 0%, rgba(149, 114, 240, 0.18), transparent 55%),
+        radial-gradient(600px circle at 10% 100%, rgba(99, 50, 204, 0.15), transparent 55%);
+      pointer-events: none;
+    }
+    .money-inner {
+      position: relative;
+      max-width: var(--max-w);
+      margin: 0 auto;
+      padding: clamp(2.5rem, 5vw, 4rem) var(--gutter);
+    }
+    .money .centered-eyebrow { color: var(--p-300); }
+    .money .centered-title { color: #fff; }
+    .money .centered-sub { color: rgba(255, 255, 255, 0.7); }
+    .money-grid {
+      display: grid;
+      grid-template-columns: 1.1fr 1fr;
+      gap: 3rem;
+      align-items: start;
+    }
+    @media (max-width: 880px) { .money-grid { grid-template-columns: 1fr; gap: 2rem; } }
+    .money-text p {
+      font-size: 15px;
+      line-height: 1.65;
+      color: rgba(255, 255, 255, 0.85);
+      margin-bottom: 0.85rem;
+    }
+    .money-text strong { color: #fff; font-weight: 700; }
+    .revenue-chart {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: var(--r-lg);
+      padding: 1.5rem;
+    }
+    .revenue-chart h4 {
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--p-300);
+      font-weight: 700;
+      margin-bottom: 1.25rem;
+    }
+    .revenue-item { margin-bottom: 0.9rem; }
+    .revenue-item-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 1rem;
+      margin-bottom: 0.3rem;
+      font-size: 13px;
+      color: rgba(255, 255, 255, 0.9);
+    }
+    .revenue-item-pct {
+      font-family: var(--mono);
+      font-weight: 700;
+      color: #fff;
+    }
+    .revenue-bar {
+      height: 8px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 999px;
+      overflow: hidden;
+    }
+    .revenue-bar-fill {
+      height: 100%;
+      background: var(--p-400);
+    }
+    .revenue-bar-fill.secondary { background: var(--p-300); }
+    .revenue-bar-fill.tertiary { background: rgba(255, 255, 255, 0.55); }
+    .revenue-bar-fill.quaternary { background: rgba(255, 255, 255, 0.35); }
+    .revenue-note {
+      margin-top: 1rem;
+      padding-top: 1rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      font-size: 12.5px;
+      color: rgba(255, 255, 255, 0.7);
+      line-height: 1.55;
+    }
+    .revenue-note strong { color: var(--accent); font-weight: 700; }
+
+    /* ---------- Team ---------- */
+    .team {
+      background: var(--bg);
+      border-bottom: 1px solid var(--line);
+    }
+    .team-inner {
+      max-width: var(--max-w);
+      margin: 0 auto;
+      padding: clamp(2.5rem, 5vw, 4rem) var(--gutter);
+    }
+    .team-grid {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1rem;
+    }
+    @media (max-width: 880px) { .team-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 480px) { .team-grid { grid-template-columns: 1fr; } }
+    .team-card {
+      background: var(--bg-warm);
+      border: 1px solid var(--line);
+      border-radius: var(--r-lg);
+      padding: 1.25rem;
+      text-align: center;
+    }
+    .team-avatar {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      background: var(--p-100);
+      color: var(--p-700);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 18px;
+      margin-bottom: 0.85rem;
+    }
+    .team-name {
+      font-size: 1rem;
+      font-weight: 700;
+      margin-bottom: 0.25rem;
+    }
+    .team-name a {
+      color: var(--ink);
+      text-decoration: none;
+    }
+    .team-name a:hover,
+    .team-name a:focus-visible {
+      color: var(--p-700);
+    }
+    .team-role {
+      font-size: 12.5px;
+      color: var(--muted);
+      margin: 0;
+    }
+
+    /* ---------- Sources ---------- */
+    .sources-section {
+      background: var(--bg-warm);
+      border-bottom: 1px solid var(--line);
+    }
+    .sources-inner {
+      max-width: var(--max-w);
+      margin: 0 auto;
+      padding: clamp(2.5rem, 5vw, 4rem) var(--gutter);
+    }
+    .sources-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+    @media (max-width: 720px) { .sources-grid { grid-template-columns: 1fr; } }
+    .sources-block {
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: var(--r-lg);
+      padding: 1.5rem;
+    }
+    .sources-block h3 {
+      display: flex;
+      align-items: center;
+      gap: 0.55rem;
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--ink);
+      margin-bottom: 1rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    .sources-block h3 svg { width: 17px; height: 17px; color: var(--p-700); }
+    .sources-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: grid;
+      gap: 0.35rem;
+      font-size: 13.5px;
+      color: var(--ink-soft);
+    }
+    .sources-list li.country {
+      font-family: var(--mono);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--muted-2);
+      font-weight: 700;
+      margin-top: 0.6rem;
+      padding-bottom: 0.2rem;
+      border-bottom: 1px dashed var(--line);
+    }
+    .sources-list li.country:first-child { margin-top: 0; }
+
+    /* ---------- Media ---------- */
+    .media {
+      background: var(--bg);
+      border-bottom: 1px solid var(--line);
+    }
+    .media-inner {
+      max-width: var(--max-w);
+      margin: 0 auto;
+      padding: 2rem var(--gutter);
+      display: flex;
+      align-items: center;
+      gap: 2rem;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    .media-label {
+      font-family: var(--mono);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--muted);
+      font-weight: 700;
+      margin: 0;
+    }
+    .media-logos {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      gap: 1.5rem 2rem;
+      flex-wrap: wrap;
+    }
+    .media-logos li {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--muted-2);
+      letter-spacing: -0.01em;
+    }
+
+    /* ---------- Contact ---------- */
+    .contact-band {
+      background: var(--p-50);
+    }
+    .contact-inner {
+      max-width: var(--max-w);
+      margin: 0 auto;
+      padding: clamp(2.5rem, 5vw, 3.5rem) var(--gutter);
+      text-align: center;
+    }
+    .contact-title {
+      font-size: clamp(1.5rem, 2.5vw, 2rem);
       font-weight: 800;
       letter-spacing: -0.02em;
       color: var(--ink);
-      line-height: 1.2;
-      margin-bottom: 1rem;
+      margin-bottom: 0.75rem;
     }
-    p { color: var(--muted); max-width: 60ch; }
+    .contact-lead {
+      font-size: 15.5px;
+      line-height: 1.6;
+      color: var(--muted);
+      max-width: 60ch;
+      margin: 0 auto 1.75rem;
+    }
+    .contact-channels {
+      display: flex;
+      gap: 0.85rem;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    .contact-channel {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.85rem;
+      padding: 1rem 1.25rem;
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: var(--r);
+      text-decoration: none;
+      color: var(--ink);
+      text-align: left;
+    }
+    .contact-channel:hover,
+    .contact-channel:focus-visible {
+      border-color: var(--p-400);
+      color: var(--ink);
+    }
+    .contact-channel-ic {
+      width: 36px;
+      height: 36px;
+      border-radius: 9px;
+      background: var(--p-50);
+      color: var(--p-700);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .contact-channel-ic svg { width: 18px; height: 18px; }
+    .contact-channel-name {
+      font-size: 11.5px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--muted);
+      font-weight: 600;
+      font-family: var(--mono);
+    }
+    .contact-channel-value {
+      font-size: 14.5px;
+      font-weight: 700;
+      color: var(--ink);
+    }
   </style>
 </BaseLayout>

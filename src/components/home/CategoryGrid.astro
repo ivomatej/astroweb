@@ -1,0 +1,365 @@
+---
+import { categories } from "../../data/categories";
+
+const featured = categories.find((c) => c.featured);
+const rest = categories.filter((c) => !c.featured);
+---
+
+<section id="kategorie" class="cat-section" aria-labelledby="cat-title">
+  <header class="cat-section-head">
+    <div>
+      <p class="cat-eyebrow">Hlavní kategorie</p>
+      <h2 id="cat-title" class="cat-title">
+        Vyberte si oblast, ve které potřebujete poradit
+      </h2>
+    </div>
+    <a href="/mapa-webu/" class="cat-all-link">
+      Mapa všech kategorií
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+        <line x1="5" y1="12" x2="19" y2="12" />
+        <polyline points="12 5 19 12 12 19" />
+      </svg>
+    </a>
+  </header>
+
+  <div class="cat-grid">
+    {
+      featured && (
+        <a href={featured.href} class:list={["cat-card", "featured", `accent-${featured.accent}`]}>
+          <div class="cat-card-media">
+            {
+              featured.heroImageSrc ? (
+                <img src={featured.heroImageSrc} alt="" loading="lazy" decoding="async" />
+              ) : (
+                <div class="cat-card-pattern" />
+              )
+            }
+            <span class="cat-card-tag">
+              Hlavní kategorie · {featured.articleCount} článků
+            </span>
+          </div>
+          <div class="cat-card-body">
+            <div class="cat-card-name">{featured.name}</div>
+            <p class="cat-card-tagline">{featured.tagline}</p>
+            <p class="cat-card-desc">{featured.description}</p>
+            <ul class="cat-card-topics">
+              {featured.topics.map((t) => <li>{t}</li>)}
+            </ul>
+            <div class="cat-card-foot">
+              <span class="cat-card-count">
+                {featured.articleCount} článků
+                {featured.freshCount && <em> · {featured.freshCount} nových</em>}
+              </span>
+              <span class="cat-card-cta" aria-hidden="true">
+                Procházet
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <line x1="5" y1="12" x2="19" y2="12" />
+                  <polyline points="12 5 19 12 12 19" />
+                </svg>
+              </span>
+            </div>
+          </div>
+        </a>
+      )
+    }
+
+    <div class="cat-subgrid">
+      {
+        rest.map((category) => (
+          <a href={category.href} class:list={["cat-card", "compact", `accent-${category.accent}`]}>
+            <div class="cat-card-body">
+              <div class="cat-card-name">{category.name}</div>
+              <p class="cat-card-tagline">{category.tagline}</p>
+              <p class="cat-card-desc">{category.description}</p>
+              <ul class="cat-card-topics">
+                {category.topics.slice(0, 4).map((t) => <li>{t}</li>)}
+              </ul>
+              <div class="cat-card-foot">
+                <span class="cat-card-count">
+                  {category.articleCount} článků
+                  {category.freshCount && <em> · {category.freshCount} nových</em>}
+                </span>
+                <span class="cat-card-cta" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <line x1="5" y1="12" x2="19" y2="12" />
+                    <polyline points="12 5 19 12 12 19" />
+                  </svg>
+                </span>
+              </div>
+            </div>
+          </a>
+        ))
+      }
+    </div>
+  </div>
+</section>
+
+<style>
+  .cat-section {
+    max-width: var(--max-w);
+    margin: 0 auto;
+    padding: clamp(3rem, 6vw, 5rem) var(--gutter);
+  }
+
+  .cat-section-head {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 2rem;
+    flex-wrap: wrap;
+    margin-bottom: 2rem;
+  }
+
+  .cat-eyebrow {
+    font-family: var(--mono);
+    font-size: 11.5px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--p-700);
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+  }
+
+  .cat-title {
+    font-size: clamp(1.6rem, 3.5vw, 2.4rem);
+    font-weight: 800;
+    letter-spacing: -0.025em;
+    color: var(--ink);
+    line-height: 1.15;
+    max-width: 30ch;
+  }
+
+  .cat-all-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-size: 13.5px;
+    font-weight: 600;
+    color: var(--p-700);
+    text-decoration: none;
+  }
+
+  .cat-all-link svg {
+    width: 13px;
+    height: 13px;
+  }
+
+  .cat-all-link:hover,
+  .cat-all-link:focus-visible {
+    color: var(--p-900);
+  }
+
+  /* ---------- Grid layout ---------- */
+
+  .cat-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .cat-subgrid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+  }
+
+  @media (max-width: 720px) {
+    .cat-subgrid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  /* ---------- Card base ---------- */
+
+  .cat-card {
+    display: flex;
+    flex-direction: column;
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: var(--r-xl);
+    overflow: hidden;
+    text-decoration: none;
+    color: var(--ink);
+    position: relative;
+    transition: border-color 0.2s, transform 0.2s, box-shadow 0.2s;
+  }
+
+  .cat-card::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: var(--accent-color);
+    z-index: 1;
+  }
+
+  .cat-card.accent-purple { --accent-color: var(--p-500); --accent-bg: var(--p-50); --accent-fg: var(--p-700); }
+  .cat-card.accent-amber  { --accent-color: var(--amber); --accent-bg: var(--amber-bg); --accent-fg: var(--amber); }
+  .cat-card.accent-green  { --accent-color: var(--green); --accent-bg: var(--green-bg); --accent-fg: var(--green); }
+  .cat-card.accent-red    { --accent-color: var(--red); --accent-bg: var(--red-bg); --accent-fg: var(--red); }
+  .cat-card.accent-blue   { --accent-color: #1d4ed8; --accent-bg: #e8eeff; --accent-fg: #1e40af; }
+
+  .cat-card:hover,
+  .cat-card:focus-visible {
+    border-color: var(--accent-color);
+    transform: translateY(-3px);
+    box-shadow: 0 18px 36px -20px rgba(46, 20, 102, 0.25);
+    color: var(--ink);
+  }
+
+  /* ---------- Featured (large) ---------- */
+
+  .cat-card.featured {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    min-height: 320px;
+  }
+
+  @media (max-width: 880px) {
+    .cat-card.featured {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .cat-card-media {
+    position: relative;
+    overflow: hidden;
+    background: var(--accent-bg);
+    min-height: 220px;
+  }
+
+  .cat-card-media img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  .cat-card-pattern {
+    width: 100%;
+    height: 100%;
+    background:
+      repeating-linear-gradient(
+        45deg,
+        var(--accent-bg) 0 10px,
+        transparent 10px 22px
+      );
+  }
+
+  .cat-card-tag {
+    position: absolute;
+    top: 1rem;
+    left: 1rem;
+    padding: 4px 10px;
+    background: rgba(15, 19, 30, 0.85);
+    color: #fff;
+    font-family: var(--mono);
+    font-size: 10.5px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-weight: 700;
+    border-radius: var(--r-sm);
+    backdrop-filter: blur(4px);
+  }
+
+  /* ---------- Card body ---------- */
+
+  .cat-card-body {
+    padding: 1.5rem 1.5rem 1.25rem;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    gap: 0.5rem;
+  }
+
+  .cat-card.compact .cat-card-body {
+    padding: 1.5rem;
+  }
+
+  .cat-card-name {
+    font-size: clamp(1.35rem, 2vw, 1.65rem);
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    color: var(--ink);
+    line-height: 1.15;
+  }
+
+  .cat-card.featured .cat-card-name {
+    font-size: clamp(1.6rem, 2.6vw, 2.1rem);
+  }
+
+  .cat-card-tagline {
+    font-size: 13.5px;
+    color: var(--accent-fg);
+    font-weight: 600;
+    line-height: 1.3;
+    margin: 0;
+  }
+
+  .cat-card-desc {
+    font-size: 14px;
+    color: var(--muted);
+    line-height: 1.55;
+    margin: 0.5rem 0 0;
+  }
+
+  .cat-card-topics {
+    list-style: none;
+    padding: 0;
+    margin: 0.85rem 0 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+  }
+
+  .cat-card-topics li {
+    padding: 3px 9px;
+    background: var(--bg-warm);
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    font-size: 11.5px;
+    font-weight: 500;
+    color: var(--ink-soft);
+  }
+
+  .cat-card-foot {
+    margin-top: auto;
+    padding-top: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+
+  .cat-card-count {
+    font-size: 12.5px;
+    color: var(--muted);
+  }
+
+  .cat-card-count em {
+    font-style: normal;
+    color: var(--accent-fg);
+    font-weight: 600;
+  }
+
+  .cat-card-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--accent-fg);
+    transition: gap 0.2s;
+  }
+
+  .cat-card-cta svg {
+    width: 14px;
+    height: 14px;
+  }
+
+  .cat-card:hover .cat-card-cta {
+    gap: 0.6rem;
+  }
+</style>

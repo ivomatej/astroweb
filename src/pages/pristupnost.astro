@@ -1,0 +1,1214 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import PageBreadcrumbs from "../components/page/PageBreadcrumbs.astro";
+import PageHero from "../components/page/PageHero.astro";
+
+const tldr = [
+  "Web je <strong>částečně přístupný</strong> podle WCAG 2.1 Level AA.",
+  "Sémantický HTML, alt texty, kontrast 4.5:1, plné ovládání klávesnicí.",
+  "Známe slabá místa — některé infografiky a srovnávací tabulky.",
+  "Pravidelný audit 1× ročně, poslední 04/2026.",
+  "Problém ohlásíte na <a href=\"mailto:pristupnost@recenzer.cz\">pristupnost@recenzer.cz</a>.",
+];
+
+const compliance = {
+  status: "partial",
+  label: "Částečně přístupný",
+  detail: "Web Recenzer.cz splňuje WCAG 2.1 Level AA na zhruba 92 %. Známé výjimky jsou popsané níže.",
+};
+
+const features = [
+  {
+    icon: "code",
+    title: "Sémantický HTML",
+    text: "Používáme <code>&lt;header&gt;</code>, <code>&lt;nav&gt;</code>, <code>&lt;main&gt;</code>, <code>&lt;article&gt;</code>, <code>&lt;section&gt;</code>, <code>&lt;footer&gt;</code> namísto <code>&lt;div&gt;</code>. Screen reader pak pozná strukturu stránky.",
+  },
+  {
+    icon: "image",
+    title: "Alt texty u obrázků",
+    text: "Každý obrázek nesoucí informaci má <code>alt</code> popisující obsah. Dekorativní obrázky mají <code>alt=\"\"</code>.",
+  },
+  {
+    icon: "contrast",
+    title: "Dostatečný kontrast",
+    text: "Text vs. pozadí minimálně 4.5:1 pro normální text, 3:1 pro velký text. Měřeno přes Stark a manuálně.",
+  },
+  {
+    icon: "keyboard",
+    title: "Ovládání klávesnicí",
+    text: "Vše na webu lze ovládat jen klávesnicí — Tab/Shift+Tab navigace, Enter/Space pro aktivaci, Escape pro zavření dialogů.",
+  },
+  {
+    icon: "aria",
+    title: "ARIA atributy",
+    text: "Doplňujeme aria-label, aria-labelledby, aria-current, aria-expanded tam, kde sémantický HTML nestačí.",
+  },
+  {
+    icon: "skip",
+    title: "Skip link",
+    text: "Na začátku každé stránky je odkaz „Přeskočit na obsah“ — viditelný při focus, skrytý jinak. Pro screen readery klíčové.",
+  },
+];
+
+const standards = [
+  {
+    name: "WCAG 2.1 Level AA",
+    full: "Web Content Accessibility Guidelines",
+    body: "W3C",
+    url: "https://www.w3.org/TR/WCAG21/",
+    note: "Mezinárodní standard přístupnosti webů. Nejcitovanější referenční bod.",
+  },
+  {
+    name: "EN 301 549",
+    full: "Evropská norma přístupnosti",
+    body: "ETSI",
+    url: "https://www.etsi.org/deliver/etsi_en/301500_301599/301549/",
+    note: "Závazná pro veřejný sektor v EU. Recenzer není veřejný subjekt, ale standardy dodržujeme dobrovolně.",
+  },
+  {
+    name: "Zákon č. 99/2019 Sb.",
+    full: "O přístupnosti internetových stránek",
+    body: "ČR",
+    url: "https://www.zakonyprolidi.cz/cs/2019-99",
+    note: "Český zákon implementující směrnici EU 2016/2102.",
+  },
+];
+
+const gaps = [
+  {
+    title: "Některé infografiky bez textové alternativy",
+    text: "Cca 15 starších infografik v článcích nemá podrobný popis v <code>alt</code>. Postupně doplňujeme — cíl do konce Q3 2026.",
+    severity: "medium",
+  },
+  {
+    title: "Videa bez titulků",
+    text: "Aktuálně všechny videoukázky testů mají automatické YouTube titulky. Vlastní ručně otitulkovaná videa máme jen u článků z 2025+.",
+    severity: "medium",
+  },
+  {
+    title: "Komplexní srovnávací tabulky",
+    text: "Velké srovnání 20+ modelů je vizuálně optimalizováno pro myš. Screen reader to přečte řádek po řádku, což může být únavné. Pracujeme na lepší struktuře <code>&lt;th scope&gt;</code>.",
+    severity: "low",
+  },
+  {
+    title: "Některé PDF dokumenty nejsou přístupné",
+    text: "Starší PDF (např. testovací protokoly z 2018–2022) nemají vrstvy a značky pro screen reader. Při dotazu poskytneme textovou verzi.",
+    severity: "low",
+  },
+  {
+    title: "Autoplay videí v některých článcích",
+    text: "Vzácně se objeví video s autoplay (s vypnutým zvukem). Plánujeme úplně odstranit do 06/2026.",
+    severity: "medium",
+  },
+  {
+    title: "Search bar bez ARIA live region",
+    text: "Výsledky hledání se nepřidávají do live region, takže screen reader nedostane oznámení o aktualizaci výsledků. V plánu na 05/2026.",
+    severity: "high",
+  },
+];
+
+const audits = [
+  { date: "2026-04-15", who: "Interní + tichý uživatelský test (3 osoby)", outcome: "Detekováno 6 nedostatků, 4 opraveny, 2 v plánu (search ARIA, autoplay)." },
+  { date: "2025-09-20", who: "Externí auditor (Blind Friendly, o.p.s.)", outcome: "Web prošel s 89 % shody WCAG 2.1 AA. Doporučení: lepší kontrast u kategorií Auto a Děti." },
+  { date: "2024-11-12", who: "Interní audit po redesignu", outcome: "Po přechodu na nový design system kontrola všech komponent. 12 nedostatků, vše opraveno." },
+];
+
+const userHelp = [
+  {
+    icon: "zoom",
+    title: "Zvětšení textu",
+    text: "V prohlížeči: <kbd>Cmd</kbd>+<kbd>+</kbd> (macOS) nebo <kbd>Ctrl</kbd>+<kbd>+</kbd> (Windows). Web funguje i při 200% zvětšení.",
+  },
+  {
+    icon: "contrast",
+    title: "Vysoký kontrast",
+    text: "Můžete zapnout v Nastavení prohlížeče (Edge: Vysoký kontrast; Firefox: Předvolby vzhledu). Náš design respektuje vaše vlastní barvy.",
+  },
+  {
+    icon: "keyboard",
+    title: "Ovládání klávesnicí",
+    text: "Tab přepíná na další odkaz/tlačítko, Shift+Tab zpět. Enter aktivuje. Esc zavře modální okna a menu.",
+  },
+];
+
+const shortcuts = [
+  { key: "Cmd / Ctrl + K", action: "Otevřít vyhledávání (chystáme)" },
+  { key: "Tab", action: "Další interaktivní prvek" },
+  { key: "Shift + Tab", action: "Předchozí interaktivní prvek" },
+  { key: "Enter / Space", action: "Aktivovat tlačítko nebo odkaz" },
+  { key: "Esc", action: "Zavřít modální okno nebo menu" },
+];
+
+const complaintFlow = [
+  {
+    num: "01",
+    title: "Popište problém",
+    text: "Stránka URL + co konkrétně nefunguje. Stačí pár vět. Pokud používáte konkrétní asistivní technologii (NVDA, JAWS, VoiceOver), uveďte ji.",
+  },
+  {
+    num: "02",
+    title: "Potvrdíme přijetí",
+    text: "Do 24 hodin v pracovní dny vám pošleme potvrzení s číslem případu. Vážnost problému určujeme podle dopadu — kritické řešíme okamžitě.",
+  },
+  {
+    num: "03",
+    title: "Oprava a zpětná vazba",
+    text: "Drobné chyby (alt text, kontrast) opravíme do 5 dnů. Strukturální problémy (přepis komponenty) plánujeme do nejbližšího vývojového cyklu — typicky 2–6 týdnů.",
+  },
+];
+
+const lastUpdated = "2026-04-15";
+---
+
+<BaseLayout
+  title="Přístupnost — Recenzer"
+  description="Prohlášení o přístupnosti webu Recenzer.cz. WCAG 2.1 Level AA, známé nedostatky, audity, jak nahlásit problém."
+>
+  <PageBreadcrumbs items={[{ href: "/", label: "Recenzer" }, { label: "Přístupnost" }]} />
+
+  <PageHero
+    eyebrow={`Prohlášení o přístupnosti · revize ${lastUpdated}`}
+    eyebrowIcon="shield"
+    title="Přístupnost<br/><em>webu</em>"
+    subtitle="Recenzer.cz se snaží být dostupný pro všechny — včetně lidí se zrakovým, sluchovým nebo motorickým postižením. <strong>Postupně se zlepšujeme</strong> a transparentně přiznáváme, kde ještě nejsme úplně tam, kde bychom chtěli."
+  />
+
+  <!-- Compliance status -->
+  <section class="acc-status">
+    <div class="inner">
+      <div class:list={["status-card", `status-${compliance.status}`]}>
+        <div class="status-ic" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10" />
+            <line x1="12" y1="8" x2="12" y2="12" />
+            <line x1="12" y1="16" x2="12.01" y2="16" />
+          </svg>
+        </div>
+        <div>
+          <p class="status-label">Aktuální stav</p>
+          <h2>Web je {compliance.label.toLowerCase()}</h2>
+          <p class="status-detail">{compliance.detail}</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TLDR -->
+  <section class="legal-tldr">
+    <div class="inner">
+      <div class="tldr-card">
+        <p class="tldr-eyebrow">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+            <polyline points="9 11 12 14 22 4" />
+            <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" />
+          </svg>
+          Přístupnost za 30 vteřin
+        </p>
+        <ul class="tldr-list">
+          {tldr.map((p) => <li set:html={p} />)}
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- Features -->
+  <section class="acc-features">
+    <div class="inner">
+      <header class="section-head">
+        <p class="eyebrow">Co děláme</p>
+        <h2>Co konkrétně pro přístupnost děláme</h2>
+        <p class="lead">
+          Šest základních věcí, které platí napříč celým webem.
+        </p>
+      </header>
+      <ul class="features-grid">
+        {
+          features.map((f) => (
+            <li class="feature-card">
+              <div class="feature-ic" aria-hidden="true">
+                {f.icon === "code" && (<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>)}
+                {f.icon === "image" && (<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>)}
+                {f.icon === "contrast" && (<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 2v20" /><path d="M12 2a10 10 0 0 1 0 20z" fill="currentColor"/></svg>)}
+                {f.icon === "keyboard" && (<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M6 8h.01M10 8h.01M14 8h.01M18 8h.01M6 12h.01M10 12h.01M14 12h.01M18 12h.01M7 16h10"/></svg>)}
+                {f.icon === "aria" && (<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/></svg>)}
+                {f.icon === "skip" && (<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="13 17 18 12 13 7"/><polyline points="6 17 11 12 6 7"/></svg>)}
+              </div>
+              <h3>{f.title}</h3>
+              <p set:html={f.text} />
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <!-- Standards -->
+  <section class="acc-standards">
+    <div class="inner">
+      <header class="section-head">
+        <p class="eyebrow">Standardy</p>
+        <h2>Použité normy</h2>
+        <p class="lead">
+          Tři referenční rámce, podle kterých se hodnotíme.
+        </p>
+      </header>
+      <ul class="standards-list">
+        {
+          standards.map((s) => (
+            <li>
+              <div class="std-head">
+                <div>
+                  <strong>{s.name}</strong>
+                  <span class="std-full">{s.full}</span>
+                </div>
+                <span class="std-body">{s.body}</span>
+              </div>
+              <p>{s.note}</p>
+              <a href={s.url} class="std-link" target="_blank" rel="noopener">Otevřít specifikaci ↗</a>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <!-- Known gaps -->
+  <section class="acc-gaps">
+    <div class="inner">
+      <header class="section-head">
+        <p class="eyebrow">Slabá místa</p>
+        <h2>Známé nedostatky</h2>
+        <p class="lead">
+          Otevřeně přiznáváme, kde web ještě úplně nezvládá. Každá položka má svůj termín opravy.
+        </p>
+      </header>
+      <ul class="gaps-list">
+        {
+          gaps.map((g) => (
+            <li class:list={[`severity-${g.severity}`]}>
+              <span class="gap-severity">{g.severity === "high" ? "Vysoká" : g.severity === "medium" ? "Střední" : "Nízká"}</span>
+              <div>
+                <h3>{g.title}</h3>
+                <p set:html={g.text} />
+              </div>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <!-- Audit history -->
+  <section class="acc-audits">
+    <div class="inner">
+      <header class="section-head">
+        <p class="eyebrow">Historie</p>
+        <h2>Audity přístupnosti</h2>
+      </header>
+      <ol class="audits-list">
+        {
+          audits.map((a) => (
+            <li>
+              <time datetime={a.date}>{a.date}</time>
+              <div>
+                <strong>{a.who}</strong>
+                <p>{a.outcome}</p>
+              </div>
+            </li>
+          ))
+        }
+      </ol>
+    </div>
+  </section>
+
+  <!-- User help -->
+  <section class="acc-help">
+    <div class="inner">
+      <header class="section-head">
+        <p class="eyebrow">Pro uživatele</p>
+        <h2>Tipy, jak si web přizpůsobit</h2>
+        <p class="lead">
+          I když web podporuje přístupnost, můžete si ho dál vyladit přes nastavení prohlížeče nebo operačního systému.
+        </p>
+      </header>
+      <ul class="help-grid">
+        {
+          userHelp.map((h) => (
+            <li>
+              <div class="help-ic" aria-hidden="true">
+                {h.icon === "zoom" && (<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg>)}
+                {h.icon === "contrast" && (<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 2a10 10 0 0 1 0 20z" fill="currentColor"/></svg>)}
+                {h.icon === "keyboard" && (<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M7 16h10"/></svg>)}
+              </div>
+              <h3>{h.title}</h3>
+              <p set:html={h.text} />
+            </li>
+          ))
+        }
+      </ul>
+
+      <div class="shortcuts-card">
+        <h3>Klávesové zkratky webu</h3>
+        <ul>
+          {
+            shortcuts.map((s) => (
+              <li>
+                <kbd>{s.key}</kbd>
+                <span>{s.action}</span>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- Complaint -->
+  <section class="acc-complaint">
+    <div class="inner">
+      <header class="section-head">
+        <p class="eyebrow">Reklamace</p>
+        <h2>Nahlášení problému s přístupností</h2>
+        <p class="lead">
+          Pokud narazíte na barieru, kterou jsme nevyřešili, dejte nám vědět. Každé hlášení zařadíme do plánu oprav.
+        </p>
+      </header>
+
+      <ol class="complaint-flow">
+        {
+          complaintFlow.map((c) => (
+            <li>
+              <span class="step-num">{c.num}</span>
+              <div>
+                <h3>{c.title}</h3>
+                <p>{c.text}</p>
+              </div>
+            </li>
+          ))
+        }
+      </ol>
+
+      <div class="complaint-channels">
+        <a href="mailto:pristupnost@recenzer.cz" class="btn-primary">
+          pristupnost@recenzer.cz
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+            <line x1="5" y1="12" x2="19" y2="12" />
+            <polyline points="12 5 19 12 12 19" />
+          </svg>
+        </a>
+        <a href="/oprava-chyb/" class="btn-ghost">Obecný formulář pro hlášení chyb</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Authority -->
+  <section class="acc-authority">
+    <div class="inner">
+      <div class="authority-card">
+        <p class="eyebrow">Dozorový orgán</p>
+        <h2>Digitální a informační agentura (DIA)</h2>
+        <p>
+          Pokud nesouhlasíte s vyřízením vašeho podnětu, nebo se Recenzer.cz dlouhodobě neopraví hlášený problém, můžete podat stížnost u dozorového orgánu.
+        </p>
+        <dl class="authority-info">
+          <dt>Sídlo</dt>
+          <dd>Na Vápence 14, 130 00 Praha 3</dd>
+          <dt>E-mail</dt>
+          <dd><a href="mailto:posta@dia.gov.cz">posta@dia.gov.cz</a></dd>
+          <dt>Web</dt>
+          <dd><a href="https://www.dia.gov.cz/" target="_blank" rel="noopener">www.dia.gov.cz ↗</a></dd>
+        </dl>
+      </div>
+    </div>
+  </section>
+
+  <!-- Related -->
+  <section class="acc-related">
+    <div class="inner">
+      <div class="related-card">
+        <h2>Související dokumenty</h2>
+        <p>
+          Přístupnost je součást širšího editorialně transparentního přístupu Recenzeru.
+        </p>
+        <div class="end-actions">
+          <a href="/oprava-chyb/" class="btn-primary">Nahlásit chybu</a>
+          <a href="/zasady-osobnich-udaju/" class="btn-ghost">Zásady osobních údajů</a>
+          <a href="/zasady-cookies/" class="btn-ghost">Zásady cookies</a>
+          <a href="/podminky-pouziti/" class="btn-ghost">Podmínky použití</a>
+        </div>
+      </div>
+      <p class="acc-meta">
+        Prohlášení platné od <strong>2016</strong>, poslední aktualizace <time datetime={lastUpdated}>{lastUpdated}</time>.
+      </p>
+    </div>
+  </section>
+
+  <style>
+    .inner {
+      max-width: var(--max-w);
+      margin: 0 auto;
+      padding: clamp(2rem, 4vw, 3rem) var(--gutter);
+    }
+
+    .section-head {
+      max-width: 65ch;
+      margin: 0 0 2rem;
+    }
+
+    .eyebrow {
+      font-family: var(--mono);
+      font-size: 11.5px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--p-700);
+      font-weight: 700;
+      margin: 0 0 0.5rem;
+    }
+
+    .section-head h2 {
+      font-size: clamp(1.5rem, 3vw, 2.1rem);
+      font-weight: 800;
+      letter-spacing: -0.025em;
+      color: var(--ink);
+      line-height: 1.2;
+      margin-bottom: 0.6rem;
+    }
+
+    .section-head .lead {
+      font-size: 15px;
+      line-height: 1.6;
+      color: var(--muted);
+      margin: 0;
+    }
+
+    .section-head .lead :global(strong) { color: var(--ink); font-weight: 700; }
+
+    /* Status */
+    .acc-status {
+      background: var(--bg);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .status-card {
+      display: grid;
+      grid-template-columns: 64px 1fr;
+      gap: 1.5rem;
+      align-items: center;
+      padding: 1.75rem 2rem;
+      background: var(--amber-bg);
+      border: 1px solid rgba(180, 83, 9, 0.18);
+      border-radius: var(--r-lg);
+    }
+
+    .status-card.status-full {
+      background: var(--green-bg);
+      border-color: rgba(21, 128, 61, 0.18);
+    }
+
+    .status-card.status-none {
+      background: var(--red-bg);
+      border-color: rgba(185, 28, 28, 0.18);
+    }
+
+    .status-ic {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      background: #fff;
+      color: var(--amber);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .status-card.status-full .status-ic { color: var(--green); }
+    .status-card.status-none .status-ic { color: var(--red); }
+
+    .status-ic svg { width: 28px; height: 28px; }
+
+    .status-label {
+      font-family: var(--mono);
+      font-size: 11.5px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--amber);
+      font-weight: 700;
+      margin: 0 0 0.4rem;
+    }
+
+    .status-card.status-full .status-label { color: var(--green); }
+    .status-card.status-none .status-label { color: var(--red); }
+
+    .status-card h2 {
+      font-size: clamp(1.4rem, 2.5vw, 1.8rem);
+      font-weight: 800;
+      color: var(--ink);
+      letter-spacing: -0.02em;
+      margin: 0 0 0.5rem;
+    }
+
+    .status-detail {
+      font-size: 15px;
+      line-height: 1.55;
+      color: var(--ink-soft);
+      margin: 0;
+    }
+
+    /* TLDR (shared with legal pages) */
+    .legal-tldr { background: var(--bg); border-bottom: 1px solid var(--line); }
+
+    .tldr-card {
+      max-width: 760px;
+      margin: 0 auto;
+      padding: 2rem;
+      background: var(--ink);
+      color: #fff;
+      border-radius: var(--r-xl);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .tldr-card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(700px circle at 100% 0%, rgba(149, 114, 240, 0.28), transparent 55%),
+        radial-gradient(500px circle at 0% 100%, rgba(99, 50, 204, 0.2), transparent 55%);
+      pointer-events: none;
+    }
+
+    .tldr-eyebrow {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-family: var(--mono);
+      font-size: 11.5px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--p-300);
+      font-weight: 700;
+      margin: 0 0 1.25rem;
+    }
+
+    .tldr-eyebrow svg { width: 14px; height: 14px; }
+
+    .tldr-list {
+      position: relative;
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      counter-reset: tldr;
+      display: grid;
+      gap: 0.4rem;
+    }
+
+    .tldr-list li {
+      counter-increment: tldr;
+      padding: 0.65rem 0 0.65rem 3rem;
+      position: relative;
+      font-size: 15px;
+      line-height: 1.5;
+      color: rgba(255, 255, 255, 0.9);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .tldr-list li:last-child { border-bottom: 0; }
+
+    .tldr-list li :global(strong) { color: #fff; font-weight: 700; }
+    .tldr-list li :global(a) {
+      color: var(--p-200);
+      text-decoration: underline;
+    }
+
+    .tldr-list li::before {
+      content: counter(tldr, decimal-leading-zero);
+      position: absolute;
+      left: 0;
+      top: 0.65rem;
+      width: 28px;
+      height: 28px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      border-radius: 7px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--mono);
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--p-200);
+    }
+
+    /* Features */
+    .acc-features {
+      background: var(--bg-warm);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .features-grid {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.85rem;
+    }
+
+    @media (max-width: 880px) { .features-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 560px) { .features-grid { grid-template-columns: 1fr; } }
+
+    .feature-card {
+      padding: 1.5rem;
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: var(--r-lg);
+    }
+
+    .feature-ic {
+      width: 40px;
+      height: 40px;
+      border-radius: 11px;
+      background: var(--p-50);
+      color: var(--p-700);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 0.85rem;
+    }
+
+    .feature-ic svg { width: 20px; height: 20px; }
+
+    .feature-card h3 {
+      font-size: 1rem;
+      font-weight: 800;
+      color: var(--ink);
+      letter-spacing: -0.015em;
+      margin-bottom: 0.4rem;
+    }
+
+    .feature-card p {
+      font-size: 13.5px;
+      line-height: 1.6;
+      color: var(--muted);
+      margin: 0;
+    }
+
+    .feature-card p :global(code) {
+      font-family: var(--mono);
+      font-size: 11.5px;
+      background: var(--bg-warm);
+      padding: 1px 5px;
+      border-radius: 3px;
+      border: 1px solid var(--line);
+      color: var(--ink);
+    }
+
+    /* Standards */
+    .acc-standards {
+      background: var(--bg);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .standards-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 0.6rem;
+    }
+
+    .standards-list li {
+      padding: 1.25rem 1.5rem;
+      background: var(--bg-warm);
+      border: 1px solid var(--line);
+      border-left: 3px solid var(--p-500);
+      border-radius: var(--r);
+    }
+
+    .std-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 1rem;
+      margin-bottom: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    .std-head strong {
+      font-size: 1rem;
+      font-weight: 800;
+      color: var(--ink);
+      letter-spacing: -0.01em;
+    }
+
+    .std-full {
+      display: block;
+      font-size: 12.5px;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+
+    .std-body {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--p-700);
+      background: var(--p-50);
+      padding: 3px 9px;
+      border-radius: 4px;
+      letter-spacing: 0.04em;
+      white-space: nowrap;
+    }
+
+    .standards-list p {
+      font-size: 14px;
+      line-height: 1.6;
+      color: var(--muted);
+      margin: 0 0 0.6rem;
+    }
+
+    .std-link {
+      font-family: var(--mono);
+      font-size: 12px;
+      color: var(--p-700);
+      text-decoration: none;
+    }
+
+    .std-link:hover,
+    .std-link:focus-visible {
+      color: var(--p-900);
+      text-decoration: underline;
+    }
+
+    /* Gaps */
+    .acc-gaps {
+      background: var(--amber-bg);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .acc-gaps .eyebrow { color: var(--amber); }
+
+    .gaps-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 0.6rem;
+    }
+
+    .gaps-list li {
+      display: grid;
+      grid-template-columns: 90px 1fr;
+      gap: 1rem;
+      padding: 1.25rem 1.5rem;
+      background: #fff;
+      border: 1px solid rgba(180, 83, 9, 0.18);
+      border-radius: var(--r);
+      align-items: start;
+    }
+
+    .gap-severity {
+      font-family: var(--mono);
+      font-size: 10.5px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: 4px;
+      text-align: center;
+      background: var(--amber-bg);
+      color: var(--amber);
+      align-self: start;
+    }
+
+    .severity-high .gap-severity { background: var(--red-bg); color: var(--red); }
+    .severity-low .gap-severity { background: var(--green-bg); color: var(--green); }
+
+    .gaps-list h3 {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--ink);
+      margin-bottom: 0.35rem;
+    }
+
+    .gaps-list p {
+      font-size: 13.5px;
+      line-height: 1.6;
+      color: var(--muted);
+      margin: 0;
+    }
+
+    .gaps-list p :global(code) {
+      font-family: var(--mono);
+      font-size: 11.5px;
+      background: var(--bg-warm);
+      padding: 1px 5px;
+      border-radius: 3px;
+      border: 1px solid var(--line);
+      color: var(--ink);
+    }
+
+    /* Audits */
+    .acc-audits {
+      background: var(--bg);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .audits-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .audits-list li {
+      display: grid;
+      grid-template-columns: 110px 1fr;
+      gap: 1rem;
+      padding: 1.1rem 1.4rem;
+      background: var(--bg-warm);
+      border: 1px solid var(--line);
+      border-radius: var(--r);
+    }
+
+    @media (max-width: 600px) {
+      .audits-list li { grid-template-columns: 1fr; gap: 0.3rem; }
+    }
+
+    .audits-list time {
+      font-family: var(--mono);
+      font-size: 13px;
+      color: var(--p-700);
+      font-weight: 700;
+    }
+
+    .audits-list strong {
+      display: block;
+      font-size: 14px;
+      color: var(--ink);
+      margin-bottom: 0.3rem;
+    }
+
+    .audits-list p {
+      font-size: 13.5px;
+      line-height: 1.55;
+      color: var(--muted);
+      margin: 0;
+    }
+
+    /* User help */
+    .acc-help {
+      background: var(--bg-warm);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .help-grid {
+      list-style: none;
+      padding: 0;
+      margin: 0 0 1.5rem;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.85rem;
+    }
+
+    @media (max-width: 720px) { .help-grid { grid-template-columns: 1fr; } }
+
+    .help-grid li {
+      padding: 1.5rem;
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: var(--r-lg);
+    }
+
+    .help-ic {
+      width: 40px;
+      height: 40px;
+      border-radius: 11px;
+      background: var(--p-50);
+      color: var(--p-700);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 0.85rem;
+    }
+
+    .help-ic svg { width: 20px; height: 20px; }
+
+    .help-grid h3 {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--ink);
+      margin-bottom: 0.35rem;
+    }
+
+    .help-grid p {
+      font-size: 13.5px;
+      line-height: 1.6;
+      color: var(--muted);
+      margin: 0;
+    }
+
+    .help-grid p :global(kbd) {
+      font-family: var(--mono);
+      font-size: 11px;
+      padding: 2px 6px;
+      border-radius: 4px;
+      background: var(--bg-warm);
+      border: 1px solid var(--line);
+      color: var(--ink);
+    }
+
+    .shortcuts-card {
+      padding: 1.5rem;
+      background: var(--ink);
+      color: #fff;
+      border-radius: var(--r-lg);
+    }
+
+    .shortcuts-card h3 {
+      font-family: var(--mono);
+      font-size: 11.5px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--p-300);
+      font-weight: 700;
+      margin: 0 0 1rem;
+    }
+
+    .shortcuts-card ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 0.5rem 1.25rem;
+    }
+
+    @media (max-width: 600px) { .shortcuts-card ul { grid-template-columns: 1fr; } }
+
+    .shortcuts-card li {
+      display: flex;
+      justify-content: space-between;
+      gap: 1rem;
+      padding: 0.5rem 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      font-size: 13.5px;
+    }
+
+    .shortcuts-card kbd {
+      font-family: var(--mono);
+      font-size: 11.5px;
+      padding: 3px 8px;
+      border-radius: 4px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      color: #fff;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .shortcuts-card span {
+      color: rgba(255, 255, 255, 0.7);
+    }
+
+    /* Complaint */
+    .acc-complaint {
+      background: var(--bg);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .complaint-flow {
+      list-style: none;
+      padding: 0;
+      margin: 0 0 1.5rem;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.85rem;
+    }
+
+    @media (max-width: 720px) { .complaint-flow { grid-template-columns: 1fr; } }
+
+    .complaint-flow li {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 1rem;
+      padding: 1.5rem;
+      background: var(--bg-warm);
+      border: 1px solid var(--line);
+      border-radius: var(--r-lg);
+    }
+
+    .step-num {
+      font-family: var(--mono);
+      font-size: 1.4rem;
+      font-weight: 800;
+      color: var(--p-700);
+      line-height: 1;
+    }
+
+    .complaint-flow h3 {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--ink);
+      margin-bottom: 0.3rem;
+    }
+
+    .complaint-flow p {
+      font-size: 13.5px;
+      line-height: 1.55;
+      color: var(--muted);
+      margin: 0;
+    }
+
+    .complaint-channels {
+      display: flex;
+      gap: 0.6rem;
+      flex-wrap: wrap;
+    }
+
+    /* Authority */
+    .acc-authority { background: var(--bg-warm); border-bottom: 1px solid var(--line); }
+
+    .authority-card {
+      max-width: 720px;
+      padding: 1.75rem;
+      background: #fff;
+      border: 1px solid var(--line);
+      border-left: 3px solid var(--p-500);
+      border-radius: var(--r-lg);
+    }
+
+    .authority-card h2 {
+      font-size: 1.25rem;
+      font-weight: 800;
+      color: var(--ink);
+      letter-spacing: -0.015em;
+      margin-bottom: 0.6rem;
+    }
+
+    .authority-card p {
+      font-size: 14.5px;
+      line-height: 1.6;
+      color: var(--ink-soft);
+      margin-bottom: 1rem;
+    }
+
+    .authority-info {
+      display: grid;
+      grid-template-columns: 80px 1fr;
+      gap: 0.4rem 1rem;
+      margin: 0;
+      padding: 1rem 0 0;
+      border-top: 1px solid var(--line);
+    }
+
+    .authority-info dt {
+      font-family: var(--mono);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--muted);
+      font-weight: 700;
+    }
+
+    .authority-info dd {
+      margin: 0;
+      font-size: 14px;
+      color: var(--ink);
+    }
+
+    .authority-info a {
+      color: var(--p-700);
+      text-decoration: underline;
+    }
+
+    /* Related */
+    .acc-related { background: var(--bg); }
+
+    .related-card {
+      max-width: 760px;
+      margin: 0 auto;
+      padding: 2.25rem 2rem;
+      background: var(--p-50);
+      border: 1px solid rgba(99, 50, 204, 0.18);
+      border-radius: var(--r-xl);
+      text-align: center;
+    }
+
+    .related-card h2 {
+      font-size: clamp(1.4rem, 2.5vw, 1.85rem);
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      color: var(--ink);
+      margin-bottom: 0.6rem;
+    }
+
+    .related-card p {
+      font-size: 15px;
+      line-height: 1.6;
+      color: var(--ink-soft);
+      max-width: 56ch;
+      margin: 0 auto 1.5rem;
+    }
+
+    .end-actions {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .acc-meta {
+      margin-top: 1.5rem;
+      font-size: 12.5px;
+      color: var(--muted);
+      text-align: center;
+    }
+
+    .acc-meta strong { color: var(--ink); font-weight: 700; }
+
+    .btn-primary,
+    .btn-ghost {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      padding: 0.7rem 1.2rem;
+      border-radius: var(--r);
+      font-size: 13.5px;
+      font-weight: 600;
+      text-decoration: none;
+    }
+
+    .btn-primary {
+      background: var(--p-700);
+      color: #fff;
+      border: 1px solid var(--p-700);
+    }
+
+    .btn-primary:hover,
+    .btn-primary:focus-visible {
+      background: var(--p-800);
+      border-color: var(--p-800);
+      color: #fff;
+    }
+
+    .btn-primary svg { width: 14px; height: 14px; }
+
+    .btn-ghost {
+      background: #fff;
+      color: var(--ink);
+      border: 1px solid var(--line);
+    }
+
+    .btn-ghost:hover,
+    .btn-ghost:focus-visible {
+      border-color: var(--p-400);
+      color: var(--p-700);
+    }
+  </style>
+</BaseLayout>

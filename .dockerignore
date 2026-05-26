@@ -1,0 +1,27 @@
+# Files that should NOT be sent to Docker build context.
+# Bind-mounted at runtime, so we don't need them in the image either.
+
+node_modules
+dist
+.astro
+
+# Local-only directories
+docs
+
+# Editor & OS files
+.DS_Store
+.vscode
+.idea
+
+# Git
+.git
+.gitignore
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+
+# Environment files
+.env
+.env.local
+.env.production

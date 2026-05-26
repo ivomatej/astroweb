@@ -1,0 +1,742 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import PageBreadcrumbs from "../components/page/PageBreadcrumbs.astro";
+import PageHero from "../components/page/PageHero.astro";
+import StatStrip from "../components/page/StatStrip.astro";
+
+const stats = [
+  { value: "180 m²", label: "plochy laboratoře" },
+  { value: "4", label: "specializovaná pracoviště" },
+  { value: "30+", label: "měřicích přístrojů" },
+  { value: "Brno", label: "sídlo, ČR" },
+];
+
+const stations = [
+  {
+    icon: "speaker",
+    title: "Akustická komora",
+    text: "Polotichá místnost s obložením 80 mm pohlcovači. Měříme hluk pračky, vysavače, sušičky podle ISO 3744 — porovnatelně s Stiftung Warentest.",
+    accent: "purple",
+  },
+  {
+    icon: "bolt",
+    title: "Energetická zóna",
+    text: "Šest paralelně připojených zdrojů + Yokogawa WT310E wattmetr. Měříme reálnou spotřebu při různých zatíženích v 1 s intervalu.",
+    accent: "amber",
+  },
+  {
+    icon: "thermo",
+    title: "Termovize a teplotní měření",
+    text: "FLIR E54 termokamera + 12 kanálů Pt100. Sledujeme teplotu motorů pod zátěží, distribuci tepla v troubě, izolaci ledničky.",
+    accent: "red",
+  },
+  {
+    icon: "clock",
+    title: "Dlouhodobé testy",
+    text: "Pole 60 zásuvek + IoT senzory. Modely běží v plném provozu měsíce — testujeme životnost ložisek, baterií a izolace.",
+    accent: "green",
+  },
+];
+
+const instruments = [
+  { name: "Yokogawa WT310E", category: "Wattmetr", note: "Přesnost 0,1 % — referenční standard pro spotřebu." },
+  { name: "Brüel & Kjær 2245", category: "Hlukoměr", note: "Třída 1, ISO 3744-kompatibilní. Pro akustickou komoru." },
+  { name: "FLIR E54", category: "Termokamera", note: "320×240 pixelů, citlivost <40 mK. Termovize pod zátěží." },
+  { name: "PCE-LXP 30", category: "Luxmetr", note: "Pro testy svítidel a displejů — kalibrovaný 1× ročně." },
+  { name: "Mitutoyo 547-401", category: "Tloušťkoměr", note: "Přesnost 0,01 mm — pro plech, drát, materiál." },
+  { name: "Hioki PW3198", category: "Analyzátor sítě", note: "Měření kvality napájení, harmonických zkreslení." },
+  { name: "Testo 410-1", category: "Anemometr", note: "Pro foukače a ventilátory — proudění vzduchu m/s." },
+  { name: "Kern PCB 6000-1", category: "Váha", note: "Přesnost 0,1 g, kapacita 6 kg. Pro hmotnostní zkoušky." },
+  { name: "SpyderX Elite", category: "Kolorimetr", note: "Kalibrace displejů, barevný gamut, ΔE měření." },
+];
+
+const categories = [
+  {
+    title: "Domácí spotřebiče",
+    items: ["Pračky a sušičky", "Myčky a trouby", "Ledničky a mrazáky", "Robotické vysavače", "Kávovary"],
+  },
+  {
+    title: "Elektronika",
+    items: ["Notebooky a monitory", "Bezdrátová sluchátka", "Smartphone a tablety", "Domácí kina", "Routery"],
+  },
+  {
+    title: "Zahradní technika",
+    items: ["Aku sekačky", "Foukače listí", "Plotostříhače", "Aku pily", "Závlaha"],
+  },
+  {
+    title: "Pneumatiky a auto",
+    items: ["Zimní pneumatiky 16–18\"", "Letní pneumatiky", "Autobaterie 12V", "GPS lokátory", "Dashkamery"],
+  },
+  {
+    title: "Děti a rodina",
+    items: ["Autosedačky 0–36 kg", "Kočárky", "Monitory dýchání", "Dětská obuv", "Hračky"],
+  },
+  {
+    title: "Sport a fitness",
+    items: ["Běžecké hodinky", "Activity trackery", "Domácí trenažéry", "Posilovací stroje", "Outdoor vybavení"],
+  },
+];
+
+const limits = [
+  "Crash-testy aut a motocyklů — chybí nám speciální polygon a rychlostní dráha.",
+  "Test elektromagnetické kompatibility (EMC) — vyžaduje stíněnou komoru za miliony.",
+  "Dlouhodobé klimatické testy nad 60 °C — nemáme termální komoru.",
+  "Pevnostní zkoušky materiálů a destruktivní zkoušky kovů — necháváme akreditovaným lab.",
+];
+
+const team = [
+  { initials: "MV", name: "Martin Veselý", role: "Vedoucí laboratoře · 12 let praxe" },
+  { initials: "PK", name: "Petra Kovářová", role: "Inženýrka měření · ČVUT" },
+  { initials: "TS", name: "Tomáš Šimek", role: "Akustika a vibrace · 8 let v Tesco/QC" },
+  { initials: "AL", name: "Adéla Linhartová", role: "Termovize, energetika" },
+];
+
+const history = [
+  { year: "2018", text: "Provizorní laboratoř 40 m² v Brně, 3 přístroje, dva lidé." },
+  { year: "2020", text: "Rozšíření na 90 m² + akustická komora. Externí kalibrace přístrojů 1× ročně." },
+  { year: "2023", text: "FLIR termokamera, energetická zóna se 6 zásuvkami." },
+  { year: "2025", text: "Aktuálních 180 m², 4 pracoviště, 30+ přístrojů, 4 technici." },
+];
+
+const lastUpdated = "2026-04-15";
+---
+
+<BaseLayout
+  title="Testovací laboratoř — Recenzer"
+  description="180 m² laboratoře v Brně. 4 specializovaná pracoviště, 30+ měřicích přístrojů, 4 techniky. Co a jak v laboratoři testujeme."
+>
+  <PageBreadcrumbs items={[{ href: "/", label: "Recenzer" }, { label: "Testovací laboratoř" }]} />
+
+  <PageHero
+    eyebrow="Editorial standards · laboratoř Brno"
+    eyebrowIcon="lab"
+    title="Naše<br/><em>testovací laboratoř</em>"
+    subtitle="Provozujeme vlastní 180 m² laboratoř v Brně. <strong>Měříme — neopisujeme.</strong> Žádný model neopustí redakci bez vlastních dat z minimálně jedné z těchto čtyř disciplín."
+  />
+
+  <StatStrip label="Klíčová čísla" stats={stats} />
+
+  <!-- Stations -->
+  <section class="lab-stations">
+    <div class="inner">
+      <header class="section-head">
+        <p class="eyebrow">Pracoviště</p>
+        <h2>4 specializovaná pracoviště</h2>
+        <p class="lead">
+          Každé pracoviště má vlastní metodiku, kalibrované přístroje a zodpovědného technika. Testy probíhají vždy podle ISO norem (kde existují) a opakovaně 5× na model.
+        </p>
+      </header>
+      <ul class="stations-grid">
+        {
+          stations.map((s) => (
+            <li class:list={["station-card", `accent-${s.accent}`]}>
+              <div class="station-ic" aria-hidden="true">
+                {s.icon === "speaker" && (<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="4" height="8"/><polygon points="11 5 3 11 3 13 11 19"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>)}
+                {s.icon === "bolt" && (<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>)}
+                {s.icon === "thermo" && (<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 14.76V3.5a2.5 2.5 0 0 0-5 0v11.26a4 4 0 1 0 5 0z"/></svg>)}
+                {s.icon === "clock" && (<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>)}
+              </div>
+              <h3>{s.title}</h3>
+              <p>{s.text}</p>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <!-- Instruments -->
+  <section class="lab-instruments">
+    <div class="inner">
+      <header class="section-head">
+        <p class="eyebrow">Vybavení</p>
+        <h2>Klíčové měřicí přístroje</h2>
+        <p class="lead">
+          Všechny přístroje s kalibrovaným certifikátem 1× ročně (ČMI Praha nebo Brno). Konkrétní výrobní čísla evidujeme v laboratorním deníku.
+        </p>
+      </header>
+      <ul class="instr-grid">
+        {
+          instruments.map((i) => (
+            <li>
+              <div class="instr-head">
+                <strong>{i.name}</strong>
+                <span class="instr-cat">{i.category}</span>
+              </div>
+              <p>{i.note}</p>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <!-- Categories -->
+  <section class="lab-categories">
+    <div class="inner">
+      <header class="section-head">
+        <p class="eyebrow">Rozsah</p>
+        <h2>Co konkrétně testujeme</h2>
+        <p class="lead">
+          Šest hlavních oblastí, ve kterých máme vlastní metodiku a relevantní vybavení. Pro odbornější testy (auto crash, EMC) využíváme akreditované partnery.
+        </p>
+      </header>
+      <ul class="cat-grid">
+        {
+          categories.map((c) => (
+            <li>
+              <h3>{c.title}</h3>
+              <ul>
+                {c.items.map((item) => <li>{item}</li>)}
+              </ul>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <!-- Limits -->
+  <section class="lab-limits">
+    <div class="inner">
+      <header class="section-head">
+        <p class="eyebrow">Hranice</p>
+        <h2>Kde má naše laboratoř limity</h2>
+        <p class="lead">
+          Žádná malá laboratoř nepokryje všechno. Co fyzicky nezvládneme, výslovně přiznáváme — a v takových případech citujeme externí akreditované zdroje.
+        </p>
+      </header>
+      <ul class="limits-list">
+        {
+          limits.map((l) => (
+            <li>
+              <div class="limit-ic" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <circle cx="12" cy="12" r="10" />
+                  <line x1="4.93" y1="4.93" x2="19.07" y2="19.07" />
+                </svg>
+              </div>
+              <span>{l}</span>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <!-- Team -->
+  <section class="lab-team">
+    <div class="inner">
+      <header class="section-head">
+        <p class="eyebrow">Tým</p>
+        <h2>Kdo v laboratoři pracuje</h2>
+        <p class="lead">
+          Čtyři techniky na plný úvazek. Všichni s technickým vzděláním a praxí v měření z předchozích pozic ve výzkumných nebo QC organizacích.
+        </p>
+      </header>
+      <ul class="team-grid">
+        {
+          team.map((p) => (
+            <li>
+              <div class="team-avatar">{p.initials}</div>
+              <h3>{p.name}</h3>
+              <p>{p.role}</p>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <!-- History -->
+  <section class="lab-history">
+    <div class="inner">
+      <header class="section-head">
+        <p class="eyebrow">Historie</p>
+        <h2>Jak laboratoř rostla</h2>
+      </header>
+      <ol class="history-line">
+        {
+          history.map((h) => (
+            <li>
+              <span class="history-year">{h.year}</span>
+              <p>{h.text}</p>
+            </li>
+          ))
+        }
+      </ol>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="lab-end">
+    <div class="inner">
+      <div class="lab-end-card">
+        <h2>Chcete se podívat na vlastní oči?</h2>
+        <p>
+          Pro novináře, partnery a školy nabízíme prohlídky laboratoře po předchozí domluvě. Vidíte přístroje v provozu a můžete se ptát na cokoliv ohledně metodiky.
+        </p>
+        <div class="end-actions">
+          <a href="mailto:laborator@recenzer.cz" class="btn-primary">
+            laborator@recenzer.cz
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+              <line x1="5" y1="12" x2="19" y2="12" />
+              <polyline points="12 5 19 12 12 19" />
+            </svg>
+          </a>
+          <a href="/metodika/" class="btn-ghost">Metodika testů</a>
+          <a href="/duveryhodne-zdroje/" class="btn-ghost">Důvěryhodné zdroje</a>
+        </div>
+      </div>
+      <p class="lab-meta">
+        Provoz od <strong>2018</strong>, poslední aktualizace inventáře <time datetime={lastUpdated}>{lastUpdated}</time>.
+      </p>
+    </div>
+  </section>
+
+  <style>
+    .inner {
+      max-width: var(--max-w);
+      margin: 0 auto;
+      padding: clamp(2.5rem, 5vw, 4rem) var(--gutter);
+    }
+
+    .section-head {
+      max-width: 65ch;
+      margin: 0 0 2rem;
+    }
+
+    .eyebrow {
+      font-family: var(--mono);
+      font-size: 11.5px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--p-700);
+      font-weight: 700;
+      margin: 0 0 0.5rem;
+    }
+
+    .section-head h2 {
+      font-size: clamp(1.5rem, 3vw, 2.1rem);
+      font-weight: 800;
+      letter-spacing: -0.025em;
+      color: var(--ink);
+      line-height: 1.2;
+      margin-bottom: 0.6rem;
+    }
+
+    .section-head .lead {
+      font-size: 15px;
+      line-height: 1.6;
+      color: var(--muted);
+      margin: 0;
+    }
+
+    /* Stations */
+    .lab-stations {
+      background: var(--bg);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .stations-grid {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1rem;
+    }
+
+    @media (max-width: 720px) { .stations-grid { grid-template-columns: 1fr; } }
+
+    .station-card {
+      padding: 1.75rem;
+      background: var(--bg-warm);
+      border: 1px solid var(--line);
+      border-top: 3px solid var(--p-500);
+      border-radius: var(--r-lg);
+    }
+
+    .station-card.accent-purple { border-top-color: var(--p-500); }
+    .station-card.accent-amber { border-top-color: var(--amber); }
+    .station-card.accent-red { border-top-color: var(--red); }
+    .station-card.accent-green { border-top-color: var(--green); }
+
+    .station-ic {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      background: var(--p-50);
+      color: var(--p-700);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 0.85rem;
+    }
+
+    .station-card.accent-amber .station-ic { background: var(--amber-bg); color: var(--amber); }
+    .station-card.accent-red .station-ic { background: var(--red-bg); color: var(--red); }
+    .station-card.accent-green .station-ic { background: var(--green-bg); color: var(--green); }
+
+    .station-ic svg { width: 22px; height: 22px; }
+
+    .station-card h3 {
+      font-size: 1.1rem;
+      font-weight: 800;
+      color: var(--ink);
+      letter-spacing: -0.015em;
+      margin-bottom: 0.4rem;
+    }
+
+    .station-card p {
+      font-size: 14px;
+      line-height: 1.6;
+      color: var(--muted);
+      margin: 0;
+    }
+
+    /* Instruments */
+    .lab-instruments {
+      background: var(--bg-warm);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .instr-grid {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.6rem;
+    }
+
+    @media (max-width: 880px) { .instr-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 560px) { .instr-grid { grid-template-columns: 1fr; } }
+
+    .instr-grid li {
+      padding: 1rem 1.1rem;
+      background: #fff;
+      border: 1px solid var(--line);
+      border-left: 3px solid var(--p-500);
+      border-radius: var(--r);
+    }
+
+    .instr-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 0.6rem;
+      margin-bottom: 0.3rem;
+      flex-wrap: wrap;
+    }
+
+    .instr-head strong {
+      font-size: 13.5px;
+      color: var(--ink);
+    }
+
+    .instr-cat {
+      font-family: var(--mono);
+      font-size: 10px;
+      color: var(--p-700);
+      background: var(--p-50);
+      padding: 2px 6px;
+      border-radius: 4px;
+      letter-spacing: 0.04em;
+      white-space: nowrap;
+    }
+
+    .instr-grid p {
+      font-size: 12.5px;
+      line-height: 1.55;
+      color: var(--muted);
+      margin: 0;
+    }
+
+    /* Categories */
+    .lab-categories {
+      background: var(--bg);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .cat-grid {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.85rem;
+    }
+
+    @media (max-width: 880px) { .cat-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 560px) { .cat-grid { grid-template-columns: 1fr; } }
+
+    .cat-grid > li {
+      padding: 1.5rem;
+      background: var(--bg-warm);
+      border: 1px solid var(--line);
+      border-radius: var(--r-lg);
+    }
+
+    .cat-grid h3 {
+      font-size: 1rem;
+      font-weight: 800;
+      color: var(--ink);
+      letter-spacing: -0.015em;
+      margin-bottom: 0.85rem;
+      padding-bottom: 0.6rem;
+      border-bottom: 1px dashed var(--line);
+    }
+
+    .cat-grid ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+    }
+
+    .cat-grid ul li {
+      padding-left: 1.1rem;
+      position: relative;
+      font-size: 13.5px;
+      color: var(--ink-soft);
+      line-height: 1.5;
+    }
+
+    .cat-grid ul li::before {
+      content: "→";
+      position: absolute;
+      left: 0;
+      color: var(--p-600);
+      font-weight: 700;
+    }
+
+    /* Limits */
+    .lab-limits {
+      background: var(--amber-bg);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .lab-limits .eyebrow { color: var(--amber); }
+
+    .limits-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .limits-list li {
+      display: grid;
+      grid-template-columns: 32px 1fr;
+      gap: 1rem;
+      padding: 1rem 1.25rem;
+      background: #fff;
+      border: 1px solid rgba(180, 83, 9, 0.18);
+      border-radius: var(--r);
+      align-items: center;
+    }
+
+    .limit-ic {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: var(--amber-bg);
+      color: var(--amber);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .limit-ic svg { width: 16px; height: 16px; }
+
+    .limits-list span {
+      font-size: 14px;
+      color: var(--ink-soft);
+      line-height: 1.55;
+    }
+
+    /* Team */
+    .lab-team {
+      background: var(--bg);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .team-grid {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 0.85rem;
+    }
+
+    @media (max-width: 880px) { .team-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 480px) { .team-grid { grid-template-columns: 1fr; } }
+
+    .team-grid li {
+      padding: 1.5rem;
+      background: var(--bg-warm);
+      border: 1px solid var(--line);
+      border-radius: var(--r-lg);
+      text-align: center;
+    }
+
+    .team-avatar {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background: var(--p-100);
+      color: var(--p-700);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 16px;
+      margin-bottom: 0.85rem;
+    }
+
+    .team-grid h3 {
+      font-size: 14.5px;
+      font-weight: 700;
+      color: var(--ink);
+      margin-bottom: 0.3rem;
+    }
+
+    .team-grid p {
+      font-size: 12.5px;
+      color: var(--muted);
+      margin: 0;
+      line-height: 1.4;
+    }
+
+    /* History */
+    .lab-history {
+      background: var(--bg-warm);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .history-line {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      max-width: 720px;
+    }
+
+    .history-line li {
+      display: grid;
+      grid-template-columns: 70px 1fr;
+      gap: 1rem;
+      padding: 0.85rem 1.25rem;
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: var(--r);
+      align-items: center;
+    }
+
+    .history-year {
+      font-family: var(--mono);
+      font-size: 14px;
+      font-weight: 800;
+      color: var(--p-700);
+    }
+
+    .history-line p {
+      font-size: 14px;
+      color: var(--ink-soft);
+      line-height: 1.5;
+      margin: 0;
+    }
+
+    /* End */
+    .lab-end { background: var(--bg); }
+
+    .lab-end-card {
+      max-width: 760px;
+      margin: 0 auto;
+      padding: 2.25rem 2rem;
+      background: var(--p-50);
+      border: 1px solid rgba(99, 50, 204, 0.18);
+      border-radius: var(--r-xl);
+      text-align: center;
+    }
+
+    .lab-end-card h2 {
+      font-size: clamp(1.4rem, 2.5vw, 1.85rem);
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      color: var(--ink);
+      margin-bottom: 0.6rem;
+    }
+
+    .lab-end-card p {
+      font-size: 15px;
+      line-height: 1.6;
+      color: var(--ink-soft);
+      max-width: 56ch;
+      margin: 0 auto 1.5rem;
+    }
+
+    .end-actions {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .lab-meta {
+      margin-top: 1.5rem;
+      font-size: 12.5px;
+      color: var(--muted);
+      text-align: center;
+    }
+
+    .lab-meta strong { color: var(--ink); font-weight: 700; }
+
+    .btn-primary,
+    .btn-ghost {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      padding: 0.75rem 1.25rem;
+      border-radius: var(--r);
+      font-size: 14px;
+      font-weight: 600;
+      text-decoration: none;
+    }
+
+    .btn-primary {
+      background: var(--p-700);
+      color: #fff;
+      border: 1px solid var(--p-700);
+    }
+
+    .btn-primary:hover,
+    .btn-primary:focus-visible {
+      background: var(--p-800);
+      border-color: var(--p-800);
+      color: #fff;
+    }
+
+    .btn-primary svg { width: 14px; height: 14px; }
+
+    .btn-ghost {
+      background: #fff;
+      color: var(--ink);
+      border: 1px solid var(--line);
+    }
+
+    .btn-ghost:hover,
+    .btn-ghost:focus-visible {
+      border-color: var(--p-400);
+      color: var(--p-700);
+    }
+  </style>
+</BaseLayout>

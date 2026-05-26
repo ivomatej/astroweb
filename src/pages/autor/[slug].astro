@@ -1,0 +1,734 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import PageBreadcrumbs from "../../components/page/PageBreadcrumbs.astro";
+import { allPeople, getPersonBySlug } from "../../data/people";
+
+export function getStaticPaths() {
+  return allPeople.map((person) => ({
+    params: { slug: person.slug },
+    props: { person },
+  }));
+}
+
+const { person } = Astro.props;
+if (!person) return Astro.redirect("/404");
+
+function formatCzechDate(iso: string): string {
+  const d = new Date(iso);
+  return `${d.getDate()}. ${d.getMonth() + 1}. ${d.getFullYear()}`;
+}
+
+const kindLabel = person.kind === "internal" ? "Interní redakce" : "Externí odborný garant";
+---
+
+<BaseLayout
+  title={`${person.name} — ${person.role} | Recenzer`}
+  description={person.tagline}
+>
+  <PageBreadcrumbs
+    items={[
+      { href: "/", label: "Recenzer" },
+      { href: "/autori/", label: "Autoři" },
+      { label: person.name },
+    ]}
+  />
+
+  <!-- Hero -->
+  <header class:list={["autor-hero", `kind-${person.kind}`]}>
+    <div class="inner">
+      <div class="hero-grid">
+        <div class:list={["hero-avatar", `kind-${person.kind}`]}>
+          {person.photoUrl ? (
+            <img src={person.photoUrl} alt={person.name} />
+          ) : (
+            <span>{person.initials ?? person.name.slice(0, 2)}</span>
+          )}
+        </div>
+        <div class="hero-body">
+          <p class="hero-eyebrow">{kindLabel} · Recenzer.cz</p>
+          <h1 class="hero-name">{person.name}</h1>
+          <p class="hero-role">{person.role}</p>
+          <p class="hero-tagline">{person.tagline}</p>
+          {person.links && person.links.length > 0 && (
+            <div class="hero-links">
+              {person.links.map((l) => (
+                <a href={l.href}>{l.label}</a>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Stats -->
+  {person.stats && person.stats.length > 0 && (
+    <section class="autor-stats">
+      <div class="inner">
+        <ul>
+          {person.stats.map((s) => (
+            <li>
+              <strong>{s.value}</strong>
+              <span>{s.label}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </section>
+  )}
+
+  <!-- Long bio -->
+  {person.longBioHtml && (
+    <section class="autor-bio">
+      <div class="inner">
+        <header class="section-head">
+          <p class="eyebrow">O autorovi</p>
+          <h2>Cesta k Recenzer.cz</h2>
+        </header>
+        <div class="bio-content" set:html={person.longBioHtml} />
+      </div>
+    </section>
+  )}
+
+  <!-- Expertise -->
+  {person.expertise.length > 0 && (
+    <section class="autor-expertise">
+      <div class="inner">
+        <header class="section-head">
+          <p class="eyebrow">Čemu se věnuji</p>
+          <h2>Oblasti odbornosti</h2>
+        </header>
+        <ul class="expertise-chips">
+          {person.expertise.map((e) => <li>{e}</li>)}
+        </ul>
+      </div>
+    </section>
+  )}
+
+  <!-- Credentials -->
+  {person.credentials.length > 0 && (
+    <section class="autor-creds">
+      <div class="inner">
+        <header class="section-head">
+          <p class="eyebrow">Vzdělání a zkušenosti</p>
+          <h2>Kvalifikace</h2>
+        </header>
+        <ul class="creds-list">
+          {person.credentials.map((c) => (
+            <li set:html={c} />
+          ))}
+        </ul>
+      </div>
+    </section>
+  )}
+
+  <!-- Timeline -->
+  {person.timeline && person.timeline.length > 0 && (
+    <section class="autor-timeline">
+      <div class="inner">
+        <header class="section-head">
+          <p class="eyebrow">Career</p>
+          <h2>Kariérní timeline</h2>
+        </header>
+        <ol class="timeline-line">
+          {person.timeline.map((t) => (
+            <li>
+              <span class="tl-year">{t.year}</span>
+              <div>
+                <h3>{t.title}</h3>
+                <p>{t.text}</p>
+              </div>
+            </li>
+          ))}
+        </ol>
+      </div>
+    </section>
+  )}
+
+  <!-- Articles -->
+  {person.articles && person.articles.length > 0 && (
+    <section class="autor-articles">
+      <div class="inner">
+        <header class="section-head">
+          <p class="eyebrow">Publikace</p>
+          <h2>Co jsem napsal nebo schválil</h2>
+          <p class="lead">
+            Poslední {person.articles.length} článků, na kterých jsem se podílel — buď jako autor, nebo jako garant kontroly.
+          </p>
+        </header>
+        <ul class="articles-list">
+          {person.articles.map((a) => (
+            <li>
+              <a href={a.href}>
+                <div class="art-meta">
+                  <span class="art-cat">{a.category}</span>
+                  <time datetime={a.date}>{formatCzechDate(a.date)}</time>
+                </div>
+                <h3>{a.title}</h3>
+              </a>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </section>
+  )}
+
+  <!-- Media -->
+  {person.mediaCitations && person.mediaCitations.length > 0 && (
+    <section class="autor-media">
+      <div class="inner">
+        <header class="section-head">
+          <p class="eyebrow">V médiích</p>
+          <h2>Recenzer.cz citovali</h2>
+        </header>
+        <ul class="media-logos">
+          {person.mediaCitations.map((m) => <li>{m}</li>)}
+        </ul>
+      </div>
+    </section>
+  )}
+
+  <!-- Contact -->
+  <section class="autor-contact">
+    <div class="inner">
+      <div class="contact-card">
+        <h2>Máte na mě otázku?</h2>
+        <p>
+          Odpovídám zpravidla do 24 hodin v pracovní dny. Pište otevřeně — tipy, otázky, kritiku, vše vítáme.
+        </p>
+        {person.contactEmail ? (
+          <div class="contact-actions">
+            <a href={`mailto:${person.contactEmail}`} class="btn-primary">
+              {person.contactEmail}
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+                <line x1="5" y1="12" x2="19" y2="12" />
+                <polyline points="12 5 19 12 12 19" />
+              </svg>
+            </a>
+            <a href="/autori/" class="btn-ghost">Všichni autoři</a>
+          </div>
+        ) : (
+          <div class="contact-actions">
+            <a href="mailto:redakce@recenzer.cz" class="btn-primary">
+              redakce@recenzer.cz
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+                <line x1="5" y1="12" x2="19" y2="12" />
+                <polyline points="12 5 19 12 12 19" />
+              </svg>
+            </a>
+            <a href="/autori/" class="btn-ghost">Všichni autoři</a>
+          </div>
+        )}
+      </div>
+    </div>
+  </section>
+
+  <style>
+    .inner {
+      max-width: var(--max-w);
+      margin: 0 auto;
+      padding: clamp(2rem, 4vw, 3rem) var(--gutter);
+    }
+
+    .section-head {
+      max-width: 65ch;
+      margin: 0 0 1.75rem;
+    }
+
+    .eyebrow {
+      font-family: var(--mono);
+      font-size: 11.5px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--p-700);
+      font-weight: 700;
+      margin: 0 0 0.5rem;
+    }
+
+    .section-head h2 {
+      font-size: clamp(1.4rem, 2.5vw, 1.85rem);
+      font-weight: 800;
+      letter-spacing: -0.025em;
+      color: var(--ink);
+      line-height: 1.2;
+      margin-bottom: 0.6rem;
+    }
+
+    .section-head .lead {
+      font-size: 15px;
+      line-height: 1.6;
+      color: var(--muted);
+      margin: 0;
+    }
+
+    /* Hero */
+    .autor-hero {
+      background:
+        radial-gradient(900px circle at 90% 0%, rgba(149, 114, 240, 0.14), transparent 55%),
+        radial-gradient(700px circle at 10% 110%, rgba(99, 50, 204, 0.08), transparent 55%),
+        var(--bg);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .autor-hero.kind-external {
+      background:
+        radial-gradient(900px circle at 90% 0%, rgba(180, 83, 9, 0.12), transparent 55%),
+        radial-gradient(700px circle at 10% 110%, rgba(180, 83, 9, 0.06), transparent 55%),
+        var(--bg);
+    }
+
+    .autor-hero .inner {
+      padding: clamp(2.5rem, 5vw, 4rem) var(--gutter);
+    }
+
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 140px 1fr;
+      gap: 2rem;
+      align-items: center;
+    }
+
+    @media (max-width: 600px) { .hero-grid { grid-template-columns: 100px 1fr; gap: 1.25rem; } }
+
+    .hero-avatar {
+      width: 140px;
+      height: 140px;
+      border-radius: 50%;
+      background: var(--p-100);
+      color: var(--p-700);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 42px;
+      flex-shrink: 0;
+      overflow: hidden;
+    }
+
+    @media (max-width: 600px) {
+      .hero-avatar { width: 100px; height: 100px; font-size: 30px; }
+    }
+
+    .hero-avatar.kind-external {
+      background: var(--amber-bg);
+      color: var(--amber);
+    }
+
+    .hero-avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .hero-eyebrow {
+      font-family: var(--mono);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--p-700);
+      font-weight: 700;
+      margin: 0 0 0.5rem;
+    }
+
+    .autor-hero.kind-external .hero-eyebrow { color: var(--amber); }
+
+    .hero-name {
+      font-size: clamp(1.85rem, 4vw, 2.75rem);
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      color: var(--ink);
+      line-height: 1.1;
+      margin: 0 0 0.4rem;
+    }
+
+    .hero-role {
+      font-size: clamp(1rem, 1.4vw, 1.15rem);
+      font-weight: 600;
+      color: var(--p-700);
+      margin: 0 0 0.85rem;
+    }
+
+    .autor-hero.kind-external .hero-role { color: var(--amber); }
+
+    .hero-tagline {
+      font-size: 15px;
+      line-height: 1.55;
+      color: var(--ink-soft);
+      margin: 0 0 1.25rem;
+      max-width: 60ch;
+    }
+
+    .hero-links {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    .hero-links a {
+      padding: 0.45rem 0.95rem;
+      background: var(--bg);
+      border: 1px solid var(--line);
+      border-radius: var(--r);
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--ink);
+      text-decoration: none;
+    }
+
+    .hero-links a:hover,
+    .hero-links a:focus-visible {
+      border-color: var(--p-400);
+      color: var(--p-700);
+    }
+
+    /* Stats */
+    .autor-stats {
+      background: var(--bg);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .autor-stats .inner {
+      padding: 2rem var(--gutter);
+    }
+
+    .autor-stats ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1.5rem;
+    }
+
+    @media (max-width: 720px) { .autor-stats ul { grid-template-columns: repeat(2, 1fr); gap: 1rem; } }
+
+    .autor-stats li {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      padding-top: 0.75rem;
+      border-top: 2px solid var(--p-200);
+    }
+
+    .autor-stats strong {
+      font-size: clamp(1.6rem, 3vw, 2.2rem);
+      font-weight: 800;
+      color: var(--ink);
+      letter-spacing: -0.02em;
+      line-height: 1;
+    }
+
+    .autor-stats span {
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.3;
+    }
+
+    /* Bio */
+    .autor-bio {
+      background: var(--bg-warm);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .bio-content {
+      max-width: 720px;
+    }
+
+    .bio-content :global(p) {
+      font-size: 16px;
+      line-height: 1.7;
+      color: var(--ink-soft);
+      margin-bottom: 1rem;
+    }
+
+    .bio-content :global(strong) {
+      color: var(--ink);
+      font-weight: 700;
+    }
+
+    /* Expertise */
+    .autor-expertise {
+      background: var(--bg);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .expertise-chips {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    .expertise-chips li {
+      padding: 0.5rem 1rem;
+      background: var(--p-50);
+      color: var(--p-700);
+      border-radius: 999px;
+      font-size: 13.5px;
+      font-weight: 600;
+    }
+
+    /* Creds */
+    .autor-creds {
+      background: var(--bg-warm);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .creds-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      max-width: 720px;
+    }
+
+    .creds-list li {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.85rem;
+      padding: 0.85rem 1rem;
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: var(--r);
+      font-size: 14.5px;
+      color: var(--ink-soft);
+      line-height: 1.5;
+    }
+
+    .creds-list li::before {
+      content: "✓";
+      color: var(--green);
+      font-weight: 800;
+      font-size: 1.1rem;
+      line-height: 1;
+      flex-shrink: 0;
+    }
+
+    .creds-list :global(strong) { color: var(--ink); font-weight: 700; }
+
+    /* Timeline */
+    .autor-timeline {
+      background: var(--bg);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .timeline-line {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      max-width: 720px;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .timeline-line li {
+      display: grid;
+      grid-template-columns: 70px 1fr;
+      gap: 1.25rem;
+      padding: 1.1rem 1.4rem;
+      background: var(--bg-warm);
+      border: 1px solid var(--line);
+      border-left: 3px solid var(--p-500);
+      border-radius: var(--r);
+    }
+
+    @media (max-width: 560px) {
+      .timeline-line li { grid-template-columns: 1fr; gap: 0.3rem; }
+    }
+
+    .tl-year {
+      font-family: var(--mono);
+      font-size: 16px;
+      font-weight: 800;
+      color: var(--p-700);
+      align-self: center;
+    }
+
+    .timeline-line h3 {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--ink);
+      margin-bottom: 0.25rem;
+    }
+
+    .timeline-line p {
+      font-size: 13.5px;
+      line-height: 1.6;
+      color: var(--muted);
+      margin: 0;
+    }
+
+    /* Articles */
+    .autor-articles {
+      background: var(--bg-warm);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .articles-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 0.6rem;
+    }
+
+    @media (max-width: 720px) { .articles-list { grid-template-columns: 1fr; } }
+
+    .articles-list a {
+      display: block;
+      padding: 1.1rem 1.25rem;
+      background: #fff;
+      border: 1px solid var(--line);
+      border-left: 3px solid var(--p-500);
+      border-radius: var(--r);
+      text-decoration: none;
+      color: var(--ink);
+      transition: border-color 0.15s, transform 0.15s;
+    }
+
+    .articles-list a:hover,
+    .articles-list a:focus-visible {
+      border-color: var(--p-400);
+      transform: translateY(-2px);
+    }
+
+    .art-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 0.6rem;
+      margin-bottom: 0.4rem;
+    }
+
+    .art-cat {
+      font-family: var(--mono);
+      font-size: 10.5px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--p-700);
+      background: var(--p-50);
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-weight: 700;
+    }
+
+    .articles-list time {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--muted);
+    }
+
+    .articles-list h3 {
+      font-size: 14.5px;
+      font-weight: 700;
+      color: var(--ink);
+      line-height: 1.4;
+      margin: 0;
+    }
+
+    /* Media */
+    .autor-media {
+      background: var(--bg);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .media-logos {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      gap: 1.25rem 2.5rem;
+      flex-wrap: wrap;
+    }
+
+    .media-logos li {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--muted-2);
+      letter-spacing: -0.01em;
+    }
+
+    /* Contact */
+    .autor-contact {
+      background: var(--bg);
+    }
+
+    .contact-card {
+      max-width: 760px;
+      margin: 0 auto;
+      padding: 2.25rem 2rem;
+      background: var(--p-50);
+      border: 1px solid rgba(99, 50, 204, 0.18);
+      border-radius: var(--r-xl);
+      text-align: center;
+    }
+
+    .contact-card h2 {
+      font-size: clamp(1.4rem, 2.5vw, 1.85rem);
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      color: var(--ink);
+      margin-bottom: 0.6rem;
+    }
+
+    .contact-card p {
+      font-size: 15px;
+      line-height: 1.6;
+      color: var(--ink-soft);
+      max-width: 56ch;
+      margin: 0 auto 1.5rem;
+    }
+
+    .contact-actions {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .btn-primary,
+    .btn-ghost {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      padding: 0.75rem 1.25rem;
+      border-radius: var(--r);
+      font-size: 14px;
+      font-weight: 600;
+      text-decoration: none;
+    }
+
+    .btn-primary {
+      background: var(--p-700);
+      color: #fff;
+      border: 1px solid var(--p-700);
+    }
+
+    .btn-primary:hover,
+    .btn-primary:focus-visible {
+      background: var(--p-800);
+      border-color: var(--p-800);
+      color: #fff;
+    }
+
+    .btn-primary svg { width: 14px; height: 14px; }
+
+    .btn-ghost {
+      background: #fff;
+      color: var(--ink);
+      border: 1px solid var(--line);
+    }
+
+    .btn-ghost:hover,
+    .btn-ghost:focus-visible {
+      border-color: var(--p-400);
+      color: var(--p-700);
+    }
+  </style>
+</BaseLayout>

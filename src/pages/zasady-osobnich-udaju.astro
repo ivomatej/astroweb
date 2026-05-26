@@ -1,0 +1,730 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import PageBreadcrumbs from "../components/page/PageBreadcrumbs.astro";
+import PageHero from "../components/page/PageHero.astro";
+
+const tldr = [
+  "Sbíráme jen data nezbytná pro provoz webu a doručení služby.",
+  "Neprodáváme vaše údaje třetím stranám. Nikdy.",
+  "Cookies pro reklamu zapínáme jen s vaším souhlasem.",
+  "Můžete kdykoli požádat o výmaz nebo přístup ke svým datům.",
+  "Detail řeší samostatný dokument Zásady cookies.",
+];
+
+const sections = [
+  {
+    id: "spravce",
+    num: "01",
+    title: "Kdo zpracovává vaše údaje",
+    paragraphs: [
+      "Správcem osobních údajů je <strong>Converso Group s.r.o.</strong>, IČ 09876543, se sídlem Lidická 718/77, 602 00 Brno, zapsaná v obchodním rejstříku vedeném Krajským soudem v Brně, oddíl C, vložka 12345.",
+      "Kontakt na pověřence pro ochranu osobních údajů: <a href=\"mailto:gdpr@recenzer.cz\">gdpr@recenzer.cz</a>.",
+    ],
+  },
+  {
+    id: "udaje",
+    num: "02",
+    title: "Jaké údaje sbíráme",
+    paragraphs: [
+      "Sbíráme jen to, co je nezbytně nutné pro provoz webu a poskytnutí služby. Žádné údaje navíc „pro jistotu\" do databáze neukládáme.",
+    ],
+    cards: [
+      {
+        title: "Technické údaje",
+        text: "IP adresa, typ prohlížeče, operační systém, jazyk. Sbíráme automaticky kvůli bezpečnosti a optimalizaci. Uchováváme 30 dní v anonymizované podobě.",
+      },
+      {
+        title: "Údaje o chování na webu",
+        text: "Které články čtete, na co klikáte, jak dlouho zůstáváte. Anonymně přes Google Analytics 4 (s vaším souhlasem). Pomáhá nám zlepšovat obsah.",
+      },
+      {
+        title: "Kontaktní údaje",
+        text: "Jméno a e-mail, pokud nám napíšete přes formulář nebo se přihlásíte k newsletteru. Nikdy nepředáváme třetím stranám.",
+      },
+      {
+        title: "Komentáře a hodnocení",
+        text: "Text, který napíšete pod článkem, případně zobrazované jméno. Veřejné. E-mail vidíme jen my a nezveřejňujeme ho.",
+      },
+    ],
+  },
+  {
+    id: "proc",
+    num: "03",
+    title: "Proč údaje zpracováváme",
+    paragraphs: [
+      "Každé zpracování má svůj právní důvod podle GDPR a konkrétní účel:",
+    ],
+    list: [
+      "<strong>Provoz webu</strong> — oprávněný zájem (čl. 6 odst. 1 písm. f). Technické údaje pro bezpečnost a fungování.",
+      "<strong>Odpověď na váš dotaz</strong> — plnění smlouvy (čl. 6 odst. 1 písm. b). Kontaktní údaje z formuláře.",
+      "<strong>Newsletter</strong> — souhlas (čl. 6 odst. 1 písm. a). E-mail jen pro odběr novinek, kdykoli odhlásíte.",
+      "<strong>Analytika a zlepšování obsahu</strong> — souhlas s cookies. Anonymní data přes GA4.",
+      "<strong>Zákonné povinnosti</strong> — účetní doklady uchováváme podle zákona (čl. 6 odst. 1 písm. c).",
+    ],
+  },
+  {
+    id: "zpracovatele",
+    num: "04",
+    title: "Komu data předáváme",
+    paragraphs: [
+      "Vaše osobní údaje nepředáváme nikomu „jen tak\". Spolupracujeme však s několika zpracovateli, kteří nám poskytují technické služby. Všichni jsou vázáni smlouvou o zpracování osobních údajů a působí buď v EU, nebo v zemích s adekvátní úrovní ochrany.",
+    ],
+    processors: [
+      { name: "Google (Analytics 4)", purpose: "Anonymizovaná analytika návštěvnosti", region: "EU / USA (SCC)" },
+      { name: "Heureka, Alza, Datart + další e-shopy", purpose: "Affiliate tracking — pouze ID a klik", region: "EU" },
+      { name: "SmartEmailing", purpose: "Doručení newsletteru", region: "ČR" },
+      { name: "Wedos + Cloudflare", purpose: "Hosting a ochrana před útoky", region: "ČR / globální CDN" },
+    ],
+  },
+  {
+    id: "prava",
+    num: "05",
+    title: "Vaše práva podle GDPR",
+    paragraphs: [
+      "Máte následující práva. Uplatnit je můžete e-mailem na <a href=\"mailto:gdpr@recenzer.cz\">gdpr@recenzer.cz</a>. Odpovídáme do 30 dnů.",
+    ],
+    rights: [
+      { title: "Přístup", text: "Zjistit, jaká data o vás máme.", icon: "eye" },
+      { title: "Oprava", text: "Změnit nesprávné nebo neúplné údaje.", icon: "edit" },
+      { title: "Výmaz („právo být zapomenut\")", text: "Smazat osobní údaje. Pokud nebrání zákonná povinnost.", icon: "trash" },
+      { title: "Omezení", text: "Pozastavit zpracování při sporu o správnost dat.", icon: "pause" },
+      { title: "Přenositelnost", text: "Získat data ve strojově čitelném formátu.", icon: "download" },
+      { title: "Námitka", text: "Nesouhlasit se zpracováním na základě oprávněného zájmu.", icon: "stop" },
+      { title: "Odvolání souhlasu", text: "Kdykoli odvolat dříve daný souhlas. Bez vlivu na minulost.", icon: "back" },
+      { title: "Stížnost u ÚOOÚ", text: "Obrátit se na Úřad pro ochranu osobních údajů.", icon: "shield" },
+    ],
+  },
+  {
+    id: "doba",
+    num: "06",
+    title: "Jak dlouho údaje uchováváme",
+    paragraphs: [
+      "Technické logy 30 dní. Kontaktní údaje z formuláře 3 roky (pro případné upozornění na řešení dotazu). Newsletter údaje do odhlášení odběru. Účetní doklady 10 let (zákonná povinnost).",
+      "Po uplynutí těchto lhůt data automaticky mažeme. Některé údaje (např. v anonymizovaných agregacích pro analytiku) zůstávají, ale již vás nemohou identifikovat.",
+    ],
+  },
+  {
+    id: "zabezpeceni",
+    num: "07",
+    title: "Jak vaše údaje chráníme",
+    paragraphs: [
+      "Bezpečnost dat bereme vážně — i proto jsme se rozhodli web technicky zjednodušit a omezit povrch pro útoky.",
+    ],
+    list: [
+      "<strong>HTTPS</strong> šifrování pro veškerou komunikaci s webem (TLS 1.3).",
+      "<strong>Cloudflare WAF</strong> filtruje běžné útoky (SQL injection, XSS, DDoS) ještě před našimi servery.",
+      "<strong>Automatické zálohy</strong> databáze každých 24 h, kontinuální WAL log (RPO max 15 min).",
+      "<strong>Monitoring 24/7</strong> přes Sentry + Grafana. Kritické incidenty řeší dispečer do 15 min.",
+      "<strong>Šifrování hesel</strong> přes Argon2id. Plain-text hesla nikde neukládáme.",
+      "<strong>Reakce na incident</strong>: postup v souladu s GDPR čl. 33–34, oznámení ÚOOÚ do 72 h.",
+    ],
+  },
+  {
+    id: "deti",
+    num: "08",
+    title: "Děti a mladiství",
+    paragraphs: [
+      "Recenzer.cz není určen dětem do 15 let. Vědomě nesbíráme údaje od osob mladších 15 let. Pokud zjistíme, že jsme získali údaje od dítěte bez souhlasu zákonného zástupce, neprodleně je smažeme.",
+      "Podle GDPR čl. 8 je věková hranice pro samostatný souhlas se zpracováním osobních údajů v ČR <strong>15 let</strong>.",
+    ],
+  },
+  {
+    id: "cookies",
+    num: "09",
+    title: "Cookies",
+    paragraphs: [
+      "Použití cookies, jejich kategorizace, doba uchování a možnosti odvolání souhlasu řešíme samostatně v dokumentu <a href=\"/zasady-cookies/\">Zásady cookies</a>. Detailní seznam použitých cookies najdete v <a href=\"/cookies-listy/\">Listě cookies</a>.",
+    ],
+  },
+  {
+    id: "uoou",
+    num: "10",
+    title: "Stížnost u dozorového úřadu",
+    paragraphs: [
+      "Pokud máte za to, že zpracováním vašich osobních údajů porušujeme GDPR, máte právo podat stížnost u dozorového úřadu:",
+      "<strong>Úřad pro ochranu osobních údajů (ÚOOÚ)</strong><br>Pplk. Sochora 27, 170 00 Praha 7<br>Tel.: +420 234 665 111<br>E-mail: <a href=\"mailto:posta@uoou.cz\">posta@uoou.cz</a><br>Web: <a href=\"https://www.uoou.cz/\" target=\"_blank\" rel=\"noopener\">www.uoou.cz</a>",
+    ],
+  },
+];
+
+const lastUpdated = "2026-04-15";
+---
+
+<BaseLayout
+  title="Zásady ochrany osobních údajů — Recenzer"
+  description="Jak nakládáme s vašimi osobními údaji. Co sbíráme, proč, komu předáváme a jaká máte práva podle GDPR."
+>
+  <PageBreadcrumbs items={[{ href: "/", label: "Recenzer" }, { label: "Zásady ochrany osobních údajů" }]} />
+
+  <PageHero
+    eyebrow={`GDPR · poslední revize ${lastUpdated}`}
+    eyebrowIcon="shield"
+    title="Zásady ochrany<br/><em>osobních údajů</em>"
+    subtitle="Co sbíráme, proč, komu předáváme a jaká máte práva. <strong>Vaše data neprodáváme</strong> a držíme jen to, co nezbytně potřebujeme."
+  />
+
+  <!-- TLDR -->
+  <section class="legal-tldr">
+    <div class="inner">
+      <div class="tldr-card">
+        <p class="tldr-eyebrow">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+            <polyline points="9 11 12 14 22 4" />
+            <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" />
+          </svg>
+          Co potřebujete vědět za 30 vteřin
+        </p>
+        <ul class="tldr-list">
+          {tldr.map((p) => <li>{p}</li>)}
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- TOC -->
+  <section class="legal-toc">
+    <div class="inner">
+      <nav aria-label="Obsah">
+        <p class="toc-label">Obsah</p>
+        <ol>
+          {
+            sections.map((s) => (
+              <li>
+                <a href={`#${s.id}`}>
+                  <span class="toc-num">{s.num}</span>
+                  <span>{s.title}</span>
+                </a>
+              </li>
+            ))
+          }
+        </ol>
+      </nav>
+    </div>
+  </section>
+
+  <!-- BODY -->
+  <article class="legal-body">
+    <div class="inner">
+      {
+        sections.map((s) => (
+          <section id={s.id} class="legal-section">
+            <header>
+              <span class="legal-num">{s.num}</span>
+              <h2>{s.title}</h2>
+            </header>
+
+            {s.paragraphs?.map((p) => <p set:html={p} />)}
+
+            {s.cards && (
+              <ul class="data-cards">
+                {s.cards.map((card) => (
+                  <li>
+                    <h3>{card.title}</h3>
+                    <p>{card.text}</p>
+                  </li>
+                ))}
+              </ul>
+            )}
+
+            {s.list && (
+              <ul class="legal-list">
+                {s.list.map((item) => <li set:html={item} />)}
+              </ul>
+            )}
+
+            {s.processors && (
+              <ul class="processors">
+                {s.processors.map((p) => (
+                  <li>
+                    <div class="processor-name">{p.name}</div>
+                    <div class="processor-purpose">{p.purpose}</div>
+                    <div class="processor-region">{p.region}</div>
+                  </li>
+                ))}
+              </ul>
+            )}
+
+            {s.rights && (
+              <ul class="rights-grid">
+                {s.rights.map((r) => (
+                  <li>
+                    <div class="right-ic" aria-hidden="true">
+                      {r.icon === "eye" && (<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>)}
+                      {r.icon === "edit" && (<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>)}
+                      {r.icon === "trash" && (<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-2 14a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2L5 6"/></svg>)}
+                      {r.icon === "pause" && (<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>)}
+                      {r.icon === "download" && (<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>)}
+                      {r.icon === "stop" && (<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>)}
+                      {r.icon === "back" && (<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>)}
+                      {r.icon === "shield" && (<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>)}
+                    </div>
+                    <div>
+                      <h3>{r.title}</h3>
+                      <p>{r.text}</p>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </section>
+        ))
+      }
+
+      <footer class="legal-footer">
+        <p>
+          Platnost těchto zásad od <strong>2016</strong>, poslední revize <time datetime={lastUpdated}>{lastUpdated}</time>.
+          Pro uplatnění práv pište na <a href="mailto:gdpr@recenzer.cz">gdpr@recenzer.cz</a>.
+        </p>
+        <div class="legal-actions">
+          <a href="/zasady-cookies/" class="btn-primary">Zásady cookies</a>
+          <a href="/cookies-listy/" class="btn-ghost">Seznam cookies</a>
+          <a href="/podminky-pouziti/" class="btn-ghost">Podmínky použití</a>
+        </div>
+      </footer>
+    </div>
+  </article>
+
+  <style>
+    .inner {
+      max-width: var(--max-w);
+      margin: 0 auto;
+      padding: clamp(2rem, 4vw, 3rem) var(--gutter);
+    }
+
+    /* TLDR */
+    .legal-tldr {
+      background: var(--bg);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .tldr-card {
+      max-width: 760px;
+      margin: 0 auto;
+      padding: 2rem;
+      background: var(--ink);
+      color: #fff;
+      border-radius: var(--r-xl);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .tldr-card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(700px circle at 100% 0%, rgba(149, 114, 240, 0.28), transparent 55%),
+        radial-gradient(500px circle at 0% 100%, rgba(99, 50, 204, 0.2), transparent 55%);
+      pointer-events: none;
+    }
+
+    .tldr-eyebrow {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-family: var(--mono);
+      font-size: 11.5px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--p-300);
+      font-weight: 700;
+      margin: 0 0 1.25rem;
+    }
+
+    .tldr-eyebrow svg { width: 14px; height: 14px; }
+
+    .tldr-list {
+      position: relative;
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      counter-reset: tldr;
+      display: grid;
+      gap: 0.4rem;
+    }
+
+    .tldr-list li {
+      counter-increment: tldr;
+      padding: 0.65rem 0 0.65rem 3rem;
+      position: relative;
+      font-size: 15px;
+      line-height: 1.5;
+      color: rgba(255, 255, 255, 0.9);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .tldr-list li:last-child { border-bottom: 0; }
+
+    .tldr-list li::before {
+      content: counter(tldr, decimal-leading-zero);
+      position: absolute;
+      left: 0;
+      top: 0.65rem;
+      width: 28px;
+      height: 28px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      border-radius: 7px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--mono);
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--p-200);
+    }
+
+    /* TOC */
+    .legal-toc {
+      background: var(--bg-warm);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .legal-toc .inner {
+      max-width: 760px;
+    }
+
+    .toc-label {
+      font-family: var(--mono);
+      font-size: 11.5px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--p-700);
+      font-weight: 700;
+      margin: 0 0 1rem;
+    }
+
+    .legal-toc ol {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.4rem 1rem;
+    }
+
+    @media (max-width: 720px) {
+      .legal-toc ol { grid-template-columns: 1fr; }
+    }
+
+    .legal-toc a {
+      display: flex;
+      align-items: baseline;
+      gap: 0.6rem;
+      padding: 0.5rem 0;
+      color: var(--ink);
+      font-size: 14.5px;
+      text-decoration: none;
+    }
+
+    .legal-toc a:hover,
+    .legal-toc a:focus-visible {
+      color: var(--p-700);
+    }
+
+    .toc-num {
+      flex-shrink: 0;
+      width: 1.75rem;
+      font-family: var(--mono);
+      font-size: 11.5px;
+      font-weight: 700;
+      color: var(--muted-2);
+    }
+
+    /* Body */
+    .legal-body {
+      background: var(--bg);
+    }
+
+    .legal-body .inner {
+      max-width: 760px;
+    }
+
+    .legal-section {
+      padding: 1.5rem 0;
+      border-bottom: 1px solid var(--line);
+      scroll-margin-top: 5rem;
+    }
+
+    .legal-section:last-of-type {
+      border-bottom: 0;
+    }
+
+    .legal-section header {
+      display: flex;
+      align-items: baseline;
+      gap: 0.85rem;
+      margin-bottom: 1rem;
+    }
+
+    .legal-num {
+      font-family: var(--mono);
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--p-700);
+      letter-spacing: 0.06em;
+    }
+
+    .legal-section h2 {
+      font-size: clamp(1.25rem, 2vw, 1.5rem);
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      color: var(--ink);
+      line-height: 1.25;
+      margin: 0;
+    }
+
+    .legal-section p {
+      font-size: 16px;
+      line-height: 1.7;
+      color: var(--ink-soft);
+      margin-bottom: 0.85rem;
+    }
+
+    .legal-section p :global(strong) {
+      color: var(--ink);
+      font-weight: 700;
+    }
+
+    .legal-section p :global(a) {
+      color: var(--p-700);
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+
+    /* Data cards */
+    .data-cards {
+      list-style: none;
+      padding: 0;
+      margin: 1rem 0;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.75rem;
+    }
+
+    @media (max-width: 600px) { .data-cards { grid-template-columns: 1fr; } }
+
+    .data-cards li {
+      padding: 1.1rem;
+      background: var(--bg-warm);
+      border: 1px solid var(--line);
+      border-left: 3px solid var(--p-500);
+      border-radius: var(--r);
+    }
+
+    .data-cards h3 {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--ink);
+      margin-bottom: 0.35rem;
+    }
+
+    .data-cards p {
+      font-size: 13.5px;
+      line-height: 1.55;
+      color: var(--muted);
+      margin: 0;
+    }
+
+    /* Legal list */
+    .legal-list {
+      list-style: none;
+      padding: 0;
+      margin: 1rem 0;
+      display: flex;
+      flex-direction: column;
+      gap: 0.6rem;
+    }
+
+    .legal-list li {
+      padding-left: 1.5rem;
+      position: relative;
+      font-size: 15px;
+      line-height: 1.6;
+      color: var(--ink-soft);
+    }
+
+    .legal-list li::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 0.65rem;
+      width: 6px;
+      height: 6px;
+      background: var(--p-500);
+      border-radius: 50%;
+    }
+
+    .legal-list :global(strong) {
+      color: var(--ink);
+      font-weight: 700;
+    }
+
+    /* Processors */
+    .processors {
+      list-style: none;
+      padding: 0;
+      margin: 1rem 0 0.5rem;
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 0.5rem;
+    }
+
+    .processors li {
+      display: grid;
+      grid-template-columns: 1.2fr 1.5fr auto;
+      gap: 1rem;
+      padding: 0.85rem 1.1rem;
+      background: var(--bg-warm);
+      border: 1px solid var(--line);
+      border-radius: var(--r);
+      align-items: center;
+    }
+
+    @media (max-width: 640px) {
+      .processors li {
+        grid-template-columns: 1fr;
+        gap: 0.3rem;
+      }
+    }
+
+    .processor-name {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--ink);
+    }
+
+    .processor-purpose {
+      font-size: 13.5px;
+      color: var(--muted);
+      line-height: 1.4;
+    }
+
+    .processor-region {
+      font-family: var(--mono);
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--p-700);
+      background: var(--p-50);
+      padding: 3px 8px;
+      border-radius: 4px;
+      letter-spacing: 0.04em;
+      white-space: nowrap;
+    }
+
+    /* Rights grid */
+    .rights-grid {
+      list-style: none;
+      padding: 0;
+      margin: 1rem 0;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.75rem;
+    }
+
+    @media (max-width: 600px) { .rights-grid { grid-template-columns: 1fr; } }
+
+    .rights-grid li {
+      display: grid;
+      grid-template-columns: 32px 1fr;
+      gap: 0.85rem;
+      padding: 1rem 1.1rem;
+      background: var(--bg-warm);
+      border: 1px solid var(--line);
+      border-radius: var(--r);
+    }
+
+    .right-ic {
+      width: 32px;
+      height: 32px;
+      border-radius: 9px;
+      background: var(--p-50);
+      color: var(--p-700);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .right-ic svg { width: 16px; height: 16px; }
+
+    .rights-grid h3 {
+      font-size: 13.5px;
+      font-weight: 700;
+      color: var(--ink);
+      margin-bottom: 0.25rem;
+      line-height: 1.3;
+    }
+
+    .rights-grid p {
+      font-size: 12.5px;
+      line-height: 1.5;
+      color: var(--muted);
+      margin: 0;
+    }
+
+    /* Footer */
+    .legal-footer {
+      margin-top: 2.5rem;
+      padding: 1.75rem;
+      background: var(--bg-warm);
+      border: 1px solid var(--line);
+      border-radius: var(--r-lg);
+    }
+
+    .legal-footer p {
+      font-size: 14px;
+      line-height: 1.6;
+      color: var(--muted);
+      margin: 0 0 1.25rem;
+    }
+
+    .legal-footer strong { color: var(--ink); font-weight: 700; }
+    .legal-footer a {
+      color: var(--p-700);
+      text-decoration: underline;
+    }
+
+    .legal-actions {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    .btn-primary,
+    .btn-ghost {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      padding: 0.65rem 1.1rem;
+      border-radius: var(--r);
+      font-size: 13.5px;
+      font-weight: 600;
+      text-decoration: none;
+    }
+
+    .btn-primary {
+      background: var(--p-700);
+      color: #fff;
+      border: 1px solid var(--p-700);
+    }
+
+    .btn-primary:hover,
+    .btn-primary:focus-visible {
+      background: var(--p-800);
+      border-color: var(--p-800);
+    }
+
+    .btn-ghost {
+      background: #fff;
+      color: var(--ink);
+      border: 1px solid var(--line);
+    }
+
+    .btn-ghost:hover,
+    .btn-ghost:focus-visible {
+      border-color: var(--p-400);
+      color: var(--p-700);
+    }
+  </style>
+</BaseLayout>

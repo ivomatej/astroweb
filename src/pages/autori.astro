@@ -1,0 +1,438 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import PageBreadcrumbs from "../components/page/PageBreadcrumbs.astro";
+import PageHero from "../components/page/PageHero.astro";
+import { getInternalTeam, getExternalExperts } from "../data/people";
+
+const internal = getInternalTeam();
+const external = getExternalExperts();
+---
+
+<BaseLayout
+  title="Autoři a odborníci — Recenzer"
+  description="Interní redakce a externí odborní garanti, kteří píší a kontrolují články na Recenzer.cz."
+>
+  <PageBreadcrumbs items={[{ href: "/", label: "Recenzer" }, { label: "Autoři a odborníci" }]} />
+
+  <PageHero
+    eyebrow={`${internal.length + external.length} lidí · interní redakce + externí experti`}
+    eyebrowIcon="info"
+    title="Lidé za<br/><em>recenzemi</em>"
+    subtitle="Každý článek na Recenzer.cz má identifikovaného autora i odborného garanta. <strong>Žádné anonymní zdroje, žádné AI generování bez supervize</strong>. Tady jsou všichni, kdo se podílí na tvorbě obsahu."
+  />
+
+  <!-- Search hint -->
+  <section class="autori-search">
+    <div class="inner">
+      <div class="search-wrap">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+          <circle cx="11" cy="11" r="8" />
+          <line x1="21" y1="21" x2="16.65" y2="16.65" />
+        </svg>
+        <input
+          type="search"
+          placeholder="Najít autora podle jména…"
+          aria-label="Vyhledávání autorů"
+          data-autori-search
+        />
+      </div>
+      <p class="search-hint">Nebo procházejte podle týmu níže.</p>
+    </div>
+  </section>
+
+  <!-- Internal team -->
+  <section class="autori-section">
+    <div class="inner">
+      <header class="section-head">
+        <p class="eyebrow">Interní tým</p>
+        <h2>Interní tým Recenzer.cz</h2>
+        <p class="lead">
+          Lidé, kteří jsou v redakci na plný úvazek nebo na dlouhodobou spolupráci. Píšou, editují, koordinují odborné garanty.
+        </p>
+      </header>
+      <ul class="people-grid">
+        {
+          internal.map((p) => (
+            <li>
+              <a href={`/autor/${p.slug}/`} class="person-card" data-person-name={p.name.toLowerCase()}>
+                <div class="person-avatar">{p.initials ?? p.name.slice(0, 2)}</div>
+                <h3>{p.name}</h3>
+                <p class="person-role">{p.role}</p>
+                <p class="person-tagline">{p.tagline}</p>
+                <ul class="person-expertise">
+                  {p.expertise.slice(0, 3).map((e) => <li>{e}</li>)}
+                </ul>
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <!-- External experts -->
+  <section class="autori-section accent-external">
+    <div class="inner">
+      <header class="section-head">
+        <p class="eyebrow">Externí odborníci</p>
+        <h2>Externí odborní garanti</h2>
+        <p class="lead">
+          Lidé z oboru, kteří kontrolují fakta v odborných článcích. <strong>Bez jejich podpisu článek neopouští redakci</strong>.
+        </p>
+      </header>
+      <ul class="people-grid">
+        {
+          external.map((p) => (
+            <li>
+              <a href={`/autor/${p.slug}/`} class="person-card external" data-person-name={p.name.toLowerCase()}>
+                <div class="person-avatar external">{p.initials ?? p.name.slice(0, 2)}</div>
+                <h3>{p.name}</h3>
+                <p class="person-role">{p.role}</p>
+                <p class="person-tagline">{p.tagline}</p>
+                <ul class="person-expertise">
+                  {p.expertise.slice(0, 3).map((e) => <li>{e}</li>)}
+                </ul>
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <!-- Empty state (hidden, shown by JS when no results) -->
+  <div class="autori-empty" hidden data-autori-empty>
+    <div class="inner">
+      <p>Nikdo nenalezen. Zkuste jiné jméno nebo se vraťte k procházení týmu.</p>
+    </div>
+  </div>
+
+  <!-- Related -->
+  <section class="autori-related">
+    <div class="inner">
+      <div class="related-card">
+        <h2>Jak naše redakce funguje</h2>
+        <p>
+          Detail editoriálních procesů, fact-checkingu a odborné garance najdete v souvisejících dokumentech.
+        </p>
+        <div class="end-actions">
+          <a href="/redakcni-zasady/" class="btn-primary">Redakční zásady</a>
+          <a href="/eticky-kodex/" class="btn-ghost">Etický kodex</a>
+          <a href="/overovani-faktu/" class="btn-ghost">Ověřování faktů</a>
+          <a href="/metodika/" class="btn-ghost">Metodika</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <script>
+    // Filter authors by name as you type.
+    const input = document.querySelector<HTMLInputElement>("[data-autori-search]");
+    const cards = document.querySelectorAll<HTMLElement>("[data-person-name]");
+    const emptyState = document.querySelector<HTMLElement>("[data-autori-empty]");
+    if (input && cards.length && emptyState) {
+      input.addEventListener("input", () => {
+        const q = input.value.trim().toLowerCase();
+        let visible = 0;
+        cards.forEach((card) => {
+          const name = card.dataset.personName ?? "";
+          const li = card.closest("li");
+          const match = name.includes(q);
+          if (li) li.style.display = match ? "" : "none";
+          if (match) visible++;
+        });
+        emptyState.hidden = visible !== 0;
+        // Hide sections with zero results
+        document.querySelectorAll<HTMLElement>(".autori-section").forEach((section) => {
+          const stillVisible = section.querySelectorAll<HTMLElement>(
+            'li[style=""]:not([style*="display: none"]), li:not([style])'
+          ).length;
+          section.style.display = stillVisible === 0 && q !== "" ? "none" : "";
+        });
+      });
+    }
+  </script>
+
+  <style>
+    .inner {
+      max-width: var(--max-w);
+      margin: 0 auto;
+      padding: clamp(2rem, 4vw, 3rem) var(--gutter);
+    }
+
+    /* Search */
+    .autori-search {
+      background: var(--bg);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .search-wrap {
+      max-width: 560px;
+      margin: 0 auto;
+      position: relative;
+    }
+
+    .search-wrap svg {
+      position: absolute;
+      left: 1rem;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 18px;
+      height: 18px;
+      color: var(--muted-2);
+    }
+
+    .search-wrap input {
+      width: 100%;
+      padding: 0.85rem 1rem 0.85rem 3rem;
+      font-size: 15px;
+      background: var(--bg-warm);
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      color: var(--ink);
+    }
+
+    .search-wrap input:focus-visible {
+      outline: none;
+      border-color: var(--p-500);
+      box-shadow: 0 0 0 3px rgba(122, 79, 227, 0.15);
+    }
+
+    .search-hint {
+      margin-top: 0.75rem;
+      text-align: center;
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    /* Sections */
+    .autori-section {
+      background: var(--bg);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .autori-section.accent-external { background: var(--bg-warm); }
+    .autori-section.accent-external .eyebrow { color: var(--amber); }
+
+    .section-head {
+      max-width: 65ch;
+      margin: 0 0 2rem;
+    }
+
+    .eyebrow {
+      font-family: var(--mono);
+      font-size: 11.5px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--p-700);
+      font-weight: 700;
+      margin: 0 0 0.5rem;
+    }
+
+    .section-head h2 {
+      font-size: clamp(1.5rem, 3vw, 2.1rem);
+      font-weight: 800;
+      letter-spacing: -0.025em;
+      color: var(--ink);
+      line-height: 1.2;
+      margin-bottom: 0.6rem;
+    }
+
+    .section-head .lead {
+      font-size: 15px;
+      line-height: 1.6;
+      color: var(--muted);
+      margin: 0;
+    }
+
+    .section-head .lead :global(strong) { color: var(--ink); font-weight: 700; }
+
+    /* People grid */
+    .people-grid {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 0.85rem;
+    }
+
+    @media (max-width: 980px) { .people-grid { grid-template-columns: repeat(3, 1fr); } }
+    @media (max-width: 720px) { .people-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 480px) { .people-grid { grid-template-columns: 1fr; } }
+
+    .person-card {
+      display: block;
+      padding: 1.5rem;
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: var(--r-lg);
+      text-decoration: none;
+      color: var(--ink);
+      transition: border-color 0.15s, transform 0.15s, box-shadow 0.15s;
+    }
+
+    .person-card:hover,
+    .person-card:focus-visible {
+      border-color: var(--p-400);
+      transform: translateY(-3px);
+      box-shadow: 0 12px 28px -16px rgba(46, 20, 102, 0.22);
+    }
+
+    .person-card.external:hover,
+    .person-card.external:focus-visible {
+      border-color: var(--amber);
+    }
+
+    .person-avatar {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background: var(--p-100);
+      color: var(--p-700);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 17px;
+      margin-bottom: 0.85rem;
+    }
+
+    .person-avatar.external {
+      background: var(--amber-bg);
+      color: var(--amber);
+    }
+
+    .person-card h3 {
+      font-size: 1rem;
+      font-weight: 800;
+      color: var(--ink);
+      letter-spacing: -0.01em;
+      margin-bottom: 0.2rem;
+    }
+
+    .person-role {
+      font-size: 12.5px;
+      font-weight: 600;
+      color: var(--p-700);
+      margin: 0 0 0.4rem;
+    }
+
+    .person-card.external .person-role { color: var(--amber); }
+
+    .person-tagline {
+      font-size: 13px;
+      line-height: 1.5;
+      color: var(--muted);
+      margin: 0 0 0.85rem;
+    }
+
+    .person-expertise {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.3rem;
+    }
+
+    .person-expertise li {
+      padding: 2px 8px;
+      background: var(--bg-warm);
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      font-size: 11px;
+      color: var(--ink-soft);
+    }
+
+    /* Empty state */
+    .autori-empty {
+      background: var(--bg);
+    }
+
+    .autori-empty p {
+      text-align: center;
+      padding: 3rem 1rem;
+      font-size: 15px;
+      color: var(--muted);
+      background: var(--bg-warm);
+      border: 1px dashed var(--line);
+      border-radius: var(--r-lg);
+    }
+
+    /* Related */
+    .autori-related {
+      background: var(--bg);
+    }
+
+    .related-card {
+      max-width: 760px;
+      margin: 0 auto;
+      padding: 2.25rem 2rem;
+      background: var(--p-50);
+      border: 1px solid rgba(99, 50, 204, 0.18);
+      border-radius: var(--r-xl);
+      text-align: center;
+    }
+
+    .related-card h2 {
+      font-size: clamp(1.4rem, 2.5vw, 1.85rem);
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      color: var(--ink);
+      margin-bottom: 0.6rem;
+    }
+
+    .related-card p {
+      font-size: 15px;
+      line-height: 1.6;
+      color: var(--ink-soft);
+      max-width: 56ch;
+      margin: 0 auto 1.5rem;
+    }
+
+    .end-actions {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .btn-primary,
+    .btn-ghost {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      padding: 0.7rem 1.2rem;
+      border-radius: var(--r);
+      font-size: 13.5px;
+      font-weight: 600;
+      text-decoration: none;
+    }
+
+    .btn-primary {
+      background: var(--p-700);
+      color: #fff;
+      border: 1px solid var(--p-700);
+    }
+
+    .btn-primary:hover,
+    .btn-primary:focus-visible {
+      background: var(--p-800);
+      border-color: var(--p-800);
+      color: #fff;
+    }
+
+    .btn-ghost {
+      background: #fff;
+      color: var(--ink);
+      border: 1px solid var(--line);
+    }
+
+    .btn-ghost:hover,
+    .btn-ghost:focus-visible {
+      border-color: var(--p-400);
+      color: var(--p-700);
+    }
+  </style>
+</BaseLayout>

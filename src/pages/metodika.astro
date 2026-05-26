@@ -1,0 +1,371 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import PageBreadcrumbs from "../components/page/PageBreadcrumbs.astro";
+import PageHero from "../components/page/PageHero.astro";
+import StatStrip from "../components/page/StatStrip.astro";
+
+const stats = [
+  { value: "12", label: "měřených parametrů" },
+  { value: "7", label: "disciplín testu" },
+  { value: "50+", label: "ověřených zdrojů" },
+  { value: "2×", label: "ročně aktualizace" },
+];
+
+const steps = [
+  {
+    num: "01",
+    title: "Výběr tématu",
+    text: "Sledujeme reálnou poptávku ve vyhledávačích a prodejní statistiky Heureka.cz. Téma musí dávat smysl pro čtenáře, ne pro affiliate provize.",
+  },
+  {
+    num: "02",
+    title: "Hluboký research",
+    text: "Projdeme oficiální materiály výrobců, zahraniční testy (Stiftung Warentest, Which?, dTest), normy a recenze reálných uživatelů. Nikdy nestačí jeden zdroj.",
+  },
+  {
+    num: "03",
+    title: "Měření v laboratoři",
+    text: "Modely fyzicky kupujeme za běžnou tržní cenu. Měříme stejnou metodikou, stejnými přístroji, stejné disciplíny. Pět opakování na model.",
+  },
+  {
+    num: "04",
+    title: "Odborná kontrola",
+    text: "Článek prochází kontrolou externího garanta s relevantní praxí — řemeslník, inženýr, lékař. Bez podpisu garanta článek neopouští redakci.",
+  },
+  {
+    num: "05",
+    title: "Publikace a revize",
+    text: "Publikujeme s plnou historií změn. Minimálně 2× ročně aktualizujeme ceny, dostupnost a doplňujeme nové modely.",
+  },
+];
+
+const qualityPoints = [
+  {
+    title: "Žádné placené recenze",
+    text: "Hodnocení nikdy nezávisí na výši affiliate provize ani vztazích s výrobci. Kdokoli si může prověřit naše příjmy ve Sbírce listin.",
+  },
+  {
+    title: "Křížové ověřování",
+    text: "Každý fakt v článku má alespoň dva nezávislé zdroje. Když nemáme jistotu, raději napíšeme „nevíme“.",
+  },
+  {
+    title: "Editor → garant → korektor",
+    text: "Tři páry očí na každém článku. Autor píše, redaktor edituje, externí garant ověřuje fakta, korektor čistí jazyk.",
+  },
+  {
+    title: "Veřejná oprava chyb",
+    text: "Nikdy nemažeme historii. Když uděláme chybu, opravíme ji do 48 h, zveřejníme v Historii revizí a vysvětlíme.",
+  },
+];
+---
+
+<BaseLayout
+  title="Metodika testů — Recenzer"
+  description="Jak vznikají naše recenze. Pět kroků od výběru tématu po publikaci, odborná kontrola, křížové ověřování zdrojů."
+>
+  <PageBreadcrumbs items={[{ href: "/", label: "Recenzer" }, { label: "Metodika" }]} />
+
+  <PageHero
+    eyebrow="Editorial standards · Metodika"
+    eyebrowIcon="lab"
+    title="Jak vznikají naše&nbsp;<em>recenze</em>"
+    subtitle="Každý článek na Recenzer.cz prochází stejným procesem — od výběru tématu přes ověřování parametrů až po odbornou kontrolu. <strong>12 měřených parametrů, 7 disciplín testu, dvojí roční aktualizace.</strong>"
+  />
+
+  <StatStrip label="Klíčové parametry metodiky" stats={stats} />
+
+  <!-- Process -->
+  <section class="process">
+    <div class="inner">
+      <header class="section-head">
+        <p class="eyebrow">Proces</p>
+        <h2>Pět kroků, kterým podléhá každý článek</h2>
+        <p class="lead">
+          Tyto kroky platí pro každou recenzi — od krátké aktualizace cen po hloubkový test 30 modelů praček. Když výjimečně postup přizpůsobíme (např. rozhovor s garantem), uvedeme to v Metodice na konci článku.
+        </p>
+      </header>
+
+      <ol class="steps">
+        {
+          steps.map((step) => (
+            <li class="step">
+              <div class="step-num">{step.num}</div>
+              <h3>{step.title}</h3>
+              <p>{step.text}</p>
+            </li>
+          ))
+        }
+      </ol>
+    </div>
+  </section>
+
+  <!-- Quality -->
+  <section class="quality">
+    <div class="inner">
+      <header class="section-head">
+        <p class="eyebrow">Kvalita</p>
+        <h2>Čtyři pravidla, která neporušujeme</h2>
+        <p class="lead">
+          Když porušíme jedno z nich, ztratíme to nejcennější — důvěru čtenářů. Proto je nikdy neporušíme.
+        </p>
+      </header>
+
+      <ul class="quality-grid">
+        {
+          qualityPoints.map((q) => (
+            <li class="quality-card">
+              <div class="quality-check" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <polyline points="20 6 9 17 4 12" />
+                </svg>
+              </div>
+              <div>
+                <h3>{q.title}</h3>
+                <p>{q.text}</p>
+              </div>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <!-- Sources -->
+  <section class="sources-cta">
+    <div class="inner">
+      <h2>Odkud čerpáme</h2>
+      <p>
+        Přes 50 testovacích organizací, normativních a oborových zdrojů. Mezi nejčastěji citované patří
+        <strong>Stiftung Warentest</strong>, <strong>dTest</strong>, <strong>Which?</strong>,
+        <strong>ADAC</strong>, <strong>ČSN/EN normy</strong> a oficiální materiály výrobců.
+      </p>
+      <div class="cta-row">
+        <a href="/duveryhodne-zdroje/" class="btn-primary">
+          Kompletní seznam zdrojů
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+            <line x1="5" y1="12" x2="19" y2="12" />
+            <polyline points="12 5 19 12 12 19" />
+          </svg>
+        </a>
+        <a href="/eticky-kodex/" class="btn-ghost">Etický kodex</a>
+        <a href="/redakcni-zasady/" class="btn-ghost">Redakční zásady</a>
+      </div>
+    </div>
+  </section>
+
+  <style>
+    .inner {
+      max-width: var(--max-w);
+      margin: 0 auto;
+      padding: clamp(2.5rem, 5vw, 4rem) var(--gutter);
+    }
+
+    .section-head {
+      max-width: 65ch;
+      margin: 0 0 2rem;
+    }
+
+    .eyebrow {
+      font-family: var(--mono);
+      font-size: 11.5px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--p-700);
+      font-weight: 700;
+      margin: 0 0 0.5rem;
+    }
+
+    .section-head h2 {
+      font-size: clamp(1.6rem, 3vw, 2.1rem);
+      font-weight: 800;
+      letter-spacing: -0.025em;
+      color: var(--ink);
+      line-height: 1.2;
+      margin-bottom: 0.6rem;
+    }
+
+    .section-head .lead {
+      font-size: 15.5px;
+      line-height: 1.6;
+      color: var(--muted);
+      margin: 0;
+    }
+
+    /* Process */
+    .process {
+      background: var(--bg);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .steps {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 0.85rem;
+    }
+
+    @media (max-width: 980px) { .steps { grid-template-columns: repeat(3, 1fr); } }
+    @media (max-width: 600px) { .steps { grid-template-columns: 1fr; } }
+
+    .step {
+      background: var(--bg-warm);
+      border: 1px solid var(--line);
+      border-top: 3px solid var(--p-500);
+      border-radius: var(--r);
+      padding: 1.25rem;
+    }
+
+    .step-num {
+      font-family: var(--mono);
+      font-size: 11.5px;
+      font-weight: 700;
+      color: var(--p-700);
+      margin-bottom: 0.5rem;
+    }
+
+    .step h3 {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--ink);
+      margin-bottom: 0.35rem;
+    }
+
+    .step p {
+      font-size: 13px;
+      line-height: 1.55;
+      color: var(--muted);
+      margin: 0;
+    }
+
+    /* Quality */
+    .quality {
+      background: var(--bg-warm);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .quality-grid {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1rem;
+    }
+
+    @media (max-width: 720px) { .quality-grid { grid-template-columns: 1fr; } }
+
+    .quality-card {
+      display: grid;
+      grid-template-columns: 36px 1fr;
+      gap: 1rem;
+      padding: 1.5rem;
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: var(--r-lg);
+    }
+
+    .quality-check {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: var(--green-bg);
+      color: var(--green);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .quality-check svg { width: 18px; height: 18px; }
+
+    .quality-card h3 {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--ink);
+      margin-bottom: 0.35rem;
+    }
+
+    .quality-card p {
+      font-size: 14px;
+      line-height: 1.6;
+      color: var(--muted);
+      margin: 0;
+    }
+
+    /* Sources CTA */
+    .sources-cta {
+      background: var(--p-50);
+    }
+
+    .sources-cta .inner {
+      max-width: 720px;
+      text-align: center;
+    }
+
+    .sources-cta h2 {
+      font-size: clamp(1.5rem, 2.5vw, 2rem);
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      color: var(--ink);
+      margin-bottom: 0.75rem;
+    }
+
+    .sources-cta p {
+      font-size: 15.5px;
+      line-height: 1.6;
+      color: var(--ink-soft);
+      margin-bottom: 1.5rem;
+    }
+
+    .sources-cta strong {
+      color: var(--ink);
+      font-weight: 700;
+    }
+
+    .cta-row {
+      display: flex;
+      gap: 0.6rem;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .btn-primary,
+    .btn-ghost {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      padding: 0.7rem 1.25rem;
+      border-radius: var(--r);
+      font-size: 14px;
+      font-weight: 600;
+      text-decoration: none;
+    }
+
+    .btn-primary {
+      background: var(--p-700);
+      color: #fff;
+      border: 1px solid var(--p-700);
+    }
+
+    .btn-primary:hover,
+    .btn-primary:focus-visible {
+      background: var(--p-800);
+      border-color: var(--p-800);
+    }
+
+    .btn-primary svg { width: 14px; height: 14px; }
+
+    .btn-ghost {
+      background: #fff;
+      color: var(--ink);
+      border: 1px solid var(--line);
+    }
+
+    .btn-ghost:hover,
+    .btn-ghost:focus-visible {
+      border-color: var(--p-400);
+      color: var(--p-700);
+    }
+  </style>
+</BaseLayout>

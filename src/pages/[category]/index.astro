@@ -1,0 +1,25 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import CategoryHeader from "../../components/category/CategoryHeader.astro";
+import ArticleList from "../../components/category/ArticleList.astro";
+import { categories } from "../../data/categories";
+import { getArticleCardsByCategory } from "../../data/featured";
+
+export function getStaticPaths() {
+  return categories.map((category) => ({
+    params: { category: category.slug },
+    props: { category },
+  }));
+}
+
+const { category } = Astro.props;
+const articles = getArticleCardsByCategory(category.slug);
+---
+
+<BaseLayout
+  title={`${category.name} — recenze, testy a návody | Recenzer`}
+  description={category.description}
+>
+  <CategoryHeader category={category} articleCount={articles.length} />
+  <ArticleList articles={articles} />
+</BaseLayout>

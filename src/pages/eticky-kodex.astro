@@ -1,0 +1,591 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import PageBreadcrumbs from "../components/page/PageBreadcrumbs.astro";
+import PageHero from "../components/page/PageHero.astro";
+
+const tldrPoints = [
+  "Žádné placené ani sponzorované recenze.",
+  "Žádné modely zapůjčené ani dotované výrobcem — vše kupujeme za běžnou cenu.",
+  "Žádný anonymní obsah — u každého článku víte, kdo ho napsal a kdo ho ověřil.",
+  "Žádné mazání chyb — opravu vždy zveřejníme v historii revizí.",
+  "Žádné vlivy obchodního týmu na redakční obsah.",
+];
+
+const pillars = [
+  {
+    icon: "shield",
+    title: "Nezávislost",
+    text: "Redakce je organizačně i finančně oddělená od obchodního týmu. Žádný inzerent ani partner nemá vliv na to, co a jak píšeme. Pokud někdy obchodní zájem koliduje s redakčním, vyhrává vždy čtenář.",
+  },
+  {
+    icon: "globe",
+    title: "Transparentnost",
+    text: "Otevřeně přiznáváme, jak vyděláváme. Když článek obsahuje affiliate odkazy, řekneme to. Když je kategorie pro nás zisková, řekneme to. Zdroje příjmů máme veřejné v sekci Jak vyděláváme.",
+  },
+  {
+    icon: "check",
+    title: "Ověřitelnost",
+    text: "Každý fakt v článku má alespoň dva nezávislé zdroje. Když fakta měříme sami, popíšeme metodu, přístroje a počet opakování. Když si nejsme jistí, raději napíšeme „nevíme“.",
+  },
+  {
+    icon: "people",
+    title: "Odpovědnost",
+    text: "Autor i garant podepisují článek svým jménem. Chyba se přiznává, opravuje do 48 h a zveřejní v historii revizí. Kritika čtenáře má vždy odpověď.",
+  },
+  {
+    icon: "balance",
+    title: "Rovné zacházení",
+    text: "Stejnou metodikou hodnotíme model levný i drahý, českou značku i světovou. Žádné „značkové úlevy“ — pravidla jsou stejná pro všechny.",
+  },
+  {
+    icon: "lock",
+    title: "Soukromí čtenáře",
+    text: "Sbíráme jen data nezbytná pro provoz webu. Nesledujeme uživatele pro reklamní účely třetích stran. Detail v Zásadách ochrany osobních údajů.",
+  },
+];
+
+const dosDonts = {
+  dos: [
+    "Modely fyzicky kupujeme za běžnou tržní cenu — i hi-end za desítky tisíc.",
+    "U každého článku uvádíme autora, garanta, datum publikace a datum poslední revize.",
+    "Affiliate odkazy označujeme a vysvětlujeme.",
+    "Reklamní obsah (banner, partner content) je vždy zřetelně oddělený od redakčního.",
+    "Chyby opravujeme veřejně, v historii revizí.",
+    "Když nás čtenář upozorní na neúplnost, doplníme to a v článku připíšeme zdroj připomínky.",
+  ],
+  donts: [
+    "Nepublikujeme PR zprávy výrobců jako autorské články.",
+    "Nepřijímáme dárky, výlety ani vzorky výměnou za pozitivní hodnocení.",
+    "Neměníme hodnocení modelu na základě stížnosti výrobce, pokud nedoloží novou skutečnost.",
+    "Nemažeme negativní recenze ani komentáře — schováme jen zjevný spam a urážky.",
+    "Neuzavíráme exkluzivní smlouvy, které by nás zavazovaly k pozitivnímu pokrytí značky.",
+    "Nepoužíváme AI k psaní celých článků. AI je nástroj — autorem je vždy člověk.",
+  ],
+};
+
+const revisions = [
+  { date: "2026-03-15", change: "Doplněno pravidlo o použití AI při tvorbě obsahu." },
+  { date: "2025-09-02", change: "Rozšíření o pravidla pro Recenzer.sk." },
+  { date: "2024-02-10", change: "Veřejné zveřejnění zdrojů příjmů (Jak vyděláváme)." },
+  { date: "2022-04-01", change: "První publikace pod novou firmou Converso Group." },
+  { date: "2016-11-12", change: "Původní kodex při založení Recenzer.cz." },
+];
+---
+
+<BaseLayout
+  title="Etický kodex — Recenzer"
+  description="Šest pilířů editoriální etiky Recenzer.cz. Co děláme, co neděláme a jak se to dá ověřit."
+>
+  <PageBreadcrumbs items={[{ href: "/", label: "Recenzer" }, { label: "Etický kodex" }]} />
+
+  <PageHero
+    eyebrow="Editorial standards · platnost od 2016"
+    eyebrowIcon="shield"
+    title="Etický kodex<br/><em>v jednoduché řeči</em>"
+    subtitle="Šest pilířů, na kterých Recenzer.cz stojí už od roku 2016. Nejde o marketingové fráze — když pravidlo porušíme, ztratíme to nejcennější: <strong>vaši důvěru</strong>."
+  />
+
+  <!-- TLDR -->
+  <section class="kodex-tldr">
+    <div class="inner">
+      <div class="tldr-card">
+        <div class="tldr-head">
+          <p class="tldr-eyebrow">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+              <polyline points="9 11 12 14 22 4" />
+              <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" />
+            </svg>
+            Kodex v pěti větách
+          </p>
+        </div>
+        <ul class="tldr-list">
+          {tldrPoints.map((p) => <li>{p}</li>)}
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- PILLARS -->
+  <section class="kodex-pillars">
+    <div class="inner">
+      <header class="section-head">
+        <p class="eyebrow">Šest pilířů</p>
+        <h2>Naše hodnoty rozepsané</h2>
+      </header>
+      <ul class="pillars-grid">
+        {
+          pillars.map((p) => (
+            <li class="pillar">
+              <div class="pillar-ic" aria-hidden="true">
+                {p.icon === "shield" && (<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>)}
+                {p.icon === "globe" && (<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>)}
+                {p.icon === "check" && (<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>)}
+                {p.icon === "people" && (<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>)}
+                {p.icon === "balance" && (<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6-7 6 7"/><path d="M12 2v20"/><path d="M2 9c0 2 2 4 4 4s4-2 4-4"/><path d="M14 9c0 2 2 4 4 4s4-2 4-4"/></svg>)}
+                {p.icon === "lock" && (<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>)}
+              </div>
+              <h3>{p.title}</h3>
+              <p>{p.text}</p>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <!-- DO / DON'T -->
+  <section class="kodex-dosdonts">
+    <div class="inner">
+      <header class="section-head">
+        <p class="eyebrow">Praxe</p>
+        <h2>Co děláme a co naopak nikdy</h2>
+        <p class="lead">
+          Pravidla z kodexu přeložená do konkrétních věcí, podle kterých nás můžete denně poměřovat.
+        </p>
+      </header>
+
+      <div class="dosdonts-grid">
+        <div class="dosdonts-col positive">
+          <h3>
+            <span class="check" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+            </span>
+            Co děláme
+          </h3>
+          <ul>
+            {dosDonts.dos.map((item) => <li>{item}</li>)}
+          </ul>
+        </div>
+        <div class="dosdonts-col negative">
+          <h3>
+            <span class="check" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </span>
+            Co nikdy
+          </h3>
+          <ul>
+            {dosDonts.donts.map((item) => <li>{item}</li>)}
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ACCOUNTABILITY -->
+  <section class="kodex-accountability">
+    <div class="inner">
+      <header class="section-head">
+        <p class="eyebrow">Odpovědnost</p>
+        <h2>Co dělat, když se nám něco nepovede</h2>
+      </header>
+      <div class="acc-grid">
+        <div>
+          <p>
+            Tento kodex nebrání tomu, abychom se mýlili. Brání nám ho zatajit. Pokud najdete chybu v článku, neoznámený konflikt zájmů, neetické chování autora — <strong>napište to redakci nebo přímo zakladateli</strong>.
+          </p>
+          <p>
+            Každý podnět projde do 48 hodin, případnou chybu opravíme veřejně v historii revizí článku. Při systémovém porušení kodexu zveřejníme i opravné prohlášení redakce.
+          </p>
+        </div>
+        <div class="acc-actions">
+          <a href="/oprava-chyb/" class="btn-primary">
+            Nahlásit chybu
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+              <line x1="5" y1="12" x2="19" y2="12" />
+              <polyline points="12 5 19 12 12 19" />
+            </svg>
+          </a>
+          <a href="mailto:eticky@recenzer.cz" class="btn-ghost">eticky@recenzer.cz</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- REVISIONS -->
+  <section class="kodex-revisions">
+    <div class="inner">
+      <header class="section-head">
+        <p class="eyebrow">Historie</p>
+        <h2>Revize kodexu</h2>
+      </header>
+      <ol class="revisions">
+        {
+          revisions.map((r) => (
+            <li>
+              <time datetime={r.date}>{r.date}</time>
+              <span>{r.change}</span>
+            </li>
+          ))
+        }
+      </ol>
+    </div>
+  </section>
+
+  <style>
+    .inner {
+      max-width: var(--max-w);
+      margin: 0 auto;
+      padding: clamp(2.5rem, 5vw, 4rem) var(--gutter);
+    }
+
+    .section-head {
+      max-width: 65ch;
+      margin: 0 0 2rem;
+    }
+
+    .eyebrow {
+      font-family: var(--mono);
+      font-size: 11.5px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--p-700);
+      font-weight: 700;
+      margin: 0 0 0.5rem;
+    }
+
+    .section-head h2 {
+      font-size: clamp(1.6rem, 3vw, 2.1rem);
+      font-weight: 800;
+      letter-spacing: -0.025em;
+      color: var(--ink);
+      line-height: 1.2;
+      margin-bottom: 0.6rem;
+    }
+
+    .section-head .lead {
+      font-size: 15.5px;
+      line-height: 1.6;
+      color: var(--muted);
+      margin: 0;
+    }
+
+    /* TLDR */
+    .kodex-tldr {
+      background: var(--bg);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .tldr-card {
+      max-width: 760px;
+      margin: 0 auto;
+      padding: 2rem;
+      background: var(--ink);
+      color: #fff;
+      border-radius: var(--r-xl);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .tldr-card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(700px circle at 100% 0%, rgba(149, 114, 240, 0.3), transparent 55%),
+        radial-gradient(500px circle at 0% 100%, rgba(99, 50, 204, 0.22), transparent 55%);
+      pointer-events: none;
+    }
+
+    .tldr-head {
+      position: relative;
+      margin-bottom: 1.25rem;
+    }
+
+    .tldr-eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-family: var(--mono);
+      font-size: 11.5px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--p-300);
+      font-weight: 700;
+      margin: 0;
+    }
+
+    .tldr-eyebrow svg { width: 14px; height: 14px; }
+
+    .tldr-list {
+      position: relative;
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      counter-reset: tldr;
+      display: grid;
+      gap: 0.4rem;
+    }
+
+    .tldr-list li {
+      counter-increment: tldr;
+      padding: 0.65rem 0 0.65rem 3rem;
+      position: relative;
+      font-size: 15px;
+      line-height: 1.5;
+      color: rgba(255, 255, 255, 0.9);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .tldr-list li:last-child { border-bottom: 0; }
+
+    .tldr-list li::before {
+      content: counter(tldr, decimal-leading-zero);
+      position: absolute;
+      left: 0;
+      top: 0.65rem;
+      width: 28px;
+      height: 28px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      border-radius: 7px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--mono);
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--p-200);
+    }
+
+    /* PILLARS */
+    .kodex-pillars {
+      background: var(--bg-warm);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .pillars-grid {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1rem;
+    }
+
+    @media (max-width: 880px) { .pillars-grid { grid-template-columns: 1fr 1fr; } }
+    @media (max-width: 560px) { .pillars-grid { grid-template-columns: 1fr; } }
+
+    .pillar {
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: var(--r-lg);
+      padding: 1.5rem;
+    }
+
+    .pillar-ic {
+      width: 40px;
+      height: 40px;
+      border-radius: 11px;
+      background: var(--p-50);
+      color: var(--p-700);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 0.85rem;
+    }
+
+    .pillar-ic svg { width: 20px; height: 20px; }
+
+    .pillar h3 {
+      font-size: 1.05rem;
+      font-weight: 800;
+      color: var(--ink);
+      margin-bottom: 0.4rem;
+    }
+
+    .pillar p {
+      font-size: 13.5px;
+      line-height: 1.6;
+      color: var(--muted);
+      margin: 0;
+    }
+
+    /* DO / DON'T */
+    .kodex-dosdonts {
+      background: var(--bg);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .dosdonts-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+
+    @media (max-width: 720px) { .dosdonts-grid { grid-template-columns: 1fr; } }
+
+    .dosdonts-col {
+      padding: 1.75rem;
+      border: 1px solid var(--line);
+      border-radius: var(--r-lg);
+    }
+
+    .dosdonts-col.positive {
+      background: var(--green-bg);
+      border-color: rgba(21, 128, 61, 0.2);
+    }
+
+    .dosdonts-col.negative {
+      background: var(--red-bg);
+      border-color: rgba(185, 28, 28, 0.2);
+    }
+
+    .dosdonts-col h3 {
+      display: flex;
+      align-items: center;
+      gap: 0.55rem;
+      font-size: 14px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--ink);
+      margin-bottom: 1rem;
+      font-weight: 800;
+    }
+
+    .check {
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .positive .check { background: var(--green); color: #fff; }
+    .negative .check { background: var(--red); color: #fff; }
+    .check svg { width: 14px; height: 14px; }
+
+    .dosdonts-col ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 0.6rem;
+    }
+
+    .dosdonts-col li {
+      font-size: 14px;
+      line-height: 1.55;
+      color: var(--ink-soft);
+      padding-left: 1.25rem;
+      position: relative;
+    }
+
+    .dosdonts-col li::before {
+      content: "•";
+      position: absolute;
+      left: 0;
+      top: 0;
+      color: var(--ink);
+      font-weight: 700;
+    }
+
+    /* Accountability */
+    .kodex-accountability {
+      background: var(--bg-warm);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .acc-grid {
+      display: grid;
+      grid-template-columns: 1.4fr 1fr;
+      gap: 2rem;
+      align-items: start;
+    }
+
+    @media (max-width: 720px) { .acc-grid { grid-template-columns: 1fr; } }
+
+    .acc-grid p {
+      font-size: 15px;
+      line-height: 1.65;
+      color: var(--ink-soft);
+      margin-bottom: 0.85rem;
+    }
+
+    .acc-grid strong { color: var(--ink); font-weight: 700; }
+
+    .acc-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 0.6rem;
+    }
+
+    /* Revisions */
+    .kodex-revisions {
+      background: var(--bg);
+    }
+
+    .revisions {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      max-width: 720px;
+      border: 1px solid var(--line);
+      border-radius: var(--r-lg);
+      overflow: hidden;
+    }
+
+    .revisions li {
+      display: grid;
+      grid-template-columns: 120px 1fr;
+      gap: 1rem;
+      padding: 0.85rem 1.25rem;
+      background: #fff;
+      border-bottom: 1px solid var(--line-soft);
+      font-size: 14px;
+    }
+
+    .revisions li:last-child { border-bottom: 0; }
+
+    .revisions time {
+      font-family: var(--mono);
+      color: var(--muted);
+      font-size: 12.5px;
+    }
+
+    .revisions span {
+      color: var(--ink-soft);
+      line-height: 1.5;
+    }
+
+    .btn-primary,
+    .btn-ghost {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      padding: 0.7rem 1.1rem;
+      border-radius: var(--r);
+      font-size: 14px;
+      font-weight: 600;
+      text-decoration: none;
+      justify-content: center;
+    }
+
+    .btn-primary {
+      background: var(--p-700);
+      color: #fff;
+      border: 1px solid var(--p-700);
+    }
+
+    .btn-primary:hover,
+    .btn-primary:focus-visible {
+      background: var(--p-800);
+      border-color: var(--p-800);
+    }
+
+    .btn-primary svg { width: 14px; height: 14px; }
+
+    .btn-ghost {
+      background: #fff;
+      color: var(--ink);
+      border: 1px solid var(--line);
+    }
+
+    .btn-ghost:hover,
+    .btn-ghost:focus-visible {
+      border-color: var(--p-400);
+      color: var(--p-700);
+    }
+  </style>
+</BaseLayout>

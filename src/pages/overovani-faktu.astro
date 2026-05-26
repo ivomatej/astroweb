@@ -1,0 +1,727 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import PageBreadcrumbs from "../components/page/PageBreadcrumbs.astro";
+import PageHero from "../components/page/PageHero.astro";
+import StatStrip from "../components/page/StatStrip.astro";
+
+const stats = [
+  { value: "2", label: "nezávislé zdroje na každé tvrzení" },
+  { value: "3", label: "lidé v trojúhelníku kontroly" },
+  { value: "10+", label: "ověřovacích databází" },
+  { value: "48 h", label: "limit pro opravu chyby" },
+];
+
+const claimTypes = [
+  {
+    title: "Technické parametry",
+    text: "Výkon, kapacita, hmotnost, rozměry, spotřeba. Ověřujeme proti datasheetům výrobců a vlastnímu měření v laboratoři.",
+    icon: "gauge",
+  },
+  {
+    title: "Ceny a dostupnost",
+    text: "Konkrétní částky, doba dodání, skladovost. Kontrolujeme přes Heureku.cz a 5 hlavních e-shopů, snímky archivujeme.",
+    icon: "tag",
+  },
+  {
+    title: "Normy a předpisy",
+    text: "ČSN EN, ekodesign, energetický štítek, GDPR ustanovení. Citujeme přímo z ÚNMZ a EU databází.",
+    icon: "book",
+  },
+  {
+    title: "Historická data",
+    text: "Trendy cen, vývoj značky, technologické změny. Wayback Machine + archiv vlastních článků.",
+    icon: "clock",
+  },
+  {
+    title: "Hodnocení a recenze",
+    text: "Skóre v Stiftung Warentest, ÖKO-Test, dTest, Which?. Vždy uvádíme jméno zdroje a rok.",
+    icon: "star",
+  },
+  {
+    title: "Tvrzení výrobce",
+    text: "Marketingové fráze („nejlepší“, „špičkový“). Vyžadujeme měřitelný důkaz, jinak rovnou škrtáme.",
+    icon: "megaphone",
+  },
+];
+
+const triangle = [
+  {
+    role: "Autor článku",
+    text: "Sbírá fakta, hledá primární zdroje, píše text. Eviduje každé tvrzení v interním dokumentu se zdrojem.",
+    color: "purple",
+  },
+  {
+    role: "Odborný garant",
+    text: "Externí specialista s praxí — lékař, inženýr, řemeslník. Ověřuje fakta z pohledu oboru. Bez jeho podpisu článek neopouští redakci.",
+    color: "amber",
+  },
+  {
+    role: "Editor",
+    text: "Třetí pár očí — kontroluje konzistenci, logiku argumentů, tón a citace. Má veto pro publikaci.",
+    color: "green",
+  },
+];
+
+const steps = [
+  {
+    num: "01",
+    title: "Identifikace faktických tvrzení",
+    text: "Autor projde návrh článku a označí každou větu obsahující fakt. Marketingové fráze vyřadí nebo přepíše na měřitelná tvrzení.",
+  },
+  {
+    num: "02",
+    title: "Primární ověření v 2 nezávislých zdrojích",
+    text: "Každé tvrzení musí být potvrzeno alespoň 2 nezávislými zdroji. Web výrobce a jeho tisková zpráva = jeden zdroj. Test cizí redakce + naše měření = dva zdroje.",
+  },
+  {
+    num: "03",
+    title: "Zápis zdrojů do dokumentu",
+    text: "Interní dokument fact-check.md drží mapování tvrzení → zdroj. Snapshoty webových zdrojů archivujeme přes Wayback Machine — později nelze tichá změna.",
+  },
+  {
+    num: "04",
+    title: "Odborná kontrola garantem",
+    text: "Externí garant projde celý článek. Může připisovat poznámky, navrhovat opravy, nebo článek zcela odmítnout. Komunikace probíhá v dokumentu, je auditovatelná.",
+  },
+  {
+    num: "05",
+    title: "Křížová kontrola s konkurencí",
+    text: "Editor zkontroluje, jak stejný produkt hodnotí konkurence — Stiftung Warentest, dTest, Which?. Velké rozdíly v hodnocení musíme umět vysvětlit.",
+  },
+  {
+    num: "06",
+    title: "Finální checklist před publikací",
+    text: "20bodový checklist — všichni autoři, garant, datum revize, zdroje v patičce, citace formátované, žádné nepodložené tvrzení.",
+  },
+  {
+    num: "07",
+    title: "Pravidelná revalidace",
+    text: "Každý článek minimálně 2× ročně. Kontrolujeme ceny, dostupnost, nové modely, případné aktualizace norem. Změna se zaznamená v Historii revizí.",
+  },
+];
+
+const tools = [
+  {
+    name: "Heureka.cz",
+    purpose: "Aktuální ceny a dostupnost u e-shopů. Snímky archivujeme.",
+    type: "Srovnávač",
+  },
+  {
+    name: "Wayback Machine",
+    purpose: "Snapshoty webových zdrojů — proti tiché změně cizího obsahu.",
+    type: "Archiv",
+  },
+  {
+    name: "Datasheety výrobců",
+    purpose: "Oficiální PDF s parametry. Vždy konkrétní edice s datem vydání.",
+    type: "Primární",
+  },
+  {
+    name: "Stiftung Warentest",
+    purpose: "Nezávislé testy z Německa. Předplatné má redakce.",
+    type: "Testovací",
+  },
+  {
+    name: "dTest",
+    purpose: "Český spotřebitelský magazín — testy pro CZ trh.",
+    type: "Testovací",
+  },
+  {
+    name: "ÚNMZ a EU databáze",
+    purpose: "Normy, ekodesign, energetické štítky.",
+    type: "Regulace",
+  },
+  {
+    name: "SOI databáze",
+    purpose: "Stahování vadných výrobků v ČR.",
+    type: "Regulace",
+  },
+  {
+    name: "Detektory fake recenzí",
+    purpose: "Fakespot, ReviewMeta pro filtrování manipulovaných recenzí.",
+    type: "Nástroj",
+  },
+];
+
+const examples = [
+  {
+    title: "Výrobce uváděl o 40 % vyšší výdrž baterie, než jsme naměřili",
+    summary: "U aku brusky XY výrobce tvrdil 90 min provozu na 5 Ah. Naše měření v laboratoři ukázalo 54 min při plné zátěži. Po dotazu výrobce přiznal, že měřil bez zátěže.",
+    outcome: "V článku uvádíme reálné měření, marketingovou hodnotu jen jako poznámku.",
+    tone: "warn",
+  },
+  {
+    title: "dTest a Stiftung Warentest se neshodují v hodnocení",
+    summary: "U pračky AEG hodnotil Warentest „velmi dobře“, dTest „dobře“. Rozdíl byl v testovacím cyklu (60 °C vs. 40 °C).",
+    outcome: "V článku oba zdroje citujeme, vysvětlujeme metodologický rozdíl a dáváme vlastní doporučení podle scénáře použití.",
+    tone: "info",
+  },
+  {
+    title: "Cena se za týden změnila o 23 %",
+    summary: "U sušičky Bosch sledujeme cenu — od publikace článku stoupla z 16 990 na 20 890 Kč.",
+    outcome: "Aktualizovali jsme TOP doporučení, sušička klesla z 1. na 4. místo. Historie změn článku to ukazuje.",
+    tone: "amber",
+  },
+];
+
+const lastUpdated = "2026-04-15";
+---
+
+<BaseLayout
+  title="Ověřování faktů — Recenzer"
+  description="Jak ověřujeme každý fakt v článku. 6 typů tvrzení, trojúhelník kontroly (autor + garant + editor), 7-krokový proces a nástroje."
+>
+  <PageBreadcrumbs items={[{ href: "/", label: "Recenzer" }, { label: "Ověřování faktů" }]} />
+
+  <PageHero
+    eyebrow="Editorial standards · Fact-checking"
+    eyebrowIcon="check"
+    title="Jak ověřujeme<br/><em>každý fakt</em>"
+    subtitle="Každé tvrzení v článku má alespoň <strong>dva nezávislé zdroje</strong>. Procesy mají tři lidé (autor, garant, editor) a sedm kroků — od identifikace tvrzení po pravidelnou revalidaci."
+  />
+
+  <StatStrip label="Klíčové principy" stats={stats} />
+
+  <!-- Claim types -->
+  <section class="fact-claims">
+    <div class="inner">
+      <header class="section-head">
+        <p class="eyebrow">Co ověřujeme</p>
+        <h2>6 typů faktických tvrzení</h2>
+        <p class="lead">
+          Každé tvrzení v článku spadá do jedné z těchto kategorií. Pro každou platí jiná pravidla ověřování a jiné zdroje.
+        </p>
+      </header>
+      <ul class="claims-grid">
+        {
+          claimTypes.map((c) => (
+            <li class="claim-card">
+              <div class="claim-ic" aria-hidden="true">
+                {c.icon === "gauge" && (<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>)}
+                {c.icon === "tag" && (<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>)}
+                {c.icon === "book" && (<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>)}
+                {c.icon === "clock" && (<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>)}
+                {c.icon === "star" && (<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>)}
+                {c.icon === "megaphone" && (<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 11l18-5v12L3 14v-3z"/><path d="M11.6 16.8a3 3 0 1 1-5.8-1.6"/></svg>)}
+              </div>
+              <h3>{c.title}</h3>
+              <p>{c.text}</p>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <!-- Triangle -->
+  <section class="fact-triangle">
+    <div class="inner">
+      <header class="section-head">
+        <p class="eyebrow">Kdo ověřuje</p>
+        <h2>Trojúhelník fact-checkingu</h2>
+        <p class="lead">
+          Tři páry očí na každém článku. Žádný z nich neopustí redakční pipeline bez ostatních dvou.
+        </p>
+      </header>
+      <ul class="triangle-grid">
+        {
+          triangle.map((t) => (
+            <li class:list={["triangle-card", `color-${t.color}`]}>
+              <div class="triangle-role">{t.role}</div>
+              <p>{t.text}</p>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <!-- Steps -->
+  <section class="fact-steps">
+    <div class="inner">
+      <header class="section-head">
+        <p class="eyebrow">Postup</p>
+        <h2>Fact-checking krok za krokem</h2>
+        <p class="lead">
+          Sedm kroků, kterými prochází každý článek — od identifikace tvrzení po pravidelnou revalidaci.
+        </p>
+      </header>
+      <ol class="steps-list">
+        {
+          steps.map((step) => (
+            <li>
+              <span class="step-num">{step.num}</span>
+              <div>
+                <h3>{step.title}</h3>
+                <p>{step.text}</p>
+              </div>
+            </li>
+          ))
+        }
+      </ol>
+    </div>
+  </section>
+
+  <!-- Tools -->
+  <section class="fact-tools">
+    <div class="inner">
+      <header class="section-head">
+        <p class="eyebrow">Nástroje</p>
+        <h2>Co fyzicky používáme</h2>
+        <p class="lead">
+          Žádný osamocený zdroj nestačí. Naše standardní paleta pro křížové ověření:
+        </p>
+      </header>
+      <ul class="tools-grid">
+        {
+          tools.map((t) => (
+            <li>
+              <div class="tool-head">
+                <strong>{t.name}</strong>
+                <span class="tool-type">{t.type}</span>
+              </div>
+              <p>{t.purpose}</p>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <!-- Examples -->
+  <section class="fact-examples">
+    <div class="inner">
+      <header class="section-head">
+        <p class="eyebrow">Příklady z praxe</p>
+        <h2>Tři reálné fact-checky z naší práce</h2>
+        <p class="lead">
+          Zveřejňujeme i tyto případy — abychom ukázali, že fact-checking není formalita.
+        </p>
+      </header>
+      <ul class="examples-list">
+        {
+          examples.map((ex) => (
+            <li class:list={["example-card", `tone-${ex.tone}`]}>
+              <h3>{ex.title}</h3>
+              <p class="example-summary">{ex.summary}</p>
+              <div class="example-outcome">
+                <strong>Co s tím v článku:</strong> {ex.outcome}
+              </div>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <section class="fact-end">
+    <div class="inner">
+      <div class="fact-end-card">
+        <h2>Pochybujete o nějakém faktu v článku?</h2>
+        <p>
+          Napište nám. Každý podnět projde do 48 hodin, případnou chybu opravíme veřejně v Historii revizí článku.
+        </p>
+        <div class="end-actions">
+          <a href="/oprava-chyb/" class="btn-primary">
+            Nahlásit chybu
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+              <line x1="5" y1="12" x2="19" y2="12" />
+              <polyline points="12 5 19 12 12 19" />
+            </svg>
+          </a>
+          <a href="/duveryhodne-zdroje/" class="btn-ghost">Důvěryhodné zdroje</a>
+          <a href="/metodika/" class="btn-ghost">Metodika testů</a>
+        </div>
+      </div>
+      <p class="fact-meta">
+        Platnost od <strong>2016</strong>, poslední revize <time datetime={lastUpdated}>{lastUpdated}</time>.
+      </p>
+    </div>
+  </section>
+
+  <style>
+    .inner {
+      max-width: var(--max-w);
+      margin: 0 auto;
+      padding: clamp(2.5rem, 5vw, 4rem) var(--gutter);
+    }
+
+    .section-head {
+      max-width: 65ch;
+      margin: 0 0 2rem;
+    }
+
+    .eyebrow {
+      font-family: var(--mono);
+      font-size: 11.5px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--p-700);
+      font-weight: 700;
+      margin: 0 0 0.5rem;
+    }
+
+    .section-head h2 {
+      font-size: clamp(1.5rem, 3vw, 2.1rem);
+      font-weight: 800;
+      letter-spacing: -0.025em;
+      color: var(--ink);
+      line-height: 1.2;
+      margin-bottom: 0.6rem;
+    }
+
+    .section-head .lead {
+      font-size: 15px;
+      line-height: 1.6;
+      color: var(--muted);
+      margin: 0;
+    }
+
+    /* Claims */
+    .fact-claims {
+      background: var(--bg);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .claims-grid {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1rem;
+    }
+
+    @media (max-width: 880px) { .claims-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 560px) { .claims-grid { grid-template-columns: 1fr; } }
+
+    .claim-card {
+      padding: 1.5rem;
+      background: var(--bg-warm);
+      border: 1px solid var(--line);
+      border-radius: var(--r-lg);
+    }
+
+    .claim-ic {
+      width: 40px;
+      height: 40px;
+      border-radius: 11px;
+      background: var(--p-50);
+      color: var(--p-700);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 0.85rem;
+    }
+
+    .claim-ic svg { width: 20px; height: 20px; }
+
+    .claim-card h3 {
+      font-size: 1.05rem;
+      font-weight: 800;
+      color: var(--ink);
+      margin-bottom: 0.4rem;
+    }
+
+    .claim-card p {
+      font-size: 13.5px;
+      line-height: 1.6;
+      color: var(--muted);
+      margin: 0;
+    }
+
+    /* Triangle */
+    .fact-triangle {
+      background: var(--bg-warm);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .triangle-grid {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1rem;
+    }
+
+    @media (max-width: 720px) { .triangle-grid { grid-template-columns: 1fr; } }
+
+    .triangle-card {
+      padding: 1.75rem;
+      background: #fff;
+      border: 1px solid var(--line);
+      border-top: 3px solid var(--p-500);
+      border-radius: var(--r-lg);
+    }
+
+    .triangle-card.color-amber { border-top-color: var(--amber); }
+    .triangle-card.color-green { border-top-color: var(--green); }
+    .triangle-card.color-purple { border-top-color: var(--p-500); }
+
+    .triangle-role {
+      font-family: var(--mono);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--p-700);
+      font-weight: 700;
+      margin-bottom: 0.6rem;
+    }
+
+    .triangle-card.color-amber .triangle-role { color: var(--amber); }
+    .triangle-card.color-green .triangle-role { color: var(--green); }
+
+    .triangle-card p {
+      font-size: 14.5px;
+      line-height: 1.6;
+      color: var(--ink-soft);
+      margin: 0;
+    }
+
+    /* Steps */
+    .fact-steps {
+      background: var(--bg);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .steps-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .steps-list li {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 1.25rem;
+      padding: 1.25rem 1.5rem;
+      background: var(--bg-warm);
+      border: 1px solid var(--line);
+      border-radius: var(--r-lg);
+    }
+
+    .step-num {
+      font-family: var(--mono);
+      font-size: 1.4rem;
+      font-weight: 800;
+      color: var(--p-700);
+      line-height: 1;
+      letter-spacing: -0.015em;
+    }
+
+    .steps-list h3 {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--ink);
+      margin-bottom: 0.3rem;
+    }
+
+    .steps-list p {
+      font-size: 14px;
+      line-height: 1.6;
+      color: var(--muted);
+      margin: 0;
+    }
+
+    /* Tools */
+    .fact-tools {
+      background: var(--bg-warm);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .tools-grid {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 0.6rem;
+    }
+
+    @media (max-width: 720px) { .tools-grid { grid-template-columns: 1fr; } }
+
+    .tools-grid li {
+      padding: 1.1rem 1.25rem;
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: var(--r);
+    }
+
+    .tool-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 1rem;
+      margin-bottom: 0.3rem;
+    }
+
+    .tool-head strong {
+      font-size: 14.5px;
+      color: var(--ink);
+    }
+
+    .tool-type {
+      font-family: var(--mono);
+      font-size: 10.5px;
+      color: var(--p-700);
+      background: var(--p-50);
+      padding: 2px 7px;
+      border-radius: 4px;
+      letter-spacing: 0.04em;
+      white-space: nowrap;
+    }
+
+    .tools-grid p {
+      font-size: 13px;
+      line-height: 1.55;
+      color: var(--muted);
+      margin: 0;
+    }
+
+    /* Examples */
+    .fact-examples {
+      background: var(--bg);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .examples-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .example-card {
+      padding: 1.5rem 1.75rem;
+      background: var(--bg-warm);
+      border: 1px solid var(--line);
+      border-left: 4px solid var(--p-500);
+      border-radius: var(--r-lg);
+    }
+
+    .example-card.tone-warn { border-left-color: var(--red); background: var(--red-bg); }
+    .example-card.tone-info { border-left-color: var(--p-500); }
+    .example-card.tone-amber { border-left-color: var(--amber); background: var(--amber-bg); }
+
+    .example-card h3 {
+      font-size: 1.05rem;
+      font-weight: 800;
+      color: var(--ink);
+      letter-spacing: -0.015em;
+      margin-bottom: 0.5rem;
+      line-height: 1.3;
+    }
+
+    .example-summary {
+      font-size: 14.5px;
+      line-height: 1.6;
+      color: var(--ink-soft);
+      margin: 0 0 0.85rem;
+    }
+
+    .example-outcome {
+      padding: 0.75rem 1rem;
+      background: rgba(255, 255, 255, 0.6);
+      border-radius: var(--r);
+      font-size: 13.5px;
+      line-height: 1.55;
+      color: var(--ink-soft);
+    }
+
+    .example-outcome strong {
+      color: var(--ink);
+      font-weight: 700;
+    }
+
+    /* End */
+    .fact-end { background: var(--bg); }
+
+    .fact-end-card {
+      max-width: 760px;
+      margin: 0 auto;
+      padding: 2.25rem 2rem;
+      background: var(--p-50);
+      border: 1px solid rgba(99, 50, 204, 0.18);
+      border-radius: var(--r-xl);
+      text-align: center;
+    }
+
+    .fact-end-card h2 {
+      font-size: clamp(1.4rem, 2.5vw, 1.85rem);
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      color: var(--ink);
+      margin-bottom: 0.75rem;
+    }
+
+    .fact-end-card p {
+      font-size: 15.5px;
+      line-height: 1.6;
+      color: var(--ink-soft);
+      max-width: 56ch;
+      margin: 0 auto 1.5rem;
+    }
+
+    .end-actions {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .fact-meta {
+      margin-top: 1.5rem;
+      font-size: 12.5px;
+      color: var(--muted);
+      text-align: center;
+    }
+
+    .fact-meta strong { color: var(--ink); font-weight: 700; }
+
+    .btn-primary,
+    .btn-ghost {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      padding: 0.75rem 1.2rem;
+      border-radius: var(--r);
+      font-size: 14px;
+      font-weight: 600;
+      text-decoration: none;
+    }
+
+    .btn-primary {
+      background: var(--p-700);
+      color: #fff;
+      border: 1px solid var(--p-700);
+    }
+
+    .btn-primary:hover,
+    .btn-primary:focus-visible {
+      background: var(--p-800);
+      border-color: var(--p-800);
+      color: #fff;
+    }
+
+    .btn-primary svg { width: 14px; height: 14px; }
+
+    .btn-ghost {
+      background: #fff;
+      color: var(--ink);
+      border: 1px solid var(--line);
+    }
+
+    .btn-ghost:hover,
+    .btn-ghost:focus-visible {
+      border-color: var(--p-400);
+      color: var(--p-700);
+    }
+  </style>
+</BaseLayout>

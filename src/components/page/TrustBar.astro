@@ -1,0 +1,77 @@
+---
+interface Props {
+  label?: string;
+  items: string[];
+}
+
+const { label = "Co garantujeme", items } = Astro.props;
+---
+
+<section class="trust-bar" aria-label={label}>
+  <div class="trust-bar-inner">
+    <span class="trust-bar-label">{label}</span>
+    <ul class="trust-bar-items">
+      {
+        items.map((item) => (
+          <li class="trust-bar-item">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+              <polyline points="20 6 9 17 4 12" />
+            </svg>
+            {item}
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</section>
+
+<style>
+  .trust-bar {
+    background: var(--p-50);
+    border-bottom: 1px solid var(--line);
+  }
+
+  .trust-bar-inner {
+    max-width: var(--max-w);
+    margin: 0 auto;
+    padding: 1rem var(--gutter);
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+  }
+
+  .trust-bar-label {
+    font-family: var(--mono);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--p-700);
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+
+  .trust-bar-items {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem 1.5rem;
+  }
+
+  .trust-bar-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--ink-soft);
+  }
+
+  .trust-bar-item svg {
+    width: 14px;
+    height: 14px;
+    color: var(--green);
+  }
+</style>

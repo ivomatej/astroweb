@@ -1,98 +1,17 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
+import Hero from "../components/home/Hero.astro";
+import CategoryGrid from "../components/home/CategoryGrid.astro";
+import FeaturedArticles from "../components/home/FeaturedArticles.astro";
+import EditorialPromise from "../components/home/EditorialPromise.astro";
 ---
 
 <BaseLayout
-  title="Recenzer — nezávislý průvodce nákupem"
-  description="Hloubkové testy, srozumitelná doporučení, bez sponzoringu. Recenzer pomáhá vybrat to nejlepší od roku 2017."
+  title="Recenzer — nezávislé recenze nářadí, spotřebičů a víc"
+  description="Hloubkové testy, srozumitelná doporučení, bez sponzoringu. Recenzer pomáhá vybrat to nejlepší od roku 2016."
 >
-  <section class="placeholder">
-    <div class="placeholder-inner">
-      <p class="eyebrow">Vývojový prototyp · krok 1</p>
-      <h1>Editorial shell je nasazený</h1>
-      <p>
-        Tahle stránka zatím slouží jen jako prostor pro ověření, že top bar,
-        masthead, footer a fonty fungují tak, jak mají. Skutečná domovská
-        stránka — výpis nejnovějších testů, doporučená témata, žebříčky —
-        přijde v dalším kroku.
-      </p>
-      <div class="row">
-        <a href="/o-nas/" class="btn">O nás</a>
-        <a href="/kontakt/" class="btn btn-primary">Kontakt</a>
-      </div>
-    </div>
-  </section>
-
-  <style>
-    .placeholder {
-      padding: 4rem var(--gutter);
-    }
-
-    .placeholder-inner {
-      max-width: var(--max-w-text);
-      margin: 0 auto;
-    }
-
-    .eyebrow {
-      font-size: 12px;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      color: var(--p-700);
-      font-weight: 600;
-      margin-bottom: 1rem;
-    }
-
-    h1 {
-      font-size: clamp(2rem, 5vw, 2.75rem);
-      font-weight: 800;
-      letter-spacing: -0.02em;
-      color: var(--ink);
-      line-height: 1.15;
-      margin-bottom: 1rem;
-    }
-
-    p {
-      color: var(--muted);
-      margin-bottom: 1rem;
-      max-width: 60ch;
-    }
-
-    .row {
-      display: flex;
-      gap: 0.75rem;
-      flex-wrap: wrap;
-      margin-top: 1.5rem;
-    }
-
-    .btn {
-      display: inline-flex;
-      align-items: center;
-      padding: 0.6rem 1.1rem;
-      border-radius: var(--r);
-      border: 1px solid var(--line);
-      background: var(--bg);
-      color: var(--ink);
-      font-weight: 500;
-      font-size: 14.5px;
-    }
-
-    .btn:hover,
-    .btn:focus-visible {
-      border-color: var(--p-300);
-      color: var(--p-700);
-    }
-
-    .btn-primary {
-      background: var(--p-700);
-      border-color: var(--p-700);
-      color: #fff;
-    }
-
-    .btn-primary:hover,
-    .btn-primary:focus-visible {
-      background: var(--p-800);
-      border-color: var(--p-800);
-      color: #fff;
-    }
-  </style>
+  <Hero />
+  <CategoryGrid />
+  <FeaturedArticles />
+  <EditorialPromise />
 </BaseLayout>

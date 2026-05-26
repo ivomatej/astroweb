@@ -1,0 +1,74 @@
+---
+import type { BreadcrumbItem } from "../../types/article";
+
+interface Props {
+  items: BreadcrumbItem[];
+}
+
+const { items } = Astro.props;
+---
+
+<nav class="page-breadcrumbs" aria-label="Drobečková navigace">
+  <div class="page-breadcrumbs-inner">
+    <ol>
+      {
+        items.map((item, i) => (
+          <li>
+            {item.href ? <a href={item.href}>{item.label}</a> : <span>{item.label}</span>}
+            {i < items.length - 1 && <span class="sep" aria-hidden="true">›</span>}
+          </li>
+        ))
+      }
+    </ol>
+  </div>
+</nav>
+
+<style>
+  .page-breadcrumbs {
+    border-bottom: 1px solid var(--line);
+    background: var(--bg);
+  }
+
+  .page-breadcrumbs-inner {
+    max-width: var(--max-w);
+    margin: 0 auto;
+    padding: 0.85rem var(--gutter);
+  }
+
+  .page-breadcrumbs ol {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 13px;
+    color: var(--muted);
+  }
+
+  .page-breadcrumbs li {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+
+  .page-breadcrumbs a {
+    color: var(--muted);
+    text-decoration: none;
+  }
+
+  .page-breadcrumbs a:hover,
+  .page-breadcrumbs a:focus-visible {
+    color: var(--p-700);
+  }
+
+  .page-breadcrumbs li:last-child span:not(.sep) {
+    color: var(--ink);
+    font-weight: 500;
+  }
+
+  .sep {
+    color: var(--muted-2);
+  }
+</style>

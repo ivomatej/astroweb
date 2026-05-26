@@ -1,0 +1,356 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import PageBreadcrumbs from "../components/page/PageBreadcrumbs.astro";
+import PageHero from "../components/page/PageHero.astro";
+
+const sections = [
+  {
+    id: "rozsah",
+    num: "01",
+    title: "Rozsah a platnost zásad",
+    paragraphs: [
+      "Tyto zásady upravují vznik a publikování redakčního obsahu na Recenzer.cz a slovenské mutaci Recenzer.sk. Vztahují se na všechny interní redaktory, externí autory, garanty, editory i korektory, kteří se podílí na tvorbě obsahu.",
+      "Zásady jsou závazné. Jejich porušení znamená vrácení článku k přepracování, v opakovaných případech ukončení spolupráce. Aktuální verzi schvaluje šéfredaktor po konzultaci s redakční radou.",
+    ],
+  },
+  {
+    id: "nezavislost",
+    num: "02",
+    title: "Nezávislost a konflikt zájmů",
+    paragraphs: [
+      "Žádný článek nevzniká na základě objednávky inzerenta. Obchodní tým nemá vliv na to, co a jak píšeme. Pokud se autorovi naskytne potenciální konflikt zájmů (osobní vztah s výrobcem, podíl ve firmě, dlouhodobá spolupráce mimo Recenzer), je povinen ho předem oznámit editorovi.",
+      "Editor pak rozhodne, zda autor článek může napsat, nebo zda ho předá kolegovi. Vážnější konflikty se zveřejňují v patičce článku.",
+    ],
+  },
+  {
+    id: "zdroje",
+    num: "03",
+    title: "Zdroje, citace a ověřování",
+    paragraphs: [
+      "Každý netriviální fakt v článku má alespoň dva nezávislé zdroje. Preferujeme primární zdroje (oficiální materiály výrobců, normy, vědecké studie, vlastní měření) před sekundárními (recenze, fóra, články jiných redakcí).",
+      "Citujeme transparentně — pokud informaci přebíráme, uvedeme zdroj v textu nebo v sekci Zdroje. Doslovné citace dlouhé přes 20 slov používáme pouze se svolením nebo v rámci práva citačního dle autorského zákona.",
+      "Když si nejsme jistí, napíšeme to. Lepší věta „přesné číslo neznáme, odhadem 5–8 %\" než vymyšlený údaj.",
+    ],
+  },
+  {
+    id: "garant",
+    num: "04",
+    title: "Role odborného garanta",
+    paragraphs: [
+      "U odborných témat (zdraví, bezpečnost, elektronářadí, dětské produkty, finance) prochází článek kontrolou externího garanta s relevantní praxí — lékař, inženýr, řemeslník, finanční poradce.",
+      "Garant je u článku podepsán jménem a uvádí svou kvalifikaci. Nemá nárok na editorský zásah do tónu článku, ale fakta ověřuje a může je opravit. Pokud garant s článkem zásadně nesouhlasí, článek neopustí redakci, dokud spor nevyřešíme.",
+    ],
+  },
+  {
+    id: "ai",
+    num: "05",
+    title: "Použití umělé inteligence",
+    paragraphs: [
+      "AI je nástroj, ne autor. Můžeme ji použít pro rešerši, kontrolu pravopisu, generování návrhů struktury nebo otázek. Nikdy nepublikujeme text vygenerovaný AI jako autorský článek.",
+      "Pokud v článku použijeme AI nad rámec běžné jazykové korektury, uvedeme to v sekci Metodika článku.",
+    ],
+  },
+  {
+    id: "produkty",
+    num: "06",
+    title: "Testované produkty a vzorky",
+    paragraphs: [
+      "Modely k testování kupujeme za běžnou tržní cenu, ze stejných e-shopů, kde si je můžete koupit i vy. Nepřijímáme vzorky výměnou za pozitivní hodnocení.",
+      "Pokud nám výrobce poskytne model k testu bez nároku na vrácení (například pro dlouhodobý test trvanlivosti), uvedeme to v článku. Hodnocení je vždy nezávislé na tom, kdo model dodal.",
+    ],
+  },
+  {
+    id: "affiliate",
+    num: "07",
+    title: "Affiliate odkazy a inzerce",
+    paragraphs: [
+      "Většinu provozu financujeme z affiliate provizí — když kliknete na odkaz a něco koupíte, dostaneme malou provizi od e-shopu. Pro vás se cena nemění.",
+      "Affiliate odkazy nemají vliv na pořadí ani hodnocení modelů. Pokud nejlepší model je z e-shopu, se kterým nemáme spolupráci, doporučíme ho stejně.",
+      "Reklamní obsah (sponzorované články, native ads) na Recenzer.cz aktuálně nepoužíváme. Pokud bychom někdy přidali, bude vždy jasně označený a oddělený od redakce.",
+    ],
+  },
+  {
+    id: "opravy",
+    num: "08",
+    title: "Opravy chyb a stížnosti",
+    paragraphs: [
+      "Když uděláme chybu, opravíme ji do 48 hodin od ohlášení. Opravu zveřejníme v historii revizí článku včetně data a popisu změny. Nikdy nepřepisujeme tichou cestou — čtenář musí vidět, co a kdy se změnilo.",
+      "Stížnost na článek může podat každý — e-mailem na <a href=\"mailto:redakce@recenzer.cz\">redakce@recenzer.cz</a>, formulářem na stránce Nahlásit chybu, nebo přímo přes kontakt na autora. Odpověď posíláme do 5 pracovních dnů.",
+    ],
+  },
+  {
+    id: "anonymita",
+    num: "09",
+    title: "Identifikace autorů",
+    paragraphs: [
+      "Každý článek má identifikovaného autora s vlastní profilovou stránkou. Žádný anonymní nebo pseudonymní obsah. Pokud externí autor preferuje pseudonym (např. ze zaměstnaneckých důvodů), redakce zná jeho skutečnou totožnost a důvod pseudonymu sdělí na požádání.",
+    ],
+  },
+  {
+    id: "soukromi",
+    num: "10",
+    title: "Soukromí čtenářů a komentátorů",
+    paragraphs: [
+      "Komentáře a recenze čtenářů můžeme upravit pouze za účelem skrytí osobních údajů (e-mail, telefon, adresa), spamu nebo zjevně urážlivého obsahu. Negativní hodnocení nemažeme.",
+      "Detail práce s daty: <a href=\"/zasady-osobnich-udaju/\">Zásady ochrany osobních údajů</a>.",
+    ],
+  },
+];
+
+const lastUpdated = "2026-03-15";
+---
+
+<BaseLayout
+  title="Redakční zásady — Recenzer"
+  description="Závazná pravidla, kterými se řídí každý článek na Recenzer.cz. Nezávislost, zdroje, garanti, AI, affiliate, opravy chyb."
+>
+  <PageBreadcrumbs items={[{ href: "/", label: "Recenzer" }, { label: "Redakční zásady" }]} />
+
+  <PageHero
+    eyebrow={`Platnost od 2016 · poslední revize ${lastUpdated}`}
+    eyebrowIcon="doc"
+    title="Redakční&nbsp;<em>zásady</em>"
+    subtitle="Závazná pravidla, kterými se řídí každý interní redaktor i externí autor Recenzeru. Detailní výklad Etického kodexu — co konkrétně musí splňovat každý článek, než opustí redakci."
+  />
+
+  <!-- TOC -->
+  <section class="rz-toc">
+    <div class="inner">
+      <nav aria-label="Obsah">
+        <p class="toc-label">Obsah</p>
+        <ol>
+          {
+            sections.map((s) => (
+              <li>
+                <a href={`#${s.id}`}>
+                  <span class="toc-num">{s.num}</span>
+                  <span>{s.title}</span>
+                </a>
+              </li>
+            ))
+          }
+        </ol>
+      </nav>
+    </div>
+  </section>
+
+  <!-- BODY -->
+  <article class="rz-body">
+    <div class="inner">
+      {
+        sections.map((s) => (
+          <section id={s.id} class="rz-section">
+            <header>
+              <span class="rz-num">{s.num}</span>
+              <h2>{s.title}</h2>
+            </header>
+            {s.paragraphs.map((p) => <p set:html={p} />)}
+          </section>
+        ))
+      }
+
+      <footer class="rz-footer">
+        <p>
+          Tyto zásady schválil šéfredaktor Recenzer.cz Ivo Matěj.
+          Verze platná od <strong>2016</strong>, poslední revize <time datetime={lastUpdated}>{lastUpdated}</time>.
+          Změny historie najdete v <a href="/eticky-kodex/#revize">Etickém kodexu</a>.
+        </p>
+        <div class="rz-actions">
+          <a href="/eticky-kodex/" class="btn-primary">Etický kodex</a>
+          <a href="/metodika/" class="btn-ghost">Metodika testů</a>
+          <a href="/oprava-chyb/" class="btn-ghost">Nahlásit chybu</a>
+        </div>
+      </footer>
+    </div>
+  </article>
+
+  <style>
+    .inner {
+      max-width: var(--max-w);
+      margin: 0 auto;
+      padding: clamp(2rem, 4vw, 3rem) var(--gutter);
+    }
+
+    /* TOC */
+    .rz-toc {
+      background: var(--bg-warm);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .rz-toc .inner {
+      max-width: 760px;
+    }
+
+    .toc-label {
+      font-family: var(--mono);
+      font-size: 11.5px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--p-700);
+      font-weight: 700;
+      margin: 0 0 1rem;
+    }
+
+    .rz-toc ol {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.4rem 1rem;
+    }
+
+    @media (max-width: 720px) {
+      .rz-toc ol { grid-template-columns: 1fr; }
+    }
+
+    .rz-toc a {
+      display: flex;
+      align-items: baseline;
+      gap: 0.6rem;
+      padding: 0.5rem 0;
+      color: var(--ink);
+      font-size: 14.5px;
+      text-decoration: none;
+    }
+
+    .rz-toc a:hover,
+    .rz-toc a:focus-visible {
+      color: var(--p-700);
+    }
+
+    .toc-num {
+      flex-shrink: 0;
+      width: 1.75rem;
+      font-family: var(--mono);
+      font-size: 11.5px;
+      font-weight: 700;
+      color: var(--muted-2);
+    }
+
+    /* Body */
+    .rz-body {
+      background: var(--bg);
+    }
+
+    .rz-body .inner {
+      max-width: 760px;
+    }
+
+    .rz-section {
+      padding: 1.5rem 0;
+      border-bottom: 1px solid var(--line);
+      scroll-margin-top: 5rem;
+    }
+
+    .rz-section:last-of-type {
+      border-bottom: 0;
+    }
+
+    .rz-section header {
+      display: flex;
+      align-items: baseline;
+      gap: 0.85rem;
+      margin-bottom: 1rem;
+    }
+
+    .rz-num {
+      font-family: var(--mono);
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--p-700);
+      letter-spacing: 0.06em;
+    }
+
+    .rz-section h2 {
+      font-size: clamp(1.25rem, 2vw, 1.5rem);
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      color: var(--ink);
+      line-height: 1.25;
+      margin: 0;
+    }
+
+    .rz-section p {
+      font-size: 16px;
+      line-height: 1.7;
+      color: var(--ink-soft);
+      margin-bottom: 0.85rem;
+    }
+
+    .rz-section p :global(strong) {
+      color: var(--ink);
+      font-weight: 700;
+    }
+
+    .rz-section p :global(a) {
+      color: var(--p-700);
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+
+    /* Footer */
+    .rz-footer {
+      margin-top: 2.5rem;
+      padding: 1.75rem;
+      background: var(--bg-warm);
+      border: 1px solid var(--line);
+      border-radius: var(--r-lg);
+    }
+
+    .rz-footer p {
+      font-size: 14px;
+      line-height: 1.6;
+      color: var(--muted);
+      margin: 0 0 1.25rem;
+    }
+
+    .rz-footer strong { color: var(--ink); font-weight: 700; }
+    .rz-footer a {
+      color: var(--p-700);
+      text-decoration: underline;
+    }
+
+    .rz-actions {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    .btn-primary,
+    .btn-ghost {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      padding: 0.65rem 1.1rem;
+      border-radius: var(--r);
+      font-size: 13.5px;
+      font-weight: 600;
+      text-decoration: none;
+    }
+
+    .btn-primary {
+      background: var(--p-700);
+      color: #fff;
+      border: 1px solid var(--p-700);
+    }
+
+    .btn-primary:hover,
+    .btn-primary:focus-visible {
+      background: var(--p-800);
+      border-color: var(--p-800);
+    }
+
+    .btn-ghost {
+      background: #fff;
+      color: var(--ink);
+      border: 1px solid var(--line);
+    }
+
+    .btn-ghost:hover,
+    .btn-ghost:focus-visible {
+      border-color: var(--p-400);
+      color: var(--p-700);
+    }
+  </style>
+</BaseLayout>

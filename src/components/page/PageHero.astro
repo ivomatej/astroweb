@@ -1,0 +1,128 @@
+---
+interface Props {
+  /** Mono uppercase line above the title, e.g. "Recenzer.cz · od roku 2016". */
+  eyebrow?: string;
+  /** Optional icon name displayed inside the eyebrow. */
+  eyebrowIcon?: "info" | "check" | "shield" | "lab" | "mail" | "doc";
+  /** Main page title. HTML allowed (em, br, etc.). */
+  title: string;
+  /** Subtitle/lede. HTML allowed (strong, em). */
+  subtitle?: string;
+}
+
+const { eyebrow, eyebrowIcon = "info", title, subtitle } = Astro.props;
+---
+
+<header class="page-hero">
+  <div class="page-hero-inner">
+    {
+      eyebrow && (
+        <span class="page-hero-eyebrow">
+          {eyebrowIcon === "info" && (
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+              <circle cx="12" cy="12" r="10" />
+              <path d="M12 8v4M12 16h.01" />
+            </svg>
+          )}
+          {eyebrowIcon === "check" && (
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+              <polyline points="20 6 9 17 4 12" />
+            </svg>
+          )}
+          {eyebrowIcon === "shield" && (
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+            </svg>
+          )}
+          {eyebrowIcon === "lab" && (
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+              <path d="M10 2v7.31" />
+              <path d="M14 9.3V2" />
+              <path d="M8.5 2h7" />
+              <path d="M14 9.3a6.5 6.5 0 1 1-4 0" />
+            </svg>
+          )}
+          {eyebrowIcon === "mail" && (
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+              <path d="M22 6l-10 7L2 6" />
+              <rect x="2" y="4" width="20" height="16" rx="2" />
+            </svg>
+          )}
+          {eyebrowIcon === "doc" && (
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+              <polyline points="14 2 14 8 20 8" />
+            </svg>
+          )}
+          {eyebrow}
+        </span>
+      )
+    }
+
+    <h1 class="page-hero-title" set:html={title}></h1>
+    {subtitle && <p class="page-hero-subtitle" set:html={subtitle}></p>}
+  </div>
+</header>
+
+<style>
+  .page-hero {
+    background:
+      radial-gradient(900px circle at 90% 0%, rgba(149, 114, 240, 0.14), transparent 55%),
+      radial-gradient(700px circle at 10% 110%, rgba(99, 50, 204, 0.08), transparent 55%),
+      var(--bg);
+    border-bottom: 1px solid var(--line);
+  }
+
+  .page-hero-inner {
+    max-width: var(--max-w);
+    margin: 0 auto;
+    padding: clamp(2.5rem, 5vw, 4.5rem) var(--gutter);
+    max-width: min(var(--max-w), 920px);
+  }
+
+  .page-hero-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    font-family: var(--mono);
+    font-size: 11.5px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--p-700);
+    font-weight: 700;
+    margin-bottom: 1.25rem;
+  }
+
+  .page-hero-eyebrow svg {
+    width: 13px;
+    height: 13px;
+  }
+
+  .page-hero-title {
+    font-size: clamp(2rem, 5.5vw, 3.5rem);
+    font-weight: 800;
+    line-height: 1.1;
+    letter-spacing: -0.03em;
+    color: var(--ink);
+    margin-bottom: 1rem;
+  }
+
+  .page-hero-title :global(em) {
+    font-style: italic;
+    color: var(--p-700);
+    font-weight: 800;
+  }
+
+  .page-hero-subtitle {
+    font-size: clamp(1.05rem, 1.6vw, 1.25rem);
+    line-height: 1.55;
+    color: var(--ink-soft);
+    max-width: 70ch;
+    margin: 0;
+  }
+
+  .page-hero-subtitle :global(strong) {
+    color: var(--ink);
+    font-weight: 700;
+  }
+</style>

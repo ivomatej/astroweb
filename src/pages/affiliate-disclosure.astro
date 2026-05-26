@@ -1,0 +1,722 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import PageBreadcrumbs from "../components/page/PageBreadcrumbs.astro";
+import PageHero from "../components/page/PageHero.astro";
+
+const tldr = [
+  "Některé odkazy na e-shopy jsou affiliate — když přes ně něco koupíte, dostaneme provizi.",
+  "Pro vás se cena nemění. Provize jde z marže e-shopu, ne z vaší kapsy.",
+  "Doporučení produktů nezávisí na výši provize ani na vztazích s e-shopy.",
+  "Můžete kdykoli e-shop navštívit přímo — odkaz není povinný.",
+  "Affiliate odkazy v textu označujeme jako transparentní reklamní sdělení dle zákona č. 634/1992 Sb.",
+];
+
+const partners = [
+  { name: "Heureka.cz", share: 72, note: "Hlavní partner od 2016" },
+  { name: "Alza.cz", share: 8, note: "Elektronika, spotřebiče" },
+  { name: "TsBohemia", share: 5, note: "IT a foto" },
+  { name: "Allegro", share: 4, note: "Generický marketplace" },
+  { name: "Mountfield", share: 3, note: "Zahrada, elektronářadí" },
+  { name: "Datart", share: 2, note: "Spotřebiče, elektronika" },
+  { name: "Hornbach", share: 2, note: "Stavební nářadí" },
+  { name: "Ostatní (CJ, eHub, Awin)", share: 4, note: "Menší affiliate sítě" },
+];
+
+const promises = [
+  {
+    icon: "money",
+    title: "Cena pro vás zůstává stejná",
+    text: "Provize si platí e-shop ze své marže. Vy zaplatíte přesně tu samou cenu, jako kdybyste e-shop navštívili přímo.",
+  },
+  {
+    icon: "scale",
+    title: "Doporučení jsou nezávislá",
+    text: "Pořadí ani hodnocení produktů neurčuje výška provize. Když nejlepší produkt prodává e-shop, se kterým nespolupracujeme, doporučíme ho stejně.",
+  },
+  {
+    icon: "gift",
+    title: "Web zůstává zdarma",
+    text: "Díky affiliate provizím nemusíme zavádět placený obsah, paywall ani vtíravou reklamu. Recenzer čtete bez omezení.",
+  },
+  {
+    icon: "back",
+    title: "Affiliate odkaz můžete obejít",
+    text: "Odkaz vás vede na běžnou stránku e-shopu, jen s parametrem v URL. Pokud si e-shop najdete sami, na funkčnost nákupu to nemá vliv.",
+  },
+];
+
+const promises2 = [
+  {
+    icon: "no-pay",
+    title: "Žádné placené recenze",
+    text: "Hodnocení a doporučení nikdy nezávisí na placeném vztahu s výrobcem. Detail v <a href=\"/eticky-kodex/\">Etickém kodexu</a>.",
+  },
+  {
+    icon: "no-track",
+    title: "Nesledujeme váš nákup",
+    text: "E-shop nám hlásí jen, že nákup proběhl (pro výpočet provize), ne kdo co a za kolik koupil. Vaše objednávková data zůstávají u e-shopu.",
+  },
+];
+
+const laws = [
+  {
+    title: "Zákon č. 634/1992 Sb.",
+    subtitle: "O ochraně spotřebitele",
+    text: "Vyžaduje, aby reklamní sdělení bylo jako reklama identifikovatelné. Affiliate odkazy proto v textu zřetelně označujeme.",
+  },
+  {
+    title: "Směrnice EU 2005/29/ES",
+    subtitle: "O nekalých obchodních praktikách",
+    text: "Zakazuje skrytou reklamu vydávanou za nezávislé hodnocení. Recenzer.cz publikuje výhradně nezávislá hodnocení — affiliate je provize z prodeje, ne platba za pozitivní recenzi.",
+  },
+  {
+    title: "Nařízení EU 2016/679 (GDPR)",
+    subtitle: "Ochrana osobních údajů",
+    text: "Affiliate tracking používá cookies třetích stran. Jejich nastavení řeší naše <a href=\"/zasady-cookies/\">Zásady cookies</a> a souhlas.",
+  },
+  {
+    title: "Zákon č. 235/2004 Sb., o DPH",
+    subtitle: "Daňové aspekty",
+    text: "Provize z affiliate jsou pro Provozovatele zdanitelným příjmem a uvádíme je v účetnictví ve Sbírce listin.",
+  },
+];
+
+const lastUpdated = "2026-04-15";
+---
+
+<BaseLayout
+  title="Affiliate disclosure — Recenzer"
+  description="Jak fungují affiliate odkazy na Recenzer.cz, kdo jsou naši partneři a co to znamená pro vás jako čtenáře."
+>
+  <PageBreadcrumbs items={[{ href: "/", label: "Recenzer" }, { label: "Affiliate disclosure" }]} />
+
+  <PageHero
+    eyebrow={`Transparentnost · revize ${lastUpdated}`}
+    eyebrowIcon="info"
+    title="Affiliate<br/><em>disclosure</em>"
+    subtitle="Jak fungují affiliate odkazy na Recenzer.cz, <strong>kolik si tím vyděláme</strong>, a co to znamená pro vás jako čtenáře. Žádné zatajování — celý finanční model leží na stole."
+  />
+
+  <!-- TLDR -->
+  <section class="legal-tldr">
+    <div class="inner">
+      <div class="tldr-card">
+        <p class="tldr-eyebrow">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+            <polyline points="9 11 12 14 22 4" />
+            <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" />
+          </svg>
+          Co konkrétně to znamená
+        </p>
+        <ul class="tldr-list">
+          {tldr.map((p) => <li>{p}</li>)}
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- PARTNERS -->
+  <section class="aff-partners">
+    <div class="inner">
+      <header class="section-head">
+        <p class="eyebrow">Naši partneři</p>
+        <h2>Seznam affiliate partnerů</h2>
+        <p class="lead">
+          Tito e-shopy nám platí provizi z prodejů, které jim přinesete kliknutím na náš odkaz. Podíl odpovídá příjmům za rok 2025.
+        </p>
+      </header>
+
+      <ul class="partners-list">
+        {
+          partners.map((p) => (
+            <li class="partner-row">
+              <div class="partner-name">{p.name}</div>
+              <div class="partner-bar">
+                <div class="partner-bar-fill" style={`width: ${p.share}%`} />
+              </div>
+              <div class="partner-share">{p.share} %</div>
+              <div class="partner-note">{p.note}</div>
+            </li>
+          ))
+        }
+      </ul>
+
+      <p class="partners-foot">
+        <strong>Sponzorovaný obsah: 0 %.</strong> Tento podíl byl, je a vždy bude nulový.
+        Detail v sekci <a href="/o-nas/#jak-vydelavame">Jak vyděláváme</a>.
+      </p>
+    </div>
+  </section>
+
+  <!-- WHAT IT MEANS FOR YOU -->
+  <section class="aff-promises">
+    <div class="inner">
+      <header class="section-head">
+        <p class="eyebrow">Co to znamená pro vás</p>
+        <h2>Čtyři věci, které vás zajímají</h2>
+      </header>
+      <ul class="promises-grid">
+        {
+          promises.map((p) => (
+            <li class="promise-card">
+              <div class="promise-ic" aria-hidden="true">
+                {p.icon === "money" && (
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="12" y1="1" x2="12" y2="23" />
+                    <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
+                  </svg>
+                )}
+                {p.icon === "scale" && (
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M6 9l6-7 6 7" />
+                    <path d="M12 2v20" />
+                    <path d="M2 9c0 2 2 4 4 4s4-2 4-4" />
+                    <path d="M14 9c0 2 2 4 4 4s4-2 4-4" />
+                  </svg>
+                )}
+                {p.icon === "gift" && (
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="20 12 20 22 4 22 4 12" />
+                    <rect x="2" y="7" width="20" height="5" />
+                    <line x1="12" y1="22" x2="12" y2="7" />
+                    <path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z" />
+                    <path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z" />
+                  </svg>
+                )}
+                {p.icon === "back" && (
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="1 4 1 10 7 10" />
+                    <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10" />
+                  </svg>
+                )}
+              </div>
+              <h3>{p.title}</h3>
+              <p>{p.text}</p>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <!-- WHAT WE DON'T DO -->
+  <section class="aff-promises-no">
+    <div class="inner">
+      <header class="section-head">
+        <p class="eyebrow">Co naopak nikdy</p>
+        <h2>Hranice, kterou nikdy nepřekročíme</h2>
+      </header>
+      <ul class="promises-grid two-col">
+        {
+          promises2.map((p) => (
+            <li class="promise-card negative">
+              <div class="promise-ic neg" aria-hidden="true">
+                {p.icon === "no-pay" && (
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10" />
+                    <line x1="4.93" y1="4.93" x2="19.07" y2="19.07" />
+                  </svg>
+                )}
+                {p.icon === "no-track" && (
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                    <line x1="1" y1="1" x2="23" y2="23" />
+                  </svg>
+                )}
+              </div>
+              <h3>{p.title}</h3>
+              <p set:html={p.text} />
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <!-- LEGAL BASIS -->
+  <section class="aff-laws">
+    <div class="inner">
+      <header class="section-head">
+        <p class="eyebrow">Právní rámec</p>
+        <h2>Jaké zákony to upravují</h2>
+        <p class="lead">
+          Affiliate model není šedá zóna — je to standardní obchodní vztah upravený několika právními předpisy.
+        </p>
+      </header>
+      <ul class="laws-list">
+        {
+          laws.map((l) => (
+            <li>
+              <div class="law-head">
+                <h3>{l.title}</h3>
+                <span>{l.subtitle}</span>
+              </div>
+              <p set:html={l.text} />
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <!-- CONTACT -->
+  <section class="aff-contact">
+    <div class="inner">
+      <div class="aff-contact-card">
+        <div>
+          <h2>Něco vám není jasné?</h2>
+          <p>
+            Affiliate model může být na první přečtení matoucí. Pokud máte otázku — k jednomu konkrétnímu článku nebo k modelu obecně — napište nám. Odpovídáme do 24 hodin v pracovní dny.
+          </p>
+        </div>
+        <div class="aff-contact-actions">
+          <a href="mailto:redakce@recenzer.cz" class="btn-primary">
+            redakce@recenzer.cz
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+              <line x1="5" y1="12" x2="19" y2="12" />
+              <polyline points="12 5 19 12 12 19" />
+            </svg>
+          </a>
+          <a href="/o-nas/#jak-vydelavame" class="btn-ghost">Jak vyděláváme</a>
+          <a href="/eticky-kodex/" class="btn-ghost">Etický kodex</a>
+        </div>
+      </div>
+      <p class="aff-meta">
+        Platnost od <strong>2016</strong>, poslední revize <time datetime={lastUpdated}>{lastUpdated}</time>.
+      </p>
+    </div>
+  </section>
+
+  <style>
+    .inner {
+      max-width: var(--max-w);
+      margin: 0 auto;
+      padding: clamp(2rem, 4vw, 3rem) var(--gutter);
+    }
+
+    /* TLDR (shared with legal pages) */
+    .legal-tldr { background: var(--bg); border-bottom: 1px solid var(--line); }
+
+    .tldr-card {
+      max-width: 760px;
+      margin: 0 auto;
+      padding: 2rem;
+      background: var(--ink);
+      color: #fff;
+      border-radius: var(--r-xl);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .tldr-card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(700px circle at 100% 0%, rgba(149, 114, 240, 0.28), transparent 55%),
+        radial-gradient(500px circle at 0% 100%, rgba(99, 50, 204, 0.2), transparent 55%);
+      pointer-events: none;
+    }
+
+    .tldr-eyebrow {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-family: var(--mono);
+      font-size: 11.5px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--p-300);
+      font-weight: 700;
+      margin: 0 0 1.25rem;
+    }
+
+    .tldr-eyebrow svg { width: 14px; height: 14px; }
+
+    .tldr-list {
+      position: relative;
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      counter-reset: tldr;
+      display: grid;
+      gap: 0.4rem;
+    }
+
+    .tldr-list li {
+      counter-increment: tldr;
+      padding: 0.65rem 0 0.65rem 3rem;
+      position: relative;
+      font-size: 15px;
+      line-height: 1.5;
+      color: rgba(255, 255, 255, 0.9);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .tldr-list li:last-child { border-bottom: 0; }
+
+    .tldr-list li::before {
+      content: counter(tldr, decimal-leading-zero);
+      position: absolute;
+      left: 0;
+      top: 0.65rem;
+      width: 28px;
+      height: 28px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      border-radius: 7px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--mono);
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--p-200);
+    }
+
+    /* Section heads */
+    .section-head {
+      max-width: 65ch;
+      margin: 0 0 1.75rem;
+    }
+
+    .eyebrow {
+      font-family: var(--mono);
+      font-size: 11.5px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--p-700);
+      font-weight: 700;
+      margin: 0 0 0.5rem;
+    }
+
+    .section-head h2 {
+      font-size: clamp(1.4rem, 2.5vw, 1.85rem);
+      font-weight: 800;
+      letter-spacing: -0.025em;
+      color: var(--ink);
+      line-height: 1.2;
+      margin-bottom: 0.6rem;
+    }
+
+    .section-head .lead {
+      font-size: 15px;
+      line-height: 1.6;
+      color: var(--muted);
+      margin: 0;
+    }
+
+    /* Partners */
+    .aff-partners {
+      background: var(--bg-warm);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .partners-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .partner-row {
+      display: grid;
+      grid-template-columns: 200px 1fr 60px 1fr;
+      gap: 1rem;
+      align-items: center;
+      padding: 0.85rem 1.25rem;
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: var(--r);
+    }
+
+    @media (max-width: 880px) {
+      .partner-row {
+        grid-template-columns: 1fr auto;
+        gap: 0.5rem 1rem;
+      }
+      .partner-bar { grid-column: 1 / -1; order: 99; }
+      .partner-note { grid-column: 1 / -1; order: 100; }
+    }
+
+    .partner-name {
+      font-size: 14.5px;
+      font-weight: 700;
+      color: var(--ink);
+    }
+
+    .partner-bar {
+      height: 8px;
+      background: var(--bg-warm);
+      border-radius: 999px;
+      overflow: hidden;
+    }
+
+    .partner-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--p-500), var(--p-700));
+    }
+
+    .partner-share {
+      font-family: var(--mono);
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--p-700);
+      text-align: right;
+    }
+
+    .partner-note {
+      font-size: 12.5px;
+      color: var(--muted);
+    }
+
+    .partners-foot {
+      margin-top: 1.25rem;
+      padding: 1rem 1.25rem;
+      background: var(--accent-soft);
+      border: 1px solid rgba(255, 79, 0, 0.16);
+      border-radius: var(--r);
+      font-size: 14px;
+      line-height: 1.6;
+      color: var(--ink-soft);
+    }
+
+    .partners-foot strong { color: var(--accent); font-weight: 700; }
+    .partners-foot a {
+      color: var(--p-700);
+      text-decoration: underline;
+    }
+
+    /* Promises */
+    .aff-promises {
+      background: var(--bg);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .aff-promises-no {
+      background: var(--bg-warm);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .promises-grid {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 0.85rem;
+    }
+
+    .promises-grid.two-col { grid-template-columns: repeat(2, 1fr); }
+
+    @media (max-width: 720px) {
+      .promises-grid { grid-template-columns: 1fr; }
+    }
+
+    .promise-card {
+      padding: 1.5rem;
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: var(--r-lg);
+    }
+
+    .promise-card.negative {
+      background: #fff;
+      border-color: rgba(185, 28, 28, 0.18);
+    }
+
+    .promise-ic {
+      width: 40px;
+      height: 40px;
+      border-radius: 11px;
+      background: var(--p-50);
+      color: var(--p-700);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 0.85rem;
+    }
+
+    .promise-ic.neg {
+      background: var(--red-bg);
+      color: var(--red);
+    }
+
+    .promise-ic svg { width: 20px; height: 20px; }
+
+    .promise-card h3 {
+      font-size: 1.05rem;
+      font-weight: 800;
+      color: var(--ink);
+      letter-spacing: -0.015em;
+      margin-bottom: 0.4rem;
+    }
+
+    .promise-card p {
+      font-size: 14px;
+      line-height: 1.6;
+      color: var(--muted);
+      margin: 0;
+    }
+
+    .promise-card p :global(a) {
+      color: var(--p-700);
+      text-decoration: underline;
+    }
+
+    /* Laws */
+    .aff-laws {
+      background: var(--bg);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .laws-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 0.6rem;
+    }
+
+    .laws-list li {
+      padding: 1.25rem 1.5rem;
+      background: var(--bg-warm);
+      border: 1px solid var(--line);
+      border-left: 3px solid var(--p-500);
+      border-radius: var(--r);
+    }
+
+    .law-head {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 1rem;
+      flex-wrap: wrap;
+      margin-bottom: 0.4rem;
+    }
+
+    .law-head h3 {
+      font-size: 1rem;
+      font-weight: 800;
+      color: var(--ink);
+      letter-spacing: -0.01em;
+      margin: 0;
+    }
+
+    .law-head span {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--p-700);
+      background: var(--p-50);
+      padding: 2px 8px;
+      border-radius: 4px;
+      letter-spacing: 0.04em;
+    }
+
+    .laws-list p {
+      font-size: 14px;
+      line-height: 1.6;
+      color: var(--muted);
+      margin: 0;
+    }
+
+    .laws-list p :global(a) {
+      color: var(--p-700);
+      text-decoration: underline;
+    }
+
+    /* Contact */
+    .aff-contact {
+      background: var(--bg);
+    }
+
+    .aff-contact-card {
+      display: grid;
+      grid-template-columns: 1.4fr 1fr;
+      gap: 2rem;
+      align-items: center;
+      padding: 2rem;
+      background: var(--p-50);
+      border: 1px solid rgba(99, 50, 204, 0.18);
+      border-radius: var(--r-xl);
+    }
+
+    @media (max-width: 780px) {
+      .aff-contact-card { grid-template-columns: 1fr; }
+    }
+
+    .aff-contact-card h2 {
+      font-size: clamp(1.4rem, 2.5vw, 1.85rem);
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      color: var(--ink);
+      margin-bottom: 0.6rem;
+    }
+
+    .aff-contact-card p {
+      font-size: 15px;
+      line-height: 1.6;
+      color: var(--ink-soft);
+      margin: 0;
+    }
+
+    .aff-contact-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .aff-meta {
+      margin-top: 1.5rem;
+      font-size: 12.5px;
+      color: var(--muted);
+      text-align: center;
+    }
+
+    .aff-meta strong { color: var(--ink); font-weight: 700; }
+
+    .btn-primary,
+    .btn-ghost {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      padding: 0.75rem 1.25rem;
+      border-radius: var(--r);
+      font-size: 14px;
+      font-weight: 600;
+      text-decoration: none;
+      justify-content: center;
+    }
+
+    .btn-primary {
+      background: var(--p-700);
+      color: #fff;
+      border: 1px solid var(--p-700);
+    }
+
+    .btn-primary:hover,
+    .btn-primary:focus-visible {
+      background: var(--p-800);
+      border-color: var(--p-800);
+      color: #fff;
+    }
+
+    .btn-primary svg { width: 14px; height: 14px; }
+
+    .btn-ghost {
+      background: #fff;
+      color: var(--ink);
+      border: 1px solid var(--line);
+    }
+
+    .btn-ghost:hover,
+    .btn-ghost:focus-visible {
+      border-color: var(--p-400);
+      color: var(--p-700);
+    }
+  </style>
+</BaseLayout>
