@@ -348,8 +348,10 @@
   width: 42px;
   height: 42px;
   border-radius: 50%;
-  background: var(--p-400);
-  color: var(--p-900);
+  /* p-400 + p-900 dávalo borderline 4.36:1. Změna na světlejší bg (p-100)
+     a tmavší text (p-700) zvyšuje kontrast na 7+ :1. */
+  background: var(--p-100);
+  color: var(--p-700);
   display: inline-flex;
   align-items: center;
   justify-content: center;

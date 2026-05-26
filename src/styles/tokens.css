@@ -66,7 +66,9 @@
    *           Contrast 5.62:1 ✓ AA pro normal text.
    */
   --accent:      #ff4f00;
-  --accent-text: #cc3f00;
+  /* Darkened z #cc3f00 na #a83300 — na --accent-soft #fff1ea dává 5.8:1 ✓ AA
+     (předchozí #cc3f00 dávalo borderline 4.5:1). */
+  --accent-text: #a83300;
   --accent-soft: #fff1ea;
 
   /* Ink, text, background
@@ -93,13 +95,28 @@
   --bg-alt:    #faf8fd;
   --bg-warm:   #f6f3fb;
 
-  /* Functional / state */
-  --green:    #15803d;
-  --green-bg: #e7f5ec;
+  /* Functional / state
+   *
+   * Pravidlo: `--X-text` darker variant pro text-on-X-bg kontexty.
+   * Vždy dosahuje min. 4.5:1 kontrast na svém *-bg variantu (WCAG AA).
+   *
+   * --green:      bg / accent color  — POZOR jen pro tlačítka s bílým textem
+   * --green-text: text on green-bg   — 4.5+:1 ✓ AA
+   * --green-bg:   světlé pozadí
+   *
+   * Stejný pattern pro red, amber, accent.
+   */
+  --green:      #15803d;
+  --green-text: #0e6e36;
+  --green-bg:   #e7f5ec;
+
   --red:      #b91c1c;
+  --red-text: #991414;
   --red-bg:   #fbeaea;
-  --amber:    #b45309;
-  --amber-bg: #fdf3e1;
+
+  --amber:      #b45309;
+  --amber-text: #8a3f06;
+  --amber-bg:   #fdf3e1;
 
   /* Typography */
   --sans: "Figtree", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
