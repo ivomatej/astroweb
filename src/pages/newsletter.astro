@@ -97,6 +97,7 @@ const faqs = [
 <BaseLayout
   title="Newsletter — nejlepší recenze v jednom mailu | Recenzer"
   description="Nezávislé recenze, praktické návody a TOP slevy 1× měsíčně přímo do vaší schránky. 5 600+ odběratelů. Žádný spam, odhlášení jedním klikem."
+  hideNewsletterBand
 >
   <PageBreadcrumbs items={[{ href: "/", label: "Recenzer" }, { label: "Newsletter" }]} />
 
@@ -129,6 +130,10 @@ const faqs = [
               autocomplete="email"
               placeholder="vase@email.cz"
             />
+            <label class="hero-consent">
+              <input type="checkbox" required />
+              <span>Souhlasím se <a href="/zasady-osobnich-udaju/">zpracováním osobních údajů</a> a posláním <strong>potvrzovacího e-mailu</strong>.</span>
+            </label>
             <button type="submit" class="btn-primary">
               Přihlásit se k odběru
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
@@ -136,10 +141,6 @@ const faqs = [
                 <polyline points="12 5 19 12 12 19" />
               </svg>
             </button>
-            <label class="hero-consent">
-              <input type="checkbox" required />
-              <span>Souhlasím se <a href="/zasady-osobnich-udaju/">zpracováním osobních údajů</a> a posláním <strong>potvrzovacího e-mailu</strong>.</span>
-            </label>
           </form>
         </div>
 
@@ -618,11 +619,13 @@ const faqs = [
     }
 
     .hero-stats strong {
-      font-size: clamp(1.5rem, 2.6vw, 2rem);
+      font-size: clamp(1.2rem, 2.2vw, 1.75rem);
       font-weight: 800;
       color: var(--ink);
       letter-spacing: -0.02em;
-      line-height: 1;
+      line-height: 1.1;
+      hyphens: none;
+      word-break: keep-all;
     }
 
     .hero-stats span {

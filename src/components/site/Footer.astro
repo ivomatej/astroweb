@@ -11,9 +11,17 @@ interface Props {
    * (typically Komunita / Redakce) are preserved at the end.
    */
   categoryContext?: FooterCategoryContext;
+
+  /**
+   * Hide the global newsletter band above the footer.
+   * Pages that are themselves the newsletter signup destination
+   * (e.g. /newsletter/) should set this so the visitor doesn't see
+   * two competing dark signup CTAs back-to-back.
+   */
+  hideNewsletterBand?: boolean;
 }
 
-const { categoryContext } = Astro.props;
+const { categoryContext, hideNewsletterBand = false } = Astro.props;
 
 const defaults = site.footer.columns;
 const columns: FooterColumn[] =
@@ -28,7 +36,7 @@ const currentYear = new Date().getFullYear();
 ---
 
 <footer class="foot">
-  <Newsletter />
+  {!hideNewsletterBand && <Newsletter />}
 
   <div class="foot-inner">
     <div class="foot-brand">
