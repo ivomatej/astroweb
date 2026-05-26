@@ -1,0 +1,1080 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import PageBreadcrumbs from "../components/page/PageBreadcrumbs.astro";
+import PageHero from "../components/page/PageHero.astro";
+
+const lastUpdated = "2026-05-21";
+
+interface ContentType {
+  /** Slug pro anchor URL (#hloubkova-analyza). */
+  id: string;
+  /** Krátký název (chip / breadcrumb). */
+  shortName: string;
+  /** Plný název s podtitulem. */
+  title: string;
+  subtitle: string;
+  /** Barevný tone pro UI. */
+  tone: "purple" | "amber" | "green" | "red" | "ink" | "blue";
+  /** Ikona. */
+  icon:
+    | "doc"
+    | "list"
+    | "vs"
+    | "product"
+    | "guide"
+    | "brand"
+    | "news"
+    | "interview"
+    | "shop";
+  /** Krátká definice (jedna věta). */
+  oneLiner: string;
+  /** Co tam najdete (3–5 bullets). */
+  whatItContains: string[];
+  /** Metodika — jak vzniká (2–4 bullets). */
+  howWeMakeIt: string[];
+  /** Čas, který strávíte čtením. */
+  readingTime: string;
+  /** Jak dlouho na něm pracujeme. */
+  productionTime: string;
+  /** Co se ze článku dozvíte (1 věta). */
+  whatYouLearn: string;
+  /** Pro koho je ideální. */
+  bestFor: string;
+  /** Vzorová URL. */
+  sampleHref?: string;
+  sampleTitle?: string;
+  /** Frekvence aktualizace. */
+  refreshCadence: string;
+}
+
+const contentTypes: ContentType[] = [
+  {
+    id: "hloubkova-analyza",
+    shortName: "Hloubková analýza",
+    title: "Hloubková analýza · Pillar článek",
+    subtitle: "Kompletní průvodce kategorií",
+    tone: "purple",
+    icon: "doc",
+    oneLiner:
+      "Nejširší formát na Recenzer.cz. Pokrývá <strong>vše, co potřebujete vědět</strong> o celé kategorii produktů — od základní teorie po konkrétní doporučení.",
+    whatItContains: [
+      "Úvodní teorie kategorie (proč to existuje, k čemu se to hodí)",
+      "Klíčové parametry a jejich vliv na výsledek",
+      "Srovnávací tabulka testovaných modelů (10+ kusů)",
+      "Slovník pojmů + FAQ + scénáře použití",
+      "5 typických chyb při nákupu",
+      "Doporučení podle profilů (začátečník / pokročilý / profík)",
+    ],
+    howWeMakeIt: [
+      "Hands-on test 10–25 modelů v laboratoři",
+      "Konzultace s odborným garantem dané kategorie",
+      "Křížové ověření faktů z minimálně 5 nezávislých zdrojů",
+      "Pravidelný refresh 2× ročně + při významných tržních změnách",
+    ],
+    readingTime: "15–25 min",
+    productionTime: "6–10 týdnů",
+    whatYouLearn:
+      "Pochopíte celou kategorii — naučíte se rozeznat dobrý model od marketingu a získáte rámec pro samostatné rozhodování.",
+    bestFor:
+      "Kupujete poprvé v dané kategorii a chcete se vyhnout drahým chybám. Investice 20+ tisíc Kč si zaslouží 20 minut čtení.",
+    sampleHref: "/clanek/aku-brusky/",
+    sampleTitle: "Aku brusky 2026: jak vybrat skutečně dobrou aku brusku",
+    refreshCadence: "2× ročně + při významných tržních změnách",
+  },
+  {
+    id: "top-zebricek",
+    shortName: "TOP žebříček",
+    title: "TOP X · Žebříček",
+    subtitle: "Doporučení konkrétních modelů s pořadím",
+    tone: "amber",
+    icon: "list",
+    oneLiner:
+      "Konkrétní doporučení — <strong>5 až 10 nejlepších modelů</strong> v dané kategorii s pořadím, plusy/mínusy a verdiktem.",
+    whatItContains: [
+      "Top 5–10 modelů s rankem a vážená skóre",
+      "Jasný „verdikt“ za každý model (komu se hodí, komu ne)",
+      "Pro/proti karty (3–5 bodů na model)",
+      "Cenovka aktualizovaná v 12 e-shopech denně",
+      "Filtr „pro koho se hodí“ — rodiny, profíci, malé byty",
+      "Závěrečné doporučení redakce",
+    ],
+    howWeMakeIt: [
+      "Vyběr modelů na základě prodejnosti, recenzí a vlastního výzkumu",
+      "Stejná testovací metodika pro všechny — srovnatelná data",
+      "Bezpečnostně vážené skóre (sníh × 2 u pneu apod.)",
+      "Pravidelný refresh modelů — odebíráme ukončené, přidáváme nové",
+    ],
+    readingTime: "8–12 min",
+    productionTime: "4–6 týdnů",
+    whatYouLearn:
+      "Dostanete konkrétní 1–2 modely k zakoupení s argumenty proč právě ty. Bez nutnosti rozumět celé kategorii.",
+    bestFor:
+      "Nemáte čas na teorii a chcete jen vědět, co koupit. Důvěřujete naší metodice a chcete krátké doporučení.",
+    sampleHref: "/nejlepsi-pracky-2026/",
+    sampleTitle: "Nejlepší pračky 2026: TOP 7",
+    refreshCadence: "Kvartálně + okamžitě při ukončení modelu",
+  },
+  {
+    id: "srovnani",
+    shortName: "Srovnání",
+    title: "Srovnání · Head-to-head",
+    subtitle: "Dva kandidáti, jeden výherce",
+    tone: "blue",
+    icon: "vs",
+    oneLiner:
+      "Detailní face-off mezi <strong>dvěma konkrétními modely nebo značkami</strong>. Pro situaci, kdy se rozhodujete mezi A a B.",
+    whatItContains: [
+      "7 kol head-to-head srovnání (parametry, výkon, cena, atd.)",
+      "Skóre na 100-bodové škále v každé disciplíně",
+      "TCO (Total Cost of Ownership) za 10 let",
+      "Tabulka „Pro koho je která“ — audience profily",
+      "Verdikt + alternativa pro různé use-cases",
+    ],
+    howWeMakeIt: [
+      "Současný test obou modelů ve stejných podmínkách",
+      "Identická metodika měření pro fair comparison",
+      "Garant podepíše rovnou ohodnocení obou modelů",
+      "Aktualizace, pokud výrobce vydá novou generaci",
+    ],
+    readingTime: "10–16 min",
+    productionTime: "3–5 týdnů",
+    whatYouLearn:
+      "Konečné rozhodnutí mezi dvěma kandidáty s konkrétní odpovědí — který si vybrat a proč.",
+    bestFor:
+      "Už jste se rozhodli mezi dvěma modely a chcete poslední argument. Nebo srovnáváte dvě značky obecně.",
+    sampleHref: "/bosch-vs-miele-pracky/",
+    sampleTitle: "Bosch vs Miele — která pračka je lepší?",
+    refreshCadence: "Při vydání nové generace jednoho z modelů",
+  },
+  {
+    id: "produktova-recenze",
+    shortName: "Produktová recenze",
+    title: "Produktová recenze · Single product",
+    subtitle: "Jeden model, hluboký detail",
+    tone: "green",
+    icon: "product",
+    oneLiner:
+      "Detailní recenze <strong>jednoho konkrétního modelu</strong> — hands-on test, parametry, srovnání cen, alternativy.",
+    whatItContains: [
+      "6-dimenzionální skóre (kvalita, energetika, hlučnost, design, programy, spolehlivost)",
+      "Kompletní technická specifikace (kapacita, rozměry, motor, záruka)",
+      "Kde koupit — porovnání cen v 12 e-shopech",
+      "Pro koho je / pro koho není (ANO/NE bullets)",
+      "Co říká 2 000+ uživatelů na Heureka.cz",
+      "Alternativy — levnější, dražší prémie, modernější",
+    ],
+    howWeMakeIt: [
+      "Nákup modelu redakcí za běžnou tržní cenu",
+      "6-týdenní hands-on test v laboratoři + reálném prostředí",
+      "30+ testovacích cyklů (pračka), 100+ hodin (notebook), atd.",
+      "Konzultace garanta + analýza 2 000+ uživatelských recenzí",
+    ],
+    readingTime: "10–15 min",
+    productionTime: "6–8 týdnů",
+    whatYouLearn:
+      "Vše o jednom konkrétním modelu — jestli vám se hodí, co je jeho slabina, kolik stojí provoz na 10 let.",
+    bestFor:
+      "Konkrétní model jste si vyhlédli a hledáte detailní recenzi před nákupem. Nebo kontrola, jestli jste vybrali správně.",
+    sampleHref: "/recenze/bosch-wgg244a0by/",
+    sampleTitle: "Bosch WGG244A0BY recenze",
+    refreshCadence: "Pololetně + při významném update firmwaru",
+  },
+  {
+    id: "navod",
+    shortName: "Návod",
+    title: "Návod · Jak vybrat / jak používat",
+    subtitle: "Praktický průvodce procesem",
+    tone: "purple",
+    icon: "guide",
+    oneLiner:
+      "Strukturovaný how-to text — buď <strong>jak vybrat</strong> produkt v dané kategorii, nebo <strong>jak ho používat</strong> (instalace, údržba, řešení problémů).",
+    whatItContains: [
+      "Step-by-step proces (5–8 kroků s ilustracemi)",
+      "Checklisty před nákupem / před použitím",
+      "Časté chyby a jak se jim vyhnout",
+      "Q&A pro typické situace",
+      "Slovník pojmů přímo v textu",
+    ],
+    howWeMakeIt: [
+      "Strukturováno podle reálných uživatelských situací",
+      "Krok po kroku s reálnými screenshoty / fotkami",
+      "Test scénářů — opravdu jsme to zkusili",
+      "Garant podepíše návod (zejména u bezpečnostně citlivých kategorií)",
+    ],
+    readingTime: "8–15 min",
+    productionTime: "3–4 týdny",
+    whatYouLearn:
+      "Konkrétní postup, jak něco udělat — od výběru po praktické používání. Bez teorie navíc.",
+    bestFor:
+      "Chcete praktickou pomoc krok po kroku, ne hluboké pochopení. Hodí se před první koupí nebo po ní (kdy si nevíte rady).",
+    sampleHref: "/clanek/aku-brusky/",
+    sampleTitle: "Jak vybrat aku brusku (sekce v pillar článku)",
+    refreshCadence: "Při změně použité technologie nebo legislativy",
+  },
+  {
+    id: "brand-stranka",
+    shortName: "Brand stránka",
+    title: "Brand stránka · Profil značky",
+    subtitle: "Vše o jednom výrobci",
+    tone: "amber",
+    icon: "brand",
+    oneLiner:
+      "Přehled jedné konkrétní značky — <strong>historie, filozofie, řady produktů, servis a slabiny</strong>. Pro pochopení, jestli značce důvěřovat.",
+    whatItContains: [
+      "Historie značky (kdy založena, kde sídlo, vlastnictví)",
+      "Filozofie a positioning na trhu",
+      "Hlavní produktové řady s odkazem na testy",
+      "Servisní síť v ČR, dostupnost dílů",
+      "Záruky a podpora — co reálně značka dodržuje",
+      "Slabiny a opakované problémy z reálných zkušeností",
+    ],
+    howWeMakeIt: [
+      "Otevřené zdroje (výroční zprávy, oficiální komunikace)",
+      "Analýza 1 000+ uživatelských recenzí napříč produkty",
+      "Konzultace s nezávislými techniky a servisními partnery",
+      "Aktualizace při major změnách (akvizice, redesign loga, nová strategie)",
+    ],
+    readingTime: "10–15 min",
+    productionTime: "4–6 týdnů",
+    whatYouLearn:
+      "Komu důvěřovat jako značce — i mimo konkrétní produkt. Kdo má dlouhodobou kvalitu a kdo jen marketing.",
+    bestFor:
+      "Vybíráte si nejen produkt, ale i značku, které budete dlouhodobě věřit. Důležité u velkých investic (spotřebiče, auta, nářadí).",
+    sampleHref: "/znacky/bosch/",
+    sampleTitle: "Bosch — profil značky (chystáme)",
+    refreshCadence: "Ročně + při významných změnách na úrovni značky",
+  },
+  {
+    id: "novinky-magazin",
+    shortName: "Novinky",
+    title: "Novinky · Magazín",
+    subtitle: "Krátké aktuality a trendy",
+    tone: "blue",
+    icon: "news",
+    oneLiner:
+      "Krátký text — <strong>novinka z trhu</strong>, oznámení nového produktu, analýza tržního trendu nebo komentář k aktuální události.",
+    whatItContains: [
+      "Krátký shrnující perex (3–4 věty)",
+      "Co se stalo + proč na tom záleží",
+      "Náš editoriální komentář",
+      "Odkaz na detailní recenzi / pillar (pokud existuje)",
+    ],
+    howWeMakeIt: [
+      "Reagujeme na tržní novinky do 48 hodin",
+      "Vždy s editoriálním pohledem — neopisujeme tiskové zprávy",
+      "Při tvrzení o produktu vždy s odkazem na podrobný test",
+    ],
+    readingTime: "3–6 min",
+    productionTime: "1–3 dny",
+    whatYouLearn:
+      "Co je v branži nového a jak to interpretovat. Náhled na situaci s editoriálním kontextem.",
+    bestFor:
+      "Sledujete obor a chcete být v obraze. Hodí se k pravidelnému odběru našeho newsletteru.",
+    sampleHref: "/newsletter/",
+    sampleTitle: "Newsletter Recenzer.cz",
+    refreshCadence: "N/A — novinka má své datum a nepoužíváme refresh",
+  },
+  {
+    id: "rozhovor",
+    shortName: "Rozhovor",
+    title: "Rozhovor s garantem · Expert interview",
+    subtitle: "Q&A formát s odborníkem",
+    tone: "ink",
+    icon: "interview",
+    oneLiner:
+      "Strukturovaný rozhovor s <strong>odborným garantem dané kategorie</strong> — otázky redaktora, odpovědi praktika z oboru.",
+    whatItContains: [
+      "Bio rozhovořeného (kvalifikace, praxe, certifikáty)",
+      "12–20 otázek seřazených od základních po expertní",
+      "Citace v Q&A formátu s přesnými údaji",
+      "Body „klíčové insighty“ jako TL;DR pro spěchající",
+      "Odkaz na další zdroje od dotyčné osoby",
+    ],
+    howWeMakeIt: [
+      "Otázky připravuje redaktor na základě analýzy uživatelských dotazů",
+      "Rozhovor nahráváme (audio + video), přepisujeme přesně",
+      "Garant schválí finální text před publikací",
+      "Bez úprav citací — jen jazyková korektura",
+    ],
+    readingTime: "10–18 min",
+    productionTime: "2–3 týdny",
+    whatYouLearn:
+      "Pohled praktika z oboru — to, co se nedozvíte z manuálu ani z marketingu. Skutečné zkušenosti.",
+    bestFor:
+      "Chcete pohled „odzdola“ — od člověka, který v oboru reálně pracuje, ne jen píše. Doplněk k pillar článku.",
+    sampleHref: "/autor/jakub-novak/",
+    sampleTitle: "Rozhovor s Jakubem Novákem (chystáme)",
+    refreshCadence: "Bez refresh — rozhovor je historický záznam",
+  },
+  {
+    id: "recenze-eshopu",
+    shortName: "Recenze e-shopu",
+    title: "Recenze e-shopu · Where to buy",
+    subtitle: "Hodnocení nákupního zážitku",
+    tone: "red",
+    icon: "shop",
+    oneLiner:
+      "Hodnocení konkrétního e-shopu jako <strong>nákupního zážitku</strong> — ne produkty, ale doručení, reklamace, ceny, podpora.",
+    whatItContains: [
+      "Cenový monitoring — jak je e-shop konkurenceschopný",
+      "Test objednávky — doba doručení, balení, dostupnost",
+      "Test reklamace — kompletní průchod procesem",
+      "Zákaznická podpora — chat, telefon, e-mail (doba odpovědi)",
+      "Hodnocení na Heurece + analýza negativních recenzí",
+      "Jaké značky a kategorie vede / nevede",
+    ],
+    howWeMakeIt: [
+      "Reálné objednávky (placené z naší kasy)",
+      "Reklamace na úmyslně závadný produkt",
+      "Test komunikace mystery-shopper stylu",
+      "Roční refresh — e-shop se mění výrazně rychle",
+    ],
+    readingTime: "8–12 min",
+    productionTime: "8–12 týdnů (čekání na servisní reakce)",
+    whatYouLearn:
+      "Kde nakoupit — který e-shop má férové ceny, slušnou podporu a vyřízenou reklamaci. Praktické dataměření, ne marketing.",
+    bestFor:
+      "Rozhodujete se, kde nakoupit drahý produkt. Nebo plánujete dlouhodobou věrnost e-shopu.",
+    sampleHref: "/recenze-eshopu/datart/",
+    sampleTitle: "Datart.cz — recenze e-shopu (chystáme)",
+    refreshCadence: "Ročně + okamžitě při významné změně (vlastnictví, redesign)",
+  },
+];
+
+const decisionMatrix = [
+  {
+    situation: "Nákup poprvé v dané kategorii",
+    recommendation: "Hloubková analýza (pillar)",
+    href: "#hloubkova-analyza",
+    why: "Pochopíte celou kategorii — co je důležité, co marketing.",
+  },
+  {
+    situation: "Mám rozpočet, chci konkrétní model",
+    recommendation: "TOP žebříček",
+    href: "#top-zebricek",
+    why: "Konkrétní 1–2 modely k zakoupení podle vašeho rozpočtu.",
+  },
+  {
+    situation: "Rozhoduju se mezi A a B",
+    recommendation: "Srovnání head-to-head",
+    href: "#srovnani",
+    why: "Jasná odpověď, který z dvou kandidátů je lepší pro vás.",
+  },
+  {
+    situation: "Konkrétní model jsem si vybral",
+    recommendation: "Produktová recenze",
+    href: "#produktova-recenze",
+    why: "Hluboký detail jednoho modelu — silné a slabé stránky.",
+  },
+  {
+    situation: "Potřebuju krok-po-kroku radu",
+    recommendation: "Návod",
+    href: "#navod",
+    why: "Praktická pomoc — co dělat krok po kroku, bez teorie navíc.",
+  },
+  {
+    situation: "Chci vědět o značce, ne o produktu",
+    recommendation: "Brand stránka",
+    href: "#brand-stranka",
+    why: "Filozofie, historie, servis a opakované problémy značky.",
+  },
+  {
+    situation: "Sleduju trh a chci být v obraze",
+    recommendation: "Novinky / magazín",
+    href: "#novinky-magazin",
+    why: "Krátké aktuality s editoriálním komentářem.",
+  },
+  {
+    situation: "Hledám pohled praktika z oboru",
+    recommendation: "Rozhovor s garantem",
+    href: "#rozhovor",
+    why: "Skutečné zkušenosti člověka, který v oboru pracuje.",
+  },
+  {
+    situation: "Vybírám e-shop, kde nakoupit",
+    recommendation: "Recenze e-shopu",
+    href: "#recenze-eshopu",
+    why: "Doručení, reklamace, podpora — ne ceny produktů.",
+  },
+];
+
+const stats = [
+  { value: `${contentTypes.length}`, label: "typů obsahu" },
+  { value: "1–25", label: "min čtení podle typu" },
+  { value: "1 den–10 týd.", label: "produkční čas" },
+  { value: "100 %", label: "schvaluje šéfredaktor" },
+];
+---
+
+<BaseLayout
+  title="Typy obsahu — co najdete na Recenzer.cz | Recenzer"
+  description="9 typů redakčního obsahu na Recenzer.cz — od hloubkové analýzy přes TOP žebříčky po recenze e-shopů. Co kdy číst, jak vznikají a komu jsou určené."
+>
+  <PageBreadcrumbs
+    items={[
+      { href: "/", label: "Recenzer" },
+      { label: "Typy obsahu" },
+    ]}
+  />
+
+  <PageHero
+    eyebrow="Editorial standards · taxonomy"
+    eyebrowIcon="doc"
+    title="9 typů obsahu<br/><em>které najdete na webu</em>"
+    subtitle={`Recenzer.cz není jen „blog“. Máme <strong>9 různých redakčních formátů</strong>, každý s vlastní metodikou, časovou náročností a cílovou skupinou čtenářů. Tady je přehled, co kdy číst a co od jakého typu očekávat.`}
+  />
+
+  <!-- ============ STATS ============ -->
+  <section class="stats-strip">
+    <div class="inner">
+      <ul>
+        {
+          stats.map((s) => (
+            <li>
+              <strong>{s.value}</strong>
+              <span>{s.label}</span>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <!-- ============ DECISION MATRIX ============ -->
+  <section class="ct-matrix">
+    <div class="inner">
+      <header class="section-head">
+        <p class="eyebrow">Rychlý průvodce</p>
+        <h2>Co byste měli číst podle situace</h2>
+        <p class="lead">
+          Devět typických situací, ve kterých k nám čtenáři přijdou — a jaký formát doporučujeme.
+        </p>
+      </header>
+      <div class="matrix-table-wrap">
+        <table class="matrix-table">
+          <thead>
+            <tr>
+              <th>Vaše situace</th>
+              <th>Co číst</th>
+              <th>Proč zrovna to</th>
+            </tr>
+          </thead>
+          <tbody>
+            {
+              decisionMatrix.map((m) => (
+                <tr>
+                  <td><strong>{m.situation}</strong></td>
+                  <td>
+                    <a href={m.href} class="matrix-link">
+                      {m.recommendation}
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+                        <line x1="5" y1="12" x2="19" y2="12" />
+                        <polyline points="12 5 19 12 12 19" />
+                      </svg>
+                    </a>
+                  </td>
+                  <td class="matrix-why">{m.why}</td>
+                </tr>
+              ))
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ CONTENT TYPES ============ -->
+  {
+    contentTypes.map((ct) => (
+      <section class={`ct-section ct-tone-${ct.tone}`} id={ct.id}>
+        <div class="inner ct-grid">
+          <aside class="ct-meta">
+            <div class="ct-icon" aria-hidden="true">
+              {ct.icon === "doc" && (
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                  <polyline points="14 2 14 8 20 8" />
+                  <line x1="8" y1="13" x2="16" y2="13" />
+                  <line x1="8" y1="17" x2="16" y2="17" />
+                </svg>
+              )}
+              {ct.icon === "list" && (
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <line x1="8" y1="6" x2="21" y2="6" />
+                  <line x1="8" y1="12" x2="21" y2="12" />
+                  <line x1="8" y1="18" x2="21" y2="18" />
+                  <line x1="3" y1="6" x2="3.01" y2="6" />
+                  <line x1="3" y1="12" x2="3.01" y2="12" />
+                  <line x1="3" y1="18" x2="3.01" y2="18" />
+                </svg>
+              )}
+              {ct.icon === "vs" && (
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M9 3v18M15 3v18" />
+                  <path d="M5 8h2M5 16h2M17 8h2M17 16h2" />
+                </svg>
+              )}
+              {ct.icon === "product" && (
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="3" y="3" width="18" height="18" rx="2" />
+                  <circle cx="12" cy="13" r="5" />
+                </svg>
+              )}
+              {ct.icon === "guide" && (
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="3 6 8 6 8 18 3 18" />
+                  <polyline points="21 6 16 6 16 18 21 18" />
+                  <line x1="8" y1="12" x2="16" y2="12" />
+                </svg>
+              )}
+              {ct.icon === "brand" && (
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                </svg>
+              )}
+              {ct.icon === "news" && (
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-2 2zm0 0a2 2 0 0 1-2-2v-9c0-1.1.9-2 2-2h2" />
+                  <path d="M18 14h-8M15 18h-5M10 6h8v4h-8z" />
+                </svg>
+              )}
+              {ct.icon === "interview" && (
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+                </svg>
+              )}
+              {ct.icon === "shop" && (
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" />
+                  <line x1="3" y1="6" x2="21" y2="6" />
+                  <path d="M16 10a4 4 0 0 1-8 0" />
+                </svg>
+              )}
+            </div>
+            <span class="ct-short">{ct.shortName}</span>
+            <div class="ct-tags">
+              <div class="ct-tag">
+                <span class="ct-tag-label">Čtení</span>
+                <strong>{ct.readingTime}</strong>
+              </div>
+              <div class="ct-tag">
+                <span class="ct-tag-label">Tvorba</span>
+                <strong>{ct.productionTime}</strong>
+              </div>
+              <div class="ct-tag">
+                <span class="ct-tag-label">Refresh</span>
+                <strong>{ct.refreshCadence}</strong>
+              </div>
+            </div>
+            {ct.sampleHref && (
+              <a href={ct.sampleHref} class="ct-sample-link">
+                <span class="ct-sample-label">Vzorový článek</span>
+                <span class="ct-sample-title">{ct.sampleTitle}</span>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+                  <line x1="5" y1="12" x2="19" y2="12" />
+                  <polyline points="12 5 19 12 12 19" />
+                </svg>
+              </a>
+            )}
+          </aside>
+
+          <div class="ct-body">
+            <header class="ct-head">
+              <p class="ct-eyebrow">{ct.subtitle}</p>
+              <h2>{ct.title}</h2>
+              <p class="ct-oneliner" set:html={ct.oneLiner} />
+            </header>
+
+            <div class="ct-blocks">
+              <div class="ct-block">
+                <h3>Co tam najdete</h3>
+                <ul>
+                  {ct.whatItContains.map((c) => <li>{c}</li>)}
+                </ul>
+              </div>
+
+              <div class="ct-block">
+                <h3>Jak to vzniká</h3>
+                <ul>
+                  {ct.howWeMakeIt.map((c) => <li>{c}</li>)}
+                </ul>
+              </div>
+            </div>
+
+            <div class="ct-summary">
+              <div class="ct-summary-card">
+                <span class="ct-summary-label">Co se dozvíte</span>
+                <p>{ct.whatYouLearn}</p>
+              </div>
+              <div class="ct-summary-card">
+                <span class="ct-summary-label">Pro koho je ideální</span>
+                <p>{ct.bestFor}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    ))
+  }
+
+  <!-- ============ CROSS-LINK CTA ============ -->
+  <section class="ct-cta">
+    <div class="inner">
+      <div class="cta-card">
+        <h2>Stále nevíte, co číst?</h2>
+        <p>
+          Začněte u kategorie, která vás zajímá — homepage má rozcestník 6 hlavních témat. Nebo prozkoumejte mapu webu pro úplný přehled.
+        </p>
+        <div class="cta-actions">
+          <a href="/" class="btn-primary">
+            Hlavní stránka
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+              <line x1="5" y1="12" x2="19" y2="12" />
+              <polyline points="12 5 19 12 12 19" />
+            </svg>
+          </a>
+          <a href="/mapa-webu/" class="btn-ghost">Mapa webu</a>
+          <a href="/metodika/" class="btn-ghost">Metodika testů</a>
+          <a href="/autori/" class="btn-ghost">Autoři a garanti</a>
+        </div>
+      </div>
+      <p class="cta-meta">
+        Stránku aktualizujeme <time datetime={lastUpdated}>{lastUpdated}</time> · Pokud se přidává nový typ obsahu, doplníme sem.
+      </p>
+    </div>
+  </section>
+
+  <style>
+    .inner {
+      max-width: var(--max-w);
+      margin: 0 auto;
+      padding: clamp(2.5rem, 5vw, 4rem) var(--gutter);
+    }
+    .section-head {
+      max-width: 65ch;
+      margin: 0 0 2rem;
+    }
+    .eyebrow {
+      font-family: var(--mono);
+      font-size: 11.5px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--p-700);
+      font-weight: 700;
+      margin: 0 0 0.5rem;
+    }
+    .section-head h2 {
+      font-size: clamp(1.5rem, 3vw, 2.1rem);
+      font-weight: 800;
+      letter-spacing: -0.025em;
+      color: var(--ink);
+      line-height: 1.2;
+      margin-bottom: 0.6rem;
+    }
+    .section-head .lead {
+      font-size: 15px;
+      line-height: 1.6;
+      color: var(--muted);
+      margin: 0;
+    }
+
+    /* ============ STATS ============ */
+    .stats-strip {
+      background: var(--bg);
+      border-bottom: 1px solid var(--line);
+    }
+    .stats-strip .inner { padding: 2rem var(--gutter); }
+    .stats-strip ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1.5rem;
+    }
+    @media (max-width: 720px) {
+      .stats-strip ul { grid-template-columns: repeat(2, 1fr); gap: 1rem; }
+    }
+    .stats-strip li {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      padding-top: 0.75rem;
+      border-top: 2px solid var(--p-200);
+    }
+    .stats-strip strong {
+      font-size: clamp(1.5rem, 2.7vw, 2rem);
+      font-weight: 800;
+      color: var(--ink);
+      letter-spacing: -0.02em;
+      line-height: 1;
+    }
+    .stats-strip span {
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.3;
+    }
+
+    /* ============ MATRIX ============ */
+    .ct-matrix {
+      background: var(--bg-warm);
+      border-bottom: 1px solid var(--line);
+    }
+    .matrix-table-wrap {
+      overflow-x: auto;
+      background: var(--bg);
+      border: 1px solid var(--line);
+      border-radius: var(--r);
+    }
+    .matrix-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.92rem;
+      min-width: 800px;
+    }
+    .matrix-table thead th {
+      padding: 0.85rem 1rem;
+      background: var(--bg-warm);
+      text-align: left;
+      font-family: var(--mono);
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--p-700);
+      font-weight: 700;
+      border-bottom: 1px solid var(--line);
+    }
+    .matrix-table tbody td {
+      padding: 0.95rem 1rem;
+      border-bottom: 1px solid var(--line-soft);
+      vertical-align: middle;
+      color: var(--text);
+      line-height: 1.5;
+    }
+    .matrix-table tbody tr:last-child td { border-bottom: none; }
+    .matrix-table tbody tr:hover td { background: var(--bg-warm); }
+    .matrix-table strong { color: var(--ink); font-weight: 700; }
+    .matrix-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      color: var(--p-700);
+      text-decoration: none;
+      font-weight: 700;
+      font-size: 0.92rem;
+      padding: 0.3rem 0.7rem;
+      background: var(--p-50);
+      border-radius: 99px;
+      transition: background 0.15s ease;
+    }
+    .matrix-link:hover { background: var(--p-100); }
+    .matrix-link svg { width: 12px; height: 12px; }
+    .matrix-why { color: var(--muted); }
+
+    /* ============ CONTENT TYPE SECTION ============ */
+    .ct-section {
+      background: var(--bg);
+      border-bottom: 1px solid var(--line);
+      scroll-margin-top: 1.5rem;
+    }
+    .ct-section:nth-of-type(even) { background: var(--bg-alt); }
+
+    .ct-grid {
+      display: grid;
+      grid-template-columns: 280px 1fr;
+      gap: 2.5rem;
+      align-items: start;
+    }
+    @media (max-width: 900px) { .ct-grid { grid-template-columns: 1fr; gap: 1.5rem; } }
+
+    /* ============ META (LEFT COLUMN) ============ */
+    .ct-meta {
+      position: sticky;
+      top: 1rem;
+      padding: 1.5rem;
+      background: var(--bg);
+      border: 1px solid var(--line);
+      border-radius: var(--r-lg);
+    }
+    @media (max-width: 900px) { .ct-meta { position: static; } }
+
+    .ct-icon {
+      width: 56px;
+      height: 56px;
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 1rem;
+    }
+    .ct-icon svg { width: 28px; height: 28px; }
+
+    .ct-tone-purple .ct-icon { background: var(--p-50); color: var(--p-700); }
+    .ct-tone-amber .ct-icon { background: var(--amber-bg); color: var(--amber); }
+    .ct-tone-green .ct-icon { background: var(--green-bg); color: var(--green); }
+    .ct-tone-red .ct-icon { background: var(--red-bg); color: var(--red); }
+    .ct-tone-ink .ct-icon { background: rgba(20, 16, 50, 0.1); color: var(--ink); }
+    .ct-tone-blue .ct-icon { background: #e8f0fa; color: #0a4fa3; }
+
+    .ct-short {
+      display: inline-block;
+      font-family: var(--mono);
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--p-700);
+      font-weight: 700;
+      padding: 0.2rem 0.55rem;
+      background: var(--p-50);
+      border-radius: 4px;
+      margin-bottom: 1rem;
+    }
+    .ct-tone-amber .ct-short { color: var(--amber); background: var(--amber-bg); }
+    .ct-tone-green .ct-short { color: var(--green); background: var(--green-bg); }
+    .ct-tone-red .ct-short { color: var(--red); background: var(--red-bg); }
+    .ct-tone-ink .ct-short { color: var(--ink); background: rgba(20, 16, 50, 0.08); }
+    .ct-tone-blue .ct-short { color: #0a4fa3; background: #e8f0fa; }
+
+    .ct-tags {
+      display: flex;
+      flex-direction: column;
+      gap: 0.55rem;
+      margin-bottom: 1rem;
+    }
+    .ct-tag {
+      padding: 0.55rem 0.75rem;
+      background: var(--bg-warm);
+      border: 1px solid var(--line);
+      border-radius: var(--r-sm);
+    }
+    .ct-tag-label {
+      display: block;
+      font-family: var(--mono);
+      font-size: 0.65rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+      margin-bottom: 0.15rem;
+    }
+    .ct-tag strong {
+      font-size: 0.85rem;
+      color: var(--ink);
+      font-weight: 700;
+    }
+
+    .ct-sample-link {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+      padding: 0.8rem 0.9rem;
+      background: var(--p-700);
+      color: #fff;
+      border-radius: var(--r);
+      text-decoration: none;
+      position: relative;
+      transition: background 0.15s ease;
+    }
+    .ct-sample-link:hover { background: var(--p-800); }
+    .ct-sample-label {
+      font-family: var(--mono);
+      font-size: 0.65rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: rgba(255, 255, 255, 0.7);
+    }
+    .ct-sample-title {
+      font-size: 0.88rem;
+      font-weight: 700;
+      color: #fff;
+      line-height: 1.35;
+      padding-right: 1.25rem;
+    }
+    .ct-sample-link svg {
+      position: absolute;
+      right: 0.85rem;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 14px;
+      height: 14px;
+    }
+
+    /* ============ BODY (RIGHT COLUMN) ============ */
+    .ct-head { margin-bottom: 1.5rem; }
+    .ct-eyebrow {
+      font-family: var(--mono);
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--p-700);
+      font-weight: 700;
+      margin: 0 0 0.4rem;
+    }
+    .ct-tone-amber .ct-eyebrow { color: var(--amber); }
+    .ct-tone-green .ct-eyebrow { color: var(--green); }
+    .ct-tone-red .ct-eyebrow { color: var(--red); }
+    .ct-tone-blue .ct-eyebrow { color: #0a4fa3; }
+
+    .ct-head h2 {
+      font-family: var(--sans);
+      font-size: clamp(1.5rem, 3vw, 2rem);
+      font-weight: 800;
+      color: var(--ink);
+      letter-spacing: -0.025em;
+      line-height: 1.15;
+      margin: 0 0 0.85rem;
+    }
+    .ct-oneliner {
+      margin: 0;
+      font-size: 1.02rem;
+      line-height: 1.65;
+      color: var(--text);
+    }
+    .ct-oneliner :global(strong) { color: var(--ink); font-weight: 600; }
+
+    .ct-blocks {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+    @media (max-width: 720px) { .ct-blocks { grid-template-columns: 1fr; } }
+    .ct-block {
+      padding: 1.25rem;
+      background: var(--bg);
+      border: 1px solid var(--line);
+      border-radius: var(--r);
+    }
+    .ct-section:nth-of-type(even) .ct-block { background: var(--bg-alt); }
+    .ct-block h3 {
+      margin: 0 0 0.85rem;
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--ink);
+      padding-bottom: 0.5rem;
+      border-bottom: 1px dashed var(--line);
+    }
+    .ct-block ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 0.45rem;
+    }
+    .ct-block li {
+      position: relative;
+      padding-left: 1.2rem;
+      font-size: 0.88rem;
+      line-height: 1.5;
+      color: var(--text);
+    }
+    .ct-block li::before {
+      content: "✓";
+      position: absolute;
+      left: 0;
+      color: var(--green);
+      font-weight: 800;
+    }
+
+    .ct-summary {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.85rem;
+    }
+    @media (max-width: 720px) { .ct-summary { grid-template-columns: 1fr; } }
+    .ct-summary-card {
+      padding: 1.1rem 1.25rem;
+      background: var(--bg);
+      border: 1px solid var(--line);
+      border-left: 3px solid var(--p-500);
+      border-radius: var(--r);
+    }
+    .ct-tone-amber .ct-summary-card { border-left-color: var(--amber); }
+    .ct-tone-green .ct-summary-card { border-left-color: var(--green); }
+    .ct-tone-red .ct-summary-card { border-left-color: var(--red); }
+    .ct-tone-blue .ct-summary-card { border-left-color: #0a4fa3; }
+    .ct-tone-ink .ct-summary-card { border-left-color: var(--ink); }
+    .ct-summary-label {
+      display: block;
+      font-family: var(--mono);
+      font-size: 0.68rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--p-700);
+      font-weight: 700;
+      margin-bottom: 0.4rem;
+    }
+    .ct-tone-amber .ct-summary-label { color: var(--amber); }
+    .ct-tone-green .ct-summary-label { color: var(--green); }
+    .ct-tone-red .ct-summary-label { color: var(--red); }
+    .ct-tone-blue .ct-summary-label { color: #0a4fa3; }
+    .ct-tone-ink .ct-summary-label { color: var(--ink); }
+    .ct-summary-card p {
+      margin: 0;
+      font-size: 0.9rem;
+      line-height: 1.6;
+      color: var(--text);
+    }
+
+    /* ============ CTA ============ */
+    .ct-cta { background: var(--bg); }
+    .cta-card {
+      max-width: 760px;
+      margin: 0 auto;
+      padding: 2.5rem 2rem;
+      background: linear-gradient(135deg, var(--p-700), var(--p-900));
+      color: #fff;
+      border-radius: var(--r-xl);
+      text-align: center;
+    }
+    .cta-card h2 {
+      font-size: clamp(1.4rem, 2.6vw, 1.85rem);
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      margin-bottom: 0.6rem;
+    }
+    .cta-card p {
+      font-size: 1rem;
+      line-height: 1.6;
+      color: rgba(255, 255, 255, 0.85);
+      max-width: 56ch;
+      margin: 0 auto 1.5rem;
+    }
+    .cta-actions {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    .btn-primary,
+    .btn-ghost {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      padding: 0.8rem 1.3rem;
+      border-radius: var(--r);
+      font-size: 0.9rem;
+      font-weight: 700;
+      text-decoration: none;
+    }
+    .btn-primary {
+      background: var(--accent);
+      color: #fff;
+      border: 1px solid var(--accent);
+    }
+    .btn-primary:hover { background: #ff6600; }
+    .btn-primary svg { width: 14px; height: 14px; }
+    .btn-ghost {
+      background: rgba(255, 255, 255, 0.12);
+      color: #fff;
+      border: 1px solid rgba(255, 255, 255, 0.25);
+    }
+    .btn-ghost:hover { background: rgba(255, 255, 255, 0.2); }
+    .cta-meta {
+      margin: 1.5rem 0 0;
+      font-size: 0.78rem;
+      color: var(--muted);
+      text-align: center;
+    }
+  </style>
+</BaseLayout>

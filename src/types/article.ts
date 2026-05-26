@@ -51,6 +51,47 @@ export interface AffiliateDisclosure {
   link?: { href: string; label: string };
 }
 
+/**
+ * Jakým způsobem redakce produkt získala k testu.
+ * Povinné pole pro každý článek s recenzí — vyplývá z FTC pravidel (2009)
+ * a EU Směrnice o nekalých obchodních praktikách (Omnibus 2019/2161).
+ */
+export type AcquisitionMethod =
+  | "purchased" // Nakoupeno redakcí za běžnou tržní cenu
+  | "loaned" // Zapůjčeno výrobcem (vráceno po testu)
+  | "donated" // Darováno výrobcem (zůstává u redakce)
+  | "pr-agency" // Test od PR agentury (nevyžádaný)
+  | "reader"; // Crowdsource — produkt od čtenáře
+
+export interface ProductAcquisitionEntry {
+  /** Konkrétní název produktu (volitelné — při jediné metodě pro všechny). */
+  product?: string;
+  /** Jakou cestou redakce produkt získala. */
+  method: AcquisitionMethod;
+  /** Volitelná poznámka — datum, kusy, kolik stálo. */
+  note?: string;
+}
+
+export interface ProductAcquisition {
+  /**
+   * True = blok se zobrazí. False = článek se netýká testovaných produktů
+   * (např. čistě teoretický návod). Default povinný.
+   */
+  enabled: boolean;
+  /** Seznam — buď jeden záznam (summary), nebo per-product list. */
+  items: ProductAcquisitionEntry[];
+  /**
+   * Explicit answer — ovlivnil způsob získání hodnocení?
+   * answer: "no" (nezávislé), "partial" (částečně), "yes" (s důsledkem).
+   */
+  affectedRating: {
+    answer: "no" | "yes" | "partial";
+    explanation: string;
+  };
+  /** Volitelné: co se s produktem stalo po testu. */
+  afterTest?: string;
+}
+
 export interface Person {
   slug: string;
   name: string;
@@ -211,6 +252,8 @@ export interface Article {
   credibilityStats: CredibilityStat[];
   trustPills: TrustPill[];
   affiliateDisclosure: AffiliateDisclosure;
+  /** Povinný disclosure block — jak redakce produkt získala k testu. */
+  productAcquisition?: ProductAcquisition;
 
   // People
   author: Person;

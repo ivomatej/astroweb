@@ -1,0 +1,486 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import PageBreadcrumbs from "../components/page/PageBreadcrumbs.astro";
+import PageHero from "../components/page/PageHero.astro";
+
+const lastUpdated = "2026-05-21";
+
+interface ServiceOffer {
+  icon: "ad" | "data" | "event" | "lab" | "edu" | "syn";
+  title: string;
+  description: string;
+  pricing: string;
+  bestFor: string;
+}
+
+const services: ServiceOffer[] = [
+  {
+    icon: "ad",
+    title: "Display reklama na webu",
+    description:
+      "Bannerové reklamní pozice na hlavní stránce, kategorii, článku. <strong>Vždy viditelně označeno jako „Reklamní sdělení“</strong> — ne v textu redakčního obsahu.",
+    pricing: "CPM 280–380 Kč podle umístění a kategorie",
+    bestFor: "Brand awareness, výrobci v naší niche",
+  },
+  {
+    icon: "data",
+    title: "Custom market data report",
+    description:
+      "Připravíme vám reportaž z naší databáze — preference českých spotřebitelů, srovnání cen, vývoj kategorie. <strong>Data zveřejníme i pro veřejnost</strong>, exkluzivita 30 dnů.",
+    pricing: "Od 60 000 Kč podle rozsahu",
+    bestFor: "Marketing týmy, PR analytici",
+  },
+  {
+    icon: "event",
+    title: "Press event v laboratoři",
+    description:
+      "Uspořádáme prohlídku naší 180 m² laboratoře v Brně-Židenicích pro vaše PR oddělení a vybrané novináře. <strong>Bez podmínek na pozitivní pokrytí</strong> — jen reálný vhled do procesu.",
+    pricing: "Od 25 000 Kč (catering, prohlídka, foto)",
+    bestFor: "PR launch nových produktů",
+  },
+  {
+    icon: "lab",
+    title: "Test služby v laboratoři",
+    description:
+      "Otestujeme váš produkt v naší laboratoři podle ověřené metodiky. <strong>Výsledek dostanete jen vy</strong> — nepublikujeme bez vašeho souhlasu. Hodí se pro internal validation před launch.",
+    pricing: "15 000–120 000 Kč podle rozsahu",
+    bestFor: "Výrobci před launch, R&D týmy",
+  },
+  {
+    icon: "edu",
+    title: "Vzdělávací workshopy",
+    description:
+      "Lekce pro váš tým — affiliate marketing, recenzní žurnalistika, AI v médiích, SEO. <strong>Vede Ivo Matěj nebo seniorní redaktor</strong>. Online nebo fyzicky.",
+    pricing: "12 000–25 000 Kč / půldenní workshop",
+    bestFor: "Marketing týmy, agentury, agentury",
+  },
+  {
+    icon: "syn",
+    title: "Syndikace obsahu",
+    description:
+      "Licencujeme naše recenze pro vaše interní materiály, sales decks, B2B prezentace. <strong>S atribucí a aktualizací podle vašeho cyklu</strong>. Roční licence.",
+    pricing: "85 000–250 000 Kč / rok",
+    bestFor: "Distributoři, B2B prodejci",
+  },
+];
+
+interface Boundary {
+  title: string;
+  text: string;
+  tone: "do" | "dont";
+}
+
+const boundaries: Boundary[] = [
+  {
+    title: "Můžete u nás inzerovat",
+    tone: "do",
+    text:
+      "Display bannery, custom market reporty, press events, vzdělávání. Všechno mimo redakční obsah a vždy viditelně označené.",
+  },
+  {
+    title: "Můžete nám pomoct s research",
+    tone: "do",
+    text:
+      "Pošlete nám své produktové datasheety, beta vzorky, pozvánky na firemní akce. Použijeme jako jedny ze zdrojů — vždy se ale řídíme vlastní metodikou.",
+  },
+  {
+    title: "Můžete zaplatit za rychlejší recenzi",
+    tone: "do",
+    text:
+      "Jediný způsob, jak se dostat dříve do našeho redakčního pipeline, je <strong>zaslat produkt</strong> (pak je samozřejmě v acquisition disclosure jako „zapůjčeno“ nebo „darováno“).",
+  },
+  {
+    title: "Nemůžete koupit pozitivní recenzi",
+    tone: "dont",
+    text:
+      "Hodnocení produktu nezávisí na žádné finanční vazbě. Ani na zapůjčení, ani na affiliate provizi.",
+  },
+  {
+    title: "Nemůžete koupit pozici v žebříčku",
+    tone: "dont",
+    text:
+      "Pořadí v TOP X žebříčcích určuje výhradně testovací metodika a hodnocení redakce + garanta.",
+  },
+  {
+    title: "Nemůžete koupit „advertorial“ vydávaný za článek",
+    tone: "dont",
+    text:
+      "Komerční sdělení musí být zřetelně označeno. Žádné „native advertising“ vydávané za nezávislou recenzi.",
+  },
+  {
+    title: "Nemůžete žádat o smazání negativního obsahu",
+    tone: "dont",
+    text:
+      "Pokud máme s vaším produktem problém, najdete ho na webu i poté, co budete inzerovat. Faktická chyba se opraví, hodnocení ne.",
+  },
+];
+
+interface Trustpoint {
+  num: string;
+  title: string;
+  text: string;
+}
+
+const trustpoints: Trustpoint[] = [
+  {
+    num: "01",
+    title: "Smlouva s explicit Chinese wall doložkou",
+    text:
+      "V každé smlouvě o reklamní spolupráci je článek o oddělení obchodního a redakčního týmu. Etický kodex Recenzer.cz je její nedílnou součástí.",
+  },
+  {
+    num: "02",
+    title: "Veřejný rozpis příjmů",
+    text:
+      "Naše příjmy zveřejňujeme veřejně — viz <a href=\"/o-nas/#jak-vydelavame\">Jak vyděláváme</a>. Žádný klient nereprezentuje více než 5 % našeho ročního obratu.",
+  },
+  {
+    num: "03",
+    title: "Affiliate provize bez vlivu",
+    text:
+      "Autoři jsou placeni fixními honoráři. Affiliate příjmy jdou do společné kasy. Detail v <a href=\"/affiliate-disclosure/\">Affiliate disclosure</a>.",
+  },
+  {
+    num: "04",
+    title: "Editoriální veto šéfredaktora",
+    text:
+      "Šéfredaktor má veto nad jakoukoliv smlouvou, která by mohla ovlivnit obsah. Případy s vetem evidujeme v interním logu.",
+  },
+];
+---
+
+<BaseLayout
+  title="Pro značky, firmy a agentury — spolupráce s Recenzer.cz"
+  description="Možnosti spolupráce s Recenzer.cz pro výrobce, distributory, PR a marketingové agentury. Display reklama, market data, press events, laboratorní testy. Etické podmínky a Chinese wall."
+>
+  <PageBreadcrumbs items={[{ href: "/", label: "Recenzer" }, { label: "Pro značky, firmy a agentury" }]} />
+
+  <PageHero
+    eyebrow="B2B · komerční spolupráce"
+    eyebrowIcon="info"
+    title="Spolupráce s Recenzer.cz<br/>pro <em>značky a agentury</em>"
+    subtitle={`Recenzer.cz spolupracuje s desítkami českých i mezinárodních značek. <strong>Vždy ale podle pravidel</strong> — nákupní oddělení od redakce neoddělí jen brand guidelines, ale i konkrétní článek <a href="/kodex-ferove-firmy/">Kodex férové firmy</a>. Co u nás můžete a co ne.`}
+  />
+
+  <!-- ============ BOUNDARIES ============ -->
+  <section class="b2b-boundaries">
+    <div class="inner">
+      <header class="section-head">
+        <p class="eyebrow">Hranice spolupráce</p>
+        <h2>Co u nás můžete a co ne</h2>
+        <p class="lead">
+          Nepíšeme to obecně. <strong>Sedmí přesných pravidel</strong>, která definují, kde končí obchodní a začíná editoriální.
+        </p>
+      </header>
+      <ul class="boundary-list">
+        {
+          boundaries.map((b) => (
+            <li class={`boundary-card boundary-${b.tone}`}>
+              <div class="boundary-mark" aria-hidden="true">
+                {b.tone === "do" ? (
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                    <polyline points="20 6 9 17 4 12" />
+                  </svg>
+                ) : (
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                    <line x1="18" y1="6" x2="6" y2="18" />
+                    <line x1="6" y1="6" x2="18" y2="18" />
+                  </svg>
+                )}
+              </div>
+              <div class="boundary-body">
+                <h3>{b.title}</h3>
+                <p set:html={b.text} />
+              </div>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <!-- ============ SERVICES ============ -->
+  <section class="b2b-services">
+    <div class="inner">
+      <header class="section-head">
+        <p class="eyebrow">Co konkrétně nabízíme</p>
+        <h2>6 typů komerční spolupráce</h2>
+        <p class="lead">
+          Všechny mimo redakční obsah a vždy s pevnou cenou. Bez „zavolejte si pro nabídku" — sazby zveřejňujeme.
+        </p>
+      </header>
+      <ul class="services-grid">
+        {
+          services.map((s) => (
+            <li class="service-card">
+              <div class="service-icon" aria-hidden="true">
+                {s.icon === "ad" && (
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="3" width="18" height="18" rx="2" />
+                    <line x1="3" y1="9" x2="21" y2="9" />
+                    <line x1="9" y1="21" x2="9" y2="9" />
+                  </svg>
+                )}
+                {s.icon === "data" && (
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="18" y1="20" x2="18" y2="10" />
+                    <line x1="12" y1="20" x2="12" y2="4" />
+                    <line x1="6" y1="20" x2="6" y2="14" />
+                  </svg>
+                )}
+                {s.icon === "event" && (
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="4" width="18" height="18" rx="2" />
+                    <line x1="16" y1="2" x2="16" y2="6" />
+                    <line x1="8" y1="2" x2="8" y2="6" />
+                    <line x1="3" y1="10" x2="21" y2="10" />
+                  </svg>
+                )}
+                {s.icon === "lab" && (
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M10 2v7.31M14 9.3V2M8.5 2h7" />
+                    <path d="M14 9.3a6.5 6.5 0 1 1-4 0" />
+                  </svg>
+                )}
+                {s.icon === "edu" && (
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
+                    <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
+                  </svg>
+                )}
+                {s.icon === "syn" && (
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="17 1 21 5 17 9" />
+                    <path d="M3 11V9a4 4 0 0 1 4-4h14" />
+                    <polyline points="7 23 3 19 7 15" />
+                    <path d="M21 13v2a4 4 0 0 1-4 4H3" />
+                  </svg>
+                )}
+              </div>
+              <h3 class="service-title">{s.title}</h3>
+              <p class="service-desc" set:html={s.description} />
+              <div class="service-meta">
+                <div class="service-pricing">
+                  <span class="service-pricing-label">Cena</span>
+                  <strong>{s.pricing}</strong>
+                </div>
+                <div class="service-best">
+                  <span class="service-best-label">Pro koho</span>
+                  <span>{s.bestFor}</span>
+                </div>
+              </div>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <!-- ============ TRUST GUARANTEES ============ -->
+  <section class="b2b-trust">
+    <div class="inner">
+      <header class="section-head">
+        <p class="eyebrow">Garance editoriální nezávislosti</p>
+        <h2>4 závazky, které nikdy nepřekročíme</h2>
+        <p class="lead">
+          To není marketing. Tyto závazky jsou v každé smlouvě o reklamní spolupráci.
+        </p>
+      </header>
+      <ol class="trust-list">
+        {
+          trustpoints.map((t) => (
+            <li>
+              <span class="trust-num">{t.num}</span>
+              <div>
+                <h3>{t.title}</h3>
+                <p set:html={t.text} />
+              </div>
+            </li>
+          ))
+        }
+      </ol>
+    </div>
+  </section>
+
+  <!-- ============ CTA ============ -->
+  <section class="b2b-cta">
+    <div class="inner">
+      <div class="cta-card">
+        <h2>Chcete spolupracovat?</h2>
+        <p>
+          Začneme rozhovorem nad tím, co potřebujete. <strong>Žádné quick wins</strong> — všechny smlouvy jsou na minimálně 3 měsíce a předchází jim ověření shody s Kodexem férové firmy.
+        </p>
+        <div class="cta-actions">
+          <a href="mailto:obchod@recenzer.cz?subject=B2B%20zájem%20o%20spolupráci" class="btn-primary">
+            obchod@recenzer.cz
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+              <line x1="5" y1="12" x2="19" y2="12" />
+              <polyline points="12 5 19 12 12 19" />
+            </svg>
+          </a>
+          <a href="/kodex-ferove-firmy/" class="btn-ghost">Kodex férové firmy</a>
+          <a href="/eticky-kodex/" class="btn-ghost">Etický kodex</a>
+          <a href="/affiliate-disclosure/" class="btn-ghost">Affiliate disclosure</a>
+        </div>
+      </div>
+      <p class="cta-meta">
+        Sazebník platí do 31. 12. 2026 · Aktualizace <time datetime={lastUpdated}>{lastUpdated}</time>.
+      </p>
+    </div>
+  </section>
+
+  <style>
+    .inner { max-width: var(--max-w); margin: 0 auto; padding: clamp(2.5rem, 5vw, 4rem) var(--gutter); }
+    .section-head { max-width: 65ch; margin: 0 0 2rem; }
+    .eyebrow {
+      font-family: var(--mono); font-size: 11.5px; text-transform: uppercase;
+      letter-spacing: 0.1em; color: var(--p-700); font-weight: 700; margin: 0 0 0.5rem;
+    }
+    .section-head h2 {
+      font-size: clamp(1.5rem, 3vw, 2.1rem); font-weight: 800; letter-spacing: -0.025em;
+      color: var(--ink); line-height: 1.2; margin-bottom: 0.6rem;
+    }
+    .section-head .lead { font-size: 15px; line-height: 1.6; color: var(--muted); margin: 0; }
+    .section-head .lead strong { color: var(--ink); }
+    .section-head .lead a { color: var(--p-700); text-decoration: none; border-bottom: 1px dashed var(--p-300); }
+
+    /* BOUNDARIES */
+    .b2b-boundaries { background: var(--bg); border-bottom: 1px solid var(--line); }
+    .boundary-list {
+      list-style: none; padding: 0; margin: 0;
+      display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.75rem;
+    }
+    @media (max-width: 800px) { .boundary-list { grid-template-columns: 1fr; } }
+    .boundary-card {
+      display: grid; grid-template-columns: 36px 1fr; gap: 0.85rem;
+      padding: 1.1rem 1.3rem; background: var(--bg-warm);
+      border: 1px solid var(--line); border-radius: var(--r);
+    }
+    .boundary-do { border-left: 3px solid var(--green); }
+    .boundary-dont { border-left: 3px solid var(--red); }
+    .boundary-mark {
+      width: 36px; height: 36px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center; color: #fff;
+    }
+    .boundary-do .boundary-mark { background: var(--green); }
+    .boundary-dont .boundary-mark { background: var(--red); }
+    .boundary-mark svg { width: 18px; height: 18px; }
+    .boundary-body h3 {
+      margin: 0 0 0.35rem; font-size: 0.98rem; font-weight: 700; color: var(--ink);
+    }
+    .boundary-body p {
+      margin: 0; font-size: 0.88rem; line-height: 1.55; color: var(--text);
+    }
+    .boundary-body p :global(strong) { color: var(--ink); font-weight: 600; }
+
+    /* SERVICES */
+    .b2b-services { background: var(--bg-warm); border-bottom: 1px solid var(--line); }
+    .services-grid {
+      list-style: none; padding: 0; margin: 0;
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.85rem;
+    }
+    @media (max-width: 900px) { .services-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 540px) { .services-grid { grid-template-columns: 1fr; } }
+    .service-card {
+      padding: 1.5rem; background: var(--bg);
+      border: 1px solid var(--line); border-top: 3px solid var(--p-500);
+      border-radius: var(--r);
+      display: flex; flex-direction: column; gap: 0.85rem;
+    }
+    .service-icon {
+      width: 44px; height: 44px; border-radius: 12px;
+      background: var(--p-50); color: var(--p-700);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .service-icon svg { width: 22px; height: 22px; }
+    .service-title {
+      margin: 0; font-size: 1.05rem; font-weight: 800;
+      color: var(--ink); letter-spacing: -0.015em;
+    }
+    .service-desc {
+      margin: 0; font-size: 0.9rem; line-height: 1.6; color: var(--text);
+    }
+    .service-desc :global(strong) { color: var(--ink); font-weight: 600; }
+    .service-meta {
+      display: flex; flex-direction: column; gap: 0.55rem;
+      margin-top: auto; padding-top: 0.85rem; border-top: 1px dashed var(--line);
+    }
+    .service-pricing-label,
+    .service-best-label {
+      display: block; font-family: var(--mono); font-size: 0.65rem;
+      text-transform: uppercase; letter-spacing: 0.08em;
+      color: var(--p-700); font-weight: 700; margin-bottom: 0.15rem;
+    }
+    .service-pricing strong {
+      color: var(--green); font-weight: 800; font-size: 0.95rem;
+    }
+    .service-best span {
+      font-size: 0.82rem; color: var(--muted);
+    }
+
+    /* TRUST */
+    .b2b-trust { background: var(--bg); border-bottom: 1px solid var(--line); }
+    .trust-list {
+      list-style: none; padding: 0; margin: 0;
+      display: flex; flex-direction: column; gap: 0.85rem;
+      max-width: 880px;
+    }
+    .trust-list li {
+      display: grid; grid-template-columns: 56px 1fr; gap: 1.25rem;
+      padding: 1.25rem 1.5rem; background: var(--bg-warm);
+      border: 1px solid var(--line); border-left: 3px solid var(--green);
+      border-radius: var(--r);
+    }
+    @media (max-width: 540px) { .trust-list li { grid-template-columns: 1fr; gap: 0.5rem; } }
+    .trust-num {
+      font-family: var(--mono); font-size: 1.6rem; font-weight: 800;
+      color: var(--green); line-height: 1;
+    }
+    .trust-list h3 {
+      margin: 0 0 0.4rem; font-size: 1.05rem;
+      font-weight: 700; color: var(--ink);
+    }
+    .trust-list p {
+      margin: 0; line-height: 1.6; color: var(--text); font-size: 0.92rem;
+    }
+    .trust-list p :global(a) {
+      color: var(--p-700); text-decoration: none;
+      border-bottom: 1px dashed var(--p-300);
+    }
+
+    /* CTA */
+    .b2b-cta { background: var(--bg); }
+    .cta-card {
+      max-width: 760px; margin: 0 auto;
+      padding: 2.5rem 2rem;
+      background: linear-gradient(135deg, var(--p-700), var(--p-900));
+      color: #fff; border-radius: var(--r-xl); text-align: center;
+    }
+    .cta-card h2 {
+      font-size: clamp(1.4rem, 2.6vw, 1.85rem); font-weight: 800;
+      letter-spacing: -0.02em; margin-bottom: 0.6rem;
+    }
+    .cta-card p {
+      font-size: 1rem; line-height: 1.6; color: rgba(255, 255, 255, 0.85);
+      max-width: 56ch; margin: 0 auto 1.5rem;
+    }
+    .cta-card p strong { color: #ffd166; font-weight: 700; }
+    .cta-actions {
+      display: flex; gap: 0.5rem; flex-wrap: wrap; justify-content: center;
+    }
+    .btn-primary, .btn-ghost {
+      display: inline-flex; align-items: center; gap: 0.45rem;
+      padding: 0.8rem 1.3rem; border-radius: var(--r);
+      font-size: 0.9rem; font-weight: 700; text-decoration: none;
+    }
+    .btn-primary { background: var(--accent); color: #fff; border: 1px solid var(--accent); }
+    .btn-primary:hover { background: #ff6600; }
+    .btn-primary svg { width: 14px; height: 14px; }
+    .btn-ghost {
+      background: rgba(255, 255, 255, 0.12); color: #fff;
+      border: 1px solid rgba(255, 255, 255, 0.25);
+    }
+    .btn-ghost:hover { background: rgba(255, 255, 255, 0.2); }
+    .cta-meta { margin: 1.5rem 0 0; font-size: 0.78rem; color: var(--muted); text-align: center; }
+  </style>
+</BaseLayout>

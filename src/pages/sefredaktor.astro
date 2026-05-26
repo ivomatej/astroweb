@@ -1,0 +1,1333 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import PageBreadcrumbs from "../components/page/PageBreadcrumbs.astro";
+import PageHero from "../components/page/PageHero.astro";
+import { ivoMatej } from "../data/people";
+
+const lastUpdated = "2026-05-21";
+
+interface ContactChannel {
+  icon: "mail" | "phone" | "post" | "datova";
+  label: string;
+  value: string;
+  href?: string;
+  note: string;
+}
+
+const directContacts: ContactChannel[] = [
+  {
+    icon: "mail",
+    label: "Přímý e-mail šéfredaktora",
+    value: "ivo.matej@recenzer.cz",
+    href: "mailto:ivo.matej@recenzer.cz",
+    note: "Odpovídám zpravidla do 24 hodin v pracovní dny. Pro citlivé záležitosti (stížnost, právní podnět) preferuji e-mail.",
+  },
+  {
+    icon: "phone",
+    label: "Telefon do redakce",
+    value: "Doplnit po finalizaci pevné linky",
+    note: "Pevné číslo redakce s úředními hodinami Po–Pá 9:00–17:00. Mimo úřední dobu pouze SMS.",
+  },
+  {
+    icon: "post",
+    label: "Korespondenční adresa",
+    value: "Recenzer.cz / Ivo Matěj, Jankovcova 1535/2a, 170 00 Praha 7",
+    note: "Pro formální podání (stížnost, žádost o opravu, právní výzva). Doporučená pošta s dodejkou.",
+  },
+  {
+    icon: "datova",
+    label: "Datová schránka",
+    value: "Doplnit ID datové schránky Converso Group s.r.o.",
+    note: "Pro úřední komunikaci. Nejrychlejší cesta pro výzvy státních orgánů, ÚOOÚ a soudu.",
+  },
+];
+
+interface Responsibility {
+  icon: "doc" | "shield" | "scale" | "check" | "users" | "edit";
+  title: string;
+  text: string;
+}
+
+const responsibilities: Responsibility[] = [
+  {
+    icon: "doc",
+    title: "Veškerý publikovaný obsah",
+    text: "Odpovídám za to, že každý článek na Recenzer.cz prošel redakčním procesem podle <a href=\"/redakcni-zasady/\">Redakčních zásad</a>. Žádný obsah neprochází bez schválení.",
+  },
+  {
+    icon: "scale",
+    title: "Editoriální nezávislost",
+    text: "Garantuji, že obchodní oddělení nemá vliv na obsah recenzí. Affiliate partnerství neovlivňují hodnocení produktů. Detail v <a href=\"/eticky-kodex/\">Etickém kodexu</a>.",
+  },
+  {
+    icon: "check",
+    title: "Fakta a metodika testů",
+    text: "Schvaluji metodiku každé testovací řady (pračky, brusky, autosedačky). Pokud test nedrží <a href=\"/metodika/\">naše standardy</a>, neprojde do publikace.",
+  },
+  {
+    icon: "users",
+    title: "Personální obsazení redakce",
+    text: "Najímám autory a garanty. Kontroluju jejich kvalifikaci, ověřuju profesní certifikáty. Veřejné profily na <a href=\"/autori/\">/autori/</a> jsou výsledkem mé kontroly.",
+  },
+  {
+    icon: "edit",
+    title: "Opravy chyb a stížnosti",
+    text: "Konečné slovo má šéfredaktor. Pokud čtenář nahlásí chybu přes <a href=\"/oprava-chyb/\">formulář oprav</a> nebo eskaluje na mě, rozhoduju o opravě, dementi nebo stažení článku.",
+  },
+  {
+    icon: "shield",
+    title: "Soulad s právními předpisy",
+    text: "Dohlížím na soulad obsahu se zákonem č. 46/2000 Sb. (periodický tisk), občanským zákoníkem (ochrana osobnosti), zákonem č. 634/1992 Sb. (ochrana spotřebitele) a GDPR.",
+  },
+];
+
+interface Authority {
+  scope: string;
+  decision: string;
+  who: string;
+  appeal: string;
+}
+
+const authorityMatrix: Authority[] = [
+  {
+    scope: "Publikovat / stáhnout článek",
+    decision: "Konečné rozhodnutí",
+    who: "Šéfredaktor",
+    appeal: "Provozovatel (Converso Group s.r.o.) — jen v případě právních důvodů",
+  },
+  {
+    scope: "Změnit hodnocení produktu po publikaci",
+    decision: "Po konzultaci s autorem a garantem",
+    who: "Šéfredaktor + garant",
+    appeal: "Rozdílový hlas garanta v Knize chyb",
+  },
+  {
+    scope: "Reagovat na stížnost ohledně obsahu",
+    decision: "Konečné rozhodnutí",
+    who: "Šéfredaktor",
+    appeal: "Mediální rada / ČOI / ÚOOÚ (dle povahy)",
+  },
+  {
+    scope: "Přijmout / odmítnout placený obsah",
+    decision: "Před zveřejněním",
+    who: "Šéfredaktor + Etická komise",
+    appeal: "Bez odvolání — striktní zákaz nákupu pozitivních recenzí",
+  },
+  {
+    scope: "Odmítnout reklamní spolupráci",
+    decision: "Editoriální veto",
+    who: "Šéfredaktor",
+    appeal: "Bez odvolání",
+  },
+  {
+    scope: "Smazat komentář / banovat uživatele",
+    decision: "Eskalace od moderátora",
+    who: "Šéfredaktor",
+    appeal: "Vrácení účtu po písemné výzvě",
+  },
+  {
+    scope: "Personální rozhodnutí v redakci",
+    decision: "Konečné rozhodnutí",
+    who: "Šéfredaktor",
+    appeal: "Jednatel společnosti — jen u trvalého pracovního poměru",
+  },
+];
+
+interface ComplaintStep {
+  num: string;
+  title: string;
+  text: string;
+  timing: string;
+}
+
+const complaintProcess: ComplaintStep[] = [
+  {
+    num: "01",
+    title: "Pošlete podnět e-mailem",
+    text: "Napište mi na <a href=\"mailto:ivo.matej@recenzer.cz\">ivo.matej@recenzer.cz</a> s předmětem „Stížnost“. Uveďte konkrétní URL článku, popis problému a vaše požadované řešení (oprava, dementi, stažení).",
+    timing: "Do 24 hodin potvrzení přijetí",
+  },
+  {
+    num: "02",
+    title: "Posouzení v redakci",
+    text: "Společně s autorem článku a (pokud je relevantní) odborným garantem prověřím tvrzení. Mám na to <strong>5 pracovních dnů</strong>. U citlivých případů (lékařský, právní obsah) konzultuji s externím garantem.",
+    timing: "5 pracovních dnů",
+  },
+  {
+    num: "03",
+    title: "Odpověď s vyhodnocením",
+    text: "Dostanete odpověď s jedním z těchto výsledků: <strong>(a)</strong> oprava článku, <strong>(b)</strong> dementi či doplnění, <strong>(c)</strong> stažení článku, <strong>(d)</strong> zamítnutí podnětu s vysvětlením proč.",
+    timing: "Do 7 pracovních dnů od podnětu",
+  },
+  {
+    num: "04",
+    title: "Eskalace, pokud nejste spokojeni",
+    text: "Pokud vám moje rozhodnutí nesedí, máte právo na eskalaci. Podle typu podnětu na: <strong>Radu pro reklamu</strong> (klamavá reklama), <strong>ČOI</strong> (spotřebitelská práva), <strong>ÚOOÚ</strong> (osobní údaje) nebo <strong>soud</strong> (ochrana osobnosti).",
+    timing: "Bez časového limitu",
+  },
+  {
+    num: "05",
+    title: "Veřejná evidence chyb",
+    text: "Každá oprava, dementi i stažení článku se objeví na stránce <a href=\"/oprava-chyb/\">Oprava chyb</a>. Historii všech revizí konkrétního článku najdete přímo v sekci „Historie revizí“ pod článkem.",
+    timing: "Trvalý záznam",
+  },
+];
+
+interface DontDo {
+  text: string;
+}
+
+const wontDo: DontDo[] = [
+  { text: "Nebudu mazat negativní hodnocení produktu kvůli stížnosti výrobce." },
+  { text: "Nepřijmu objednanou „pozitivní recenzi“ za úplatu nebo barter — nikdy." },
+  { text: "Nezveřejním obsah, který nemá identifikovatelného autora a editoriální kontrolu." },
+  { text: "Nepublikuju komerční sdělení označené jako redakční obsah." },
+  { text: "Nepřebírám obsah z jiných webů jako vlastní (a jiným ho nedávám bezúplatně dál)." },
+  { text: "Nepublikuju údaje o soukromých osobách bez jejich souhlasu — kromě veřejně činných ve veřejně relevantních věcech." },
+];
+
+interface CertCard {
+  title: string;
+  body: string;
+  href: string;
+  badge: string;
+}
+
+const credBadges: CertCard[] = [
+  { title: "Etický kodex", body: "Pravidla, podle kterých redakce funguje", href: "/eticky-kodex/", badge: "Závazné" },
+  { title: "Redakční zásady", body: "Procesní pravidla a workflow", href: "/redakcni-zasady/", badge: "Veřejné" },
+  { title: "Metodika testů", body: "Jak vznikají recenze v laboratoři", href: "/metodika/", badge: "ISO standardy" },
+  { title: "Ověřování faktů", body: "Fact-checking proces v 5 krocích", href: "/overovani-faktu/", badge: "5 kroků" },
+  { title: "Oprava chyb", body: "Veřejná evidence všech revizí", href: "/oprava-chyb/", badge: "Trvalá" },
+  { title: "Impressum", body: "Údaje o provozovateli a redakci", href: "/impressum/", badge: "Zákonné" },
+];
+
+interface EscalationBody {
+  icon: "scale" | "users" | "shield" | "court";
+  name: string;
+  scope: string;
+  href: string;
+  hrefLabel: string;
+}
+
+const escalationBodies: EscalationBody[] = [
+  {
+    icon: "users",
+    name: "Rada pro reklamu (RPR)",
+    scope: "Klamavá reklama, srovnávací reklama, skryté komerční sdělení.",
+    href: "https://www.rpr.cz/",
+    hrefLabel: "rpr.cz",
+  },
+  {
+    icon: "shield",
+    name: "Česká obchodní inspekce (ČOI)",
+    scope: "Spotřebitelská práva, mimosoudní řešení sporů, klamavé obchodní praktiky.",
+    href: "https://www.coi.cz/",
+    hrefLabel: "coi.cz",
+  },
+  {
+    icon: "scale",
+    name: "Úřad pro ochranu osobních údajů (ÚOOÚ)",
+    scope: "GDPR, neoprávněné zveřejnění osobních údajů, právo na výmaz.",
+    href: "https://www.uoou.cz/",
+    hrefLabel: "uoou.cz",
+  },
+  {
+    icon: "court",
+    name: "Soud — žaloba na ochranu osobnosti",
+    scope: "Občanský zákoník § 81 a násl. — zásah do osobnostních práv.",
+    href: "https://www.justice.cz/",
+    hrefLabel: "justice.cz",
+  },
+];
+
+const stats = [
+  { value: "10", label: "let jako šéfredaktor (2016–)" },
+  { value: "120+", label: "schválených článků měsíčně" },
+  { value: "24 h", label: "průměrný čas reakce" },
+  { value: "5 dní", label: "lhůta na vyřízení stížnosti" },
+];
+---
+
+<BaseLayout
+  title="Šéfredaktor a odpovědný redaktor — Ivo Matěj | Recenzer"
+  description="Ivo Matěj je odpovědný redaktor Recenzer.cz dle zákona č. 46/2000 Sb. Přímý kontakt, rozsah odpovědnosti, rozhodovací pravomoc a postup pro stížnosti na obsah."
+>
+  <PageBreadcrumbs
+    items={[
+      { href: "/", label: "Recenzer" },
+      { label: "Šéfredaktor" },
+    ]}
+  />
+
+  <PageHero
+    eyebrow="Editor-in-chief · odpovědný redaktor"
+    eyebrowIcon="shield"
+    title="Šéfredaktor je<br/><em>jeden konkrétní člověk</em>"
+    subtitle="Za každé slovo na Recenzer.cz odpovídá <strong>Ivo Matěj</strong>. Není to právní fikce — je to praktická role. Tady najdete přímý kontakt, rozsah pravomoci a způsob, jak ho oslovit přímo, pokud máte stížnost nebo právní podnět."
+  />
+
+  <!-- ============ STATS ============ -->
+  <section class="stats-strip">
+    <div class="inner">
+      <ul>
+        {
+          stats.map((s) => (
+            <li>
+              <strong>{s.value}</strong>
+              <span>{s.label}</span>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <!-- ============ KDO JE EDITOR-IN-CHIEF ============ -->
+  <section class="eic-hero">
+    <div class="inner eic-hero-grid">
+      <div class="eic-avatar">
+        <span>{ivoMatej.initials}</span>
+      </div>
+      <div class="eic-body">
+        <p class="eic-role">Odpovědný redaktor · Editor-in-chief · Šéfredaktor</p>
+        <h2 class="eic-name">{ivoMatej.name}</h2>
+        <p class="eic-tagline">{ivoMatej.tagline}</p>
+        <div class="eic-meta">
+          <div class="eic-meta-item">
+            <span class="eic-meta-label">V této roli od</span>
+            <strong>2016 (10 let)</strong>
+          </div>
+          <div class="eic-meta-item">
+            <span class="eic-meta-label">Jmenován jednatelem</span>
+            <strong>Converso Group s.r.o.</strong>
+          </div>
+          <div class="eic-meta-item">
+            <span class="eic-meta-label">Právní rámec</span>
+            <strong>Zákon č. 46/2000 Sb., § 4</strong>
+          </div>
+        </div>
+        <div class="eic-quick-links">
+          <a href="/autor/ivo-matej/" class="eic-link">
+            <span>Plný profil a publikace</span>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"
+              ><line x1="5" y1="12" x2="19" y2="12" /><polyline points="12 5 19 12 12 19" /></svg
+            >
+          </a>
+          <a href="https://www.linkedin.com/in/ivomatej" rel="noopener" target="_blank" class="eic-link">
+            <span>LinkedIn</span>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"
+              ><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" /><polyline points="15 3 21 3 21 9" /><line x1="10" y1="14" x2="21" y2="3" /></svg
+            >
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ PŘÍMÝ KONTAKT ============ -->
+  <section class="eic-contacts">
+    <div class="inner">
+      <header class="section-head">
+        <p class="eyebrow">Přímý kontakt</p>
+        <h2>Jak mě oslovit přímo</h2>
+        <p class="lead">
+          Pokud se vás obsah dotýká osobně, máte právní podnět nebo chcete eskalovat — pište mi přímo. <strong>Neukrývám se za sekretariát.</strong>
+        </p>
+      </header>
+      <ul class="contact-grid">
+        {
+          directContacts.map((c) => (
+            <li class="contact-card">
+              <div class="contact-icon" aria-hidden="true">
+                {c.icon === "mail" && (
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
+                    <polyline points="22,6 12,13 2,6" />
+                  </svg>
+                )}
+                {c.icon === "phone" && (
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z" />
+                  </svg>
+                )}
+                {c.icon === "post" && (
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+                    <circle cx="12" cy="10" r="3" />
+                  </svg>
+                )}
+                {c.icon === "datova" && (
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="3" width="18" height="18" rx="2" />
+                    <line x1="3" y1="9" x2="21" y2="9" />
+                    <path d="m9 16 2 2 4-4" />
+                  </svg>
+                )}
+              </div>
+              <div class="contact-body">
+                <span class="contact-label">{c.label}</span>
+                {c.href ? (
+                  <a href={c.href} class="contact-value">{c.value}</a>
+                ) : (
+                  <strong class="contact-value contact-value-placeholder">
+                    <em>{c.value}</em>
+                  </strong>
+                )}
+                <p class="contact-note">{c.note}</p>
+              </div>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <!-- ============ ZA CO ODPOVÍDÁ ============ -->
+  <section class="eic-responsibilities">
+    <div class="inner">
+      <header class="section-head">
+        <p class="eyebrow">Rozsah odpovědnosti</p>
+        <h2>Za co konkrétně odpovídám</h2>
+        <p class="lead">
+          Být šéfredaktor není čestný titul — je to praktická role s konkrétními povinnostmi. Tady je <strong>šest oblastí</strong>, ve kterých je moje slovo poslední.
+        </p>
+      </header>
+      <ul class="resp-grid">
+        {
+          responsibilities.map((r) => (
+            <li class="resp-card">
+              <div class="resp-icon" aria-hidden="true">
+                {r.icon === "doc" && (
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                    <polyline points="14 2 14 8 20 8" />
+                  </svg>
+                )}
+                {r.icon === "scale" && (
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M16 16.4 8 4l-5 8h10" />
+                    <path d="m5 12 3 4M16 16.4l3-4.4h-7" />
+                    <line x1="8" y1="4" x2="8" y2="20" />
+                  </svg>
+                )}
+                {r.icon === "check" && (
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="9 11 12 14 22 4" />
+                    <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" />
+                  </svg>
+                )}
+                {r.icon === "users" && (
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                    <circle cx="9" cy="7" r="4" />
+                    <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+                    <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+                  </svg>
+                )}
+                {r.icon === "edit" && (
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 20h9" />
+                    <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4z" />
+                  </svg>
+                )}
+                {r.icon === "shield" && (
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                  </svg>
+                )}
+              </div>
+              <h3 class="resp-title">{r.title}</h3>
+              <p class="resp-text" set:html={r.text} />
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <!-- ============ ROZHODOVACÍ PRAVOMOC ============ -->
+  <section class="eic-authority">
+    <div class="inner">
+      <header class="section-head">
+        <p class="eyebrow">Rozhodovací pravomoc</p>
+        <h2>Co rozhoduje šéfredaktor, kde má veto a kdy je odvolání</h2>
+        <p class="lead">
+          Tabulka přesně mapuje, kdo má v daném okamžiku „poslední slovo" a kdo ho může přebít. <strong>Žádné šedé zóny.</strong>
+        </p>
+      </header>
+      <div class="authority-table-wrap">
+        <table class="authority-table">
+          <thead>
+            <tr>
+              <th>Oblast rozhodování</th>
+              <th>Typ rozhodnutí</th>
+              <th>Kdo rozhoduje</th>
+              <th>Odvolání / eskalace</th>
+            </tr>
+          </thead>
+          <tbody>
+            {
+              authorityMatrix.map((a) => (
+                <tr>
+                  <td><strong>{a.scope}</strong></td>
+                  <td>{a.decision}</td>
+                  <td><span class="auth-who">{a.who}</span></td>
+                  <td>{a.appeal}</td>
+                </tr>
+              ))
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ JAK ŘEŠIT STÍŽNOSTI ============ -->
+  <section class="eic-complaint">
+    <div class="inner">
+      <header class="section-head">
+        <p class="eyebrow">Stížnosti na obsah</p>
+        <h2>Pětikrokový postup, jak řeším podnět od čtenáře</h2>
+        <p class="lead">
+          Stížnost neignoruju a neodkládám. Tady je <strong>přesný proces s časovými lhůtami</strong>, který garantuju každému, kdo si na obsah Recenzer.cz stěžuje.
+        </p>
+      </header>
+      <ol class="complaint-list">
+        {
+          complaintProcess.map((s) => (
+            <li class="complaint-step">
+              <div class="complaint-num-wrap">
+                <span class="complaint-num">{s.num}</span>
+                <span class="complaint-timing">{s.timing}</span>
+              </div>
+              <div class="complaint-body">
+                <h3>{s.title}</h3>
+                <p set:html={s.text} />
+              </div>
+            </li>
+          ))
+        }
+      </ol>
+    </div>
+  </section>
+
+  <!-- ============ ESKALACE / ODVOLACÍ ORGÁNY ============ -->
+  <section class="eic-escalation">
+    <div class="inner">
+      <header class="section-head">
+        <p class="eyebrow">Eskalace mimo redakci</p>
+        <h2>Kam dál, pokud moje odpověď nestačí</h2>
+        <p class="lead">
+          Šéfredaktor není „konečná instance" — pokud vám moje rozhodnutí nesedí, máte právo eskalovat. <strong>Tady je rozcestník podle typu vašeho problému.</strong>
+        </p>
+      </header>
+      <ul class="escalation-grid">
+        {
+          escalationBodies.map((b) => (
+            <li class="escalation-card">
+              <div class="escalation-icon" aria-hidden="true">
+                {b.icon === "users" && (
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                    <circle cx="9" cy="7" r="4" />
+                    <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+                  </svg>
+                )}
+                {b.icon === "shield" && (
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                  </svg>
+                )}
+                {b.icon === "scale" && (
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M16 16.4 8 4l-5 8h10" />
+                    <path d="m5 12 3 4M16 16.4l3-4.4h-7" />
+                    <line x1="8" y1="4" x2="8" y2="20" />
+                  </svg>
+                )}
+                {b.icon === "court" && (
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M3 21h18" />
+                    <path d="M3 7l9-4 9 4" />
+                    <path d="M5 7v14M19 7v14M9 11v6M15 11v6" />
+                  </svg>
+                )}
+              </div>
+              <h3 class="escalation-name">{b.name}</h3>
+              <p class="escalation-scope">{b.scope}</p>
+              <a href={b.href} rel="noopener" target="_blank" class="escalation-link">
+                {b.hrefLabel}
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+                  <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+                  <polyline points="15 3 21 3 21 9" />
+                  <line x1="10" y1="14" x2="21" y2="3" />
+                </svg>
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <!-- ============ ČERVENÉ LINKY ============ -->
+  <section class="eic-wontdo">
+    <div class="inner">
+      <header class="section-head">
+        <p class="eyebrow">Červené linky</p>
+        <h2>Co jako šéfredaktor <em>nikdy</em> neudělám</h2>
+        <p class="lead">
+          Šest věcí, o kterých si <strong>nemůžete se mnou domluvit</strong> — ani za peníze, ani „výjimečně".
+        </p>
+      </header>
+      <ul class="wontdo-list">
+        {
+          wontDo.map((w) => (
+            <li class="wontdo-item">
+              <span class="wontdo-mark" aria-hidden="true">✕</span>
+              <span>{w.text}</span>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <!-- ============ EDITORIAL DOCS ============ -->
+  <section class="eic-docs">
+    <div class="inner">
+      <header class="section-head">
+        <p class="eyebrow">Související dokumenty</p>
+        <h2>Editoriální standardy</h2>
+        <p class="lead">
+          Šest veřejně dostupných dokumentů, podle kterých redakce funguje a podle kterých rozhoduju.
+        </p>
+      </header>
+      <ul class="docs-grid">
+        {
+          credBadges.map((c) => (
+            <li>
+              <a href={c.href} class="doc-card">
+                <span class="doc-badge">{c.badge}</span>
+                <h3>{c.title}</h3>
+                <p>{c.body}</p>
+                <span class="doc-arrow" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <line x1="5" y1="12" x2="19" y2="12" />
+                    <polyline points="12 5 19 12 12 19" />
+                  </svg>
+                </span>
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <!-- ============ KONTAKT CTA ============ -->
+  <section class="eic-cta">
+    <div class="inner">
+      <div class="cta-card">
+        <h2>Máte podnět k obsahu? Napište mi přímo.</h2>
+        <p>
+          E-mail jde jen do mojí schránky — nikoliv do obecného „info@". Reaguju do 24 hodin v pracovní dny. Pro citlivé záležitosti (právní podnět, soudní výzva) preferuji písemnou cestu.
+        </p>
+        <div class="cta-actions">
+          <a href="mailto:ivo.matej@recenzer.cz?subject=Stížnost na obsah" class="btn-primary">
+            ivo.matej@recenzer.cz
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+              <line x1="5" y1="12" x2="19" y2="12" />
+              <polyline points="12 5 19 12 12 19" />
+            </svg>
+          </a>
+          <a href="/oprava-chyb/" class="btn-ghost">Formulář oprav</a>
+          <a href="/kontakt/" class="btn-ghost">Obecný kontakt</a>
+          <a href="/impressum/" class="btn-ghost">Impressum</a>
+        </div>
+      </div>
+      <p class="cta-meta">
+        Aktualizováno <time datetime={lastUpdated}>{lastUpdated}</time> · Šéfredaktorem od roku <strong>2016</strong>
+      </p>
+    </div>
+  </section>
+
+  <style>
+    .inner {
+      max-width: var(--max-w);
+      margin: 0 auto;
+      padding: clamp(2.5rem, 5vw, 4rem) var(--gutter);
+    }
+    .section-head {
+      max-width: 65ch;
+      margin: 0 0 2rem;
+    }
+    .eyebrow {
+      font-family: var(--mono);
+      font-size: 11.5px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--p-700);
+      font-weight: 700;
+      margin: 0 0 0.5rem;
+    }
+    .section-head h2 {
+      font-size: clamp(1.5rem, 3vw, 2.1rem);
+      font-weight: 800;
+      letter-spacing: -0.025em;
+      color: var(--ink);
+      line-height: 1.2;
+      margin-bottom: 0.6rem;
+    }
+    .section-head h2 em {
+      font-style: italic;
+      color: var(--p-700);
+    }
+    .section-head .lead {
+      font-size: 15px;
+      line-height: 1.6;
+      color: var(--muted);
+      margin: 0;
+    }
+    .section-head .lead strong { color: var(--ink); }
+    .section-head .lead a { color: var(--p-700); border-bottom: 1px solid var(--p-300); text-decoration: none; }
+
+    /* ============ STATS STRIP ============ */
+    .stats-strip {
+      background: var(--bg);
+      border-bottom: 1px solid var(--line);
+    }
+    .stats-strip .inner { padding: 2rem var(--gutter); }
+    .stats-strip ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1.5rem;
+    }
+    @media (max-width: 720px) {
+      .stats-strip ul { grid-template-columns: repeat(2, 1fr); gap: 1rem; }
+    }
+    .stats-strip li {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      padding-top: 0.75rem;
+      border-top: 2px solid var(--p-200);
+    }
+    .stats-strip strong {
+      font-size: clamp(1.6rem, 3vw, 2.2rem);
+      font-weight: 800;
+      color: var(--ink);
+      letter-spacing: -0.02em;
+      line-height: 1;
+    }
+    .stats-strip span {
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.3;
+    }
+
+    /* ============ EIC HERO ============ */
+    .eic-hero {
+      background: var(--bg-warm);
+      border-bottom: 1px solid var(--line);
+    }
+    .eic-hero-grid {
+      display: grid;
+      grid-template-columns: 160px 1fr;
+      gap: 2rem;
+      align-items: center;
+    }
+    @media (max-width: 720px) {
+      .eic-hero-grid { grid-template-columns: 120px 1fr; gap: 1.5rem; }
+    }
+    @media (max-width: 480px) {
+      .eic-hero-grid { grid-template-columns: 1fr; text-align: center; }
+    }
+    .eic-avatar {
+      width: 160px;
+      height: 160px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--p-100), var(--p-200));
+      color: var(--p-700);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 56px;
+      letter-spacing: -0.02em;
+    }
+    @media (max-width: 720px) {
+      .eic-avatar { width: 120px; height: 120px; font-size: 42px; }
+    }
+    @media (max-width: 480px) {
+      .eic-avatar { margin: 0 auto; }
+    }
+
+    .eic-role {
+      font-family: var(--mono);
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--p-700);
+      font-weight: 700;
+      margin: 0 0 0.4rem;
+    }
+    .eic-name {
+      font-family: var(--sans);
+      font-size: clamp(1.6rem, 3vw, 2.2rem);
+      font-weight: 800;
+      letter-spacing: -0.025em;
+      color: var(--ink);
+      line-height: 1.1;
+      margin: 0 0 0.5rem;
+    }
+    .eic-tagline {
+      font-size: 1rem;
+      color: var(--ink-soft);
+      line-height: 1.55;
+      margin: 0 0 1.25rem;
+      max-width: 56ch;
+    }
+
+    .eic-meta {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.75rem;
+      margin-bottom: 1.25rem;
+    }
+    @media (max-width: 720px) {
+      .eic-meta { grid-template-columns: 1fr; }
+    }
+    .eic-meta-item {
+      padding: 0.8rem 1rem;
+      background: var(--bg);
+      border: 1px solid var(--line);
+      border-radius: var(--r);
+    }
+    .eic-meta-label {
+      display: block;
+      font-family: var(--mono);
+      font-size: 0.66rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--muted);
+      margin-bottom: 0.25rem;
+    }
+    .eic-meta-item strong {
+      color: var(--ink);
+      font-weight: 700;
+      font-size: 0.9rem;
+    }
+
+    .eic-quick-links {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+    @media (max-width: 480px) {
+      .eic-quick-links { justify-content: center; }
+    }
+    .eic-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.55rem 0.95rem;
+      background: var(--p-50);
+      border: 1px solid var(--p-200);
+      border-radius: 99px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--p-700);
+      text-decoration: none;
+      transition: background 0.15s ease;
+    }
+    .eic-link:hover { background: var(--p-100); }
+    .eic-link svg { width: 12px; height: 12px; }
+
+    /* ============ KONTAKTY ============ */
+    .eic-contacts {
+      background: var(--bg);
+      border-bottom: 1px solid var(--line);
+    }
+    .contact-grid {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 0.85rem;
+    }
+    @media (max-width: 800px) { .contact-grid { grid-template-columns: 1fr; } }
+    .contact-card {
+      display: grid;
+      grid-template-columns: 48px 1fr;
+      gap: 1rem;
+      padding: 1.25rem 1.4rem;
+      background: var(--bg-warm);
+      border: 1px solid var(--line);
+      border-radius: var(--r);
+    }
+    .contact-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      background: var(--p-50);
+      color: var(--p-700);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .contact-icon svg { width: 22px; height: 22px; }
+    .contact-label {
+      display: block;
+      font-family: var(--mono);
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+      margin-bottom: 0.3rem;
+    }
+    .contact-value {
+      display: block;
+      font-weight: 700;
+      color: var(--ink);
+      font-size: 0.98rem;
+      margin-bottom: 0.5rem;
+      text-decoration: none;
+      word-break: break-word;
+    }
+    a.contact-value:hover { color: var(--p-700); }
+    .contact-value-placeholder em {
+      font-style: italic;
+      color: var(--amber);
+      font-weight: 500;
+    }
+    .contact-note {
+      margin: 0;
+      font-size: 0.85rem;
+      color: var(--muted);
+      line-height: 1.55;
+    }
+
+    /* ============ ODPOVĚDNOSTI ============ */
+    .eic-responsibilities {
+      background: var(--bg-alt);
+      border-bottom: 1px solid var(--line);
+    }
+    .resp-grid {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.85rem;
+    }
+    @media (max-width: 880px) { .resp-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 540px) { .resp-grid { grid-template-columns: 1fr; } }
+    .resp-card {
+      padding: 1.5rem;
+      background: var(--bg);
+      border: 1px solid var(--line);
+      border-top: 3px solid var(--p-500);
+      border-radius: var(--r);
+    }
+    .resp-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      background: var(--p-50);
+      color: var(--p-700);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 0.85rem;
+    }
+    .resp-icon svg { width: 20px; height: 20px; }
+    .resp-title {
+      font-size: 1.05rem;
+      font-weight: 800;
+      color: var(--ink);
+      letter-spacing: -0.015em;
+      margin: 0 0 0.5rem;
+    }
+    .resp-text {
+      margin: 0;
+      font-size: 0.9rem;
+      line-height: 1.6;
+      color: var(--text);
+    }
+    .resp-text :global(a) {
+      color: var(--p-700);
+      text-decoration: none;
+      border-bottom: 1px dashed var(--p-300);
+    }
+    .resp-text :global(a:hover) { border-bottom-style: solid; }
+    .resp-text :global(strong) { color: var(--ink); font-weight: 600; }
+
+    /* ============ AUTHORITY TABLE ============ */
+    .eic-authority {
+      background: var(--bg);
+      border-bottom: 1px solid var(--line);
+    }
+    .authority-table-wrap {
+      overflow-x: auto;
+      border: 1px solid var(--line);
+      border-radius: var(--r);
+    }
+    .authority-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.88rem;
+      min-width: 800px;
+    }
+    .authority-table thead th {
+      padding: 0.85rem 1rem;
+      background: var(--bg-warm);
+      text-align: left;
+      font-family: var(--mono);
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--p-700);
+      font-weight: 700;
+      border-bottom: 1px solid var(--line);
+    }
+    .authority-table tbody td {
+      padding: 0.85rem 1rem;
+      border-bottom: 1px solid var(--line-soft);
+      vertical-align: top;
+      color: var(--text);
+      line-height: 1.5;
+    }
+    .authority-table tbody tr:last-child td { border-bottom: none; }
+    .authority-table tbody tr:hover td { background: var(--bg-warm); }
+    .authority-table strong { color: var(--ink); }
+    .auth-who {
+      display: inline-block;
+      padding: 0.2rem 0.55rem;
+      background: var(--p-50);
+      color: var(--p-700);
+      border-radius: 99px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      font-family: var(--mono);
+    }
+
+    /* ============ COMPLAINT PROCESS ============ */
+    .eic-complaint {
+      background: var(--bg-warm);
+      border-bottom: 1px solid var(--line);
+    }
+    .complaint-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 0.85rem;
+      counter-reset: complaint;
+    }
+    .complaint-step {
+      display: grid;
+      grid-template-columns: 100px 1fr;
+      gap: 1.5rem;
+      padding: 1.5rem;
+      background: var(--bg);
+      border: 1px solid var(--line);
+      border-radius: var(--r-lg);
+    }
+    @media (max-width: 600px) {
+      .complaint-step { grid-template-columns: 1fr; gap: 0.6rem; }
+    }
+    .complaint-num-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      gap: 0.4rem;
+    }
+    @media (max-width: 600px) {
+      .complaint-num-wrap { flex-direction: row; justify-content: flex-start; }
+    }
+    .complaint-num {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--p-700), var(--p-900));
+      color: #fff;
+      font-family: var(--sans);
+      font-weight: 800;
+      font-size: 1.5rem;
+      letter-spacing: -0.02em;
+    }
+    .complaint-timing {
+      font-family: var(--mono);
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--green);
+      font-weight: 700;
+      padding: 0.2rem 0.5rem;
+      background: var(--green-bg);
+      border-radius: 4px;
+    }
+    .complaint-body h3 {
+      margin: 0 0 0.4rem;
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--ink);
+    }
+    .complaint-body p {
+      margin: 0;
+      line-height: 1.65;
+      color: var(--text);
+      font-size: 0.92rem;
+    }
+    .complaint-body p :global(a) {
+      color: var(--p-700);
+      text-decoration: none;
+      border-bottom: 1px dashed var(--p-300);
+    }
+    .complaint-body p :global(strong) { color: var(--ink); font-weight: 600; }
+
+    /* ============ ESCALATION ============ */
+    .eic-escalation {
+      background: var(--bg);
+      border-bottom: 1px solid var(--line);
+    }
+    .escalation-grid {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 0.85rem;
+    }
+    @media (max-width: 720px) { .escalation-grid { grid-template-columns: 1fr; } }
+    .escalation-card {
+      padding: 1.5rem;
+      background: var(--bg-warm);
+      border: 1px solid var(--line);
+      border-left: 3px solid var(--amber);
+      border-radius: var(--r);
+    }
+    .escalation-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      background: var(--amber-bg);
+      color: var(--amber);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 0.85rem;
+    }
+    .escalation-icon svg { width: 22px; height: 22px; }
+    .escalation-name {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--ink);
+      margin: 0 0 0.5rem;
+    }
+    .escalation-scope {
+      margin: 0 0 0.85rem;
+      font-size: 0.88rem;
+      color: var(--muted);
+      line-height: 1.55;
+    }
+    .escalation-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-family: var(--mono);
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: var(--amber);
+      text-decoration: none;
+      border-bottom: 1px solid rgba(180, 83, 9, 0.3);
+    }
+    .escalation-link:hover { border-bottom-color: var(--amber); }
+    .escalation-link svg { width: 12px; height: 12px; }
+
+    /* ============ WONT DO ============ */
+    .eic-wontdo {
+      background: var(--red-bg);
+      border-bottom: 1px solid var(--line);
+    }
+    .eic-wontdo .eyebrow { color: var(--red); }
+    .wontdo-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 0.6rem;
+      max-width: 920px;
+    }
+    @media (max-width: 720px) { .wontdo-list { grid-template-columns: 1fr; } }
+    .wontdo-item {
+      display: grid;
+      grid-template-columns: 28px 1fr;
+      gap: 0.85rem;
+      padding: 1rem 1.25rem;
+      background: var(--bg);
+      border: 1px solid rgba(185, 28, 28, 0.18);
+      border-radius: var(--r);
+      align-items: center;
+      font-size: 0.92rem;
+      color: var(--text);
+      line-height: 1.5;
+    }
+    .wontdo-mark {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: var(--red);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 14px;
+    }
+
+    /* ============ DOCS ============ */
+    .eic-docs {
+      background: var(--bg-warm);
+      border-bottom: 1px solid var(--line);
+    }
+    .docs-grid {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.75rem;
+    }
+    @media (max-width: 800px) { .docs-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 480px) { .docs-grid { grid-template-columns: 1fr; } }
+    .doc-card {
+      position: relative;
+      display: block;
+      padding: 1.25rem 3rem 1.25rem 1.25rem;
+      background: var(--bg);
+      border: 1px solid var(--line);
+      border-radius: var(--r);
+      text-decoration: none;
+      color: inherit;
+      transition: transform 0.15s ease, border-color 0.15s ease;
+    }
+    .doc-card:hover {
+      transform: translateY(-2px);
+      border-color: var(--p-300);
+    }
+    .doc-badge {
+      display: inline-block;
+      font-family: var(--mono);
+      font-size: 0.65rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--p-700);
+      background: var(--p-50);
+      padding: 0.15rem 0.5rem;
+      border-radius: 4px;
+      margin-bottom: 0.6rem;
+      font-weight: 700;
+    }
+    .doc-card h3 {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--ink);
+      margin: 0 0 0.3rem;
+    }
+    .doc-card p {
+      margin: 0;
+      font-size: 0.82rem;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+    .doc-arrow {
+      position: absolute;
+      right: 1rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--p-500);
+      display: inline-flex;
+    }
+    .doc-arrow svg { width: 14px; height: 14px; }
+    .doc-card:hover .doc-arrow { color: var(--p-700); }
+
+    /* ============ CTA ============ */
+    .eic-cta {
+      background: var(--bg);
+    }
+    .cta-card {
+      max-width: 760px;
+      margin: 0 auto;
+      padding: 2.5rem 2rem;
+      background: linear-gradient(135deg, var(--p-700), var(--p-900));
+      color: #fff;
+      border-radius: var(--r-xl);
+      text-align: center;
+    }
+    .cta-card h2 {
+      font-size: clamp(1.4rem, 2.6vw, 1.85rem);
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      margin-bottom: 0.6rem;
+    }
+    .cta-card p {
+      font-size: 1rem;
+      line-height: 1.6;
+      color: rgba(255, 255, 255, 0.85);
+      max-width: 56ch;
+      margin: 0 auto 1.5rem;
+    }
+    .cta-actions {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    .cta-meta {
+      margin: 1.5rem 0 0;
+      font-size: 0.78rem;
+      color: var(--muted);
+      text-align: center;
+    }
+    .cta-meta strong { color: var(--ink); font-weight: 700; }
+
+    .btn-primary,
+    .btn-ghost {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      padding: 0.8rem 1.3rem;
+      border-radius: var(--r);
+      font-size: 0.9rem;
+      font-weight: 700;
+      text-decoration: none;
+    }
+    .btn-primary {
+      background: var(--accent);
+      color: #fff;
+      border: 1px solid var(--accent);
+    }
+    .btn-primary:hover { background: #ff6600; border-color: #ff6600; }
+    .btn-primary svg { width: 14px; height: 14px; }
+    .btn-ghost {
+      background: rgba(255, 255, 255, 0.12);
+      color: #fff;
+      border: 1px solid rgba(255, 255, 255, 0.25);
+    }
+    .btn-ghost:hover { background: rgba(255, 255, 255, 0.2); }
+  </style>
+</BaseLayout>

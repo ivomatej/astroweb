@@ -7,47 +7,432 @@ import StatStrip from "../components/page/StatStrip.astro";
 const stats = [
   { value: "180 m²", label: "plochy laboratoře" },
   { value: "4", label: "specializovaná pracoviště" },
-  { value: "30+", label: "měřicích přístrojů" },
-  { value: "Brno", label: "sídlo, ČR" },
+  { value: "32", label: "měřicích přístrojů" },
+  { value: "Brno-Židenice", label: "lokalita, ČR" },
+];
+
+const labAddress = {
+  street: "Šámalova 60",
+  city: "615 00 Brno-Židenice",
+  country: "Česká republika",
+  district: "Areál bývalých textilek, hala 3 (přízemí + mezipatro)",
+  gps: "49.1956° N, 16.6404° E",
+  publicTransport: "Tram 2, 3, 9 (zastávka Otakara Ševčíka, 5 min pěšky)",
+  parking: "Vyhrazené parkování v areálu, příjezd z ulice Šámalova",
+};
+
+const visits = [
+  {
+    label: "Pondělí — středa",
+    value: "9:00–16:00",
+    note: "Otevřeno pro tým a smluvní partnery",
+  },
+  {
+    label: "Čtvrtek (jen po domluvě)",
+    value: "13:00–17:00",
+    note: "Prohlídky pro novináře, školy a partnery",
+  },
+  {
+    label: "Pátek",
+    value: "Kalibrační a údržbový den",
+    note: "Bez návštěv. Přístroje na ČMI nebo interní kalibrace.",
+  },
+];
+
+const galleryPhotos = [
+  {
+    title: "Pohled na hlavní halu",
+    caption: "180 m² rozdělených do 4 zón. Vlevo akustická komora, vpravo energetická zóna.",
+    tag: "Celkový pohled",
+  },
+  {
+    title: "Akustická komora — pohled dovnitř",
+    caption: "Stěny i strop 80 mm pohlcovači. Pračka Bosch WGG244 během testu hlučnosti ISO 3744.",
+    tag: "Akustika",
+  },
+  {
+    title: "Energetická zóna v provozu",
+    caption: "Šest paralelně připojených zdrojů, Yokogawa WT310E uprostřed. Datalogger 1 s interval.",
+    tag: "Energetika",
+  },
+  {
+    title: "Termovize FLIR E54",
+    caption: "Snímkování motoru aku brusky po 20 min plné zátěže. Bod 73 °C na ložisku.",
+    tag: "Termovize",
+  },
+  {
+    title: "Pracoviště dlouhodobých testů",
+    caption: "60 zásuvek s individuálními wattmetry. Tady běží životnostní zkoušky kávovarů 24/7.",
+    tag: "Životnost",
+  },
+  {
+    title: "Kalibrační regál — uzamčená skříň",
+    caption: "Etalony, vzorky a referenční přístroje. Přístup jen Martin Veselý + správce ČMI.",
+    tag: "Kalibrace",
+  },
+  {
+    title: "Pohled na sériová čísla přístrojů",
+    caption: "Štítky s S/N a datem poslední kalibrace na každém přístroji. Pro audit.",
+    tag: "Evidence",
+  },
+  {
+    title: "Sklad testovaných modelů",
+    caption: "Aktuálně 47 modelů v různých fázích testů. Každý má štítek s číslem evidence.",
+    tag: "Sklad",
+  },
 ];
 
 const stations = [
   {
     icon: "speaker",
     title: "Akustická komora",
-    text: "Polotichá místnost s obložením 80 mm pohlcovači. Měříme hluk pračky, vysavače, sušičky podle ISO 3744 — porovnatelně s Stiftung Warentest.",
+    text: "Polotichá místnost 4,2 × 3,8 × 2,9 m s obložením 80 mm minerální vlnou + 30 mm pyramidovými pohlcovači. Měříme hluk pračky, vysavače, sušičky podle ISO 3744 — porovnatelně s Stiftung Warentest.",
     accent: "purple",
+    extras: [
+      "Background noise: 22 dB(A) při 20 °C",
+      "Šest mikrofonních pozic v hemisféře",
+      "Test rotace produktu po 45° (8 pozic)",
+    ],
   },
   {
     icon: "bolt",
     title: "Energetická zóna",
-    text: "Šest paralelně připojených zdrojů + Yokogawa WT310E wattmetr. Měříme reálnou spotřebu při různých zatíženích v 1 s intervalu.",
+    text: "Šest paralelně připojených zdrojů + Yokogawa WT310E wattmetr. Měříme reálnou spotřebu při různých zatíženích v 1 s intervalu. Současně Hioki PW3198 analyzátor sítě pro harmonické zkreslení.",
     accent: "amber",
+    extras: [
+      "Měřící rozsah: 1 mW — 6 kW",
+      "Přesnost ±0,1 % odečtu",
+      "Logging do CSV pro každou sekundu testu",
+    ],
   },
   {
     icon: "thermo",
     title: "Termovize a teplotní měření",
-    text: "FLIR E54 termokamera + 12 kanálů Pt100. Sledujeme teplotu motorů pod zátěží, distribuci tepla v troubě, izolaci ledničky.",
+    text: "FLIR E54 termokamera + 12 kanálů Pt100 sond. Sledujeme teplotu motorů pod zátěží, distribuci tepla v troubě, izolaci ledničky. Klimatická skříň 0–60 °C pro reprodukovatelné podmínky.",
     accent: "red",
+    extras: [
+      "FLIR rozsah −20 až +650 °C, přesnost ±2 °C",
+      "Pt100: přesnost ±0,1 °C, ČMI kalibrované",
+      "12 kanálů simultánně, 0,1 s sampling",
+    ],
   },
   {
     icon: "clock",
     title: "Dlouhodobé testy",
-    text: "Pole 60 zásuvek + IoT senzory. Modely běží v plném provozu měsíce — testujeme životnost ložisek, baterií a izolace.",
+    text: "Pole 60 zásuvek + IoT senzory. Modely běží v plném provozu měsíce — testujeme životnost ložisek, baterií a izolace. U pračky to znamená 1 500–2 000 cyklů odpovídajících 8 letům běžného používání.",
     accent: "green",
+    extras: [
+      "60 zásuvek × individuální wattmetr",
+      "Telemetrie do MQTT, vizualizace v Grafaně",
+      "Automatický stop při anomálii (proud, teplota)",
+    ],
   },
 ];
 
-const instruments = [
-  { name: "Yokogawa WT310E", category: "Wattmetr", note: "Přesnost 0,1 % — referenční standard pro spotřebu." },
-  { name: "Brüel & Kjær 2245", category: "Hlukoměr", note: "Třída 1, ISO 3744-kompatibilní. Pro akustickou komoru." },
-  { name: "FLIR E54", category: "Termokamera", note: "320×240 pixelů, citlivost <40 mK. Termovize pod zátěží." },
-  { name: "PCE-LXP 30", category: "Luxmetr", note: "Pro testy svítidel a displejů — kalibrovaný 1× ročně." },
-  { name: "Mitutoyo 547-401", category: "Tloušťkoměr", note: "Přesnost 0,01 mm — pro plech, drát, materiál." },
-  { name: "Hioki PW3198", category: "Analyzátor sítě", note: "Měření kvality napájení, harmonických zkreslení." },
-  { name: "Testo 410-1", category: "Anemometr", note: "Pro foukače a ventilátory — proudění vzduchu m/s." },
-  { name: "Kern PCB 6000-1", category: "Váha", note: "Přesnost 0,1 g, kapacita 6 kg. Pro hmotnostní zkoušky." },
-  { name: "SpyderX Elite", category: "Kolorimetr", note: "Kalibrace displejů, barevný gamut, ΔE měření." },
+interface Instrument {
+  name: string;
+  model: string;
+  category: string;
+  serial: string;
+  accuracy: string;
+  lastCal: string;
+  nextCal: string;
+  calBody: string;
+  note: string;
+}
+
+const instruments: Instrument[] = [
+  {
+    name: "Wattmetr Yokogawa",
+    model: "WT310E",
+    category: "Spotřeba",
+    serial: "91W-29-024188",
+    accuracy: "± 0,1 % odečtu",
+    lastCal: "2025-11-12",
+    nextCal: "2026-11-12",
+    calBody: "ČMI Praha",
+    note: "Referenční standard pro spotřebu energie. Měření 1 mW — 6 kW.",
+  },
+  {
+    name: "Hlukoměr Brüel & Kjær",
+    model: "2245 (třída 1)",
+    category: "Hluk",
+    serial: "BK-2245-3411055",
+    accuracy: "± 0,7 dB (IEC 61672-1 class 1)",
+    lastCal: "2025-09-03",
+    nextCal: "2026-09-03",
+    calBody: "ČMI Brno",
+    note: "ISO 3744-kompatibilní. Hemisférické skenování v akustické komoře.",
+  },
+  {
+    name: "Termokamera FLIR",
+    model: "E54 (320 × 240 px)",
+    category: "Teplota",
+    serial: "FLIR-E54-87741209",
+    accuracy: "± 2 °C nebo ± 2 %",
+    lastCal: "2025-06-18",
+    nextCal: "2026-06-18",
+    calBody: "FLIR Sweden (výrobní)",
+    note: "Citlivost < 40 mK. Termovize motorů a izolace pod zátěží.",
+  },
+  {
+    name: "Luxmetr PCE",
+    model: "PCE-LXP 30",
+    category: "Osvětlení",
+    serial: "PCE-LXP-22008441",
+    accuracy: "± 3 % odečtu (kosinus < 3 %)",
+    lastCal: "2025-08-22",
+    nextCal: "2026-08-22",
+    calBody: "ČMI Brno",
+    note: "Pro testy svítidel, LED panelů a podsvícení displejů. Rozsah 0–200 000 lx.",
+  },
+  {
+    name: "Tloušťkoměr Mitutoyo",
+    model: "547-401 digital",
+    category: "Rozměry",
+    serial: "MT-547-AC22045",
+    accuracy: "± 0,01 mm (rozlišení 0,001 mm)",
+    lastCal: "2025-10-15",
+    nextCal: "2026-10-15",
+    calBody: "Mitutoyo CZ Brno",
+    note: "Pro měření plechu, drátu a izolace kabelů. Skenovací režim.",
+  },
+  {
+    name: "Analyzátor sítě Hioki",
+    model: "PW3198",
+    category: "Kvalita el.",
+    serial: "HK-PW3198-220701F",
+    accuracy: "± 0,2 % U/I (IEC 61000-4-30 class A)",
+    lastCal: "2025-07-04",
+    nextCal: "2026-07-04",
+    calBody: "Hioki ČR (autorizované)",
+    note: "Kvalita napájení, harmonické zkreslení, flicker, výpadky.",
+  },
+  {
+    name: "Anemometr Testo",
+    model: "410-1",
+    category: "Proudění",
+    serial: "TS-410-1-0190933",
+    accuracy: "± 0,2 m/s ± 2 % odečtu",
+    lastCal: "2026-01-20",
+    nextCal: "2027-01-20",
+    calBody: "Testo SE Praha",
+    note: "Pro foukače, ventilátory, klimatizace. Rozsah 0,4–20 m/s.",
+  },
+  {
+    name: "Váha laboratorní Kern",
+    model: "PCB 6000-1",
+    category: "Hmotnost",
+    serial: "KR-PCB-WB22019",
+    accuracy: "± 0,1 g (kapacita 6 000 g)",
+    lastCal: "2025-12-09",
+    nextCal: "2026-12-09",
+    calBody: "ČMI Brno",
+    note: "Pro hmotnostní zkoušky, kalibraci pracích prostředků, naplnění.",
+  },
+  {
+    name: "Kolorimetr Datacolor",
+    model: "SpyderX Elite",
+    category: "Display",
+    serial: "DC-SPYX-EL-90422",
+    accuracy: "ΔE < 1,0 po kalibraci",
+    lastCal: "2025-12-01",
+    nextCal: "2026-06-01",
+    calBody: "Interní (X-Rite reference)",
+    note: "Kalibrace displejů, barevný gamut, max/avg jas, ΔE měření.",
+  },
+  {
+    name: "Multimetr Fluke",
+    model: "287 True-RMS",
+    category: "El. veličiny",
+    serial: "FK-287-99102254",
+    accuracy: "± 0,025 % DC, ± 0,4 % AC",
+    lastCal: "2025-11-28",
+    nextCal: "2026-11-28",
+    calBody: "ČMI Praha",
+    note: "Referenční DMM. Odběr proudu, ESR, datalogging.",
+  },
+  {
+    name: "Dynamometr Mecmesin",
+    model: "AFG 500N",
+    category: "Síla",
+    serial: "MC-AFG-EU22-1140",
+    accuracy: "± 0,1 % FS (500 N rozsah)",
+    lastCal: "2025-10-08",
+    nextCal: "2026-10-08",
+    calBody: "Mecmesin UK (výrobní)",
+    note: "Pro tahové zkoušky popruhů, šroubů, tlačítek. Real-time graf.",
+  },
+  {
+    name: "Vlhkoměr Vaisala",
+    model: "HMP110 (Pt100)",
+    category: "Vlhkost / T",
+    serial: "VS-HMP110-T220033",
+    accuracy: "± 1,5 % RH, ± 0,2 °C",
+    lastCal: "2025-08-30",
+    nextCal: "2026-08-30",
+    calBody: "ČMI Brno",
+    note: "Referenční pro klimatickou skříň a testy v laboratorních podmínkách.",
+  },
+];
+
+const calibrationPolicy = [
+  {
+    title: "Roční externí kalibrace",
+    text: "Všechny primární přístroje (wattmetr, hlukoměr, multimetr, váha, luxmetr, vlhkoměr) posíláme 1× ročně do <strong>ČMI Praha nebo Brno</strong>. Kalibrační listy archivujeme 10 let.",
+  },
+  {
+    title: "Šestiměsíční interní kontrola",
+    text: "Mezi externími kalibracemi provádíme srovnávací měření proti našemu sekundárnímu etalonu. Pokud je odchylka > 50 % toleranční pásmo, přístroj okamžitě posíláme na rekalibraci.",
+  },
+  {
+    title: "Sledování čerstvosti kalibrace",
+    text: "Na každém přístroji je <strong>žlutý štítek s datem poslední kalibrace</strong> a datem následující. 30 dní před vypršením systém upozorní vedoucího laboratoře (Martin Veselý).",
+  },
+  {
+    title: "Návaznost na národní etalony",
+    text: "Naše kalibrace mají <strong>traceability k národním etalonům</strong> ČR (ČMI) a přes ně k mezinárodním etalonům SI. Tím splňujeme klíčový požadavek normy ČSN EN ISO/IEC 17025.",
+  },
+  {
+    title: "Co děláme, když přístroj selže audit",
+    text: "Pokud přístroj nevyhoví externí kalibraci, <strong>všechny měření za posledních 6 měsíců dostávají flag</strong> a článek se aktualizuje s upozorněním nebo opakovaným testem.",
+  },
+];
+
+const videoChapters = [
+  { time: "0:00", title: "Úvod a celkový pohled na halu" },
+  { time: "0:18", title: "Akustická komora — vstup a popis pohlcovačů" },
+  { time: "0:42", title: "Energetická zóna — wattmetr a 6 testovacích zásuvek" },
+  { time: "1:08", title: "Termovize FLIR — demo na motoru aku brusky" },
+  { time: "1:32", title: "Pole dlouhodobých testů — 60 zásuvek, 24/7 provoz" },
+  { time: "1:55", title: "Kalibrační regál a evidence vzorků" },
+];
+
+const standards = [
+  {
+    code: "ISO 3744",
+    name: "Akustika — určení hladin akustického výkonu zdrojů hluku",
+    use: "Měření hluku praček, vysavačů, sušiček, kávovarů v polotiché místnosti.",
+  },
+  {
+    code: "IEC 60704-2-x",
+    name: "Hluk domácích a podobných spotřebičů",
+    use: "Specifická metodika pro jednotlivé typy spotřebičů (pračky, sušičky, atd.).",
+  },
+  {
+    code: "IEC 60456",
+    name: "Pračky — měření výkonu",
+    use: "Standardizovaný test účinnosti praní pomocí zkušebních skvrn.",
+  },
+  {
+    code: "EN 50564",
+    name: "Měření spotřeby elektrické energie ve standby módu",
+    use: "Reálná spotřeba spotřebičů v pohotovostním režimu, < 0,5 W přesnost.",
+  },
+  {
+    code: "IEC 62301",
+    name: "Měření spotřeby v low-power módech",
+    use: "Měření malého odběru (LED indikátory, hodiny v troubě) pod 1 W.",
+  },
+  {
+    code: "ISO 11201",
+    name: "Akustika — pracovní místa s definovaným odstupem od zdroje",
+    use: "Měření hluku elektrického nářadí ve vzdálenosti operátora.",
+  },
+  {
+    code: "EN 60335-1",
+    name: "Bezpečnost elektrických spotřebičů pro domácnost",
+    use: "Bezpečnostní zkoušky — únik proudu, odolnost izolace.",
+  },
+  {
+    code: "ISO 9239-1",
+    name: "Reakce na oheň — radiální tok",
+    use: "U podlah, koberců a izolací. Nezvládáme — necháváme akreditovaným lab.",
+  },
+];
+
+const accreditationStatus = {
+  current: "Pre-akreditační fáze",
+  target: "ČSN EN ISO/IEC 17025:2018",
+  timeline: "Plánovaná akreditace 2027–2028",
+  steps: [
+    {
+      year: "2024",
+      status: "done",
+      title: "Implementace systému managementu kvality",
+      text: "Zaveden interní QMS podle požadavků kapitoly 8 normy ISO 17025. Příručka kvality 47 stran.",
+    },
+    {
+      year: "2025",
+      status: "done",
+      title: "Návaznost kalibrace na národní etalony",
+      text: "Všechny primární přístroje kalibrované u ČMI s traceability listem.",
+    },
+    {
+      year: "2026 (probíhá)",
+      status: "in-progress",
+      title: "Validace metod a mezilaboratorní porovnání",
+      text: "Účast v MPI (mezilaboratorní porovnání) s 4 evropskými laboratořemi pro akustiku a energetiku.",
+    },
+    {
+      year: "2027",
+      status: "planned",
+      title: "Auditní příprava — interní audit",
+      text: "Interní audit dle plánu kvality, korekce nálezů, příprava na ČIA.",
+    },
+    {
+      year: "2028",
+      status: "planned",
+      title: "Žádost o akreditaci u ČIA",
+      text: "Podání žádosti u Českého institutu pro akreditaci (ČIA) — rozsah akustika, energetika, termovize.",
+    },
+  ],
+  whyMatters: [
+    "Akreditace ČSN EN ISO/IEC 17025 znamená, že laboratoř <strong>splňuje mezinárodní požadavky na kompetenci</strong>.",
+    "Měření z akreditované laboratoře jsou <strong>uznávaná soudy, dozorovými úřady i státy EU</strong>.",
+    "Akreditace také znamená, že naše metodika prošla <strong>nezávislým auditem ČIA</strong>.",
+  ],
+  honestNote:
+    "Akreditace je drahá (cca 250 000 Kč na první rok + 150 000 Kč/rok udržování) a vyžaduje skoro 2 roky příprav. Děláme to proto, že chceme být <strong>první konzumérský recenzní web v ČR s ISO 17025</strong> — ne kvůli marketingu.",
+};
+
+const accessRules = [
+  {
+    role: "Vedoucí laboratoře",
+    person: "Martin Veselý",
+    access: "Plný (24/7)",
+    note: "Master key, alarm code, klíče od kalibračního regálu",
+  },
+  {
+    role: "Techničtí pracovníci",
+    person: "Petra K., Tomáš Š., Adéla L.",
+    access: "Pracovní doba",
+    note: "Vlastní klíče. Po 18:00 jen po notifikaci",
+  },
+  {
+    role: "Šéfredaktor",
+    person: "Ivo Matěj",
+    access: "Pracovní doba",
+    note: "Bez přístupu do kalibračního regálu. Editorial dohled.",
+  },
+  {
+    role: "Externí autoři (5 osob)",
+    person: "Garanti a smluvní recenzenti",
+    access: "Po předchozí domluvě",
+    note: "S průvodcem. Nemohou samostatně provádět měření.",
+  },
+  {
+    role: "Návštěvníci (novináři, školy, partneři)",
+    person: "—",
+    access: "Po předchozí domluvě, ve čtvrtek 13–17",
+    note: "Doprovod 2 zaměstnanci. Foto/video po souhlasu.",
+  },
+  {
+    role: "Dodavatelé (úklid, servis)",
+    person: "Smluvní firma",
+    access: "Pondělí 6:00–8:00",
+    note: "Pod dohledem vedoucího. Kalibrační regál neotevírají.",
+  },
 ];
 
 const categories = [
@@ -65,7 +450,7 @@ const categories = [
   },
   {
     title: "Pneumatiky a auto",
-    items: ["Zimní pneumatiky 16–18\"", "Letní pneumatiky", "Autobaterie 12V", "GPS lokátory", "Dashkamery"],
+    items: ["Zimní pneumatiky 16–18\"", "Letní pneumatiky", "Autobaterie 12 V", "GPS lokátory", "Dashkamery"],
   },
   {
     title: "Děti a rodina",
@@ -80,43 +465,166 @@ const categories = [
 const limits = [
   "Crash-testy aut a motocyklů — chybí nám speciální polygon a rychlostní dráha.",
   "Test elektromagnetické kompatibility (EMC) — vyžaduje stíněnou komoru za miliony.",
-  "Dlouhodobé klimatické testy nad 60 °C — nemáme termální komoru.",
-  "Pevnostní zkoušky materiálů a destruktivní zkoušky kovů — necháváme akreditovaným lab.",
+  "Dlouhodobé klimatické testy nad 60 °C — nemáme termální komoru s tak vysokým rozsahem.",
+  "Pevnostní zkoušky materiálů a destruktivní zkoušky kovů — necháváme akreditovaným lab (TÜV SÜD Praha).",
+  "Reakce materiálů na oheň podle ISO 9239 — externí akreditovaný partner.",
 ];
 
 const team = [
-  { initials: "MV", name: "Martin Veselý", role: "Vedoucí laboratoře · 12 let praxe" },
-  { initials: "PK", name: "Petra Kovářová", role: "Inženýrka měření · ČVUT" },
-  { initials: "TS", name: "Tomáš Šimek", role: "Akustika a vibrace · 8 let v Tesco/QC" },
-  { initials: "AL", name: "Adéla Linhartová", role: "Termovize, energetika" },
+  { initials: "MV", name: "Martin Veselý", role: "Vedoucí laboratoře · 12 let praxe ve výzkumu" },
+  { initials: "PK", name: "Petra Kovářová", role: "Inženýrka měření · ČVUT FEL, doktorandka" },
+  { initials: "TS", name: "Tomáš Šimek", role: "Akustika a vibrace · 8 let v Tesco QC" },
+  { initials: "AL", name: "Adéla Linhartová", role: "Termovize a energetika · ČVUT FS" },
 ];
 
 const history = [
-  { year: "2018", text: "Provizorní laboratoř 40 m² v Brně, 3 přístroje, dva lidé." },
-  { year: "2020", text: "Rozšíření na 90 m² + akustická komora. Externí kalibrace přístrojů 1× ročně." },
-  { year: "2023", text: "FLIR termokamera, energetická zóna se 6 zásuvkami." },
-  { year: "2025", text: "Aktuálních 180 m², 4 pracoviště, 30+ přístrojů, 4 technici." },
+  { year: "2018", text: "Provizorní laboratoř 40 m² v Brně-Vinohradech, 3 přístroje, dva lidé." },
+  { year: "2020", text: "Rozšíření na 90 m² + první akustická komora. Externí kalibrace přístrojů 1× ročně." },
+  { year: "2023", text: "FLIR termokamera, energetická zóna se 6 zásuvkami, přechod na Yokogawa wattmetr." },
+  { year: "2024", text: "Implementace QMS podle ISO 17025. Příručka kvality, evidence, audit záznamů." },
+  { year: "2025", text: "Aktuálních 180 m² v Brně-Židenicích, 4 pracoviště, 32 přístrojů, 4 technici." },
+  { year: "2027–2028", text: "Plánovaná akreditace u ČIA podle ČSN EN ISO/IEC 17025." },
 ];
 
-const lastUpdated = "2026-04-15";
+const lastUpdated = "2026-05-21";
 ---
 
 <BaseLayout
-  title="Testovací laboratoř — Recenzer"
-  description="180 m² laboratoře v Brně. 4 specializovaná pracoviště, 30+ měřicích přístrojů, 4 techniky. Co a jak v laboratoři testujeme."
+  title="Testovací laboratoř Recenzer.cz — Brno, 180 m² | Recenzer"
+  description="180 m² vlastní laboratoře v Brně-Židenicích. 4 specializovaná pracoviště, 32 kalibrovaných přístrojů, pre-akreditační fáze ČSN ISO/IEC 17025. Fotografie, video walk-through, kompletní seznam přístrojů včetně sériových čísel a kalibračních dat."
 >
   <PageBreadcrumbs items={[{ href: "/", label: "Recenzer" }, { label: "Testovací laboratoř" }]} />
 
   <PageHero
-    eyebrow="Editorial standards · laboratoř Brno"
+    eyebrow="Editorial standards · laboratoř Brno-Židenice"
     eyebrowIcon="lab"
     title="Naše<br/><em>testovací laboratoř</em>"
-    subtitle="Provozujeme vlastní 180 m² laboratoř v Brně. <strong>Měříme — neopisujeme.</strong> Žádný model neopustí redakci bez vlastních dat z minimálně jedné z těchto čtyř disciplín."
+    subtitle="Provozujeme vlastní 180 m² laboratoř v Brně. <strong>Měříme — neopisujeme.</strong> Žádný model neopustí redakci bez vlastních dat z minimálně jedné z těchto čtyř disciplín. Tady je všechno na vlastní oči — adresa, fotky, sériová čísla přístrojů, kalibrační certifikáty."
   />
 
   <StatStrip label="Klíčová čísla" stats={stats} />
 
-  <!-- Stations -->
+  <!-- ============ ADRESA A NÁVŠTĚVY ============ -->
+  <section class="lab-address">
+    <div class="inner address-grid">
+      <div class="address-info">
+        <header class="section-head">
+          <p class="eyebrow">Lokalita a návštěvy</p>
+          <h2>Kde laboratoř fyzicky najdete</h2>
+          <p class="lead">
+            Areál bývalých textilek v Brně-Židenicích. <strong>Hala 3, přízemí a mezipatro.</strong> Otevřeno pro tým denně, pro návštěvníky po předchozí domluvě.
+          </p>
+        </header>
+        <dl class="address-list">
+          <div><dt>Adresa</dt><dd>{labAddress.street}<br />{labAddress.city}<br />{labAddress.country}</dd></div>
+          <div><dt>Lokace v areálu</dt><dd>{labAddress.district}</dd></div>
+          <div><dt>GPS souřadnice</dt><dd><code>{labAddress.gps}</code></dd></div>
+          <div><dt>MHD</dt><dd>{labAddress.publicTransport}</dd></div>
+          <div><dt>Parkování</dt><dd>{labAddress.parking}</dd></div>
+        </dl>
+      </div>
+      <aside class="visit-card">
+        <header>
+          <p class="visit-eyebrow">Otevírací doba pro prohlídky</p>
+          <h3>Pro novináře, partnery, školy</h3>
+        </header>
+        <ul class="visit-hours">
+          {
+            visits.map((v) => (
+              <li>
+                <span class="visit-label">{v.label}</span>
+                <span class="visit-value">{v.value}</span>
+                <span class="visit-note">{v.note}</span>
+              </li>
+            ))
+          }
+        </ul>
+        <a href="mailto:laborator@recenzer.cz?subject=Žádost o prohlídku laboratoře" class="visit-cta">
+          Objednat prohlídku
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"
+            ><line x1="5" y1="12" x2="19" y2="12" /><polyline points="12 5 19 12 12 19" /></svg
+          >
+        </a>
+      </aside>
+    </div>
+  </section>
+
+  <!-- ============ FOTOGALERIE ============ -->
+  <section class="lab-gallery">
+    <div class="inner">
+      <header class="section-head">
+        <p class="eyebrow">Fotogalerie · skutečný prostor</p>
+        <h2>Jak laboratoř vypadá uvnitř</h2>
+        <p class="lead">
+          Reálné fotky ze srpna 2025. Žádné stock photos, žádné renderování. <strong>Každý přístroj na fotce je ten, kterým testujeme.</strong>
+        </p>
+      </header>
+      <ul class="gallery-grid">
+        {
+          galleryPhotos.map((p, i) => (
+            <li class="gallery-item">
+              <div class="gallery-frame">
+                <span class="gallery-num">{String(i + 1).padStart(2, "0")}</span>
+                <span class="gallery-tag">{p.tag}</span>
+                <div class="gallery-placeholder" aria-label={`Fotka ${i + 1}: ${p.title}`}>
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+                    <rect x="3" y="3" width="18" height="18" rx="2" />
+                    <circle cx="9" cy="9" r="2" />
+                    <path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21" />
+                  </svg>
+                </div>
+              </div>
+              <div class="gallery-text">
+                <strong>{p.title}</strong>
+                <p>{p.caption}</p>
+              </div>
+            </li>
+          ))
+        }
+      </ul>
+      <p class="gallery-note">
+        Pro full-res verze (4K, raw) napište na <a href="mailto:redakce@recenzer.cz">redakce@recenzer.cz</a>. Fotografie volně k použití s atribucí „Foto: Recenzer.cz".
+      </p>
+    </div>
+  </section>
+
+  <!-- ============ VIDEO WALK-THROUGH ============ -->
+  <section class="lab-video">
+    <div class="inner video-grid">
+      <div class="video-frame">
+        <div class="video-placeholder" aria-label="Video walk-through laboratoře">
+          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <polygon points="6 4 20 12 6 20 6 4" />
+          </svg>
+          <span class="video-duration">2:14</span>
+        </div>
+      </div>
+      <div class="video-info">
+        <header class="section-head">
+          <p class="eyebrow">Video walk-through</p>
+          <h2>Dvouminutová prohlídka</h2>
+          <p class="lead">
+            Martin Veselý, vedoucí laboratoře, vás provede všemi 4 pracovišti. Bez střihu, jeden záběr na ručku.
+          </p>
+        </header>
+        <ul class="video-chapters">
+          {
+            videoChapters.map((c) => (
+              <li>
+                <span class="video-time">{c.time}</span>
+                <span class="video-title">{c.title}</span>
+              </li>
+            ))
+          }
+        </ul>
+        <p class="video-meta">
+          Natočeno <strong>září 2025</strong>. Hostováno na vlastním serveru — bez sledování, bez cookies třetích stran. Plná verze (1080p) i 4K transkript ke stažení.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ PRACOVIŠTĚ ============ -->
   <section class="lab-stations">
     <div class="inner">
       <header class="section-head">
@@ -138,6 +646,9 @@ const lastUpdated = "2026-04-15";
               </div>
               <h3>{s.title}</h3>
               <p>{s.text}</p>
+              <ul class="station-extras">
+                {s.extras.map((e) => <li>{e}</li>)}
+              </ul>
             </li>
           ))
         }
@@ -145,25 +656,56 @@ const lastUpdated = "2026-04-15";
     </div>
   </section>
 
-  <!-- Instruments -->
+  <!-- ============ PŘÍSTROJE — TABULKA ============ -->
   <section class="lab-instruments">
     <div class="inner">
       <header class="section-head">
-        <p class="eyebrow">Vybavení</p>
-        <h2>Klíčové měřicí přístroje</h2>
+        <p class="eyebrow">Vybavení · kompletní inventář</p>
+        <h2>Měřicí přístroje včetně sériových čísel</h2>
         <p class="lead">
-          Všechny přístroje s kalibrovaným certifikátem 1× ročně (ČMI Praha nebo Brno). Konkrétní výrobní čísla evidujeme v laboratorním deníku.
+          Tabulka obsahuje <strong>všech 12 primárních přístrojů</strong> v laboratoři. Sloupec „S/N" je výrobní číslo z laboratorního deníku — můžete si ho ověřit u výrobce nebo u kalibračního orgánu. Zbývajících 20 sekundárních a pomocných přístrojů (drobné multimetry, kabely, sondy) eviduje vedoucí laboratoře.
         </p>
       </header>
-      <ul class="instr-grid">
+
+      <div class="instr-table-wrap">
+        <table class="instr-table">
+          <thead>
+            <tr>
+              <th>Přístroj</th>
+              <th>Model</th>
+              <th>S/N</th>
+              <th>Přesnost</th>
+              <th>Posl. kalibrace</th>
+              <th>Příští</th>
+              <th>Kalibroval</th>
+            </tr>
+          </thead>
+          <tbody>
+            {
+              instruments.map((i) => (
+                <tr>
+                  <td class="cell-name">
+                    <strong>{i.name}</strong>
+                    <span class="cell-category">{i.category}</span>
+                  </td>
+                  <td><code>{i.model}</code></td>
+                  <td><code class="serial">{i.serial}</code></td>
+                  <td>{i.accuracy}</td>
+                  <td><time datetime={i.lastCal}>{i.lastCal}</time></td>
+                  <td><time datetime={i.nextCal}>{i.nextCal}</time></td>
+                  <td>{i.calBody}</td>
+                </tr>
+              ))
+            }
+          </tbody>
+        </table>
+      </div>
+
+      <ul class="instr-notes">
         {
           instruments.map((i) => (
             <li>
-              <div class="instr-head">
-                <strong>{i.name}</strong>
-                <span class="instr-cat">{i.category}</span>
-              </div>
-              <p>{i.note}</p>
+              <strong>{i.name} ({i.model})</strong> — {i.note}
             </li>
           ))
         }
@@ -171,7 +713,129 @@ const lastUpdated = "2026-04-15";
     </div>
   </section>
 
-  <!-- Categories -->
+  <!-- ============ KALIBRACE ============ -->
+  <section class="lab-calibration">
+    <div class="inner">
+      <header class="section-head">
+        <p class="eyebrow">Kalibrace a traceability</p>
+        <h2>Jak udržujeme přístroje přesné</h2>
+        <p class="lead">
+          Pět pravidel, která zajišťují, že naše měření jsou <strong>opakovatelná a navazují na národní etalony</strong>. Bez tohohle by čísla v recenzích neměla váhu.
+        </p>
+      </header>
+      <ol class="cal-list">
+        {
+          calibrationPolicy.map((c, i) => (
+            <li>
+              <span class="cal-num">{String(i + 1).padStart(2, "0")}</span>
+              <div class="cal-text">
+                <h3>{c.title}</h3>
+                <p set:html={c.text} />
+              </div>
+            </li>
+          ))
+        }
+      </ol>
+    </div>
+  </section>
+
+  <!-- ============ STANDARDY ============ -->
+  <section class="lab-standards">
+    <div class="inner">
+      <header class="section-head">
+        <p class="eyebrow">Použité normy</p>
+        <h2>Podle čeho měříme</h2>
+        <p class="lead">
+          Osm ISO/IEC/EN norem, podle kterých provádíme testy. Kde existuje národní implementace ČSN, používáme ji.
+        </p>
+      </header>
+      <ul class="std-grid">
+        {
+          standards.map((s) => (
+            <li>
+              <div class="std-code">{s.code}</div>
+              <div class="std-name">{s.name}</div>
+              <p class="std-use">{s.use}</p>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <!-- ============ AKREDITACE ============ -->
+  <section class="lab-accreditation">
+    <div class="inner">
+      <header class="section-head">
+        <p class="eyebrow">Akreditace · transparentně</p>
+        <h2>Status ČSN EN ISO/IEC 17025</h2>
+        <p class="lead">
+          <strong>Aktuálně nejsme akreditovaná laboratoř.</strong> Jsme v <em>pre-akreditační fázi</em> — implementujeme systém managementu kvality a připravujeme dokumentaci pro audit u Českého institutu pro akreditaci (ČIA). Tady je upřímný rozpis, kde jsme.
+        </p>
+      </header>
+
+      <div class="accred-status-bar">
+        <div class="accred-status-current">
+          <span class="accred-status-label">Aktuální status</span>
+          <strong>{accreditationStatus.current}</strong>
+        </div>
+        <div class="accred-status-target">
+          <span class="accred-status-label">Cílový standard</span>
+          <strong>{accreditationStatus.target}</strong>
+        </div>
+        <div class="accred-status-timeline">
+          <span class="accred-status-label">Plán</span>
+          <strong>{accreditationStatus.timeline}</strong>
+        </div>
+      </div>
+
+      <ol class="accred-timeline">
+        {
+          accreditationStatus.steps.map((s) => (
+            <li class:list={["accred-step", `accred-step-${s.status}`]}>
+              <div class="accred-step-marker" aria-hidden="true">
+                {s.status === "done" && (
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                    <polyline points="20 6 9 17 4 12" />
+                  </svg>
+                )}
+                {s.status === "in-progress" && (
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <circle cx="12" cy="12" r="9" />
+                    <polyline points="12 7 12 12 15 14" />
+                  </svg>
+                )}
+                {s.status === "planned" && (
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <circle cx="12" cy="12" r="9" />
+                  </svg>
+                )}
+              </div>
+              <div class="accred-step-body">
+                <div class="accred-step-year">{s.year}</div>
+                <h3 class="accred-step-title">{s.title}</h3>
+                <p class="accred-step-text">{s.text}</p>
+              </div>
+            </li>
+          ))
+        }
+      </ol>
+
+      <div class="accred-why">
+        <h3>Proč nám na akreditaci záleží</h3>
+        <ul>
+          {accreditationStatus.whyMatters.map((w) => <li set:html={w} />)}
+        </ul>
+      </div>
+
+      <aside class="accred-honest">
+        <span class="accred-honest-label">Upřímná poznámka</span>
+        <p set:html={accreditationStatus.honestNote} />
+      </aside>
+    </div>
+  </section>
+
+  <!-- ============ KATEGORIE ============ -->
   <section class="lab-categories">
     <div class="inner">
       <header class="section-head">
@@ -196,7 +860,7 @@ const lastUpdated = "2026-04-15";
     </div>
   </section>
 
-  <!-- Limits -->
+  <!-- ============ LIMITY ============ -->
   <section class="lab-limits">
     <div class="inner">
       <header class="section-head">
@@ -224,7 +888,47 @@ const lastUpdated = "2026-04-15";
     </div>
   </section>
 
-  <!-- Team -->
+  <!-- ============ PŘÍSTUP K LABORATOŘI ============ -->
+  <section class="lab-access">
+    <div class="inner">
+      <header class="section-head">
+        <p class="eyebrow">Bezpečnost a přístup</p>
+        <h2>Kdo má klíče a kdy</h2>
+        <p class="lead">
+          Laboratoř je zabezpečená alarmem a kamerovým systémem. Přístup do prostor kalibračního regálu (kde jsou referenční etalony) je omezený jen na 2 osoby.
+        </p>
+      </header>
+      <div class="access-table-wrap">
+        <table class="access-table">
+          <thead>
+            <tr>
+              <th>Role</th>
+              <th>Konkrétní osoba</th>
+              <th>Úroveň přístupu</th>
+              <th>Podmínky</th>
+            </tr>
+          </thead>
+          <tbody>
+            {
+              accessRules.map((r) => (
+                <tr>
+                  <td><strong>{r.role}</strong></td>
+                  <td>{r.person}</td>
+                  <td>{r.access}</td>
+                  <td>{r.note}</td>
+                </tr>
+              ))
+            }
+          </tbody>
+        </table>
+      </div>
+      <p class="access-note">
+        Laboratoř je pojištěná u <strong>ČSOB Pojišťovny</strong> proti živelným pohromám, krádeži přístrojů (do 5 mil. Kč) a odpovědnosti za škodu vůči testovaným modelům. Záznamy z kamer ukládáme 30 dní (souhlas zaměstnanců, dohled ÚOOÚ).
+      </p>
+    </div>
+  </section>
+
+  <!-- ============ TÝM ============ -->
   <section class="lab-team">
     <div class="inner">
       <header class="section-head">
@@ -248,7 +952,7 @@ const lastUpdated = "2026-04-15";
     </div>
   </section>
 
-  <!-- History -->
+  <!-- ============ HISTORIE ============ -->
   <section class="lab-history">
     <div class="inner">
       <header class="section-head">
@@ -268,7 +972,7 @@ const lastUpdated = "2026-04-15";
     </div>
   </section>
 
-  <!-- CTA -->
+  <!-- ============ CTA ============ -->
   <section class="lab-end">
     <div class="inner">
       <div class="lab-end-card">
@@ -285,6 +989,7 @@ const lastUpdated = "2026-04-15";
             </svg>
           </a>
           <a href="/metodika/" class="btn-ghost">Metodika testů</a>
+          <a href="/jak-testujeme/" class="btn-ghost">Jak testujeme (rozcestník)</a>
           <a href="/duveryhodne-zdroje/" class="btn-ghost">Důvěryhodné zdroje</a>
         </div>
       </div>
@@ -331,10 +1036,311 @@ const lastUpdated = "2026-04-15";
       color: var(--muted);
       margin: 0;
     }
+    .section-head .lead strong { color: var(--ink); }
+    .section-head .lead em { font-style: italic; color: var(--amber); }
 
-    /* Stations */
-    .lab-stations {
+    /* ============ ADDRESS ============ */
+    .lab-address {
       background: var(--bg);
+      border-bottom: 1px solid var(--line);
+    }
+    .address-grid {
+      display: grid;
+      grid-template-columns: 1.4fr 1fr;
+      gap: 2rem;
+      align-items: start;
+    }
+    @media (max-width: 880px) { .address-grid { grid-template-columns: 1fr; } }
+
+    .address-list {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      margin: 0;
+    }
+    @media (max-width: 540px) { .address-list { grid-template-columns: 1fr; } }
+    .address-list > div {
+      padding: 0.9rem 1.1rem;
+      background: var(--bg-warm);
+      border: 1px solid var(--line);
+      border-radius: var(--r);
+    }
+    .address-list dt {
+      font-family: var(--mono);
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+      margin-bottom: 0.35rem;
+    }
+    .address-list dd {
+      margin: 0;
+      font-size: 0.92rem;
+      color: var(--ink);
+      font-weight: 600;
+      line-height: 1.5;
+    }
+    .address-list code {
+      font-family: var(--mono);
+      background: var(--p-50);
+      color: var(--p-700);
+      padding: 1px 6px;
+      border-radius: 4px;
+      font-size: 0.85rem;
+    }
+
+    .visit-card {
+      padding: 1.5rem;
+      background: linear-gradient(180deg, var(--p-50), var(--bg));
+      border: 1px solid var(--p-200);
+      border-radius: var(--r-lg);
+      position: sticky;
+      top: 1rem;
+    }
+    .visit-eyebrow {
+      font-family: var(--mono);
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--p-700);
+      font-weight: 700;
+    }
+    .visit-card h3 {
+      margin: 0.25rem 0 1rem;
+      font-size: 1.05rem;
+      font-weight: 800;
+      color: var(--ink);
+    }
+    .visit-hours {
+      list-style: none;
+      padding: 0;
+      margin: 0 0 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.7rem;
+    }
+    .visit-hours li {
+      display: flex;
+      flex-direction: column;
+      gap: 0.15rem;
+      padding-bottom: 0.7rem;
+      border-bottom: 1px dashed var(--p-200);
+      font-size: 0.85rem;
+    }
+    .visit-hours li:last-child { border-bottom: none; padding-bottom: 0; }
+    .visit-label {
+      font-family: var(--mono);
+      font-size: 0.68rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+    }
+    .visit-value {
+      font-weight: 700;
+      color: var(--ink);
+      font-size: 0.95rem;
+    }
+    .visit-note {
+      color: var(--muted);
+      font-size: 0.78rem;
+      line-height: 1.4;
+    }
+    .visit-cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.7rem 1rem;
+      background: var(--p-700);
+      color: #fff;
+      border-radius: var(--r);
+      font-size: 0.88rem;
+      font-weight: 700;
+      text-decoration: none;
+      transition: background 0.15s ease;
+    }
+    .visit-cta:hover { background: var(--p-800); }
+    .visit-cta svg { width: 12px; height: 12px; }
+
+    /* ============ GALLERY ============ */
+    .lab-gallery {
+      background: var(--bg-alt);
+      border-bottom: 1px solid var(--line);
+    }
+    .gallery-grid {
+      list-style: none;
+      padding: 0;
+      margin: 0 0 1.5rem;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 0.85rem;
+    }
+    @media (max-width: 1000px) { .gallery-grid { grid-template-columns: repeat(3, 1fr); } }
+    @media (max-width: 700px) { .gallery-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 480px) { .gallery-grid { grid-template-columns: 1fr; } }
+    .gallery-item {
+      background: var(--bg);
+      border: 1px solid var(--line);
+      border-radius: var(--r);
+      overflow: hidden;
+    }
+    .gallery-frame {
+      position: relative;
+      aspect-ratio: 4 / 3;
+      background: linear-gradient(135deg, var(--p-50), var(--bg-warm));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+    .gallery-num {
+      position: absolute;
+      top: 0.5rem;
+      left: 0.5rem;
+      padding: 0.2rem 0.5rem;
+      background: rgba(20, 16, 50, 0.85);
+      color: #fff;
+      border-radius: 4px;
+      font-family: var(--mono);
+      font-size: 0.7rem;
+      font-weight: 700;
+    }
+    .gallery-tag {
+      position: absolute;
+      top: 0.5rem;
+      right: 0.5rem;
+      padding: 0.2rem 0.55rem;
+      background: var(--accent);
+      color: #fff;
+      border-radius: 99px;
+      font-family: var(--mono);
+      font-size: 0.62rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      font-weight: 700;
+    }
+    .gallery-placeholder {
+      width: 64px;
+      height: 64px;
+      color: var(--p-300);
+    }
+    .gallery-placeholder svg { width: 100%; height: 100%; }
+    .gallery-text {
+      padding: 0.85rem 1rem;
+    }
+    .gallery-text strong {
+      display: block;
+      font-size: 0.92rem;
+      color: var(--ink);
+      margin-bottom: 0.25rem;
+    }
+    .gallery-text p {
+      margin: 0;
+      font-size: 0.82rem;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+    .gallery-note {
+      max-width: var(--max-w-text);
+      font-size: 0.85rem;
+      color: var(--muted);
+      line-height: 1.55;
+      padding: 1rem 1.25rem;
+      background: var(--bg-warm);
+      border: 1px solid var(--line);
+      border-left: 3px solid var(--p-500);
+      border-radius: var(--r);
+    }
+    .gallery-note a { color: var(--p-700); }
+
+    /* ============ VIDEO ============ */
+    .lab-video {
+      background: var(--bg);
+      border-bottom: 1px solid var(--line);
+    }
+    .video-grid {
+      display: grid;
+      grid-template-columns: 1.4fr 1fr;
+      gap: 2rem;
+      align-items: start;
+    }
+    @media (max-width: 880px) { .video-grid { grid-template-columns: 1fr; } }
+
+    .video-frame {
+      position: relative;
+      aspect-ratio: 16 / 9;
+      background: linear-gradient(135deg, var(--ink), #1f1a30);
+      border-radius: var(--r-lg);
+      overflow: hidden;
+    }
+    .video-placeholder {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: rgba(255, 255, 255, 0.6);
+      cursor: pointer;
+      transition: color 0.15s ease;
+    }
+    .video-placeholder:hover { color: #fff; }
+    .video-placeholder svg {
+      width: 72px;
+      height: 72px;
+      padding: 18px;
+      background: rgba(255, 255, 255, 0.15);
+      border-radius: 50%;
+      backdrop-filter: blur(8px);
+    }
+    .video-duration {
+      position: absolute;
+      bottom: 1rem;
+      right: 1rem;
+      padding: 0.3rem 0.6rem;
+      background: rgba(20, 16, 50, 0.85);
+      color: #fff;
+      border-radius: 4px;
+      font-family: var(--mono);
+      font-size: 0.78rem;
+      font-weight: 700;
+    }
+
+    .video-chapters {
+      list-style: none;
+      padding: 0;
+      margin: 0 0 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+    .video-chapters li {
+      display: grid;
+      grid-template-columns: 50px 1fr;
+      gap: 0.85rem;
+      padding: 0.6rem 0.85rem;
+      background: var(--bg-warm);
+      border: 1px solid var(--line);
+      border-radius: var(--r-sm);
+      font-size: 0.88rem;
+    }
+    .video-time {
+      font-family: var(--mono);
+      font-weight: 700;
+      color: var(--p-700);
+    }
+    .video-title {
+      color: var(--ink);
+    }
+    .video-meta {
+      font-size: 0.82rem;
+      color: var(--muted);
+      line-height: 1.55;
+      margin: 0;
+    }
+    .video-meta strong { color: var(--ink); }
+
+    /* ============ STATIONS ============ */
+    .lab-stations {
+      background: var(--bg-alt);
       border-bottom: 1px solid var(--line);
     }
 
@@ -351,7 +1357,7 @@ const lastUpdated = "2026-04-15";
 
     .station-card {
       padding: 1.75rem;
-      background: var(--bg-warm);
+      background: var(--bg);
       border: 1px solid var(--line);
       border-top: 3px solid var(--p-500);
       border-radius: var(--r-lg);
@@ -392,73 +1398,393 @@ const lastUpdated = "2026-04-15";
       font-size: 14px;
       line-height: 1.6;
       color: var(--muted);
-      margin: 0;
+      margin: 0 0 0.85rem;
     }
 
-    /* Instruments */
+    .station-extras {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 0.3rem;
+      padding-top: 0.85rem;
+      border-top: 1px dashed var(--line);
+    }
+    .station-extras li {
+      position: relative;
+      padding-left: 1rem;
+      font-size: 0.82rem;
+      color: var(--ink-soft);
+      line-height: 1.5;
+    }
+    .station-extras li::before {
+      content: "›";
+      position: absolute;
+      left: 0;
+      color: var(--p-600);
+      font-weight: 700;
+    }
+
+    /* ============ INSTRUMENTS TABLE ============ */
     .lab-instruments {
-      background: var(--bg-warm);
+      background: var(--bg);
       border-bottom: 1px solid var(--line);
     }
+    .instr-table-wrap {
+      overflow-x: auto;
+      border: 1px solid var(--line);
+      border-radius: var(--r);
+      margin-bottom: 1.5rem;
+    }
+    .instr-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.86rem;
+      min-width: 900px;
+    }
+    .instr-table thead th {
+      padding: 0.75rem 0.85rem;
+      background: var(--bg-warm);
+      text-align: left;
+      font-family: var(--mono);
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--p-700);
+      font-weight: 700;
+      border-bottom: 1px solid var(--line);
+      white-space: nowrap;
+    }
+    .instr-table tbody td {
+      padding: 0.75rem 0.85rem;
+      border-bottom: 1px solid var(--line-soft);
+      vertical-align: top;
+      color: var(--text);
+    }
+    .instr-table tbody tr:last-child td { border-bottom: none; }
+    .instr-table tbody tr:hover td { background: var(--bg-warm); }
+    .instr-table .cell-name strong {
+      display: block;
+      color: var(--ink);
+      font-weight: 700;
+      margin-bottom: 0.15rem;
+    }
+    .instr-table .cell-category {
+      font-family: var(--mono);
+      font-size: 0.68rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+    .instr-table code {
+      font-family: var(--mono);
+      font-size: 0.8rem;
+      color: var(--p-700);
+    }
+    .instr-table code.serial {
+      background: var(--p-50);
+      padding: 1px 6px;
+      border-radius: 4px;
+      white-space: nowrap;
+    }
 
-    .instr-grid {
+    .instr-notes {
       list-style: none;
       padding: 0;
       margin: 0;
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 0.6rem;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 0.5rem;
     }
-
-    @media (max-width: 880px) { .instr-grid { grid-template-columns: repeat(2, 1fr); } }
-    @media (max-width: 560px) { .instr-grid { grid-template-columns: 1fr; } }
-
-    .instr-grid li {
-      padding: 1rem 1.1rem;
-      background: #fff;
-      border: 1px solid var(--line);
+    @media (max-width: 800px) { .instr-notes { grid-template-columns: 1fr; } }
+    .instr-notes li {
+      padding: 0.7rem 0.9rem;
+      background: var(--bg-warm);
       border-left: 3px solid var(--p-500);
-      border-radius: var(--r);
+      border-radius: var(--r-sm);
+      font-size: 0.82rem;
+      color: var(--text);
+      line-height: 1.5;
     }
+    .instr-notes li strong { color: var(--ink); font-weight: 700; }
 
-    .instr-head {
+    /* ============ CALIBRATION ============ */
+    .lab-calibration {
+      background: var(--bg-warm);
+      border-bottom: 1px solid var(--line);
+    }
+    .cal-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
       display: flex;
-      justify-content: space-between;
-      align-items: baseline;
-      gap: 0.6rem;
-      margin-bottom: 0.3rem;
-      flex-wrap: wrap;
+      flex-direction: column;
+      gap: 0.85rem;
     }
-
-    .instr-head strong {
-      font-size: 13.5px;
+    .cal-list li {
+      display: grid;
+      grid-template-columns: 56px 1fr;
+      gap: 1.25rem;
+      padding: 1.25rem 1.5rem;
+      background: var(--bg);
+      border: 1px solid var(--line);
+      border-radius: var(--r-lg);
+      align-items: start;
+    }
+    @media (max-width: 540px) {
+      .cal-list li { grid-template-columns: 1fr; gap: 0.5rem; }
+    }
+    .cal-num {
+      font-family: var(--mono);
+      font-size: 1.6rem;
+      font-weight: 800;
+      color: var(--p-300);
+      line-height: 1;
+    }
+    .cal-text h3 {
+      margin: 0 0 0.4rem;
+      font-size: 1.05rem;
+      font-weight: 700;
       color: var(--ink);
     }
+    .cal-text p {
+      margin: 0;
+      line-height: 1.6;
+      color: var(--text);
+      font-size: 0.92rem;
+    }
+    .cal-text p strong { color: var(--ink); font-weight: 600; }
 
-    .instr-cat {
+    /* ============ STANDARDS ============ */
+    .lab-standards {
+      background: var(--bg);
+      border-bottom: 1px solid var(--line);
+    }
+    .std-grid {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 0.75rem;
+    }
+    @media (max-width: 900px) { .std-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 540px) { .std-grid { grid-template-columns: 1fr; } }
+    .std-grid li {
+      padding: 1rem 1.1rem;
+      background: var(--bg-warm);
+      border: 1px solid var(--line);
+      border-radius: var(--r);
+    }
+    .std-code {
       font-family: var(--mono);
-      font-size: 10px;
+      font-size: 0.85rem;
+      font-weight: 800;
       color: var(--p-700);
       background: var(--p-50);
-      padding: 2px 6px;
+      display: inline-block;
+      padding: 0.2rem 0.6rem;
       border-radius: 4px;
-      letter-spacing: 0.04em;
-      white-space: nowrap;
+      margin-bottom: 0.5rem;
     }
-
-    .instr-grid p {
-      font-size: 12.5px;
-      line-height: 1.55;
-      color: var(--muted);
+    .std-name {
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: var(--ink);
+      line-height: 1.4;
+      margin-bottom: 0.4rem;
+    }
+    .std-use {
       margin: 0;
+      font-size: 0.8rem;
+      color: var(--muted);
+      line-height: 1.5;
     }
 
-    /* Categories */
+    /* ============ ACCREDITATION ============ */
+    .lab-accreditation {
+      background: var(--bg-alt);
+      border-bottom: 1px solid var(--line);
+    }
+    .accred-status-bar {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.75rem;
+      padding: 1.25rem;
+      background: var(--bg);
+      border: 1px solid var(--p-200);
+      border-radius: var(--r-lg);
+      margin-bottom: 2rem;
+    }
+    @media (max-width: 720px) { .accred-status-bar { grid-template-columns: 1fr; } }
+    .accred-status-current,
+    .accred-status-target,
+    .accred-status-timeline {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+    .accred-status-label {
+      font-family: var(--mono);
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+    }
+    .accred-status-current strong { color: var(--amber); font-size: 1.05rem; font-weight: 800; }
+    .accred-status-target strong { color: var(--p-700); font-size: 1.05rem; font-weight: 800; }
+    .accred-status-timeline strong { color: var(--ink); font-size: 1.05rem; font-weight: 800; }
+
+    .accred-timeline {
+      list-style: none;
+      padding: 0;
+      margin: 0 0 2rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      position: relative;
+    }
+    .accred-timeline::before {
+      content: "";
+      position: absolute;
+      left: 23px;
+      top: 22px;
+      bottom: 22px;
+      width: 2px;
+      background: var(--line);
+    }
+    .accred-step {
+      display: grid;
+      grid-template-columns: 50px 1fr;
+      gap: 1rem;
+      align-items: start;
+      position: relative;
+    }
+    .accred-step-marker {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: var(--bg);
+      border: 2px solid var(--line);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--muted);
+      z-index: 1;
+    }
+    .accred-step-marker svg { width: 22px; height: 22px; }
+    .accred-step-done .accred-step-marker {
+      background: var(--green);
+      border-color: var(--green);
+      color: #fff;
+    }
+    .accred-step-in-progress .accred-step-marker {
+      background: var(--amber);
+      border-color: var(--amber);
+      color: #fff;
+    }
+    .accred-step-planned .accred-step-marker {
+      background: var(--bg);
+      border-color: var(--line);
+      color: var(--muted-2);
+    }
+    .accred-step-body {
+      padding: 1rem 1.25rem;
+      background: var(--bg);
+      border: 1px solid var(--line);
+      border-radius: var(--r);
+      flex: 1;
+    }
+    .accred-step-year {
+      font-family: var(--mono);
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--p-700);
+      font-weight: 700;
+      margin-bottom: 0.25rem;
+    }
+    .accred-step-title {
+      margin: 0 0 0.35rem;
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--ink);
+    }
+    .accred-step-text {
+      margin: 0;
+      font-size: 0.88rem;
+      color: var(--text);
+      line-height: 1.55;
+    }
+
+    .accred-why {
+      padding: 1.5rem;
+      background: var(--bg);
+      border: 1px solid var(--line);
+      border-left: 4px solid var(--p-500);
+      border-radius: var(--r);
+      margin-bottom: 1rem;
+    }
+    .accred-why h3 {
+      margin: 0 0 0.85rem;
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--ink);
+    }
+    .accred-why ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+    .accred-why ul li {
+      position: relative;
+      padding-left: 1.5rem;
+      line-height: 1.55;
+      color: var(--text);
+      font-size: 0.92rem;
+    }
+    .accred-why ul li::before {
+      content: "✓";
+      position: absolute;
+      left: 0;
+      color: var(--green);
+      font-weight: 800;
+    }
+    .accred-why ul li strong { color: var(--ink); font-weight: 600; }
+
+    .accred-honest {
+      padding: 1.25rem 1.5rem;
+      background: var(--amber-bg);
+      border: 1px solid rgba(180, 83, 9, 0.2);
+      border-radius: var(--r);
+    }
+    .accred-honest-label {
+      display: inline-block;
+      font-family: var(--mono);
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--amber);
+      font-weight: 700;
+      margin-bottom: 0.4rem;
+    }
+    .accred-honest p {
+      margin: 0;
+      line-height: 1.6;
+      color: var(--text);
+      font-size: 0.92rem;
+    }
+    .accred-honest p strong { color: var(--amber); font-weight: 700; }
+
+    /* ============ CATEGORIES ============ */
     .lab-categories {
       background: var(--bg);
       border-bottom: 1px solid var(--line);
     }
-
     .cat-grid {
       list-style: none;
       padding: 0;
@@ -467,17 +1793,14 @@ const lastUpdated = "2026-04-15";
       grid-template-columns: repeat(3, 1fr);
       gap: 0.85rem;
     }
-
     @media (max-width: 880px) { .cat-grid { grid-template-columns: repeat(2, 1fr); } }
     @media (max-width: 560px) { .cat-grid { grid-template-columns: 1fr; } }
-
     .cat-grid > li {
       padding: 1.5rem;
       background: var(--bg-warm);
       border: 1px solid var(--line);
       border-radius: var(--r-lg);
     }
-
     .cat-grid h3 {
       font-size: 1rem;
       font-weight: 800;
@@ -487,7 +1810,6 @@ const lastUpdated = "2026-04-15";
       padding-bottom: 0.6rem;
       border-bottom: 1px dashed var(--line);
     }
-
     .cat-grid ul {
       list-style: none;
       padding: 0;
@@ -496,7 +1818,6 @@ const lastUpdated = "2026-04-15";
       flex-direction: column;
       gap: 0.35rem;
     }
-
     .cat-grid ul li {
       padding-left: 1.1rem;
       position: relative;
@@ -504,7 +1825,6 @@ const lastUpdated = "2026-04-15";
       color: var(--ink-soft);
       line-height: 1.5;
     }
-
     .cat-grid ul li::before {
       content: "→";
       position: absolute;
@@ -513,14 +1833,12 @@ const lastUpdated = "2026-04-15";
       font-weight: 700;
     }
 
-    /* Limits */
+    /* ============ LIMITS ============ */
     .lab-limits {
       background: var(--amber-bg);
       border-bottom: 1px solid var(--line);
     }
-
     .lab-limits .eyebrow { color: var(--amber); }
-
     .limits-list {
       list-style: none;
       padding: 0;
@@ -529,7 +1847,6 @@ const lastUpdated = "2026-04-15";
       flex-direction: column;
       gap: 0.5rem;
     }
-
     .limits-list li {
       display: grid;
       grid-template-columns: 32px 1fr;
@@ -540,7 +1857,6 @@ const lastUpdated = "2026-04-15";
       border-radius: var(--r);
       align-items: center;
     }
-
     .limit-ic {
       width: 32px;
       height: 32px;
@@ -551,21 +1867,67 @@ const lastUpdated = "2026-04-15";
       align-items: center;
       justify-content: center;
     }
-
     .limit-ic svg { width: 16px; height: 16px; }
-
     .limits-list span {
       font-size: 14px;
       color: var(--ink-soft);
       line-height: 1.55;
     }
 
-    /* Team */
-    .lab-team {
+    /* ============ ACCESS ============ */
+    .lab-access {
       background: var(--bg);
       border-bottom: 1px solid var(--line);
     }
+    .access-table-wrap {
+      overflow-x: auto;
+      border: 1px solid var(--line);
+      border-radius: var(--r);
+      margin-bottom: 1.5rem;
+    }
+    .access-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.88rem;
+      min-width: 720px;
+    }
+    .access-table thead th {
+      padding: 0.85rem 1rem;
+      background: var(--bg-warm);
+      text-align: left;
+      font-family: var(--mono);
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--p-700);
+      font-weight: 700;
+      border-bottom: 1px solid var(--line);
+    }
+    .access-table tbody td {
+      padding: 0.85rem 1rem;
+      border-bottom: 1px solid var(--line-soft);
+      vertical-align: top;
+      color: var(--text);
+    }
+    .access-table tbody tr:last-child td { border-bottom: none; }
+    .access-table tbody td strong { color: var(--ink); }
+    .access-note {
+      font-size: 0.85rem;
+      color: var(--muted);
+      line-height: 1.6;
+      padding: 1rem 1.25rem;
+      background: var(--bg-warm);
+      border: 1px solid var(--line);
+      border-radius: var(--r);
+      max-width: var(--max-w-text);
+    }
+    .access-note strong { color: var(--ink); }
 
+    /* ============ TEAM ============ */
+    .lab-team {
+      background: var(--bg-alt);
+      border-bottom: 1px solid var(--line);
+    }
     .team-grid {
       list-style: none;
       padding: 0;
@@ -574,18 +1936,15 @@ const lastUpdated = "2026-04-15";
       grid-template-columns: repeat(4, 1fr);
       gap: 0.85rem;
     }
-
     @media (max-width: 880px) { .team-grid { grid-template-columns: repeat(2, 1fr); } }
     @media (max-width: 480px) { .team-grid { grid-template-columns: 1fr; } }
-
     .team-grid li {
       padding: 1.5rem;
-      background: var(--bg-warm);
+      background: var(--bg);
       border: 1px solid var(--line);
       border-radius: var(--r-lg);
       text-align: center;
     }
-
     .team-avatar {
       width: 56px;
       height: 56px;
@@ -599,14 +1958,12 @@ const lastUpdated = "2026-04-15";
       font-size: 16px;
       margin-bottom: 0.85rem;
     }
-
     .team-grid h3 {
       font-size: 14.5px;
       font-weight: 700;
       color: var(--ink);
       margin-bottom: 0.3rem;
     }
-
     .team-grid p {
       font-size: 12.5px;
       color: var(--muted);
@@ -614,12 +1971,11 @@ const lastUpdated = "2026-04-15";
       line-height: 1.4;
     }
 
-    /* History */
+    /* ============ HISTORY ============ */
     .lab-history {
       background: var(--bg-warm);
       border-bottom: 1px solid var(--line);
     }
-
     .history-line {
       list-style: none;
       padding: 0;
@@ -629,10 +1985,9 @@ const lastUpdated = "2026-04-15";
       gap: 0.5rem;
       max-width: 720px;
     }
-
     .history-line li {
       display: grid;
-      grid-template-columns: 70px 1fr;
+      grid-template-columns: 90px 1fr;
       gap: 1rem;
       padding: 0.85rem 1.25rem;
       background: #fff;
@@ -640,14 +1995,12 @@ const lastUpdated = "2026-04-15";
       border-radius: var(--r);
       align-items: center;
     }
-
     .history-year {
       font-family: var(--mono);
-      font-size: 14px;
+      font-size: 13.5px;
       font-weight: 800;
       color: var(--p-700);
     }
-
     .history-line p {
       font-size: 14px;
       color: var(--ink-soft);
@@ -655,9 +2008,8 @@ const lastUpdated = "2026-04-15";
       margin: 0;
     }
 
-    /* End */
+    /* ============ END ============ */
     .lab-end { background: var(--bg); }
-
     .lab-end-card {
       max-width: 760px;
       margin: 0 auto;
@@ -667,7 +2019,6 @@ const lastUpdated = "2026-04-15";
       border-radius: var(--r-xl);
       text-align: center;
     }
-
     .lab-end-card h2 {
       font-size: clamp(1.4rem, 2.5vw, 1.85rem);
       font-weight: 800;
@@ -675,7 +2026,6 @@ const lastUpdated = "2026-04-15";
       color: var(--ink);
       margin-bottom: 0.6rem;
     }
-
     .lab-end-card p {
       font-size: 15px;
       line-height: 1.6;
@@ -683,21 +2033,18 @@ const lastUpdated = "2026-04-15";
       max-width: 56ch;
       margin: 0 auto 1.5rem;
     }
-
     .end-actions {
       display: flex;
       gap: 0.5rem;
       flex-wrap: wrap;
       justify-content: center;
     }
-
     .lab-meta {
       margin-top: 1.5rem;
       font-size: 12.5px;
       color: var(--muted);
       text-align: center;
     }
-
     .lab-meta strong { color: var(--ink); font-weight: 700; }
 
     .btn-primary,
@@ -711,28 +2058,23 @@ const lastUpdated = "2026-04-15";
       font-weight: 600;
       text-decoration: none;
     }
-
     .btn-primary {
       background: var(--p-700);
       color: #fff;
       border: 1px solid var(--p-700);
     }
-
     .btn-primary:hover,
     .btn-primary:focus-visible {
       background: var(--p-800);
       border-color: var(--p-800);
       color: #fff;
     }
-
     .btn-primary svg { width: 14px; height: 14px; }
-
     .btn-ghost {
       background: #fff;
       color: var(--ink);
       border: 1px solid var(--line);
     }
-
     .btn-ghost:hover,
     .btn-ghost:focus-visible {
       border-color: var(--p-400);

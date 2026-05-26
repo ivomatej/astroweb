@@ -1,0 +1,541 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import PageBreadcrumbs from "../components/page/PageBreadcrumbs.astro";
+import PageHero from "../components/page/PageHero.astro";
+
+const lastUpdated = "2026-05-21";
+const codexVersion = "2.0";
+
+interface CodexPillar {
+  num: string;
+  title: string;
+  rule: string;
+  example: string;
+  consequence: string;
+}
+
+const pillars: CodexPillar[] = [
+  {
+    num: "01",
+    title: "Pravdivé informace o produktu",
+    rule:
+      "Firma musí poskytovat <strong>pravdivé a úplné</strong> technické parametry. Žádné zatajované slabiny, žádné optimisticky nadhodnocené hodnoty.",
+    example:
+      "Pračka s deklarovanou hlučností 52 dB — laboratoř ověří, naměříme 56 dB. Firma musí buď upravit datasheet, nebo dodat verifikované měření.",
+    consequence:
+      "Pokud firma odmítne, do našich tabulek napíšeme „výrobce neuvádí ověřitelné údaje“. Detail viditelně v recenzi.",
+  },
+  {
+    num: "02",
+    title: "Zákaznický servis v ČR",
+    rule:
+      "Firma musí mít <strong>česky mluvící zákaznický servis</strong> dostupný v pracovních dnech. Bez dispozice servisu v ČR sklouznem k „nemůžeme doporučit pro CZ trh“.",
+    example:
+      "Levné modely z asijských e-shopů často nemají servis v ČR — reklamace = posílat do Číny. To je pro CZ kupujícího problém.",
+    consequence:
+      "V recenzích viditelně označujeme úroveň českého servisu (od 0 do 5 hvězd).",
+  },
+  {
+    num: "03",
+    title: "Plnění zákonných záruk",
+    rule:
+      "Firma musí <strong>dodržovat 24měsíční zákonnou záruku</strong> a férově vyřizovat reklamace. Žádné výmluvy typu „použili jste to špatně“.",
+    example:
+      "Po naší recenzi monitoreme reklamace u sledovaných produktů. Pokud více než 30 % reklamací je odmítnuto neprávně, firma jde na našem trustlistu dolů.",
+    consequence:
+      "Stažení doporučení produktu + veřejné varování v článku.",
+  },
+  {
+    num: "04",
+    title: "Žádná manipulace recenzí",
+    rule:
+      "Firma <strong>nesmí kupovat falešné recenze</strong> na Heureka, Mall, Alza ani jinde. Sledujeme Fakespot, ReviewMeta a vlastní analýzu.",
+    example:
+      "Pokud detekujeme bot recenze pro váš produkt (10+ recenzí v jeden den, stejný styl, IP), produkt vyřadíme z žebříčků na 6 měsíců.",
+    consequence:
+      "Permanentní snížení důvěryhodnosti — značka označená jako „manipuluje recenze“ v interní databázi.",
+  },
+  {
+    num: "05",
+    title: "Transparentní změny modelu",
+    rule:
+      "Pokud firma změní specifikaci stávajícího modelu (jiný motor, jiná baterie), <strong>musí to být viditelně označeno</strong>. Žádné silent specification changes pod stejným model name.",
+    example:
+      "Bosch změnil v polovině roku 2024 motor v modelu X bez změny názvu. Naše doporučení se týkalo verze A — verzi B musíme znovu otestovat.",
+    consequence:
+      "Při silent change nepoznané ho označíme „pozor — výrobce změnil specifikaci“ a snížíme bodové hodnocení.",
+  },
+  {
+    num: "06",
+    title: "Odpovědné PR a marketing",
+    rule:
+      "Firma <strong>nesmí používat zavádějící marketingová tvrzení</strong>. „Nejlepší v třídě“, „certifikováno“, „doporučeno odborníky“ — to vše musí být doložitelné konkrétními zdroji.",
+    example:
+      "„Energeticky úspornější o 30 %“ — než co? Než předchozí generace? Než konkurence? Bez kontextu je tvrzení marketing, ne fakt.",
+    consequence:
+      "V naší recenzi explicit „výrobce tvrdí X, ale nedoložil“. Snížení skóre v hodnocení transparentnosti.",
+  },
+  {
+    num: "07",
+    title: "Bezpečnost produktu na prvním místě",
+    rule:
+      "Firma musí <strong>okamžitě reagovat na bezpečnostní problémy</strong> — recall, service campaign, výměna. Bez ohledu na náklady.",
+    example:
+      "Pokud zjistíme bezpečnostní riziko u doporučeného modelu, kontaktujeme výrobce. Pokud nereaguje do 14 dnů, vydáme veřejné varování.",
+    consequence:
+      "Veřejné varování v článku + e-mail upozornění naší databázi čtenářů.",
+  },
+];
+
+interface ScoreLevel {
+  level: string;
+  range: string;
+  description: string;
+  examples: string;
+  tone: "green" | "amber" | "red" | "ink";
+}
+
+const scoreLevels: ScoreLevel[] = [
+  {
+    level: "Doporučená značka",
+    range: "85–100 bodů",
+    description:
+      "Firma dlouhodobě splňuje všech 7 pilířů. Důvěryhodný partner pro spotřebitele.",
+    examples: "Bosch, Miele, Continental, DeWalt, Datart",
+    tone: "green",
+  },
+  {
+    level: "Solidní značka",
+    range: "70–84 bodů",
+    description:
+      "Splňuje většinu pilířů, drobné výhrady (typicky pomalejší servis nebo chybí transparentnost u specifikací).",
+    examples: "LG, Samsung, Whirlpool, Mountfield",
+    tone: "amber",
+  },
+  {
+    level: "Sledovaná značka",
+    range: "50–69 bodů",
+    description:
+      "Otázky kolem některých pilířů — historie reklamačních problémů, neúplné datasheety, pomalý servis.",
+    examples: "Některé čínské brand značky bez ČR servisu",
+    tone: "amber",
+  },
+  {
+    level: "Nedoporučovaná značka",
+    range: "0–49 bodů",
+    description:
+      "Závažné nedostatky — manipulace recenzí, ignorování reklamací, falešná tvrzení. <strong>Konkrétní produkty nezahrnujeme do žebříčků.</strong>",
+    examples: "Nejmenovaní porušovatelé — zveřejněni v ročním reportu transparentnosti",
+    tone: "red",
+  },
+];
+
+interface AnnualReport {
+  year: string;
+  brands: number;
+  upgrades: number;
+  downgrades: number;
+  link: string;
+}
+
+const annualReports: AnnualReport[] = [
+  { year: "2025", brands: 87, upgrades: 12, downgrades: 4, link: "/aktualizace/" },
+  { year: "2024", brands: 74, upgrades: 9, downgrades: 6, link: "/aktualizace/" },
+  { year: "2023", brands: 62, upgrades: 7, downgrades: 3, link: "/aktualizace/" },
+];
+---
+
+<BaseLayout
+  title={`Kodex férové firmy v.${codexVersion} | Recenzer.cz`}
+  description="7 pilířů Kodexu férové firmy — pravidla, podle kterých Recenzer.cz hodnotí spolupracující značky. Bodové skóre 0–100, 4 kategorie, roční report transparentnosti."
+>
+  <PageBreadcrumbs items={[{ href: "/", label: "Recenzer" }, { label: "Kodex férové firmy" }]} />
+
+  <PageHero
+    eyebrow={`Verze ${codexVersion} · od 2023`}
+    eyebrowIcon="shield"
+    title="Kodex<br/><em>férové firmy</em>"
+    subtitle="7 pilířů, podle kterých hodnotíme spolupracující značky. <strong>Není to PR dokument — je to závazný standard pro každého, kdo se chce ucházet o doporučení na Recenzer.cz.</strong> Roční audit + bodové skóre 0–100."
+  />
+
+  <!-- ============ INTRO ============ -->
+  <section class="kodex-intro">
+    <div class="inner intro-grid">
+      <div>
+        <header class="section-head">
+          <p class="eyebrow">Proč kodex vznikl</p>
+          <h2>Hodnotíme produkty, ale i značky za nimi</h2>
+        </header>
+        <p>
+          V roce 2023 jsme po opakovaných stížnostech čtenářů na pomalý servis a manipulaci recenzí pochopili, že <strong>nestačí hodnotit jen produkt</strong>. Stejně důležitá je <strong>firma za ním</strong> — její komunikace, servis, dodržování záruk, etika v marketingu.
+        </p>
+        <p>
+          Kodex je tedy <strong>doplněk k testovací metodice</strong>. Produkt může mít 4,8 / 5 v laboratoři, ale pokud výrobce ignoruje reklamace, doporučení dostane výrazně nižší skóre.
+        </p>
+        <p>
+          Aktuálně podle Kodexu hodnotíme <strong>87 značek</strong> aktivně přítomných na CZ trhu. Bodování se aktualizuje 1× ročně + při zjištění závažného porušení okamžitě.
+        </p>
+      </div>
+      <aside class="intro-aside">
+        <h3>Verze 2.0</h3>
+        <p>
+          <strong>Co se změnilo oproti v.1.0 (2023):</strong>
+        </p>
+        <ul>
+          <li>Přidán pilíř 04 (manipulace recenzí)</li>
+          <li>Přidán pilíř 07 (bezpečnost produktu)</li>
+          <li>Zvýšena váha servisu v ČR</li>
+          <li>Roční report transparentnosti</li>
+        </ul>
+        <p class="aside-meta">
+          Aktualizace 21. 5. 2026 · Příští revize plánovaná 01/2027.
+        </p>
+      </aside>
+    </div>
+  </section>
+
+  <!-- ============ 7 PILLARS ============ -->
+  <section class="kodex-pillars">
+    <div class="inner">
+      <header class="section-head">
+        <p class="eyebrow">7 pilířů kodexu</p>
+        <h2>Co musí značka splňovat</h2>
+        <p class="lead">
+          Každý pilíř má <strong>pravidlo</strong> (co očekáváme), <strong>příklad</strong> (jak se to projevuje v praxi) a <strong>důsledek</strong> (co se stane při porušení).
+        </p>
+      </header>
+      <ol class="pillars-list">
+        {
+          pillars.map((p) => (
+            <li>
+              <div class="pillar-num-wrap">
+                <span class="pillar-num">{p.num}</span>
+              </div>
+              <div class="pillar-body">
+                <h3>{p.title}</h3>
+                <div class="pillar-blocks">
+                  <div class="pillar-block">
+                    <span class="pillar-label">Pravidlo</span>
+                    <p set:html={p.rule} />
+                  </div>
+                  <div class="pillar-block pillar-block-example">
+                    <span class="pillar-label">Příklad z praxe</span>
+                    <p>{p.example}</p>
+                  </div>
+                  <div class="pillar-block pillar-block-consequence">
+                    <span class="pillar-label">Důsledek porušení</span>
+                    <p>{p.consequence}</p>
+                  </div>
+                </div>
+              </div>
+            </li>
+          ))
+        }
+      </ol>
+    </div>
+  </section>
+
+  <!-- ============ SCORING ============ -->
+  <section class="kodex-scoring">
+    <div class="inner">
+      <header class="section-head">
+        <p class="eyebrow">Bodové hodnocení</p>
+        <h2>Jak skóre značky vzniká</h2>
+        <p class="lead">
+          Každý pilíř je hodnocen na škále 0–15 bodů (kromě pilíře 07 — bezpečnost, který má 0–10 bodů). Maximum je 100. Aktualizace ročně, okamžitě při závažném porušení.
+        </p>
+      </header>
+      <ul class="scoring-list">
+        {
+          scoreLevels.map((s) => (
+            <li class={`score-card score-tone-${s.tone}`}>
+              <div class="score-head">
+                <strong class="score-level">{s.level}</strong>
+                <span class="score-range">{s.range}</span>
+              </div>
+              <p class="score-description" set:html={s.description} />
+              <div class="score-examples">
+                <span class="score-examples-label">Příklady</span>
+                <span>{s.examples}</span>
+              </div>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <!-- ============ ANNUAL REPORTS ============ -->
+  <section class="kodex-reports">
+    <div class="inner">
+      <header class="section-head">
+        <p class="eyebrow">Roční transparentnost</p>
+        <h2>Reporty z auditů značek</h2>
+        <p class="lead">
+          Každý leden zveřejňujeme report z auditu — kolik značek jsme hodnotili, kolik dostalo upgrade / downgrade, příklady konkrétních důvodů.
+        </p>
+      </header>
+      <ul class="reports-list">
+        {
+          annualReports.map((r) => (
+            <li class="report-card">
+              <div class="report-year">{r.year}</div>
+              <div class="report-stats">
+                <div>
+                  <strong>{r.brands}</strong>
+                  <span>hodnocených značek</span>
+                </div>
+                <div>
+                  <strong class="report-up">+{r.upgrades}</strong>
+                  <span>upgrade</span>
+                </div>
+                <div>
+                  <strong class="report-down">−{r.downgrades}</strong>
+                  <span>downgrade</span>
+                </div>
+              </div>
+              <a href={r.link} class="report-link">
+                Detail v aktualizacích
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+                  <line x1="5" y1="12" x2="19" y2="12" />
+                  <polyline points="12 5 19 12 12 19" />
+                </svg>
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <!-- ============ CTA ============ -->
+  <section class="kodex-cta">
+    <div class="inner">
+      <div class="cta-card">
+        <h2>Jste značka a chcete vědět vaše skóre?</h2>
+        <p>
+          Napište nám. Pošleme vám <strong>audit zprávu o vaší značce</strong> s konkrétními body, na kterých můžete pracovat. Bez poplatku.
+        </p>
+        <div class="cta-actions">
+          <a href="mailto:obchod@recenzer.cz?subject=Audit%20značky%20podle%20Kodexu" class="btn-primary">
+            obchod@recenzer.cz
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+              <line x1="5" y1="12" x2="19" y2="12" />
+              <polyline points="12 5 19 12 12 19" />
+            </svg>
+          </a>
+          <a href="/pro-znacky-firmy-agentury/" class="btn-ghost">Pro značky a agentury</a>
+          <a href="/eticky-kodex/" class="btn-ghost">Etický kodex Recenzer</a>
+        </div>
+      </div>
+      <p class="cta-meta">
+        Kodex férové firmy v.{codexVersion} · platí od <time datetime="2023-01-15">15. 1. 2023</time> · poslední aktualizace <time datetime={lastUpdated}>{lastUpdated}</time>.
+      </p>
+    </div>
+  </section>
+
+  <style>
+    .inner { max-width: var(--max-w); margin: 0 auto; padding: clamp(2.5rem, 5vw, 4rem) var(--gutter); }
+    .section-head { max-width: 65ch; margin: 0 0 2rem; }
+    .eyebrow {
+      font-family: var(--mono); font-size: 11.5px; text-transform: uppercase;
+      letter-spacing: 0.1em; color: var(--p-700); font-weight: 700; margin: 0 0 0.5rem;
+    }
+    .section-head h2 {
+      font-size: clamp(1.5rem, 3vw, 2.1rem); font-weight: 800; letter-spacing: -0.025em;
+      color: var(--ink); line-height: 1.2; margin-bottom: 0.6rem;
+    }
+    .section-head .lead { font-size: 15px; line-height: 1.6; color: var(--muted); margin: 0; }
+    .section-head .lead strong { color: var(--ink); }
+
+    /* INTRO */
+    .kodex-intro { background: var(--bg-warm); border-bottom: 1px solid var(--line); }
+    .intro-grid {
+      display: grid; grid-template-columns: 1.5fr 1fr; gap: 2.5rem; align-items: start;
+    }
+    @media (max-width: 880px) { .intro-grid { grid-template-columns: 1fr; } }
+    .kodex-intro p {
+      font-size: 1rem; line-height: 1.7; color: var(--text); margin: 0 0 0.85rem; max-width: 60ch;
+    }
+    .kodex-intro p strong { color: var(--ink); }
+    .intro-aside {
+      padding: 1.5rem; background: var(--bg);
+      border: 1px solid var(--line); border-left: 3px solid var(--p-500);
+      border-radius: var(--r);
+    }
+    .intro-aside h3 { margin: 0 0 0.85rem; font-size: 1rem; font-weight: 700; color: var(--ink); }
+    .intro-aside p { margin: 0 0 0.55rem; font-size: 0.9rem; line-height: 1.55; color: var(--text); }
+    .intro-aside ul {
+      list-style: none; padding: 0; margin: 0.55rem 0 1rem;
+      display: flex; flex-direction: column; gap: 0.35rem;
+    }
+    .intro-aside ul li {
+      position: relative; padding-left: 1.25rem;
+      font-size: 0.85rem; line-height: 1.5; color: var(--text);
+    }
+    .intro-aside ul li::before {
+      content: "›"; position: absolute; left: 0;
+      color: var(--p-700); font-weight: 800;
+    }
+    .aside-meta { font-size: 0.78rem !important; color: var(--muted) !important; margin: 0 !important; }
+
+    /* PILLARS */
+    .kodex-pillars { background: var(--bg); border-bottom: 1px solid var(--line); }
+    .pillars-list {
+      list-style: none; padding: 0; margin: 0;
+      display: flex; flex-direction: column; gap: 1rem;
+    }
+    .pillars-list li {
+      display: grid; grid-template-columns: 70px 1fr; gap: 1.5rem;
+      padding: 1.75rem; background: var(--bg-warm);
+      border: 1px solid var(--line); border-radius: var(--r-lg);
+    }
+    @media (max-width: 600px) { .pillars-list li { grid-template-columns: 1fr; gap: 0.85rem; } }
+    .pillar-num-wrap { display: flex; align-items: flex-start; }
+    .pillar-num {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 56px; height: 56px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--p-700), var(--p-900)); color: #fff;
+      font-family: var(--sans); font-weight: 800; font-size: 1.4rem; letter-spacing: -0.02em;
+    }
+    .pillar-body h3 {
+      margin: 0 0 0.85rem; font-size: 1.2rem;
+      font-weight: 800; color: var(--ink); letter-spacing: -0.015em;
+    }
+    .pillar-blocks {
+      display: flex; flex-direction: column; gap: 0.6rem;
+    }
+    .pillar-block {
+      padding: 0.85rem 1.1rem; background: var(--bg);
+      border-radius: var(--r-sm); border-left: 3px solid var(--p-500);
+    }
+    .pillar-block-example { border-left-color: var(--amber); background: var(--amber-bg); }
+    .pillar-block-consequence { border-left-color: var(--red); background: var(--red-bg); }
+    .pillar-label {
+      display: block; font-family: var(--mono);
+      font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.08em;
+      color: var(--p-700); font-weight: 700; margin-bottom: 0.35rem;
+    }
+    .pillar-block-example .pillar-label { color: var(--amber); }
+    .pillar-block-consequence .pillar-label { color: var(--red); }
+    .pillar-block p {
+      margin: 0; font-size: 0.92rem; line-height: 1.6; color: var(--text);
+    }
+    .pillar-block p :global(strong) { color: var(--ink); font-weight: 600; }
+
+    /* SCORING */
+    .kodex-scoring { background: var(--bg-alt); border-bottom: 1px solid var(--line); }
+    .scoring-list {
+      list-style: none; padding: 0; margin: 0;
+      display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.85rem;
+    }
+    @media (max-width: 800px) { .scoring-list { grid-template-columns: 1fr; } }
+    .score-card {
+      padding: 1.5rem; background: var(--bg);
+      border: 1px solid var(--line); border-radius: var(--r-lg);
+    }
+    .score-tone-green { border-left: 4px solid var(--green); }
+    .score-tone-amber { border-left: 4px solid var(--amber); }
+    .score-tone-red { border-left: 4px solid var(--red); }
+    .score-tone-ink { border-left: 4px solid var(--ink); }
+    .score-head {
+      display: flex; flex-wrap: wrap; align-items: baseline; gap: 0.5rem 1rem;
+      margin-bottom: 0.75rem;
+    }
+    .score-level { font-size: 1.1rem; font-weight: 800; color: var(--ink); letter-spacing: -0.015em; }
+    .score-tone-green .score-level { color: var(--green); }
+    .score-tone-amber .score-level { color: var(--amber); }
+    .score-tone-red .score-level { color: var(--red); }
+    .score-range {
+      font-family: var(--mono); font-size: 0.85rem; font-weight: 700;
+      color: var(--p-700); padding: 0.2rem 0.6rem;
+      background: var(--p-50); border-radius: 99px;
+    }
+    .score-description {
+      margin: 0 0 0.85rem; font-size: 0.92rem; line-height: 1.6; color: var(--text);
+    }
+    .score-description :global(strong) { color: var(--ink); font-weight: 600; }
+    .score-examples {
+      padding: 0.7rem 0.9rem; background: var(--bg-warm); border-radius: var(--r-sm);
+      font-size: 0.85rem; color: var(--ink-soft);
+    }
+    .score-examples-label {
+      display: block; font-family: var(--mono);
+      font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.08em;
+      color: var(--muted); margin-bottom: 0.2rem; font-weight: 700;
+    }
+
+    /* REPORTS */
+    .kodex-reports { background: var(--bg); border-bottom: 1px solid var(--line); }
+    .reports-list {
+      list-style: none; padding: 0; margin: 0;
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.85rem;
+    }
+    @media (max-width: 720px) { .reports-list { grid-template-columns: 1fr; } }
+    .report-card {
+      padding: 1.5rem; background: var(--bg-warm);
+      border: 1px solid var(--line); border-radius: var(--r);
+      display: flex; flex-direction: column; gap: 1rem;
+    }
+    .report-year {
+      font-family: var(--sans); font-size: 2rem; font-weight: 800;
+      color: var(--p-700); letter-spacing: -0.02em; line-height: 1;
+    }
+    .report-stats {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.5rem;
+    }
+    .report-stats > div {
+      display: flex; flex-direction: column; gap: 0.15rem;
+    }
+    .report-stats strong { font-size: 1.2rem; color: var(--ink); font-weight: 800; line-height: 1; }
+    .report-stats span { font-size: 0.72rem; color: var(--muted); }
+    .report-up { color: var(--green) !important; }
+    .report-down { color: var(--red) !important; }
+    .report-link {
+      display: inline-flex; align-items: center; gap: 0.4rem;
+      margin-top: auto; padding: 0.55rem 0.9rem;
+      background: var(--p-700); color: #fff;
+      border-radius: var(--r-sm); font-size: 0.85rem;
+      font-weight: 700; text-decoration: none;
+      transition: background 0.15s ease;
+      align-self: flex-start;
+    }
+    .report-link:hover { background: var(--p-800); color: #fff; }
+    .report-link svg { width: 12px; height: 12px; }
+
+    /* CTA */
+    .kodex-cta { background: var(--bg-warm); }
+    .cta-card {
+      max-width: 760px; margin: 0 auto;
+      padding: 2.5rem 2rem;
+      background: linear-gradient(135deg, var(--ink), #1f1a30);
+      color: #fff; border-radius: var(--r-xl); text-align: center;
+    }
+    .cta-card h2 {
+      font-size: clamp(1.4rem, 2.6vw, 1.85rem); font-weight: 800;
+      letter-spacing: -0.02em; margin-bottom: 0.6rem;
+    }
+    .cta-card p {
+      font-size: 1rem; line-height: 1.6; color: rgba(255, 255, 255, 0.85);
+      max-width: 56ch; margin: 0 auto 1.5rem;
+    }
+    .cta-card p strong { color: #ffd166; font-weight: 700; }
+    .cta-actions {
+      display: flex; gap: 0.5rem; flex-wrap: wrap; justify-content: center;
+    }
+    .btn-primary, .btn-ghost {
+      display: inline-flex; align-items: center; gap: 0.45rem;
+      padding: 0.8rem 1.3rem; border-radius: var(--r);
+      font-size: 0.9rem; font-weight: 700; text-decoration: none;
+    }
+    .btn-primary { background: var(--accent); color: #fff; border: 1px solid var(--accent); }
+    .btn-primary:hover { background: #ff6600; }
+    .btn-primary svg { width: 14px; height: 14px; }
+    .btn-ghost {
+      background: rgba(255, 255, 255, 0.12); color: #fff;
+      border: 1px solid rgba(255, 255, 255, 0.25);
+    }
+    .btn-ghost:hover { background: rgba(255, 255, 255, 0.2); }
+    .cta-meta { margin: 1.5rem 0 0; font-size: 0.78rem; color: var(--muted); text-align: center; }
+  </style>
+</BaseLayout>

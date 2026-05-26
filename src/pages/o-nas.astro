@@ -331,6 +331,13 @@ const mediaMentions = [
       <ul class="media-logos">
         {mediaMentions.map((m) => <li>{m}</li>)}
       </ul>
+      <a href="/press/" class="media-link">
+        Press &amp; Media kit — konkrétní citace s URL
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+          <line x1="5" y1="12" x2="19" y2="12" />
+          <polyline points="12 5 19 12 12 19" />
+        </svg>
+      </a>
     </div>
   </section>
 
@@ -356,6 +363,15 @@ const mediaMentions = [
           <div>
             <div class="contact-channel-name">Kontaktní formulář</div>
             <div class="contact-channel-value">/kontakt/</div>
+          </div>
+        </a>
+        <a href="/impressum/" class="contact-channel">
+          <div class="contact-channel-ic" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          </div>
+          <div>
+            <div class="contact-channel-name">Impressum a údaje o firmě</div>
+            <div class="contact-channel-value">Converso Group s.r.o. · IČO, sídlo, jednatel</div>
           </div>
         </a>
       </div>
@@ -865,6 +881,22 @@ const mediaMentions = [
       color: var(--muted-2);
       letter-spacing: -0.01em;
     }
+    .media-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      margin-top: 1.5rem;
+      padding: 0.7rem 1.1rem;
+      background: var(--p-700);
+      color: #fff;
+      border-radius: var(--r);
+      font-size: 0.88rem;
+      font-weight: 700;
+      text-decoration: none;
+      transition: background 0.15s ease;
+    }
+    .media-link:hover { background: var(--p-800); color: #fff; }
+    .media-link svg { width: 13px; height: 13px; }
 
     /* ---------- Contact ---------- */
     .contact-band {

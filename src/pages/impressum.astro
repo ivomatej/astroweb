@@ -1,0 +1,811 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import PageBreadcrumbs from "../components/page/PageBreadcrumbs.astro";
+import PageHero from "../components/page/PageHero.astro";
+
+const lastUpdated = "21. 5. 2026";
+
+interface InfoRow {
+  label: string;
+  value: string;
+  hint?: string;
+  href?: string;
+  isPlaceholder?: boolean;
+}
+
+interface InfoBlock {
+  heading: string;
+  description?: string;
+  rows: InfoRow[];
+}
+
+const blocks: InfoBlock[] = [
+  {
+    heading: "Provozovatel webu",
+    description: "Recenzer.cz je nezávislý redakční projekt provozovaný českou společností.",
+    rows: [
+      { label: "Obchodní firma", value: "Converso Group s.r.o." },
+      { label: "Sídlo", value: "Jankovcova 1535/2a, 170 00 Praha 7, Česká republika" },
+      { label: "IČO", value: "09322035" },
+      { label: "DIČ", value: "CZ09322035" },
+      {
+        label: "Zápis v obchodním rejstříku",
+        value: "Doplnit spisovou značku u Městského soudu v Praze",
+        isPlaceholder: true,
+      },
+      { label: "Jednatel", value: "Ivo Matěj" },
+      {
+        label: "Datová schránka",
+        value: "Doplnit ID datové schránky (pokud existuje)",
+        isPlaceholder: true,
+      },
+    ],
+  },
+  {
+    heading: "Redakce",
+    description:
+      "Recenzer.cz je registrovaný periodický tisk podle zákona č. 46/2000 Sb. Za obsah redakční části odpovídá šéfredaktor.",
+    rows: [
+      {
+        label: "Odpovědný redaktor (šéfredaktor)",
+        value: "Ivo Matěj — profil a pravomoci",
+        href: "/sefredaktor/",
+      },
+      {
+        label: "E-mail šéfredaktora",
+        value: "ivo.matej@recenzer.cz",
+        href: "mailto:ivo.matej@recenzer.cz",
+      },
+      {
+        label: "Telefon redakce",
+        value: "Doplnit pevné číslo redakce",
+        isPlaceholder: true,
+      },
+      {
+        label: "Obecný kontakt redakce",
+        value: "info@recenzer.cz",
+        href: "mailto:info@recenzer.cz",
+      },
+      {
+        label: "Korespondenční adresa",
+        value: "Doplnit korespondenční adresu (pokud se liší od sídla)",
+        isPlaceholder: true,
+      },
+    ],
+  },
+  {
+    heading: "Bankovní spojení",
+    description:
+      "Pro inzerci, tiskové zprávy, předplatné a další obchodní záležitosti.",
+    rows: [
+      {
+        label: "Banka",
+        value: "Doplnit název banky",
+        isPlaceholder: true,
+      },
+      {
+        label: "Číslo účtu (CZK)",
+        value: "Doplnit číslo účtu",
+        isPlaceholder: true,
+      },
+      {
+        label: "IBAN",
+        value: "Doplnit IBAN",
+        isPlaceholder: true,
+      },
+      {
+        label: "SWIFT / BIC",
+        value: "Doplnit SWIFT",
+        isPlaceholder: true,
+      },
+    ],
+  },
+  {
+    heading: "Pověřenec pro ochranu osobních údajů",
+    description:
+      "Pověřenec není ze zákona vyžadován, přesto pro dotazy k osobním údajům slouží přímý kontakt.",
+    rows: [
+      {
+        label: "Osoba odpovědná za GDPR",
+        value: "Ivo Matěj",
+      },
+      {
+        label: "E-mail pro GDPR dotazy",
+        value: "gdpr@recenzer.cz",
+        href: "mailto:gdpr@recenzer.cz",
+      },
+      {
+        label: "Dozorový úřad",
+        value: "Úřad pro ochranu osobních údajů (uoou.cz)",
+        href: "https://www.uoou.cz/",
+      },
+    ],
+  },
+];
+
+interface QuickContact {
+  icon: "edit" | "ad" | "pr" | "hr";
+  label: string;
+  value: string;
+  href: string;
+  desc: string;
+}
+
+const quickContacts: QuickContact[] = [
+  {
+    icon: "edit",
+    label: "Redakce a články",
+    value: "redakce@recenzer.cz",
+    href: "mailto:redakce@recenzer.cz",
+    desc: "Tipy na témata, opravy, dotazy k publikovaným článkům",
+  },
+  {
+    icon: "ad",
+    label: "Inzerce a partnerství",
+    value: "obchod@recenzer.cz",
+    href: "mailto:obchod@recenzer.cz",
+    desc: "Bannery, sponzorovaný obsah, dlouhodobá spolupráce se značkami",
+  },
+  {
+    icon: "pr",
+    label: "Tiskové zprávy a média",
+    value: "press@recenzer.cz",
+    href: "mailto:press@recenzer.cz",
+    desc: "Pro novináře, PR oddělení a tiskové konference. Kompletní media kit najdete na /press/.",
+  },
+  {
+    icon: "hr",
+    label: "Kariéra a stáže",
+    value: "kariera@recenzer.cz",
+    href: "mailto:kariera@recenzer.cz",
+    desc: "Volné pozice, autoři externí spolupráce, stáže studentů",
+  },
+];
+
+interface LegalBadge {
+  title: string;
+  desc: string;
+  href: string;
+}
+
+const legalBadges: LegalBadge[] = [
+  { title: "Etický kodex", desc: "Šest pilířů etiky redakce", href: "/eticky-kodex/" },
+  { title: "Redakční zásady", desc: "Procesní pravidla a workflow", href: "/redakcni-zasady/" },
+  { title: "Affiliate disclosure", desc: "Jak vyděláváme, co to neovlivňuje", href: "/affiliate-disclosure/" },
+  { title: "Ochrana osobních údajů", desc: "GDPR, cookies, zpracování", href: "/zasady-osobnich-udaju/" },
+];
+---
+
+<BaseLayout
+  title="Impressum a údaje o provozovateli | Recenzer.cz"
+  description="Kompletní právní a kontaktní údaje o provozovateli webu Recenzer.cz — Converso Group s.r.o., IČO, DIČ, sídlo, jednatel, odpovědný redaktor a kontakty na redakci."
+>
+  <PageBreadcrumbs
+    items={[
+      { label: "Domů", href: "/" },
+      { label: "Impressum" },
+    ]}
+  />
+
+  <PageHero
+    eyebrow="Recenzer.cz · transparentní údaje"
+    eyebrowIcon="doc"
+    title="Kdo Recenzer.cz <em>provozuje</em> a kdo za obsah odpovídá"
+    subtitle="Tady najdete všechny zákonné údaje o vydavateli, redakci a kontakty pro inzerci, tiskové zprávy a kariéru. <strong>Transparentnost je pro nás standard, ne výjimka.</strong>"
+  />
+
+  <main class="impressum">
+    <!-- LAST UPDATE -->
+    <div class="impressum-meta">
+      <div class="impressum-meta-inner">
+        <span class="impressum-meta-label">Aktualizace údajů</span>
+        <span class="impressum-meta-value">{lastUpdated}</span>
+        <span class="impressum-meta-sep">·</span>
+        <span class="impressum-meta-note">
+          Údaje označené <em>kurzivou</em> doplníme po finalizaci firemních dokumentů.
+        </span>
+      </div>
+    </div>
+
+    <!-- INTRO + CTA -->
+    <section class="impressum-intro">
+      <div class="impressum-intro-inner">
+        <p class="impressum-intro-lede">
+          Recenzer.cz není anonymní projekt. Stojí za ním česká s.r.o. se zápisem v obchodním rejstříku, identifikovaný jednatel a redakce s veřejnými profily.
+          Pokud něco potřebujete vyřešit obchodně, právně nebo jen tak — najdete tady přesnou kontaktní adresu.
+        </p>
+        <div class="impressum-intro-actions">
+          <a href="/o-nas/" class="impressum-link-pill">
+            <span>O redakci a misi</span>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"
+              ><line x1="5" y1="12" x2="19" y2="12" /><polyline points="12 5 19 12 12 19" /></svg
+            >
+          </a>
+          <a href="/autori/" class="impressum-link-pill">
+            <span>Autoři a garanti</span>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"
+              ><line x1="5" y1="12" x2="19" y2="12" /><polyline points="12 5 19 12 12 19" /></svg
+            >
+          </a>
+          <a href="/kontakt/" class="impressum-link-pill">
+            <span>Kontaktní formulář</span>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"
+              ><line x1="5" y1="12" x2="19" y2="12" /><polyline points="12 5 19 12 12 19" /></svg
+            >
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- INFO BLOCKS -->
+    <section class="impressum-blocks">
+      <div class="impressum-blocks-inner">
+        {
+          blocks.map((block) => (
+            <article class="info-block">
+              <header class="info-block-header">
+                <h2 class="info-block-heading">{block.heading}</h2>
+                {block.description && <p class="info-block-desc">{block.description}</p>}
+              </header>
+              <dl class="info-block-list">
+                {block.rows.map((row) => (
+                  <div class="info-row">
+                    <dt class="info-row-label">{row.label}</dt>
+                    <dd class={`info-row-value ${row.isPlaceholder ? "placeholder" : ""}`}>
+                      {row.href ? (
+                        <a href={row.href} rel={row.href.startsWith("http") ? "noopener" : undefined}>
+                          {row.value}
+                        </a>
+                      ) : row.isPlaceholder ? (
+                        <em>{row.value}</em>
+                      ) : (
+                        row.value
+                      )}
+                      {row.hint && <span class="info-row-hint">{row.hint}</span>}
+                    </dd>
+                  </div>
+                ))}
+              </dl>
+            </article>
+          ))
+        }
+      </div>
+    </section>
+
+    <!-- QUICK CONTACTS -->
+    <section class="impressum-quick">
+      <div class="impressum-quick-inner">
+        <header class="impressum-quick-header">
+          <span class="impressum-quick-eyebrow">Rychlé kontakty</span>
+          <h2 class="impressum-quick-title">Pište přímo na konkrétní oddělení</h2>
+          <p class="impressum-quick-sub">
+            Ušetříte si čas. Každý e-mail kontroluje konkrétní osoba — odpovídáme do <strong>jednoho pracovního dne</strong>.
+          </p>
+        </header>
+        <div class="quick-grid">
+          {
+            quickContacts.map((c) => (
+              <a href={c.href} class="quick-card">
+                <div class="quick-card-icon" aria-hidden="true">
+                  {c.icon === "edit" && (
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M12 20h9" />
+                      <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4z" />
+                    </svg>
+                  )}
+                  {c.icon === "ad" && (
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <rect x="3" y="3" width="18" height="18" rx="2" />
+                      <line x1="3" y1="9" x2="21" y2="9" />
+                      <line x1="9" y1="21" x2="9" y2="9" />
+                    </svg>
+                  )}
+                  {c.icon === "pr" && (
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
+                      <path d="M15.54 8.46a5 5 0 0 1 0 7.07" />
+                      <path d="M19.07 4.93a10 10 0 0 1 0 14.14" />
+                    </svg>
+                  )}
+                  {c.icon === "hr" && (
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                      <circle cx="12" cy="7" r="4" />
+                    </svg>
+                  )}
+                </div>
+                <div class="quick-card-content">
+                  <div class="quick-card-label">{c.label}</div>
+                  <div class="quick-card-value">{c.value}</div>
+                  <p class="quick-card-desc">{c.desc}</p>
+                </div>
+              </a>
+            ))
+          }
+        </div>
+      </div>
+    </section>
+
+    <!-- LEGAL DECLARATIONS -->
+    <section class="impressum-legal">
+      <div class="impressum-legal-inner">
+        <header class="impressum-legal-header">
+          <span class="impressum-legal-eyebrow">Právní prohlášení</span>
+          <h2 class="impressum-legal-title">Co Recenzer.cz <em>není</em> a co <em>je</em></h2>
+        </header>
+        <div class="legal-statements">
+          <div class="legal-statement">
+            <h3>Recenzer.cz je periodický tisk</h3>
+            <p>
+              Web je registrován v evidenci periodického tisku podle zákona č. 46/2000 Sb. o právech a povinnostech při vydávání periodického tisku. <strong>Za obsah
+                odpovídá šéfredaktor Ivo Matěj</strong>, redakční odpovědnost vykonává Converso Group s.r.o.
+            </p>
+          </div>
+          <div class="legal-statement">
+            <h3>Není to e-shop</h3>
+            <p>
+              Recenzer.cz nic neprodává. Veškerá doporučení směřují na nezávislé e-shopy (Alza, Datart, Mountfield aj.) přes affiliate odkazy, ze kterých dostáváme
+              provizi. <strong>Výše provize ani požadavky obchodníků neovlivňují obsah recenzí.</strong> Detaily v
+              <a href="/affiliate-disclosure/">Affiliate disclosure</a>.
+            </p>
+          </div>
+          <div class="legal-statement">
+            <h3>Není to sponzorovaný obsah</h3>
+            <p>
+              Neprodáváme „PR články" vydávané za nezávislé recenze. Pokud se na webu objeví obsah, který sponzoroval třetí subjekt, je <strong>viditelně
+                označen</strong> jako „Komerční sdělení" nebo „Sponzorovaný obsah" podle pravidel <a href="/eticky-kodex/">Etického kodexu</a>.
+            </p>
+          </div>
+          <div class="legal-statement">
+            <h3>Autorská práva</h3>
+            <p>
+              Veškerý obsah (texty, ilustrace, grafy, fotografie naší redakce) je chráněn autorským zákonem č. 121/2000 Sb. Pro citaci a krátké úryvky se uplatňuje
+              právo citace dle § 31. <strong>Pro převzetí celých článků nebo přebírání obsahu</strong> kontaktujte
+              <a href="mailto:redakce@recenzer.cz">redakce@recenzer.cz</a>.
+            </p>
+          </div>
+          <div class="legal-statement">
+            <h3>Mimosoudní řešení sporů</h3>
+            <p>
+              V případě sporů spojených se službami Recenzer.cz je možné využít mimosoudního řešení sporů u <a
+                href="https://adr.coi.cz/"
+                rel="noopener"
+                target="_blank">Sdružení pro obchodní arbitráž</a
+              > nebo u České obchodní inspekce. Platforma EU pro řešení sporů on-line je dostupná na
+              <a href="https://ec.europa.eu/consumers/odr" rel="noopener" target="_blank">ec.europa.eu/consumers/odr</a>.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TRUST BAR -->
+    <section class="impressum-trust">
+      <div class="impressum-trust-inner">
+        <header class="impressum-trust-header">
+          <span class="impressum-trust-eyebrow">Související standardy</span>
+          <h2 class="impressum-trust-title">Editorial a právní standardy</h2>
+          <p class="impressum-trust-sub">
+            Pět veřejně dostupných dokumentů, které definují, jak Recenzer.cz funguje.
+          </p>
+        </header>
+        <div class="trust-badges">
+          {
+            legalBadges.map((b) => (
+              <a href={b.href} class="trust-badge">
+                <div class="trust-badge-title">{b.title}</div>
+                <div class="trust-badge-desc">{b.desc}</div>
+                <span class="trust-badge-arrow" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <line x1="5" y1="12" x2="19" y2="12" />
+                    <polyline points="12 5 19 12 12 19" />
+                  </svg>
+                </span>
+              </a>
+            ))
+          }
+        </div>
+      </div>
+    </section>
+  </main>
+</BaseLayout>
+
+<style>
+  .impressum {
+    background: var(--bg);
+  }
+
+  /* ============ META BAR ============ */
+  .impressum-meta {
+    background: var(--bg-warm);
+    border-bottom: 1px solid var(--line);
+  }
+  .impressum-meta-inner {
+    max-width: var(--max-w);
+    margin: 0 auto;
+    padding: 0.85rem var(--gutter);
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.82rem;
+    color: var(--muted);
+  }
+  .impressum-meta-label {
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--p-700);
+    font-weight: 700;
+  }
+  .impressum-meta-value { color: var(--ink); font-weight: 600; }
+  .impressum-meta-sep { color: var(--muted-2); }
+  .impressum-meta-note em { font-style: italic; color: var(--amber); font-weight: 600; }
+
+  /* ============ INTRO ============ */
+  .impressum-intro-inner {
+    max-width: var(--max-w);
+    margin: 0 auto;
+    padding: 2.5rem var(--gutter) 1rem;
+  }
+  .impressum-intro-lede {
+    max-width: 68ch;
+    font-size: 1.05rem;
+    line-height: 1.65;
+    color: var(--text);
+    margin: 0 0 1.5rem;
+  }
+  .impressum-intro-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+  .impressum-link-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.55rem 0.9rem;
+    background: var(--p-50);
+    border: 1px solid var(--p-200);
+    border-radius: 99px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--p-700);
+    text-decoration: none;
+    transition: background 0.15s ease, transform 0.15s ease;
+  }
+  .impressum-link-pill:hover {
+    background: var(--p-100);
+    transform: translateY(-1px);
+  }
+  .impressum-link-pill svg { width: 12px; height: 12px; }
+
+  /* ============ INFO BLOCKS ============ */
+  .impressum-blocks-inner {
+    max-width: var(--max-w);
+    margin: 0 auto;
+    padding: 2rem var(--gutter) 3rem;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.25rem;
+  }
+  @media (max-width: 800px) {
+    .impressum-blocks-inner { grid-template-columns: 1fr; }
+  }
+  .info-block {
+    padding: 1.5rem;
+    background: var(--bg);
+    border: 1px solid var(--line);
+    border-radius: var(--r);
+  }
+  .info-block-header {
+    padding-bottom: 1rem;
+    margin-bottom: 1rem;
+    border-bottom: 1px solid var(--line-soft);
+  }
+  .info-block-heading {
+    font-family: var(--sans);
+    font-size: 1.2rem;
+    font-weight: 800;
+    color: var(--ink);
+    margin: 0 0 0.4rem;
+    letter-spacing: -0.01em;
+  }
+  .info-block-desc {
+    margin: 0;
+    font-size: 0.88rem;
+    color: var(--muted);
+    line-height: 1.55;
+  }
+
+  .info-block-list {
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.65rem;
+  }
+  .info-row {
+    display: grid;
+    grid-template-columns: 11rem 1fr;
+    gap: 0.75rem;
+    align-items: start;
+    font-size: 0.92rem;
+  }
+  @media (max-width: 480px) {
+    .info-row { grid-template-columns: 1fr; gap: 0.1rem; }
+  }
+  .info-row-label {
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--muted);
+    line-height: 1.5;
+    padding-top: 0.1rem;
+  }
+  .info-row-value {
+    margin: 0;
+    color: var(--ink);
+    font-weight: 600;
+    line-height: 1.5;
+    word-break: break-word;
+  }
+  .info-row-value a {
+    color: var(--p-700);
+    text-decoration: none;
+    border-bottom: 1px dashed var(--p-300);
+  }
+  .info-row-value a:hover { color: var(--p-900); border-bottom-style: solid; }
+  .info-row-value.placeholder { color: var(--muted); font-weight: 500; }
+  .info-row-value.placeholder em { font-style: italic; }
+  .info-row-hint {
+    display: block;
+    margin-top: 0.15rem;
+    font-size: 0.78rem;
+    font-weight: 400;
+    color: var(--muted);
+  }
+
+  /* ============ QUICK CONTACTS ============ */
+  .impressum-quick { background: var(--bg-alt); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+  .impressum-quick-inner {
+    max-width: var(--max-w);
+    margin: 0 auto;
+    padding: 3rem var(--gutter);
+  }
+  .impressum-quick-header {
+    max-width: 60ch;
+    margin: 0 0 2rem;
+  }
+  .impressum-quick-eyebrow {
+    display: inline-block;
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--p-700);
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+  }
+  .impressum-quick-title {
+    font-family: var(--sans);
+    font-size: clamp(1.4rem, 2.6vw, 1.8rem);
+    font-weight: 800;
+    color: var(--ink);
+    margin: 0 0 0.5rem;
+    letter-spacing: -0.015em;
+  }
+  .impressum-quick-sub {
+    margin: 0;
+    color: var(--muted);
+    line-height: 1.55;
+  }
+  .impressum-quick-sub strong { color: var(--ink); }
+
+  .quick-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.9rem;
+  }
+  @media (max-width: 720px) {
+    .quick-grid { grid-template-columns: 1fr; }
+  }
+  .quick-card {
+    display: flex;
+    gap: 1rem;
+    padding: 1.25rem;
+    background: var(--bg);
+    border: 1px solid var(--line);
+    border-radius: var(--r);
+    text-decoration: none;
+    color: inherit;
+    transition: transform 0.15s ease, border-color 0.15s ease;
+  }
+  .quick-card:hover {
+    transform: translateY(-2px);
+    border-color: var(--p-300);
+  }
+  .quick-card-icon {
+    flex-shrink: 0;
+    width: 42px;
+    height: 42px;
+    border-radius: 10px;
+    background: var(--p-50);
+    color: var(--p-700);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .quick-card-icon svg { width: 22px; height: 22px; }
+  .quick-card-content { min-width: 0; }
+  .quick-card-label {
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--muted);
+    margin-bottom: 0.2rem;
+  }
+  .quick-card-value {
+    font-weight: 700;
+    color: var(--ink);
+    font-size: 0.98rem;
+    margin-bottom: 0.4rem;
+  }
+  .quick-card:hover .quick-card-value { color: var(--p-700); }
+  .quick-card-desc {
+    margin: 0;
+    font-size: 0.85rem;
+    color: var(--muted);
+    line-height: 1.5;
+  }
+
+  /* ============ LEGAL DECLARATIONS ============ */
+  .impressum-legal-inner {
+    max-width: var(--max-w);
+    margin: 0 auto;
+    padding: 3.5rem var(--gutter);
+  }
+  .impressum-legal-header {
+    max-width: 60ch;
+    margin: 0 0 2rem;
+  }
+  .impressum-legal-eyebrow {
+    display: inline-block;
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--p-700);
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+  }
+  .impressum-legal-title {
+    font-family: var(--sans);
+    font-size: clamp(1.4rem, 2.6vw, 1.8rem);
+    font-weight: 800;
+    color: var(--ink);
+    margin: 0;
+    letter-spacing: -0.015em;
+  }
+  .impressum-legal-title em {
+    font-style: italic;
+    color: var(--p-700);
+  }
+
+  .legal-statements {
+    max-width: var(--max-w-text);
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+  }
+  .legal-statement {
+    padding: 1.25rem 1.5rem;
+    background: var(--bg);
+    border: 1px solid var(--line);
+    border-left: 3px solid var(--p-500);
+    border-radius: var(--r);
+  }
+  .legal-statement h3 {
+    margin: 0 0 0.5rem;
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--ink);
+  }
+  .legal-statement p {
+    margin: 0;
+    line-height: 1.65;
+    color: var(--text);
+  }
+  .legal-statement p strong { color: var(--ink); font-weight: 600; }
+  .legal-statement p a {
+    color: var(--p-700);
+    text-decoration: none;
+    border-bottom: 1px solid var(--p-300);
+  }
+  .legal-statement p a:hover { color: var(--p-900); border-bottom-color: var(--p-700); }
+
+  /* ============ TRUST BADGES ============ */
+  .impressum-trust { background: var(--bg-warm); border-top: 1px solid var(--line); }
+  .impressum-trust-inner {
+    max-width: var(--max-w);
+    margin: 0 auto;
+    padding: 3rem var(--gutter);
+  }
+  .impressum-trust-header {
+    text-align: center;
+    max-width: 60ch;
+    margin: 0 auto 2rem;
+  }
+  .impressum-trust-eyebrow {
+    display: inline-block;
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--p-700);
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+  }
+  .impressum-trust-title {
+    font-family: var(--sans);
+    font-size: clamp(1.4rem, 2.6vw, 1.8rem);
+    font-weight: 800;
+    color: var(--ink);
+    margin: 0 0 0.5rem;
+    letter-spacing: -0.015em;
+  }
+  .impressum-trust-sub {
+    margin: 0;
+    color: var(--muted);
+    line-height: 1.55;
+  }
+
+  .trust-badges {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.75rem;
+    max-width: var(--max-w-text);
+    margin: 0 auto;
+  }
+  @media (max-width: 900px) {
+    .trust-badges { grid-template-columns: repeat(2, 1fr); }
+  }
+  .trust-badge {
+    position: relative;
+    display: block;
+    padding: 1.1rem 2rem 1.1rem 1.1rem;
+    background: var(--bg);
+    border: 1px solid var(--line);
+    border-radius: var(--r);
+    text-decoration: none;
+    color: inherit;
+    transition: border-color 0.15s ease, transform 0.15s ease;
+  }
+  .trust-badge:hover {
+    border-color: var(--p-300);
+    transform: translateY(-2px);
+  }
+  .trust-badge-title {
+    font-weight: 700;
+    color: var(--ink);
+    font-size: 0.95rem;
+    margin-bottom: 0.25rem;
+  }
+  .trust-badge-desc {
+    font-size: 0.78rem;
+    color: var(--muted);
+    line-height: 1.45;
+  }
+  .trust-badge-arrow {
+    position: absolute;
+    right: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--p-500);
+    display: inline-flex;
+  }
+  .trust-badge-arrow svg { width: 14px; height: 14px; }
+  .trust-badge:hover .trust-badge-arrow { color: var(--p-700); }
+</style>

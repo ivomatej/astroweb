@@ -1,0 +1,724 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import PageBreadcrumbs from "../components/page/PageBreadcrumbs.astro";
+import PageHero from "../components/page/PageHero.astro";
+import {
+  getAllUpdates,
+  getUpdatesByYear,
+  getUpdateCounts,
+  updateKindMeta,
+  type SiteUpdateKind,
+} from "../data/updates";
+
+const allUpdates = getAllUpdates();
+const byYear = getUpdatesByYear();
+const years = Object.keys(byYear).sort((a, b) => b.localeCompare(a));
+const counts = getUpdateCounts();
+const totalUpdates = allUpdates.length;
+
+const stats = [
+  { value: `${totalUpdates}`, label: "aktualizací v archivu" },
+  { value: `${years.length}`, label: "let v evidenci" },
+  { value: `${counts.publish}`, label: "publikací nových stránek" },
+  { value: "Atom/RSS", label: "subscribable feed" },
+];
+
+function formatCzechDate(iso: string): string {
+  const d = new Date(iso);
+  return `${d.getDate()}. ${d.getMonth() + 1}. ${d.getFullYear()}`;
+}
+
+const visibleKinds = (Object.keys(updateKindMeta) as SiteUpdateKind[]).filter(
+  (k) => counts[k] > 0,
+);
+---
+
+<BaseLayout
+  title="Aktualizace webu — chronologický feed změn | Recenzer.cz"
+  description="Veřejný chronologický log všech aktualizací článků, nových stránek, oprav, redesignů a změn metodiky na Recenzer.cz. Citovatelný feed s Atom/RSS pro odběr."
+>
+  <Fragment slot="head">
+    <link
+      rel="alternate"
+      type="application/atom+xml"
+      title="Recenzer.cz — aktualizace webu (Atom feed)"
+      href="/aktualizace.xml"
+    />
+  </Fragment>
+
+  <PageBreadcrumbs
+    items={[
+      { href: "/", label: "Recenzer" },
+      { label: "Aktualizace" },
+    ]}
+  />
+
+  <PageHero
+    eyebrow="Editorial standards · changelog"
+    eyebrowIcon="doc"
+    title="Aktualizace<br/><em>napříč webem</em>"
+    subtitle={`Chronologický feed všech změn — nové články, refresh existujícího obsahu, opravy, redesigny, nové funkce. <strong>Každá položka má stabilní URL kotvu pro citaci.</strong> Pro automatický odběr je k dispozici <a href="/aktualizace.xml">Atom feed</a>.`}
+  />
+
+  <!-- ============ STATS ============ -->
+  <section class="stats-strip">
+    <div class="inner">
+      <ul>
+        {
+          stats.map((s) => (
+            <li>
+              <strong>{s.value}</strong>
+              <span>{s.label}</span>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <!-- ============ INTRO ============ -->
+  <section class="upd-intro">
+    <div class="inner intro-grid">
+      <div>
+        <header class="section-head">
+          <p class="eyebrow">Co je tento feed</p>
+          <h2>Crawlable, citovatelný, subscribable</h2>
+        </header>
+        <p class="intro-text">
+          Pokud na nás odkazujete, máte tu <strong>permanentní URL kotvy</strong> pro konkrétní aktualizace — formát <code>/aktualizace/#id-zaznamu</code>. Kotva
+          nezmizí ani když záznam přesuneme.
+        </p>
+        <p class="intro-text">
+          Tento feed je <strong>odlišný od <a href="/opravy/">/opravy/</a></strong> (archiv chyb) a <strong><a href="/nase-chyby/">/nase-chyby/</a></strong> (systémové
+          omyly). Tady jsou <em>všechny změny</em> — od triviálních aktualizací cen po publikaci nových článků a změn editoriální politiky.
+        </p>
+        <p class="intro-text">
+          Pro automatický odběr ve vašem RSS čtečce přidejte
+          <a href="/aktualizace.xml" class="feed-link"><code>recenzer.cz/aktualizace.xml</code></a>.
+        </p>
+      </div>
+      <aside class="intro-aside">
+        <h3>Jak číst záznam</h3>
+        <ul>
+          <li><strong>ID</strong> — stabilní anchor pro citaci (klikněte na # ikonu)</li>
+          <li><strong>Datum</strong> — kdy byla změna provedena</li>
+          <li><strong>Typ</strong> — kategorie změny (barevný badge)</li>
+          <li><strong>Článek</strong> — link na dotčenou stránku</li>
+          <li><strong>Autor</strong> — kdo změnu provedl</li>
+          <li><strong>Související</strong> — link na detail (opravy, AI politiku, atd.)</li>
+        </ul>
+      </aside>
+    </div>
+  </section>
+
+  <!-- ============ FILTRY ============ -->
+  <section class="upd-filters">
+    <div class="inner">
+      <div class="filter-row">
+        <span class="filter-label">Filtrovat:</span>
+        <button type="button" class="chip chip-active" data-filter-kind="all">
+          Vše <span class="chip-count">{totalUpdates}</span>
+        </button>
+        {
+          visibleKinds.map((k) => (
+            <button type="button" class={`chip chip-tone-${updateKindMeta[k].tone}`} data-filter-kind={k}>
+              {updateKindMeta[k].label} <span class="chip-count">{counts[k]}</span>
+            </button>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ FEED BY YEAR ============ -->
+  {
+    years.map((year) => (
+      <section class="upd-year">
+        <div class="inner">
+          <header class="year-head">
+            <h2>{year}</h2>
+            <span class="year-count">
+              {byYear[year].length} {byYear[year].length === 1 ? "aktualizace" : byYear[year].length < 5 ? "aktualizace" : "aktualizací"}
+            </span>
+          </header>
+          <ol class="updates-list">
+            {byYear[year].map((u) => (
+              <li
+                id={u.id}
+                class={`update-item upd-tone-${updateKindMeta[u.kind].tone}`}
+                data-kind={u.kind}
+              >
+                <div class="update-meta">
+                  <time class="update-date" datetime={u.date}>{formatCzechDate(u.date)}</time>
+                  <a class="update-anchor" href={`#${u.id}`} aria-label="Stabilní odkaz na tuto aktualizaci">
+                    #
+                  </a>
+                  <span class={`update-kind update-kind-${updateKindMeta[u.kind].tone}`}>
+                    {updateKindMeta[u.kind].label}
+                  </span>
+                  {u.category && <span class="update-category">{u.category}</span>}
+                </div>
+                <h3 class="update-title">{u.title}</h3>
+                <p class="update-description" set:html={u.description} />
+                <footer class="update-footer">
+                  {u.articleHref && (
+                    <a href={u.articleHref} class="update-article-link">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                        <polyline points="14 2 14 8 20 8" />
+                      </svg>
+                      <span>{u.articleTitle || u.articleHref}</span>
+                    </a>
+                  )}
+                  {u.author && (
+                    <span class="update-author">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                        <circle cx="12" cy="7" r="4" />
+                      </svg>
+                      {u.author}
+                    </span>
+                  )}
+                  {u.relatedHref && u.relatedLabel && (
+                    <a href={u.relatedHref} class="update-related">
+                      {u.relatedLabel}
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+                        <line x1="5" y1="12" x2="19" y2="12" />
+                        <polyline points="12 5 19 12 12 19" />
+                      </svg>
+                    </a>
+                  )}
+                </footer>
+              </li>
+            ))}
+          </ol>
+        </div>
+      </section>
+    ))
+  }
+
+  <!-- ============ SUBSCRIBE CTA ============ -->
+  <section class="upd-subscribe">
+    <div class="inner">
+      <div class="subscribe-card">
+        <span class="subscribe-eyebrow">Subscribable feed</span>
+        <h2>Sledujte aktualizace ve své RSS čtečce</h2>
+        <p>
+          Pokud chcete dostávat upozornění na každou změnu obsahu Recenzer.cz, přidejte si náš Atom feed do <strong>NetNewsWire, Feedly, Inoreader, NewsBlur</strong>
+          nebo jiného RSS klienta.
+        </p>
+        <div class="subscribe-feeds">
+          <a href="/aktualizace.xml" class="feed-btn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+              <path d="M4 11a9 9 0 0 1 9 9" />
+              <path d="M4 4a16 16 0 0 1 16 16" />
+              <circle cx="5" cy="19" r="1" />
+            </svg>
+            Atom feed (aktualizace)
+          </a>
+          <a href="/opravy/" class="feed-btn feed-btn-ghost">
+            Archiv oprav
+          </a>
+          <a href="/nase-chyby/" class="feed-btn feed-btn-ghost">
+            Systémové chyby
+          </a>
+        </div>
+        <p class="subscribe-meta">
+          Atom 1.0 standard · <code>/aktualizace.xml</code> · Aktualizovaný se synchronizací s redakčním systémem.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ FILTER SCRIPT ============ -->
+  <script is:inline>
+    (function () {
+      const chips = document.querySelectorAll("[data-filter-kind]");
+      const items = document.querySelectorAll(".update-item");
+      const years = document.querySelectorAll(".upd-year");
+
+      function applyFilter(kind) {
+        items.forEach((item) => {
+          const itemKind = item.getAttribute("data-kind");
+          if (kind === "all" || itemKind === kind) {
+            item.style.display = "";
+          } else {
+            item.style.display = "none";
+          }
+        });
+        years.forEach((year) => {
+          const visible = year.querySelectorAll(".update-item:not([style*='none'])");
+          year.style.display = visible.length > 0 ? "" : "none";
+        });
+      }
+
+      chips.forEach((chip) => {
+        chip.addEventListener("click", () => {
+          chips.forEach((c) => c.classList.remove("chip-active"));
+          chip.classList.add("chip-active");
+          applyFilter(chip.getAttribute("data-filter-kind"));
+        });
+      });
+
+      // Smooth scroll to anchor on load
+      if (window.location.hash) {
+        const target = document.getElementById(window.location.hash.slice(1));
+        if (target) {
+          setTimeout(() => target.scrollIntoView({ behavior: "smooth", block: "center" }), 100);
+        }
+      }
+    })();
+  </script>
+
+  <style>
+    .inner {
+      max-width: var(--max-w);
+      margin: 0 auto;
+      padding: clamp(2rem, 4vw, 3.5rem) var(--gutter);
+    }
+    .section-head {
+      max-width: 65ch;
+      margin: 0 0 1.5rem;
+    }
+    .eyebrow {
+      font-family: var(--mono);
+      font-size: 11.5px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--p-700);
+      font-weight: 700;
+      margin: 0 0 0.5rem;
+    }
+    .section-head h2 {
+      font-size: clamp(1.4rem, 2.7vw, 1.85rem);
+      font-weight: 800;
+      letter-spacing: -0.025em;
+      color: var(--ink);
+      line-height: 1.2;
+      margin-bottom: 0.5rem;
+    }
+
+    /* ============ STATS ============ */
+    .stats-strip {
+      background: var(--bg);
+      border-bottom: 1px solid var(--line);
+    }
+    .stats-strip .inner { padding: 2rem var(--gutter); }
+    .stats-strip ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1.5rem;
+    }
+    @media (max-width: 720px) {
+      .stats-strip ul { grid-template-columns: repeat(2, 1fr); gap: 1rem; }
+    }
+    .stats-strip li {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      padding-top: 0.75rem;
+      border-top: 2px solid var(--p-200);
+    }
+    .stats-strip strong {
+      font-size: clamp(1.5rem, 2.7vw, 2rem);
+      font-weight: 800;
+      color: var(--ink);
+      letter-spacing: -0.02em;
+      line-height: 1;
+    }
+    .stats-strip span {
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.3;
+    }
+
+    /* ============ INTRO ============ */
+    .upd-intro {
+      background: var(--bg-warm);
+      border-bottom: 1px solid var(--line);
+    }
+    .intro-grid {
+      display: grid;
+      grid-template-columns: 1.5fr 1fr;
+      gap: 2.5rem;
+      align-items: start;
+    }
+    @media (max-width: 880px) { .intro-grid { grid-template-columns: 1fr; } }
+    .intro-text {
+      font-size: 0.95rem;
+      line-height: 1.7;
+      color: var(--text);
+      margin: 0 0 0.85rem;
+      max-width: 60ch;
+    }
+    .intro-text strong { color: var(--ink); }
+    .intro-text em { font-style: italic; }
+    .intro-text a {
+      color: var(--p-700);
+      text-decoration: none;
+      border-bottom: 1px dashed var(--p-300);
+    }
+    .intro-text code {
+      font-family: var(--mono);
+      font-size: 0.85rem;
+      background: var(--p-50);
+      color: var(--p-700);
+      padding: 1px 6px;
+      border-radius: 4px;
+    }
+    .feed-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+    }
+    .intro-aside {
+      padding: 1.5rem;
+      background: var(--bg);
+      border: 1px solid var(--line);
+      border-left: 3px solid var(--p-500);
+      border-radius: var(--r);
+    }
+    .intro-aside h3 {
+      margin: 0 0 0.85rem;
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--ink);
+    }
+    .intro-aside ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 0.45rem;
+    }
+    .intro-aside li {
+      position: relative;
+      padding-left: 1.25rem;
+      font-size: 0.85rem;
+      line-height: 1.55;
+      color: var(--text);
+    }
+    .intro-aside li::before {
+      content: "›";
+      position: absolute;
+      left: 0;
+      color: var(--p-700);
+      font-weight: 800;
+    }
+    .intro-aside strong { color: var(--ink); font-weight: 700; }
+
+    /* ============ FILTERS ============ */
+    .upd-filters {
+      background: var(--bg);
+      border-bottom: 1px solid var(--line);
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+    .upd-filters .inner { padding: 1.1rem var(--gutter); }
+    .filter-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.45rem;
+    }
+    .filter-label {
+      font-family: var(--mono);
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+      font-weight: 700;
+      margin-right: 0.5rem;
+    }
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.35rem 0.75rem;
+      border-radius: 99px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      border: 1px solid var(--line);
+      background: var(--bg);
+      color: var(--ink-soft);
+      transition: all 0.15s ease;
+      font-family: inherit;
+    }
+    .chip:hover { border-color: var(--p-400); color: var(--p-700); }
+    .chip-active {
+      background: var(--p-700);
+      border-color: var(--p-700);
+      color: #fff;
+    }
+    .chip-active:hover { color: #fff; background: var(--p-800); }
+    .chip-count {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 22px;
+      height: 18px;
+      padding: 0 5px;
+      background: var(--p-50);
+      color: var(--p-700);
+      border-radius: 9px;
+      font-family: var(--mono);
+      font-size: 0.68rem;
+      font-weight: 700;
+    }
+    .chip-active .chip-count { background: rgba(255, 255, 255, 0.25); color: #fff; }
+
+    /* ============ YEAR ============ */
+    .upd-year {
+      background: var(--bg);
+      border-bottom: 1px solid var(--line);
+    }
+    .upd-year:nth-child(even) { background: var(--bg-alt); }
+    .year-head {
+      display: flex;
+      align-items: baseline;
+      gap: 1rem;
+      margin: 0 0 1.5rem;
+      padding-bottom: 0.85rem;
+      border-bottom: 2px solid var(--p-200);
+    }
+    .year-head h2 {
+      font-family: var(--sans);
+      font-size: clamp(1.5rem, 2.8vw, 2rem);
+      font-weight: 800;
+      letter-spacing: -0.025em;
+      color: var(--ink);
+      margin: 0;
+    }
+    .year-count {
+      font-family: var(--mono);
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--p-700);
+      padding: 0.2rem 0.55rem;
+      background: var(--p-50);
+      border-radius: 4px;
+      font-weight: 700;
+    }
+
+    /* ============ UPDATE ITEM ============ */
+    .updates-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+    .update-item {
+      padding: 1.25rem 1.4rem;
+      background: var(--bg);
+      border: 1px solid var(--line);
+      border-radius: var(--r);
+      transition: border-color 0.15s ease;
+    }
+    .upd-year:nth-child(even) .update-item { background: var(--bg); }
+    .update-item:hover { border-color: var(--p-300); }
+    .update-item:target {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(255, 79, 0, 0.15);
+      background: var(--accent-soft);
+    }
+    .upd-tone-green { border-left: 4px solid var(--green); }
+    .upd-tone-amber { border-left: 4px solid var(--amber); }
+    .upd-tone-red { border-left: 4px solid var(--red); }
+    .upd-tone-purple { border-left: 4px solid var(--p-500); }
+    .upd-tone-muted { border-left: 4px solid var(--muted-2); }
+
+    .update-meta {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.45rem;
+      margin-bottom: 0.55rem;
+    }
+    .update-date {
+      font-family: var(--mono);
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: var(--ink);
+    }
+    .update-anchor {
+      font-family: var(--mono);
+      font-size: 0.85rem;
+      color: var(--muted-2);
+      text-decoration: none;
+      padding: 0 0.35rem;
+      border-radius: 4px;
+      transition: color 0.15s ease, background 0.15s ease;
+    }
+    .update-anchor:hover {
+      color: var(--p-700);
+      background: var(--p-50);
+    }
+    .update-kind {
+      padding: 0.15rem 0.55rem;
+      border-radius: 99px;
+      font-family: var(--mono);
+      font-size: 0.68rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      font-weight: 700;
+    }
+    .update-kind-green { background: var(--green-bg); color: var(--green); }
+    .update-kind-amber { background: var(--amber-bg); color: var(--amber); }
+    .update-kind-red { background: var(--red-bg); color: var(--red); }
+    .update-kind-purple { background: var(--p-50); color: var(--p-700); }
+    .update-kind-muted { background: var(--bg-warm); color: var(--muted); border: 1px solid var(--line); }
+
+    .update-category {
+      font-family: var(--mono);
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--muted);
+      padding: 0.15rem 0.5rem;
+      background: var(--bg-warm);
+      border-radius: 4px;
+    }
+
+    .update-title {
+      margin: 0 0 0.5rem;
+      font-size: 1.02rem;
+      font-weight: 700;
+      color: var(--ink);
+      line-height: 1.4;
+    }
+    .update-description {
+      margin: 0 0 0.85rem;
+      font-size: 0.92rem;
+      line-height: 1.6;
+      color: var(--text);
+    }
+    .update-description :global(a) {
+      color: var(--p-700);
+      text-decoration: none;
+      border-bottom: 1px dashed var(--p-300);
+    }
+    .update-description :global(strong) { color: var(--ink); font-weight: 600; }
+
+    .update-footer {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem 1rem;
+      align-items: center;
+      padding-top: 0.7rem;
+      border-top: 1px dashed var(--line);
+      font-size: 0.82rem;
+    }
+    .update-article-link,
+    .update-author,
+    .update-related {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      color: var(--muted);
+    }
+    .update-article-link {
+      color: var(--p-700);
+      text-decoration: none;
+      font-weight: 600;
+    }
+    .update-article-link:hover { color: var(--p-900); }
+    .update-article-link svg,
+    .update-author svg { width: 13px; height: 13px; }
+    .update-related {
+      margin-left: auto;
+      color: var(--ink-soft);
+      text-decoration: none;
+      font-weight: 600;
+      padding: 0.25rem 0.6rem;
+      background: var(--bg-warm);
+      border-radius: 99px;
+    }
+    .update-related:hover { background: var(--p-50); color: var(--p-700); }
+    .update-related svg { width: 11px; height: 11px; }
+
+    /* ============ SUBSCRIBE ============ */
+    .upd-subscribe { background: var(--bg); }
+    .subscribe-card {
+      max-width: 760px;
+      margin: 0 auto;
+      padding: 2.25rem 2rem;
+      background: linear-gradient(135deg, var(--p-700), var(--p-900));
+      color: #fff;
+      border-radius: var(--r-xl);
+      text-align: center;
+    }
+    .subscribe-eyebrow {
+      display: inline-block;
+      font-family: var(--mono);
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: #ffd166;
+      margin-bottom: 0.75rem;
+      font-weight: 700;
+    }
+    .subscribe-card h2 {
+      font-size: clamp(1.35rem, 2.5vw, 1.7rem);
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      margin-bottom: 0.85rem;
+    }
+    .subscribe-card p {
+      font-size: 0.98rem;
+      line-height: 1.65;
+      color: rgba(255, 255, 255, 0.85);
+      max-width: 56ch;
+      margin: 0 auto 1.5rem;
+    }
+    .subscribe-card p strong { color: #ffd166; font-weight: 700; }
+
+    .subscribe-feeds {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    .feed-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      padding: 0.8rem 1.3rem;
+      background: var(--accent);
+      color: #fff;
+      border-radius: var(--r);
+      font-size: 0.92rem;
+      font-weight: 700;
+      text-decoration: none;
+      transition: background 0.15s ease;
+    }
+    .feed-btn:hover { background: #ff6600; }
+    .feed-btn svg { width: 14px; height: 14px; }
+    .feed-btn-ghost {
+      background: rgba(255, 255, 255, 0.12);
+      border: 1px solid rgba(255, 255, 255, 0.25);
+    }
+    .feed-btn-ghost:hover { background: rgba(255, 255, 255, 0.2); }
+
+    .subscribe-meta {
+      margin: 1.25rem 0 0;
+      font-size: 0.78rem;
+      color: rgba(255, 255, 255, 0.5);
+    }
+    .subscribe-meta code {
+      font-family: var(--mono);
+      background: rgba(255, 255, 255, 0.1);
+      color: #ffd166;
+      padding: 1px 6px;
+      border-radius: 4px;
+    }
+  </style>
+</BaseLayout>

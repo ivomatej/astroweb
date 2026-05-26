@@ -9,6 +9,7 @@ import ArticleHeader from "../../components/article/ArticleHeader.astro";
 import ByLine from "../../components/article/ByLine.astro";
 import TrustRow from "../../components/article/TrustRow.astro";
 import AffiliateDisclosure from "../../components/article/AffiliateDisclosure.astro";
+import ProductAcquisitionSection from "../../components/article/ProductAcquisitionSection.astro";
 import TLDR from "../../components/article/TLDR.astro";
 import Figure from "../../components/article/Figure.astro";
 import ArticleSection from "../../components/article/ArticleSection.astro";
@@ -63,6 +64,8 @@ if (!article) {
       <TrustRow pills={article.trustPills} />
 
       <AffiliateDisclosure disclosure={article.affiliateDisclosure} />
+
+      {article.productAcquisition && <ProductAcquisitionSection data={article.productAcquisition} />}
 
       <article class="article-body">
         <TLDR tldr={article.tldr} />

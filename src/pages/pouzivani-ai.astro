@@ -1,0 +1,1175 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import PageBreadcrumbs from "../components/page/PageBreadcrumbs.astro";
+import PageHero from "../components/page/PageHero.astro";
+
+const lastUpdated = "2026-05-21";
+const policyVersion = "2.1";
+
+interface UseCase {
+  icon: "search" | "data" | "price" | "lang" | "schema" | "image" | "chart" | "summary";
+  category: "research" | "verification" | "data" | "language";
+  title: string;
+  description: string;
+  tools: string[];
+  supervision: string;
+  example?: string;
+}
+
+const useCases: UseCase[] = [
+  {
+    icon: "search",
+    category: "research",
+    title: "Vstupní rešerše tématu",
+    description:
+      "Před začátkem práce na článku používáme AI k mapování existujících zdrojů, identifikaci klíčových testovacích parametrů a sběru relevantních norem (ISO, IEC, EN).",
+    tools: ["Perplexity Pro (s citacemi)", "Claude 3.5 Sonnet (deep research)", "ChatGPT o1"],
+    supervision:
+      "Každý zdroj, který AI navrhne, manuálně otevřeme a přečteme. AI nikdy nepoužíváme jako primární zdroj — pouze jako mapu k primárním zdrojům.",
+    example:
+      "U článku o pračkách AI navrhla: IEC 60456 (test účinnosti), EN 60335 (bezpečnost), ISO 3744 (akustika). Všechny tři normy jsme následně přečetli v plném znění a citujeme je přímo.",
+  },
+  {
+    icon: "data",
+    category: "verification",
+    title: "Křížové ověření tvrzení",
+    description:
+      "U faktických tvrzení v draftu článku se ptáme AI na potenciální chyby, rozpory s veřejně známými fakty a alternativní interpretace.",
+    tools: ["Claude 3.5 Sonnet (s extended thinking)", "GPT-4o"],
+    supervision:
+      "AI je jen jeden z pěti zdrojů fact-checkingu. <a href=\"/overovani-faktu/\">Celý proces</a> vyžaduje minimálně 2 nezávislé primární zdroje pro každé klíčové tvrzení.",
+    example:
+      "U tvrzení „Bosch motor EcoSilence má 10letou záruku“ AI upozornila, že záruka se nevztahuje na komerční použití. Doplnili jsme do článku.",
+  },
+  {
+    icon: "price",
+    category: "data",
+    title: "Monitoring cen v e-shopech",
+    description:
+      "Skript na vlastním serveru spouští každých 24 hodin AI agent, který obchází 12 e-shopů (Heureka, Alza, Datart…), extrahuje aktuální ceny sledovaných produktů a aktualizuje databázi.",
+    tools: ["Custom Python scraping + GPT-4o pro extrakci dat", "Playwright pro headless browsing"],
+    supervision:
+      "Při změně ceny o více než 15 % systém pošle redaktorovi e-mailovou notifikaci pro manuální ověření. Žádná cena se nepublikuje bez prvního manuálního schválení.",
+    example: "Sledujeme aktuálně 1 240 produktů. Průměrně se cena změní u 8 % produktů denně.",
+  },
+  {
+    icon: "chart",
+    category: "data",
+    title: "Zpracování dat z měření",
+    description:
+      "Datové soubory z laboratorních přístrojů (CSV z wattmetru, dB grafy z hlukoměru) AI pomáhá zpracovat — výpočty průměrů, detekce outlierů, generování grafů.",
+    tools: ["Python + pandas / NumPy", "Claude pro vizualizační návrh"],
+    supervision:
+      "Surová data z přístroje vždy zveřejníme spolu s článkem (PDF nebo CSV). Čtenář si může výpočty zkontrolovat sám.",
+    example:
+      "Test 30 cyklů praní Bosch WGG244A0BY: 30 řádků naměřených dat (spotřeba, teplota, doba), AI pomohla vypočítat průměry a směrodatné odchylky. Vstupní CSV je dostupný k dispozici.",
+  },
+  {
+    icon: "summary",
+    category: "data",
+    title: "Sumarizace uživatelských recenzí",
+    description:
+      "U dlouhodobých produktů procházíme stovky až tisíce reálných uživatelských recenzí na Heureka.cz, Mall.cz a dalších. AI je sumarizuje do top pozitivních a kritických bodů.",
+    tools: ["Claude 3.5 Sonnet (s embeddingy pro grupování)"],
+    supervision:
+      "AI dává návrh. Redaktor následně manuálně vybere reprezentativní citace, ověří je v originálním zdroji a uvede v článku s atribucí (jméno, datum, platforma).",
+    example: "Pro Bosch WGG244A0BY jsme prošli 2 340 recenzí z Heureky. AI vytipovala 12 reprezentativních, redaktor vybral 3 do článku.",
+  },
+  {
+    icon: "lang",
+    category: "language",
+    title: "Jazyková korektura a stylistika",
+    description:
+      "Po dokončení textu autorem prochází draft AI nástrojem pro detekci překlepů, gramatických chyb a stylistických nesrovnalostí. AI nepřepisuje obsah — jen označuje místa k revizi.",
+    tools: ["Grammarly Premium (s ČJ podporou)", "Vlastní pipeline s GPT-4o pro detekci"],
+    supervision:
+      "Každou navrženou úpravu schvaluje editor (Lucie Horáková). AI nikdy nemění obsah článku — jen formu.",
+  },
+  {
+    icon: "schema",
+    category: "data",
+    title: "Generování strukturovaných dat (Schema.org)",
+    description:
+      "AI nám pomáhá generovat JSON-LD strukturovaná data pro Product, Review, FAQPage a podobné schémata. Zajistí konzistenci napříč články.",
+    tools: ["Custom prompt template + GPT-4o"],
+    supervision:
+      "Vygenerovaný JSON-LD validujeme přes Google Rich Results Test a Schema.org validator. Bez validace se nikdy nepublikuje.",
+  },
+];
+
+interface NeverDo {
+  text: string;
+  why: string;
+}
+
+const neverDoList: NeverDo[] = [
+  {
+    text: "Negenerujeme celé články pomocí AI",
+    why: "Autor je vždy konkrétní člověk z týmu. AI je nástroj, ne autor. Pokud se v článku objeví AI-vygenerovaný text, je výslovně označený.",
+  },
+  {
+    text: "Negenerujeme fotografie produktů",
+    why: "Všechny fotky na webu jsou buď naše vlastní (z laboratoře), oficiální press fotky od výrobce, nebo fotky uživatelů (s atribucí). Žádné AI-generated images.",
+  },
+  {
+    text: "AI nerozhoduje o pořadí v žebříčku",
+    why: "Konečné pořadí v TOP X žebříčcích určuje redaktor + garant. AI může navrhnout, ale finální volba je lidská.",
+  },
+  {
+    text: "AI nepíše citace odborníků",
+    why: "Pokud v článku najdete citaci „říká Ing. Novák“, je to skutečně něco, co Ing. Novák řekl nebo napsal. Žádné AI-generated quotes.",
+  },
+  {
+    text: "AI neopisuje obsah z jiných webů",
+    why: "AI nepoužíváme jako nástroj pro „přepsání“ cizího obsahu. Naše články vznikají z primárních zdrojů (laboratoř, oficiální dokumentace, rozhovory).",
+  },
+  {
+    text: "AI nedělá fact-checking sama o sobě",
+    why: "Ověřování faktů je vícekrokový proces s minimálně 2 primárními zdroji. AI je pouze jeden z 5 kontrolních bodů — nikdy ne jediný.",
+  },
+  {
+    text: "AI nenahrazuje konzultaci s garantem",
+    why: "U článků v citlivých oborech (zdraví, bezpečnost dětí, finance) musí garant podepsat schválení. AI nemůže nahradit lidskou odbornost a odpovědnost.",
+  },
+];
+
+interface AIBoundary {
+  axis: string;
+  ai: string;
+  human: string;
+}
+
+const boundaries: AIBoundary[] = [
+  {
+    axis: "Volba tématu",
+    ai: "Návrh trendů a vyhledávacích volumů",
+    human: "Konečné rozhodnutí šéfredaktora",
+  },
+  {
+    axis: "Rešerše zdrojů",
+    ai: "Mapování dostupných norem, studií, recenzí",
+    human: "Čtení a verifikace každého zdroje",
+  },
+  {
+    axis: "Hands-on testování",
+    ai: "Nic — laboratoř je 100 % lidská",
+    human: "30 cyklů praní, měření, foto, video",
+  },
+  {
+    axis: "Zpracování dat",
+    ai: "Výpočty, vizualizace, detekce outlierů",
+    human: "Interpretace výsledků v kontextu",
+  },
+  {
+    axis: "Psaní textu",
+    ai: "Návrh struktury, prvotní outline",
+    human: "Psaní samotné, hlas autora",
+  },
+  {
+    axis: "Citace a quotes",
+    ai: "Nic — citace musí být skutečné",
+    human: "Skutečné výroky skutečných lidí",
+  },
+  {
+    axis: "Pořadí v žebříčku",
+    ai: "Navrhne podle zadaných kritérií",
+    human: "Konečná volba podle vlastního úsudku",
+  },
+  {
+    axis: "Fact-checking",
+    ai: "Jeden z 5 kontrolních bodů",
+    human: "4 z 5 kontrolních bodů + finální audit",
+  },
+  {
+    axis: "Schválení garantem",
+    ai: "Nic — garant je vždy člověk",
+    human: "Garant musí podepsat schválení",
+  },
+  {
+    axis: "Publikace",
+    ai: "Nic — publikuje editor",
+    human: "Editor stiskne tlačítko publish",
+  },
+];
+
+interface Tool {
+  name: string;
+  vendor: string;
+  use: string;
+  privacyNote: string;
+}
+
+const aiTools: Tool[] = [
+  {
+    name: "Claude 3.5 Sonnet",
+    vendor: "Anthropic",
+    use: "Hlavní research, fact-checking, sumarizace, zpracování dat",
+    privacyNote: "API enterprise plán — data se nepoužívají k tréninku modelu.",
+  },
+  {
+    name: "GPT-4o",
+    vendor: "OpenAI",
+    use: "Extrakce dat ze stránek (scraping), Schema.org JSON-LD",
+    privacyNote: "API verze (ne ChatGPT) — opt-out z trénovacích dat.",
+  },
+  {
+    name: "Perplexity Pro",
+    vendor: "Perplexity AI",
+    use: "Mapování zdrojů s citacemi — primárně rešerše",
+    privacyNote: "Enterprise tier — žádný trénink na našich datech.",
+  },
+  {
+    name: "Grammarly Premium",
+    vendor: "Grammarly",
+    use: "Jazyková korektura a stylistika (anglické texty)",
+    privacyNote: "Funguje i offline pro citlivé pasáže.",
+  },
+  {
+    name: "Custom Python + pandas",
+    vendor: "Open source",
+    use: "Zpracování dat z měření, statistická analýza",
+    privacyNote: "Běží lokálně, nikde data neopouštějí.",
+  },
+  {
+    name: "Playwright + headless Chrome",
+    vendor: "Microsoft (open source)",
+    use: "Monitoring cen — scraping e-shopů",
+    privacyNote: "Běží na našem serveru. Respektuje robots.txt.",
+  },
+];
+
+interface AuditMetric {
+  value: string;
+  label: string;
+  context: string;
+}
+
+const auditMetrics: AuditMetric[] = [
+  {
+    value: "0",
+    label: "AI-generovaných článků",
+    context: "od založení webu v roce 2016",
+  },
+  {
+    value: "~22 %",
+    label: "průměrný AI assist na článku",
+    context: "měřeno časem AI vs člověk",
+  },
+  {
+    value: "100 %",
+    label: "článků prochází lidským editorem",
+    context: "minimálně Lucie Horáková",
+  },
+  {
+    value: "5 z 5",
+    label: "kontrolních bodů obsahuje člověka",
+    context: "AI je vždy jen 1 z nich",
+  },
+];
+
+const principlesList = [
+  {
+    num: "01",
+    title: "AI je nástroj, ne autor",
+    text: "AI používáme stejně jako Excel nebo Google Search — je to nástroj, který nám urychluje práci. Autorem je vždy konkrétní člověk z týmu, který nese odpovědnost za to, co článek říká.",
+  },
+  {
+    num: "02",
+    title: "Transparentnost před skrýváním",
+    text: "Tato stránka existuje proto, abyste věděli, jak AI používáme. Když budeme používat AI nově nebo jinak, doplníme to sem do 30 dnů.",
+  },
+  {
+    num: "03",
+    title: "Žádná AI bez supervize",
+    text: "Každý AI output prochází lidskou kontrolou. AI nikdy nepublikuje sama — vždy je v cyklu člověk, který nese odpovědnost.",
+  },
+  {
+    num: "04",
+    title: "Pět kontrolních bodů, jeden z nich AI",
+    text: "Náš <a href=\"/overovani-faktu/\">fact-checking proces</a> má 5 fází. AI je jen 1 z 5. Žádný článek se nepublikuje s tvrzením, které ověřila pouze AI.",
+  },
+  {
+    num: "05",
+    title: "Otevřený dialog",
+    text: "Pokud najdete v článku něco, co působí jako AI-generated obsah, napište na <a href=\"mailto:redakce@recenzer.cz\">redakce@recenzer.cz</a>. Prošetříme a (pokud chyba) přidáme do <a href=\"/opravy/\">archivu oprav</a>.",
+  },
+];
+
+const stats = [
+  { value: `${useCases.length}`, label: "konkrétních use-cases AI" },
+  { value: `${aiTools.length}`, label: "používaných nástrojů" },
+  { value: `${neverDoList.length}`, label: "explicit no-AI zón" },
+  { value: policyVersion, label: "verze politiky" },
+];
+
+const categoryLabels: Record<UseCase["category"], { label: string; color: string }> = {
+  research: { label: "Rešerše", color: "purple" },
+  verification: { label: "Ověřování", color: "green" },
+  data: { label: "Zpracování dat", color: "amber" },
+  language: { label: "Jazyková práce", color: "muted" },
+};
+---
+
+<BaseLayout
+  title="Jak používáme AI — transparentní politika | Recenzer.cz"
+  description="Detailní transparentní popis, jak Recenzer.cz používá AI nástroje (Claude, GPT-4, Perplexity) pro research, ověřování faktů, monitoring cen a zpracování dat. Co AI dělá a co naopak nedělá. Verze 2.1."
+>
+  <PageBreadcrumbs
+    items={[
+      { href: "/", label: "Recenzer" },
+      { label: "Používání AI" },
+    ]}
+  />
+
+  <PageHero
+    eyebrow="Editorial standards · AI transparency"
+    eyebrowIcon="lab"
+    title="Jak používáme<br/><em>umělou inteligenci</em>"
+    subtitle={`<strong>AI je nástroj, ne autor.</strong> Tato stránka detailně popisuje, kde v naší redakční práci používáme AI a kde naopak nikdy. Verze politiky <strong>${policyVersion}</strong> · poslední aktualizace <time datetime="${lastUpdated}">${lastUpdated}</time>.`}
+  />
+
+  <!-- ============ STATS ============ -->
+  <section class="stats-strip">
+    <div class="inner">
+      <ul>
+        {
+          stats.map((s) => (
+            <li>
+              <strong>{s.value}</strong>
+              <span>{s.label}</span>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <!-- ============ PRINCIPLES ============ -->
+  <section class="ai-principles">
+    <div class="inner">
+      <header class="section-head">
+        <p class="eyebrow">Pět principů</p>
+        <h2>Jak myslíme o AI v redakci</h2>
+        <p class="lead">
+          Pravidla, podle kterých se rozhodujeme, kdy AI použít a kdy ne. Žádná z těchto pravidel nelze obejít — ani když by to bylo pro nás pohodlnější.
+        </p>
+      </header>
+      <ol class="principles-list">
+        {
+          principlesList.map((p) => (
+            <li>
+              <span class="principle-num">{p.num}</span>
+              <div>
+                <h3>{p.title}</h3>
+                <p set:html={p.text} />
+              </div>
+            </li>
+          ))
+        }
+      </ol>
+    </div>
+  </section>
+
+  <!-- ============ USE CASES ============ -->
+  <section class="ai-usecases">
+    <div class="inner">
+      <header class="section-head">
+        <p class="eyebrow">Konkrétní použití</p>
+        <h2>{useCases.length} use-cases — kde AI reálně používáme</h2>
+        <p class="lead">
+          Každá karta obsahuje <strong>konkrétní popis úkolu</strong>, použité nástroje, způsob lidského dohledu a (kde je relevantní) reálný příklad.
+        </p>
+      </header>
+      <ul class="usecases-grid">
+        {
+          useCases.map((u) => (
+            <li class="usecase-card">
+              <header class="usecase-head">
+                <div class="usecase-icon" aria-hidden="true">
+                  {u.icon === "search" && (
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                  )}
+                  {u.icon === "data" && (
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14a9 3 0 0 0 18 0V5"/><path d="M3 12a9 3 0 0 0 18 0"/></svg>
+                  )}
+                  {u.icon === "price" && (
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                  )}
+                  {u.icon === "lang" && (
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 7V4h16v3"/><path d="M9 20h6"/><path d="M12 4v16"/></svg>
+                  )}
+                  {u.icon === "schema" && (
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+                  )}
+                  {u.icon === "chart" && (
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+                  )}
+                  {u.icon === "summary" && (
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+                  )}
+                  {u.icon === "image" && (
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg>
+                  )}
+                </div>
+                <div class="usecase-meta">
+                  <span class={`usecase-category usecase-category-${categoryLabels[u.category].color}`}>
+                    {categoryLabels[u.category].label}
+                  </span>
+                </div>
+              </header>
+              <h3 class="usecase-title">{u.title}</h3>
+              <p class="usecase-desc">{u.description}</p>
+
+              <div class="usecase-tools">
+                <span class="usecase-tools-label">Nástroje:</span>
+                <ul>
+                  {u.tools.map((t) => <li>{t}</li>)}
+                </ul>
+              </div>
+
+              <div class="usecase-supervision">
+                <span class="usecase-supervision-label">Lidský dohled</span>
+                <p set:html={u.supervision} />
+              </div>
+
+              {u.example && (
+                <div class="usecase-example">
+                  <span class="usecase-example-label">Reálný příklad</span>
+                  <p>{u.example}</p>
+                </div>
+              )}
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <!-- ============ NEVER DO ============ -->
+  <section class="ai-neverdo">
+    <div class="inner">
+      <header class="section-head">
+        <p class="eyebrow">Co AI <em>nikdy</em> nedělá</p>
+        <h2>{neverDoList.length} explicit no-AI zón</h2>
+        <p class="lead">
+          Existují oblasti, kde AI nepoužíváme — ani pro „malou pomoc", ani jako experiment. Tady je proč.
+        </p>
+      </header>
+      <ul class="neverdo-list">
+        {
+          neverDoList.map((n) => (
+            <li class="neverdo-item">
+              <div class="neverdo-mark" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <circle cx="12" cy="12" r="10" />
+                  <line x1="4.93" y1="4.93" x2="19.07" y2="19.07" />
+                </svg>
+              </div>
+              <div class="neverdo-body">
+                <h3>{n.text}</h3>
+                <p>{n.why}</p>
+              </div>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <!-- ============ HUMAN VS AI BOUNDARY ============ -->
+  <section class="ai-boundaries">
+    <div class="inner">
+      <header class="section-head">
+        <p class="eyebrow">Hranice člověk / AI</p>
+        <h2>Kde končí AI a začíná člověk</h2>
+        <p class="lead">
+          Tabulka přesně ukazuje, kde v procesu od nápadu po publikaci je hranice mezi tím, co dělá AI, a co dělá člověk.
+        </p>
+      </header>
+      <div class="boundary-table-wrap">
+        <table class="boundary-table">
+          <thead>
+            <tr>
+              <th>Krok v redakčním procesu</th>
+              <th>AI dělá</th>
+              <th>Člověk dělá</th>
+            </tr>
+          </thead>
+          <tbody>
+            {
+              boundaries.map((b) => (
+                <tr>
+                  <td><strong>{b.axis}</strong></td>
+                  <td class="boundary-ai">{b.ai}</td>
+                  <td class="boundary-human">{b.human}</td>
+                </tr>
+              ))
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ TOOLS ============ -->
+  <section class="ai-tools">
+    <div class="inner">
+      <header class="section-head">
+        <p class="eyebrow">Konkrétní nástroje</p>
+        <h2>{aiTools.length} AI nástrojů, které používáme</h2>
+        <p class="lead">
+          Žádné „proprietární" nebo „v cloudu" formulace — tady jsou jmenovitě všechny AI nástroje v redakci a informace o tom, jak chráníme vaše a naše data.
+        </p>
+      </header>
+      <ul class="tools-grid">
+        {
+          aiTools.map((t) => (
+            <li class="tool-card">
+              <header>
+                <h3>{t.name}</h3>
+                <span class="tool-vendor">{t.vendor}</span>
+              </header>
+              <p class="tool-use">
+                <span class="tool-label">Použití</span>
+                {t.use}
+              </p>
+              <p class="tool-privacy">
+                <span class="tool-label">Data privacy</span>
+                {t.privacyNote}
+              </p>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <!-- ============ AUDIT METRICS ============ -->
+  <section class="ai-audit">
+    <div class="inner">
+      <header class="section-head">
+        <p class="eyebrow">Měřitelný audit</p>
+        <h2>Čísla, která dáváme veřejnosti</h2>
+        <p class="lead">
+          Tyto metriky aktualizujeme s každou verzí této politiky. Pokud se zvýší podíl AI assistance, řekneme to.
+        </p>
+      </header>
+      <ul class="audit-grid">
+        {
+          auditMetrics.map((m) => (
+            <li class="audit-card">
+              <strong class="audit-value">{m.value}</strong>
+              <span class="audit-label">{m.label}</span>
+              <span class="audit-context">{m.context}</span>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <!-- ============ DISCLOSURE ============ -->
+  <section class="ai-disclosure">
+    <div class="inner">
+      <div class="disclosure-card">
+        <span class="disclosure-eyebrow">Označení v článcích</span>
+        <h2>Jak poznáte, že byla AI v článku použita</h2>
+        <p>
+          Pokud AI dělá víc než jen jazykovou korekturu, v sekci „<strong>Jak vznikl tento článek</strong>" pod článkem to výslovně uvedeme. Konkrétně co AI dělala a kdo to schválil.
+        </p>
+        <div class="disclosure-example">
+          <span class="disclosure-example-label">Příklad označení</span>
+          <blockquote>
+            „Pro tento článek jsme použili AI (Claude 3.5 Sonnet) k sumarizaci 2 340 uživatelských recenzí z Heureka.cz. Reprezentativní citace následně vybral autor článku <strong>Ivo Matěj</strong>. Žádný text v článku není přímo AI-generated."
+          </blockquote>
+        </div>
+        <div class="disclosure-actions">
+          <a href="/redakcni-zasady/" class="btn-ghost">Redakční zásady</a>
+          <a href="/eticky-kodex/" class="btn-ghost">Etický kodex</a>
+          <a href="/overovani-faktu/" class="btn-ghost">Ověřování faktů</a>
+          <a href="/metodika/" class="btn-ghost">Metodika testů</a>
+        </div>
+      </div>
+      <p class="disclosure-meta">
+        Politika v.{policyVersion} · platí od <time datetime={lastUpdated}>{lastUpdated}</time> · Zpětná kompatibilita s předchozími verzemi v <a href="/opravy/">archivu</a>.
+      </p>
+    </div>
+  </section>
+
+  <style>
+    .inner {
+      max-width: var(--max-w);
+      margin: 0 auto;
+      padding: clamp(2.5rem, 5vw, 4rem) var(--gutter);
+    }
+    .section-head {
+      max-width: 65ch;
+      margin: 0 0 2rem;
+    }
+    .eyebrow {
+      font-family: var(--mono);
+      font-size: 11.5px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--p-700);
+      font-weight: 700;
+      margin: 0 0 0.5rem;
+    }
+    .section-head h2 {
+      font-size: clamp(1.5rem, 3vw, 2.1rem);
+      font-weight: 800;
+      letter-spacing: -0.025em;
+      color: var(--ink);
+      line-height: 1.2;
+      margin-bottom: 0.6rem;
+    }
+    .section-head h2 em {
+      font-style: italic;
+      color: var(--red);
+    }
+    .section-head .lead {
+      font-size: 15px;
+      line-height: 1.6;
+      color: var(--muted);
+      margin: 0;
+    }
+    .section-head .lead strong { color: var(--ink); }
+
+    /* ============ STATS ============ */
+    .stats-strip {
+      background: var(--bg);
+      border-bottom: 1px solid var(--line);
+    }
+    .stats-strip .inner { padding: 2rem var(--gutter); }
+    .stats-strip ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1.5rem;
+    }
+    @media (max-width: 720px) {
+      .stats-strip ul { grid-template-columns: repeat(2, 1fr); gap: 1rem; }
+    }
+    .stats-strip li {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      padding-top: 0.75rem;
+      border-top: 2px solid var(--p-200);
+    }
+    .stats-strip strong {
+      font-size: clamp(1.6rem, 3vw, 2.2rem);
+      font-weight: 800;
+      color: var(--ink);
+      letter-spacing: -0.02em;
+      line-height: 1;
+    }
+    .stats-strip span {
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.3;
+    }
+
+    /* ============ PRINCIPLES ============ */
+    .ai-principles {
+      background: var(--bg-warm);
+      border-bottom: 1px solid var(--line);
+    }
+    .principles-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 0.85rem;
+      max-width: 880px;
+    }
+    .principles-list li {
+      display: grid;
+      grid-template-columns: 56px 1fr;
+      gap: 1.25rem;
+      padding: 1.25rem 1.5rem;
+      background: var(--bg);
+      border: 1px solid var(--line);
+      border-radius: var(--r-lg);
+    }
+    @media (max-width: 540px) {
+      .principles-list li { grid-template-columns: 1fr; gap: 0.5rem; }
+    }
+    .principle-num {
+      font-family: var(--mono);
+      font-size: 1.6rem;
+      font-weight: 800;
+      color: var(--p-300);
+      line-height: 1;
+    }
+    .principles-list h3 {
+      margin: 0 0 0.4rem;
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--ink);
+    }
+    .principles-list p {
+      margin: 0;
+      line-height: 1.6;
+      color: var(--text);
+      font-size: 0.92rem;
+    }
+    .principles-list p :global(a) {
+      color: var(--p-700);
+      text-decoration: none;
+      border-bottom: 1px dashed var(--p-300);
+    }
+    .principles-list p :global(strong) { color: var(--ink); font-weight: 600; }
+
+    /* ============ USE CASES ============ */
+    .ai-usecases {
+      background: var(--bg);
+      border-bottom: 1px solid var(--line);
+    }
+    .usecases-grid {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1rem;
+    }
+    @media (max-width: 800px) { .usecases-grid { grid-template-columns: 1fr; } }
+    .usecase-card {
+      padding: 1.5rem;
+      background: var(--bg-warm);
+      border: 1px solid var(--line);
+      border-radius: var(--r-lg);
+      display: flex;
+      flex-direction: column;
+      gap: 0.85rem;
+    }
+    .usecase-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 0.75rem;
+    }
+    .usecase-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      background: var(--p-50);
+      color: var(--p-700);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .usecase-icon svg { width: 22px; height: 22px; }
+    .usecase-category {
+      font-family: var(--mono);
+      font-size: 0.68rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      font-weight: 700;
+      padding: 0.25rem 0.6rem;
+      border-radius: 99px;
+    }
+    .usecase-category-purple { background: var(--p-50); color: var(--p-700); }
+    .usecase-category-green { background: var(--green-bg); color: var(--green); }
+    .usecase-category-amber { background: var(--amber-bg); color: var(--amber); }
+    .usecase-category-muted { background: var(--bg); color: var(--muted); border: 1px solid var(--line); }
+
+    .usecase-title {
+      margin: 0;
+      font-size: 1.05rem;
+      font-weight: 800;
+      color: var(--ink);
+      letter-spacing: -0.015em;
+    }
+    .usecase-desc {
+      margin: 0;
+      font-size: 0.92rem;
+      line-height: 1.6;
+      color: var(--text);
+    }
+
+    .usecase-tools {
+      padding: 0.85rem 1rem;
+      background: var(--bg);
+      border: 1px solid var(--line);
+      border-radius: var(--r);
+      font-size: 0.85rem;
+    }
+    .usecase-tools-label,
+    .usecase-supervision-label,
+    .usecase-example-label {
+      display: block;
+      font-family: var(--mono);
+      font-size: 0.68rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--p-700);
+      font-weight: 700;
+      margin-bottom: 0.35rem;
+    }
+    .usecase-tools ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+    }
+    .usecase-tools li {
+      font-family: var(--mono);
+      font-size: 0.78rem;
+      color: var(--ink);
+      padding: 0.15rem 0.55rem;
+      background: var(--p-50);
+      border-radius: 4px;
+    }
+
+    .usecase-supervision {
+      padding: 0.85rem 1rem;
+      background: var(--green-bg);
+      border-left: 3px solid var(--green);
+      border-radius: var(--r-sm);
+    }
+    .usecase-supervision .usecase-supervision-label { color: var(--green); }
+    .usecase-supervision p {
+      margin: 0;
+      font-size: 0.85rem;
+      line-height: 1.55;
+      color: var(--text);
+    }
+    .usecase-supervision p :global(a) {
+      color: var(--green);
+      text-decoration: none;
+      border-bottom: 1px dashed rgba(21, 128, 61, 0.4);
+    }
+
+    .usecase-example {
+      padding: 0.85rem 1rem;
+      background: var(--bg);
+      border: 1px dashed var(--line);
+      border-radius: var(--r-sm);
+    }
+    .usecase-example .usecase-example-label { color: var(--amber); }
+    .usecase-example p {
+      margin: 0;
+      font-size: 0.82rem;
+      font-style: italic;
+      line-height: 1.55;
+      color: var(--muted);
+    }
+
+    /* ============ NEVER DO ============ */
+    .ai-neverdo {
+      background: var(--red-bg);
+      border-bottom: 1px solid var(--line);
+    }
+    .ai-neverdo .eyebrow { color: var(--red); }
+    .neverdo-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 0.75rem;
+    }
+    @media (max-width: 720px) { .neverdo-list { grid-template-columns: 1fr; } }
+    .neverdo-item {
+      display: grid;
+      grid-template-columns: 36px 1fr;
+      gap: 1rem;
+      padding: 1.25rem 1.4rem;
+      background: var(--bg);
+      border: 1px solid rgba(185, 28, 28, 0.18);
+      border-radius: var(--r);
+    }
+    .neverdo-mark {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: var(--red);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .neverdo-mark svg { width: 18px; height: 18px; }
+    .neverdo-body h3 {
+      margin: 0 0 0.4rem;
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--ink);
+    }
+    .neverdo-body p {
+      margin: 0;
+      font-size: 0.88rem;
+      color: var(--text);
+      line-height: 1.55;
+    }
+
+    /* ============ BOUNDARIES TABLE ============ */
+    .ai-boundaries {
+      background: var(--bg);
+      border-bottom: 1px solid var(--line);
+    }
+    .boundary-table-wrap {
+      overflow-x: auto;
+      border: 1px solid var(--line);
+      border-radius: var(--r);
+    }
+    .boundary-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.88rem;
+      min-width: 760px;
+    }
+    .boundary-table thead th {
+      padding: 0.85rem 1rem;
+      background: var(--bg-warm);
+      text-align: left;
+      font-family: var(--mono);
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--p-700);
+      font-weight: 700;
+      border-bottom: 1px solid var(--line);
+    }
+    .boundary-table tbody td {
+      padding: 0.85rem 1rem;
+      border-bottom: 1px solid var(--line-soft);
+      vertical-align: top;
+      color: var(--text);
+      line-height: 1.5;
+    }
+    .boundary-table tbody tr:last-child td { border-bottom: none; }
+    .boundary-table tbody tr:hover td { background: var(--bg-warm); }
+    .boundary-table strong { color: var(--ink); }
+    .boundary-ai {
+      color: var(--muted);
+      font-style: italic;
+    }
+    .boundary-human {
+      color: var(--green);
+      font-weight: 600;
+    }
+
+    /* ============ TOOLS ============ */
+    .ai-tools {
+      background: var(--bg-warm);
+      border-bottom: 1px solid var(--line);
+    }
+    .tools-grid {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.85rem;
+    }
+    @media (max-width: 900px) { .tools-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 540px) { .tools-grid { grid-template-columns: 1fr; } }
+    .tool-card {
+      padding: 1.25rem;
+      background: var(--bg);
+      border: 1px solid var(--line);
+      border-radius: var(--r);
+    }
+    .tool-card > header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 0.5rem;
+      margin-bottom: 0.85rem;
+      padding-bottom: 0.75rem;
+      border-bottom: 1px dashed var(--line);
+    }
+    .tool-card h3 {
+      margin: 0;
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--ink);
+    }
+    .tool-vendor {
+      font-family: var(--mono);
+      font-size: 0.68rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--p-700);
+      padding: 0.15rem 0.45rem;
+      background: var(--p-50);
+      border-radius: 4px;
+    }
+    .tool-label {
+      display: block;
+      font-family: var(--mono);
+      font-size: 0.65rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+      font-weight: 700;
+      margin-bottom: 0.2rem;
+    }
+    .tool-use,
+    .tool-privacy {
+      margin: 0 0 0.7rem;
+      font-size: 0.85rem;
+      line-height: 1.55;
+      color: var(--text);
+    }
+    .tool-privacy {
+      margin-bottom: 0;
+      padding-top: 0.7rem;
+      border-top: 1px dashed var(--line);
+      color: var(--muted);
+    }
+
+    /* ============ AUDIT ============ */
+    .ai-audit {
+      background: var(--bg);
+      border-bottom: 1px solid var(--line);
+    }
+    .audit-grid {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 0.85rem;
+    }
+    @media (max-width: 900px) { .audit-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 540px) { .audit-grid { grid-template-columns: 1fr; } }
+    .audit-card {
+      display: flex;
+      flex-direction: column;
+      gap: 0.3rem;
+      padding: 1.5rem 1.25rem;
+      background: var(--bg-warm);
+      border: 1px solid var(--line);
+      border-top: 3px solid var(--p-500);
+      border-radius: var(--r);
+    }
+    .audit-value {
+      font-family: var(--sans);
+      font-size: 2rem;
+      font-weight: 800;
+      color: var(--ink);
+      letter-spacing: -0.02em;
+      line-height: 1;
+    }
+    .audit-label {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--ink);
+      line-height: 1.4;
+    }
+    .audit-context {
+      font-size: 0.78rem;
+      color: var(--muted);
+      line-height: 1.45;
+    }
+
+    /* ============ DISCLOSURE ============ */
+    .ai-disclosure {
+      background: var(--bg);
+    }
+    .disclosure-card {
+      max-width: 760px;
+      margin: 0 auto;
+      padding: 2.5rem 2.25rem;
+      background: linear-gradient(135deg, var(--p-700), var(--p-900));
+      color: #fff;
+      border-radius: var(--r-xl);
+      text-align: center;
+    }
+    .disclosure-eyebrow {
+      display: inline-block;
+      font-family: var(--mono);
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: #ffd166;
+      margin-bottom: 0.75rem;
+      font-weight: 700;
+    }
+    .disclosure-card h2 {
+      font-size: clamp(1.4rem, 2.8vw, 1.85rem);
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      margin-bottom: 1rem;
+    }
+    .disclosure-card > p {
+      font-size: 1rem;
+      line-height: 1.65;
+      color: rgba(255, 255, 255, 0.85);
+      max-width: 56ch;
+      margin: 0 auto 1.5rem;
+    }
+    .disclosure-card > p strong { color: #ffd166; font-weight: 700; }
+
+    .disclosure-example {
+      max-width: 560px;
+      margin: 0 auto 1.5rem;
+      padding: 1.25rem;
+      background: rgba(255, 255, 255, 0.08);
+      border-left: 3px solid #ffd166;
+      border-radius: var(--r-sm);
+      text-align: left;
+    }
+    .disclosure-example-label {
+      display: block;
+      font-family: var(--mono);
+      font-size: 0.65rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: #ffd166;
+      margin-bottom: 0.55rem;
+    }
+    .disclosure-example blockquote {
+      margin: 0;
+      font-size: 0.88rem;
+      line-height: 1.6;
+      color: rgba(255, 255, 255, 0.9);
+      font-style: italic;
+    }
+    .disclosure-example blockquote strong { color: #ffd166; font-style: normal; }
+
+    .disclosure-actions {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    .btn-ghost {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      padding: 0.7rem 1.1rem;
+      background: rgba(255, 255, 255, 0.1);
+      color: #fff;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: var(--r);
+      font-size: 0.85rem;
+      font-weight: 600;
+      text-decoration: none;
+      transition: background 0.15s ease;
+    }
+    .btn-ghost:hover { background: rgba(255, 255, 255, 0.18); color: #fff; }
+
+    .disclosure-meta {
+      margin: 1.5rem 0 0;
+      font-size: 0.78rem;
+      color: var(--muted);
+      text-align: center;
+    }
+    .disclosure-meta strong { color: var(--ink); font-weight: 700; }
+    .disclosure-meta a {
+      color: var(--p-700);
+      text-decoration: none;
+      border-bottom: 1px dashed var(--p-300);
+    }
+  </style>
+</BaseLayout>

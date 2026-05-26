@@ -1,0 +1,1140 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import PageBreadcrumbs from "../components/page/PageBreadcrumbs.astro";
+import PageHero from "../components/page/PageHero.astro";
+
+const lastUpdated = "2026-05-21";
+
+type CorrectionType =
+  | "fact" // Faktická chyba (špatný údaj)
+  | "spec" // Špatný parametr produktu
+  | "price" // Cena / dostupnost
+  | "link" // Nefunkční odkaz
+  | "removal" // Stažení modelu (ukončení výroby, recall)
+  | "addition" // Doplnění chybějícího údaje
+  | "style" // Stylistická / gramatická
+  | "retraction"; // Stažení celého článku / dementi
+
+interface Correction {
+  /** ISO datum opravy */
+  date: string;
+  /** Typ opravy */
+  type: CorrectionType;
+  /** Titulek dotčeného článku */
+  article: string;
+  /** Slug URL článku */
+  articleHref: string;
+  /** Kategorie pro filtr */
+  category: string;
+  /** Stručný popis opravy */
+  change: string;
+  /** Kdo opravu nahlásil / detekoval */
+  reporter?: string;
+  /** Závažnost — pro řazení a vizualizaci */
+  severity: "critical" | "important" | "minor";
+}
+
+const corrections: Correction[] = [
+  // 2026
+  {
+    date: "2026-05-18",
+    type: "spec",
+    article: "Aku brusky 2026: jak vybrat skutečně dobrou aku brusku",
+    articleHref: "/clanek/aku-brusky/",
+    category: "Elektronářadí",
+    change:
+      "Opravena chybná hodnota momentu u Bosch GWS 18V-15 C — z 5,5 Nm na 6,0 Nm dle aktualizovaného datasheetu výrobce (revize 04/2026).",
+    reporter: "Martin K. (čtenář z Brna)",
+    severity: "important",
+  },
+  {
+    date: "2026-05-12",
+    type: "price",
+    article: "Nejlepší pračky 2026: TOP 7",
+    articleHref: "/nejlepsi-pracky-2026/",
+    category: "Domácí spotřebiče",
+    change:
+      "Cena Bosch Serie 8 aktualizována z 19 990 Kč na 21 590 Kč (nárůst po dovozu z DE skladu).",
+    reporter: "Interní monitoring cen",
+    severity: "minor",
+  },
+  {
+    date: "2026-05-08",
+    type: "spec",
+    article: "Aku brusky 2026: jak vybrat",
+    articleHref: "/clanek/aku-brusky/",
+    category: "Elektronářadí",
+    change:
+      "Hmotnost Makita DGA504 opravena z 2,4 kg na 2,2 kg (bez baterie). V tabulce se srovnáním byla uvedená hmotnost s baterií 5 Ah.",
+    reporter: "Anonymní čtenář (přes formulář)",
+    severity: "minor",
+  },
+  {
+    date: "2026-04-30",
+    type: "fact",
+    article: "Zimní pneumatiky 205/55 R16 — test 2026",
+    articleHref: "/clanek/zimni-pneumatiky-205-55-r16/",
+    category: "Auto",
+    change:
+      "Brzdná dráha Continental WinterContact TS 870 opravena ze 38,2 m na 39,1 m. Předchozí hodnota vycházela z chybného přepočtu na 80 km/h místo 100 km/h.",
+    reporter: "Jakub Novák (garant kategorie)",
+    severity: "critical",
+  },
+  {
+    date: "2026-04-22",
+    type: "link",
+    article: "Jak vybrat aku vrtačku",
+    articleHref: "/clanek/jak-vybrat-aku-vrtacku/",
+    category: "Elektronářadí",
+    change:
+      "Nefunkční odkaz na Heureku.cz (DeWalt DCD800) nahrazen aktuální URL po přejmenování kategorie na e-shopu.",
+    reporter: "Eva B.",
+    severity: "minor",
+  },
+  {
+    date: "2026-04-15",
+    type: "addition",
+    article: "Aku sekačky 2026",
+    articleHref: "/clanek/aku-sekacky-2026/",
+    category: "Zahrada",
+    change:
+      "Hlučnost Stihl RMA 235 doplněna o měření při sečení vysoké trávy (chyběla v původní tabulce, pouze nečinný režim).",
+    reporter: "Petr D.",
+    severity: "important",
+  },
+  {
+    date: "2026-04-12",
+    type: "removal",
+    article: "Nejlepší myčky 2026 — TOP 5",
+    articleHref: "/clanek/nejlepsi-mycky-2026/",
+    category: "Domácí spotřebiče",
+    change:
+      "Odebrán model Bosch SMI4HCS01D z žebříčku — výrobce ukončil výrobu k 31. 3. 2026. Nahrazen modelem Bosch SMI4HCS02D (stejná řada, nová generace).",
+    reporter: "Interní revize",
+    severity: "important",
+  },
+  {
+    date: "2026-03-28",
+    type: "fact",
+    article: "Bosch vs Miele — která pračka je lepší?",
+    articleHref: "/bosch-vs-miele-pracky/",
+    category: "Domácí spotřebiče",
+    change:
+      "Rok založení firmy Miele opraven z 1898 na 1899. V perexu i v brand karte byla uvedena nesprávná data.",
+    reporter: "Adam P. (čtenář)",
+    severity: "minor",
+  },
+  {
+    date: "2026-03-15",
+    type: "spec",
+    article: "Nejlepší foukače listí 2026",
+    articleHref: "/clanek/foukace-listi-2026/",
+    category: "Zahrada",
+    change:
+      "Maximální rychlost vzduchu STIHL BGA 86 opravena z 240 km/h na 235 km/h (aktualizovaný product sheet).",
+    severity: "minor",
+  },
+  {
+    date: "2026-03-04",
+    type: "retraction",
+    article: "Test elektrokoloběžek 2026 (do 25 km/h)",
+    articleHref: "/clanek/elektrokolobezky-2026/",
+    category: "Elektro",
+    change:
+      "Článek dočasně stažen z důvodu změny zákona (novela zákona o silničním provozu, účinnost 1. 4. 2026). Bude publikován v nové verzi do konce dubna.",
+    reporter: "Tomáš Veselý (autor)",
+    severity: "critical",
+  },
+  {
+    date: "2026-02-20",
+    type: "fact",
+    article: "Autobaterie 12 V — test 2026",
+    articleHref: "/clanek/autobaterie-12v-2026/",
+    category: "Auto",
+    change:
+      "Kapacita Varta E11 silver dynamic byla v tabulce zapsaná jako 74 Ah, správně 74 Ah / 750 A (chyběl proud). Doplněno.",
+    reporter: "Vladimír R. (mechanik)",
+    severity: "important",
+  },
+  {
+    date: "2026-02-08",
+    type: "price",
+    article: "TOP 5 kávovarů do 10 000 Kč",
+    articleHref: "/clanek/kavovary-do-10k/",
+    category: "Domácí spotřebiče",
+    change:
+      "Cena DeLonghi Magnifica S Smart aktualizována z 8 990 Kč na 9 490 Kč (revize 02/2026, dlouhodobý nárůst).",
+    reporter: "Interní monitoring cen",
+    severity: "minor",
+  },
+  {
+    date: "2026-01-25",
+    type: "style",
+    article: "Jak vybrat dětskou autosedačku",
+    articleHref: "/clanek/jak-vybrat-detskou-autosedacku/",
+    category: "Děti",
+    change:
+      "Sjednocena norma — místo střídavého „i-Size / iSize / I-Size“ v textu používáme jednotné „i-Size“ (oficiální zápis dle EU 129).",
+    reporter: "Lucie Horáková (editorka)",
+    severity: "minor",
+  },
+  {
+    date: "2026-01-10",
+    type: "addition",
+    article: "Plotostříhače 2026 — srovnání",
+    articleHref: "/clanek/plotostrihace-2026/",
+    category: "Zahrada",
+    change:
+      "Doplněna informace o EU recyklační známce baterií Makita 18 V LXT (chyběla pro tři modely).",
+    severity: "minor",
+  },
+
+  // 2025
+  {
+    date: "2025-12-18",
+    type: "fact",
+    article: "Robotické vysavače 2025: kompletní průvodce",
+    articleHref: "/clanek/roboticke-vysavace-2025/",
+    category: "Domácí spotřebiče",
+    change:
+      "Roborock S8 Pro Ultra — opravena nesprávná informace o pracovní mapě (uvedeno „bez paměť“ — správně „uloží až 4 mapy“).",
+    reporter: "Daniel V. (uživatel)",
+    severity: "important",
+  },
+  {
+    date: "2025-11-30",
+    type: "removal",
+    article: "Nejlepší tablety pro studenty 2025",
+    articleHref: "/clanek/tablety-studenti-2025/",
+    category: "Elektronika",
+    change:
+      "Odebrán model Lenovo Tab M9 — ukončen prodej v CZ, výrobce stáhl podporu Android updatů. Nahrazen Lenovo Tab M10 Plus 3rd gen.",
+    reporter: "Marie Müllerová (autorka)",
+    severity: "important",
+  },
+  {
+    date: "2025-11-12",
+    type: "fact",
+    article: "Test letních pneumatik 225/45 R17",
+    articleHref: "/clanek/letni-pneumatiky-225-45-r17/",
+    category: "Auto",
+    change:
+      "Brzdná dráha Michelin Primacy 4 na mokru opravena ze 33,5 m na 34,8 m. Předchozí hodnota byla aritmetickou chybou (špatný průměr ze 3 měření).",
+    reporter: "Interní recheck",
+    severity: "critical",
+  },
+  {
+    date: "2025-10-22",
+    type: "link",
+    article: "Notebooky do 25 000 Kč — TOP 7",
+    articleHref: "/clanek/notebooky-do-25k/",
+    category: "Elektronika",
+    change:
+      "Aktualizace 4 odkazů na Alza.cz po přepracování jejich URL strukruty (chybové odpovědi 404 nahrazeny aktuálními URL).",
+    severity: "minor",
+  },
+  {
+    date: "2025-10-05",
+    type: "spec",
+    article: "Kávovary s mlýnkem 2025",
+    articleHref: "/clanek/kavovary-s-mlynkem-2025/",
+    category: "Domácí spotřebiče",
+    change:
+      "Objem zásobníku na vodu Philips LatteGo 5400 opravený z 1,8 l na 1,8 l — překlep v jednotce (uvedeno „dl“).",
+    reporter: "Anonymní čtenář",
+    severity: "minor",
+  },
+  {
+    date: "2025-09-14",
+    type: "retraction",
+    article: "Recenze monitoru dechu Babysense 7",
+    articleHref: "/clanek/babysense-7-recenze/",
+    category: "Děti",
+    change:
+      "Článek stažen na 14 dní pro doplnění varování — výrobce vydal upozornění o falešném detekování pohybu v módu „mobile“ (verze firmware před 4.2.1).",
+    reporter: "MUDr. Barbora Černá (garantka)",
+    severity: "critical",
+  },
+  {
+    date: "2025-08-28",
+    type: "fact",
+    article: "Spotřeba praček — co znamená štítek A",
+    articleHref: "/clanek/spotreba-pracek/",
+    category: "Domácí spotřebiče",
+    change:
+      "Hodnota kWh/100 cyklů pro třídu A v textu byla uvedena jako „180 kWh“, správně „180 kWh / 100 cyklů“ (chybělo upřesnění normalizovaného testu IEC 60456).",
+    reporter: "Alena Rajnochová (hlavní redaktorka)",
+    severity: "important",
+  },
+  {
+    date: "2025-08-10",
+    type: "spec",
+    article: "Aku pily 2025 — srovnání",
+    articleHref: "/clanek/aku-pily-2025/",
+    category: "Elektronářadí",
+    change:
+      "Délka lišty DeWalt DCS367 opravena z 305 mm na 330 mm (model 2024 → 2025 dostal delší lištu).",
+    reporter: "Jaroslav P. (čtenář, profi řezník)",
+    severity: "important",
+  },
+  {
+    date: "2025-07-20",
+    type: "price",
+    article: "Hodinky Garmin Forerunner — srovnání",
+    articleHref: "/clanek/garmin-forerunner/",
+    category: "Sport",
+    change:
+      "Ceny 5 modelů aktualizovány po slevové akci Garmin Garage. Cenové bandy mírně sníženy.",
+    reporter: "Interní monitoring cen",
+    severity: "minor",
+  },
+  {
+    date: "2025-07-08",
+    type: "fact",
+    article: "Termostaty Honeywell vs Tado — srovnání",
+    articleHref: "/clanek/termostaty-honeywell-vs-tado/",
+    category: "Elektronika",
+    change:
+      "Špatně uvedeno: „Tado funguje bez internetu“. Správně: „Tado vyžaduje internet pro 95 % funkcí, bez něj jen základní termostat“.",
+    reporter: "Cyril Dvořák (garant)",
+    severity: "critical",
+  },
+  {
+    date: "2025-06-15",
+    type: "addition",
+    article: "Jak vybrat sušičku prádla",
+    articleHref: "/clanek/jak-vybrat-susicku/",
+    category: "Domácí spotřebiče",
+    change:
+      "Doplněn celý odstavec o tepelných čerpadlech vs kondenzačních sušičkách. Původně chybělo srovnání spotřeby.",
+    reporter: "Alena Rajnochová (autorka)",
+    severity: "important",
+  },
+  {
+    date: "2025-05-30",
+    type: "removal",
+    article: "Nejlepší rychlovarné konvice 2025",
+    articleHref: "/clanek/rychlovarne-konvice-2025/",
+    category: "Domácí spotřebiče",
+    change:
+      "Odebrána Tefal KO 7508 z důvodu masivního swarmu recenzí o problému s těsněním po 6 měsících. Nahradili jsme Bosch TWK7203.",
+    reporter: "Interní recheck (analýza Heureka)",
+    severity: "important",
+  },
+  {
+    date: "2025-05-10",
+    type: "style",
+    article: "Slovník pojmů pro elektronářadí",
+    articleHref: "/slovnik/elektronaradi/",
+    category: "Elektronářadí",
+    change:
+      "Sjednocení terminologie — „úhlová bruska“ sjednoceno (dříve i „aku flexa“), s poznámkou, že „flexa“ je hovorový termín.",
+    reporter: "Lucie Horáková (editorka)",
+    severity: "minor",
+  },
+  {
+    date: "2025-04-22",
+    type: "fact",
+    article: "Test detergentů na podlahy 2025",
+    articleHref: "/clanek/detergenty-podlahy-2025/",
+    category: "Domácí spotřebiče",
+    change:
+      "Opravena dezinformace — „Savo + Voda na koberce“ by NEMĚLO být doporučováno bez ventilace. Doplněno bezpečnostní varování.",
+    reporter: "MUDr. Eva Malá (garantka)",
+    severity: "critical",
+  },
+  {
+    date: "2025-04-05",
+    type: "spec",
+    article: "Foukače sněhu 2025",
+    articleHref: "/clanek/foukace-snehu-2025/",
+    category: "Zahrada",
+    change:
+      "Šířka záběru Honda HS720 opravena z 50 cm na 56 cm. V originální tabulce výrobce byly uvedeny chybné rozměry.",
+    reporter: "Filip Kratochvíl (garant)",
+    severity: "important",
+  },
+  {
+    date: "2025-03-18",
+    type: "link",
+    article: "Nejlepší vrtačky pro domácnost",
+    articleHref: "/clanek/vrtacky-pro-domacnost/",
+    category: "Elektronářadí",
+    change:
+      "Aktualizace 7 odkazů (Heureka, Alza, Mall) po souborné rotaci kategorií.",
+    severity: "minor",
+  },
+  {
+    date: "2025-02-25",
+    type: "retraction",
+    article: "Recenze Xiaomi Smart Air Purifier 4 Pro",
+    articleHref: "/clanek/xiaomi-air-purifier-4-pro/",
+    category: "Domácí spotřebiče",
+    change:
+      "Článek stažen pro factual error — naše naměřené hodnoty CADR byly o 25 % horší, než výrobce uvádí. Po rekalibraci hlukoměru jsme znovu změřili, hodnoty sedí na štítek. Článek znovu publikován s opravenými daty.",
+    reporter: "Adam Bartoš (technik laboratoře)",
+    severity: "critical",
+  },
+];
+
+// Typy a jejich štítky
+const typeLabels: Record<CorrectionType, { label: string; color: string }> = {
+  fact: { label: "Faktická chyba", color: "red" },
+  spec: { label: "Parametr produktu", color: "amber" },
+  price: { label: "Cena / dostupnost", color: "muted" },
+  link: { label: "Nefunkční odkaz", color: "muted" },
+  removal: { label: "Stažení modelu", color: "amber" },
+  addition: { label: "Doplnění údaje", color: "purple" },
+  style: { label: "Stylistika", color: "muted" },
+  retraction: { label: "Stažení článku", color: "red" },
+};
+
+// Vypočítané statistiky
+const totalCorrections = corrections.length;
+const criticalCount = corrections.filter((c) => c.severity === "critical").length;
+const reportedByReaders = corrections.filter(
+  (c) => c.reporter && !c.reporter.toLowerCase().includes("interní") && !c.reporter.toLowerCase().includes("autor") && !c.reporter.toLowerCase().includes("garant") && !c.reporter.toLowerCase().includes("editorka") && !c.reporter.toLowerCase().includes("redaktor") && !c.reporter.toLowerCase().includes("technik"),
+).length;
+
+// Skupiny podle roku
+const byYear: Record<string, Correction[]> = {};
+corrections.forEach((c) => {
+  const year = c.date.slice(0, 4);
+  if (!byYear[year]) byYear[year] = [];
+  byYear[year].push(c);
+});
+const years = Object.keys(byYear).sort((a, b) => b.localeCompare(a));
+
+// Statistiky podle typu pro filter chips
+const countByType: Record<CorrectionType, number> = {
+  fact: 0,
+  spec: 0,
+  price: 0,
+  link: 0,
+  removal: 0,
+  addition: 0,
+  style: 0,
+  retraction: 0,
+};
+corrections.forEach((c) => { countByType[c.type]++; });
+
+function formatCzechDate(iso: string): string {
+  const d = new Date(iso);
+  return `${d.getDate()}. ${d.getMonth() + 1}. ${d.getFullYear()}`;
+}
+
+const stats = [
+  { value: `${totalCorrections}`, label: "celkem oprav v archivu" },
+  { value: `${reportedByReaders}`, label: "nahlásili čtenáři" },
+  { value: `${criticalCount}`, label: "kritických oprav (s dopadem)" },
+  { value: "100 %", label: "veřejně zaznamenáno" },
+];
+---
+
+<BaseLayout
+  title="Archiv oprav a errata — Recenzer.cz"
+  description="Veřejný chronologický archiv všech oprav, doplnění a stažení článků na Recenzer.cz. Datum, typ opravy, dotčený článek, kdo nahlásil. Editoriální transparentnost v praxi."
+>
+  <PageBreadcrumbs
+    items={[
+      { href: "/", label: "Recenzer" },
+      { label: "Archiv oprav" },
+    ]}
+  />
+
+  <PageHero
+    eyebrow="Editorial standards · errata archive"
+    eyebrowIcon="check"
+    title="Veřejný archiv<br/><em>oprav a errat</em>"
+    subtitle="Žádná oprava článku se na Recenzer.cz neztratí. <strong>Každá změna od publikace</strong> — od překlepu po stažení celého článku — je trvale zaznamenaná v tomto chronologickém logu. Děkujeme všem čtenářům, kteří nás na chyby upozornili."
+  />
+
+  <!-- ============ STATS ============ -->
+  <section class="stats-strip">
+    <div class="inner">
+      <ul>
+        {
+          stats.map((s) => (
+            <li>
+              <strong>{s.value}</strong>
+              <span>{s.label}</span>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <!-- ============ INTRO ============ -->
+  <section class="errata-intro">
+    <div class="inner">
+      <div class="intro-grid">
+        <div>
+          <header class="section-head">
+            <p class="eyebrow">Proč archiv vůbec máme</p>
+            <h2>Oprava článku není ostudná</h2>
+          </header>
+          <p class="intro-text">
+            Každý článek je výsledkem práce autora, garanta a editora — ale chyby se občas stanou. <strong>Co dělá redakci důvěryhodnou, není absence chyb, ale způsob, jak je opravuje.</strong>
+          </p>
+          <p class="intro-text">
+            V tomto archivu najdete všech <strong>{totalCorrections} oprav</strong> publikovaných od ledna 2025. Od triviálních (špatná jednotka, překlep) až po závažné (stažení článku, chybný parametr s dopadem na bezpečnost).
+          </p>
+          <p class="intro-text">
+            Pokud najdete v některém článku chybu, použijte
+            <a href="/oprava-chyb/">formulář Nahlásit chybu</a> nebo napište přímo
+            <a href="mailto:redakce@recenzer.cz">redakce@recenzer.cz</a>. Vaše jméno (nebo přezdívku) rádi přidáme do záznamu opravy.
+          </p>
+          <p class="intro-text">
+            Hledáte spíš <strong>systémové chyby redakce</strong> — kde jsme se zmýlili na úrovni metodiky nebo etiky, ne jen v překlepu? Ty najdete na meta-stránce
+            <a href="/nase-chyby/">Naše chyby</a>.
+          </p>
+        </div>
+        <aside class="intro-aside">
+          <h3>Jak číst tento archiv</h3>
+          <ul>
+            <li><strong>Datum</strong> — kdy byla oprava provedena (ne kdy byla nahlášena)</li>
+            <li><strong>Typ</strong> — barevný štítek podle závažnosti</li>
+            <li><strong>Článek</strong> — link na aktuální (opravenou) verzi</li>
+            <li><strong>Změna</strong> — co se konkrétně opravilo</li>
+            <li><strong>Reporter</strong> — kdo chybu odhalil</li>
+          </ul>
+        </aside>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ FILTRY ============ -->
+  <section class="errata-filters">
+    <div class="inner">
+      <div class="filter-row">
+        <span class="filter-label">Filtrovat podle typu:</span>
+        <button type="button" class="chip chip-active" data-filter-type="all">
+          Vše <span class="chip-count">{totalCorrections}</span>
+        </button>
+        {
+          (Object.keys(typeLabels) as CorrectionType[])
+            .filter((t) => countByType[t] > 0)
+            .map((t) => (
+              <button type="button" class={`chip chip-${typeLabels[t].color}`} data-filter-type={t}>
+                {typeLabels[t].label} <span class="chip-count">{countByType[t]}</span>
+              </button>
+            ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ ARCHIV (podle roku) ============ -->
+  {
+    years.map((year) => (
+      <section class="errata-year">
+        <div class="inner">
+          <header class="year-head">
+            <h2>{year}</h2>
+            <span class="year-count">{byYear[year].length} {byYear[year].length === 1 ? "oprava" : byYear[year].length < 5 ? "opravy" : "oprav"}</span>
+          </header>
+          <ol class="corrections-list">
+            {byYear[year].map((c) => (
+              <li
+                class={`correction-item correction-severity-${c.severity}`}
+                data-type={c.type}
+                data-category={c.category}
+              >
+                <div class="correction-date-wrap">
+                  <time class="correction-date" datetime={c.date}>{formatCzechDate(c.date)}</time>
+                  <span class={`correction-badge correction-badge-${typeLabels[c.type].color}`}>
+                    {typeLabels[c.type].label}
+                  </span>
+                </div>
+                <div class="correction-body">
+                  <header class="correction-head">
+                    <a href={c.articleHref} class="correction-article">{c.article}</a>
+                    <span class="correction-category">{c.category}</span>
+                  </header>
+                  <p class="correction-change">{c.change}</p>
+                  {c.reporter && (
+                    <footer class="correction-reporter">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                        <circle cx="12" cy="7" r="4" />
+                      </svg>
+                      <span>Nahlásil/upozornil: <strong>{c.reporter}</strong></span>
+                    </footer>
+                  )}
+                </div>
+              </li>
+            ))}
+          </ol>
+        </div>
+      </section>
+    ))
+  }
+
+  <!-- ============ POLICY ============ -->
+  <section class="errata-policy">
+    <div class="inner">
+      <header class="section-head">
+        <p class="eyebrow">Korekční politika</p>
+        <h2>Pravidla, podle kterých provádíme opravy</h2>
+        <p class="lead">
+          Pět pravidel, která určují, jak postupujeme od přijetí podnětu po finální zveřejnění opravy.
+        </p>
+      </header>
+      <ol class="policy-list">
+        <li>
+          <span class="policy-num">01</span>
+          <div>
+            <h3>Žádnou opravu nesmažeme</h3>
+            <p>I když původní verze obsahovala chybu, zůstává v archivu. <strong>Smazat chybu by znamenalo přepsat historii.</strong> Tady evidujeme všechno — i interní omyly.</p>
+          </div>
+        </li>
+        <li>
+          <span class="policy-num">02</span>
+          <div>
+            <h3>Reportera vždy uvedeme (pokud chce)</h3>
+            <p>Pokud nás čtenář upozorní na chybu, uvedeme ho do záznamu. Buď celé jméno, příjmení s iniciálou nebo přezdívkou — záleží na vás. Bez vašeho souhlasu uvedeme jen „Anonymní čtenář".</p>
+          </div>
+        </li>
+        <li>
+          <span class="policy-num">03</span>
+          <div>
+            <h3>Kritické chyby řešíme do 24 hodin</h3>
+            <p>Chyba s dopadem na <strong>bezpečnost, zdraví nebo finanční rozhodnutí čtenáře</strong> má prioritu. Opravu provedeme do 24 hodin a v případě potřeby dočasně stáhneme článek do dořešení.</p>
+          </div>
+        </li>
+        <li>
+          <span class="policy-num">04</span>
+          <div>
+            <h3>Stažení článku je vzácné, ale možné</h3>
+            <p>Pokud se ukáže, že článek obsahuje fundamentální chybu (např. nesprávná metodika testu, dezinformace), stáhneme ho. Opětovná publikace až po kompletním přepracování s vyznačením rozdílů v Historii revizí.</p>
+          </div>
+        </li>
+        <li>
+          <span class="policy-num">05</span>
+          <div>
+            <h3>Tento archiv má trvalý záznam</h3>
+            <p>Archiv je <strong>versionovaný v Gitu</strong>. Každá oprava vytvoří commit, který je dohledatelný. I kdyby někdo (i my) chtěl historii smazat, repository obsahuje plnou stopu.</p>
+          </div>
+        </li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- ============ CTA ============ -->
+  <section class="errata-cta">
+    <div class="inner">
+      <div class="cta-card">
+        <h2>Našli jste chybu?</h2>
+        <p>
+          Děkujeme. Stačí 2 minuty — vyplnit formulář nebo poslat e-mail. Opravu provedeme a vaše jméno přidáme do tohoto archivu (pokud budete chtít).
+        </p>
+        <div class="cta-actions">
+          <a href="/oprava-chyb/" class="btn-primary">
+            Nahlásit chybu (formulář)
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+              <line x1="5" y1="12" x2="19" y2="12" />
+              <polyline points="12 5 19 12 12 19" />
+            </svg>
+          </a>
+          <a href="mailto:redakce@recenzer.cz?subject=Oprava v článku" class="btn-ghost">
+            redakce@recenzer.cz
+          </a>
+          <a href="/sefredaktor/" class="btn-ghost">Eskalace na šéfredaktora</a>
+        </div>
+      </div>
+      <p class="cta-meta">
+        Archiv aktualizovaný <time datetime={lastUpdated}>{lastUpdated}</time> · Vedený od <strong>ledna 2025</strong> · Versionovaný v Gitu
+      </p>
+    </div>
+  </section>
+
+  <!-- ============ FILTER SCRIPT ============ -->
+  <script is:inline>
+    (function () {
+      const chips = document.querySelectorAll("[data-filter-type]");
+      const items = document.querySelectorAll(".correction-item");
+      const years = document.querySelectorAll(".errata-year");
+
+      function applyFilter(type) {
+        items.forEach((item) => {
+          const itemType = item.getAttribute("data-type");
+          if (type === "all" || itemType === type) {
+            item.style.display = "";
+          } else {
+            item.style.display = "none";
+          }
+        });
+        // Hide year section if no visible items
+        years.forEach((year) => {
+          const visibleItems = year.querySelectorAll(".correction-item:not([style*='none'])");
+          year.style.display = visibleItems.length > 0 ? "" : "none";
+        });
+      }
+
+      chips.forEach((chip) => {
+        chip.addEventListener("click", () => {
+          chips.forEach((c) => c.classList.remove("chip-active"));
+          chip.classList.add("chip-active");
+          applyFilter(chip.getAttribute("data-filter-type"));
+        });
+      });
+    })();
+  </script>
+
+  <style>
+    .inner {
+      max-width: var(--max-w);
+      margin: 0 auto;
+      padding: clamp(2rem, 4vw, 3.5rem) var(--gutter);
+    }
+    .section-head {
+      max-width: 65ch;
+      margin: 0 0 2rem;
+    }
+    .eyebrow {
+      font-family: var(--mono);
+      font-size: 11.5px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--p-700);
+      font-weight: 700;
+      margin: 0 0 0.5rem;
+    }
+    .section-head h2 {
+      font-size: clamp(1.5rem, 3vw, 2rem);
+      font-weight: 800;
+      letter-spacing: -0.025em;
+      color: var(--ink);
+      line-height: 1.2;
+      margin-bottom: 0.6rem;
+    }
+    .section-head .lead {
+      font-size: 15px;
+      line-height: 1.6;
+      color: var(--muted);
+      margin: 0;
+    }
+
+    /* ============ STATS ============ */
+    .stats-strip {
+      background: var(--bg);
+      border-bottom: 1px solid var(--line);
+    }
+    .stats-strip .inner { padding: 2rem var(--gutter); }
+    .stats-strip ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1.5rem;
+    }
+    @media (max-width: 720px) {
+      .stats-strip ul { grid-template-columns: repeat(2, 1fr); gap: 1rem; }
+    }
+    .stats-strip li {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      padding-top: 0.75rem;
+      border-top: 2px solid var(--p-200);
+    }
+    .stats-strip strong {
+      font-size: clamp(1.6rem, 3vw, 2.2rem);
+      font-weight: 800;
+      color: var(--ink);
+      letter-spacing: -0.02em;
+      line-height: 1;
+    }
+    .stats-strip span {
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.3;
+    }
+
+    /* ============ INTRO ============ */
+    .errata-intro {
+      background: var(--bg-warm);
+      border-bottom: 1px solid var(--line);
+    }
+    .intro-grid {
+      display: grid;
+      grid-template-columns: 1.5fr 1fr;
+      gap: 2.5rem;
+      align-items: start;
+    }
+    @media (max-width: 880px) { .intro-grid { grid-template-columns: 1fr; } }
+    .intro-text {
+      font-size: 0.98rem;
+      line-height: 1.7;
+      color: var(--text);
+      margin: 0 0 0.85rem;
+      max-width: 60ch;
+    }
+    .intro-text strong { color: var(--ink); }
+    .intro-text a {
+      color: var(--p-700);
+      text-decoration: none;
+      border-bottom: 1px dashed var(--p-300);
+    }
+    .intro-aside {
+      padding: 1.5rem;
+      background: var(--bg);
+      border: 1px solid var(--line);
+      border-left: 3px solid var(--p-500);
+      border-radius: var(--r);
+    }
+    .intro-aside h3 {
+      margin: 0 0 0.85rem;
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--ink);
+    }
+    .intro-aside ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 0.45rem;
+    }
+    .intro-aside li {
+      position: relative;
+      padding-left: 1.25rem;
+      font-size: 0.88rem;
+      line-height: 1.55;
+      color: var(--text);
+    }
+    .intro-aside li::before {
+      content: "›";
+      position: absolute;
+      left: 0;
+      color: var(--p-700);
+      font-weight: 800;
+    }
+    .intro-aside strong { color: var(--ink); font-weight: 700; }
+
+    /* ============ FILTERS ============ */
+    .errata-filters {
+      background: var(--bg);
+      border-bottom: 1px solid var(--line);
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+    .errata-filters .inner { padding: 1.25rem var(--gutter); }
+    .filter-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .filter-label {
+      font-family: var(--mono);
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+      font-weight: 700;
+      margin-right: 0.5rem;
+    }
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.4rem 0.85rem;
+      border-radius: 99px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+      border: 1px solid var(--line);
+      background: var(--bg);
+      color: var(--ink-soft);
+      transition: all 0.15s ease;
+      font-family: inherit;
+    }
+    .chip:hover { border-color: var(--p-400); color: var(--p-700); }
+    .chip-active {
+      background: var(--p-700);
+      border-color: var(--p-700);
+      color: #fff;
+    }
+    .chip-active:hover { color: #fff; background: var(--p-800); }
+    .chip-count {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 22px;
+      height: 18px;
+      padding: 0 5px;
+      background: var(--p-50);
+      color: var(--p-700);
+      border-radius: 9px;
+      font-family: var(--mono);
+      font-size: 0.7rem;
+      font-weight: 700;
+    }
+    .chip-active .chip-count { background: rgba(255, 255, 255, 0.25); color: #fff; }
+    .chip-red .chip-count { background: var(--red-bg); color: var(--red); }
+    .chip-amber .chip-count { background: var(--amber-bg); color: var(--amber); }
+
+    /* ============ YEAR SECTIONS ============ */
+    .errata-year {
+      background: var(--bg);
+      border-bottom: 1px solid var(--line);
+    }
+    .errata-year:nth-child(odd) { background: var(--bg-alt); }
+    .year-head {
+      display: flex;
+      align-items: baseline;
+      gap: 1rem;
+      margin: 0 0 1.5rem;
+      padding-bottom: 0.85rem;
+      border-bottom: 2px solid var(--p-200);
+    }
+    .year-head h2 {
+      font-family: var(--sans);
+      font-size: clamp(1.6rem, 3vw, 2.2rem);
+      font-weight: 800;
+      letter-spacing: -0.025em;
+      color: var(--ink);
+      margin: 0;
+    }
+    .year-count {
+      font-family: var(--mono);
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--p-700);
+      padding: 0.2rem 0.6rem;
+      background: var(--p-50);
+      border-radius: 4px;
+      font-weight: 700;
+    }
+
+    .corrections-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 0.85rem;
+    }
+    .correction-item {
+      display: grid;
+      grid-template-columns: 180px 1fr;
+      gap: 1.5rem;
+      padding: 1.25rem 1.4rem;
+      background: var(--bg);
+      border: 1px solid var(--line);
+      border-radius: var(--r);
+      transition: border-color 0.15s ease, transform 0.15s ease;
+    }
+    .errata-year:nth-child(odd) .correction-item { background: var(--bg); }
+    .correction-item:hover {
+      transform: translateY(-1px);
+      border-color: var(--p-300);
+    }
+    @media (max-width: 720px) {
+      .correction-item { grid-template-columns: 1fr; gap: 0.75rem; }
+    }
+    .correction-severity-critical {
+      border-left: 4px solid var(--red);
+    }
+    .correction-severity-important {
+      border-left: 4px solid var(--amber);
+    }
+    .correction-severity-minor {
+      border-left: 4px solid var(--p-300);
+    }
+
+    .correction-date-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.5rem;
+    }
+    .correction-date {
+      font-family: var(--mono);
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--ink);
+    }
+    .correction-badge {
+      display: inline-block;
+      padding: 0.2rem 0.6rem;
+      border-radius: 99px;
+      font-family: var(--mono);
+      font-size: 0.68rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      font-weight: 700;
+    }
+    .correction-badge-red { background: var(--red-bg); color: var(--red); }
+    .correction-badge-amber { background: var(--amber-bg); color: var(--amber); }
+    .correction-badge-purple { background: var(--p-50); color: var(--p-700); }
+    .correction-badge-muted { background: var(--bg-warm); color: var(--muted); border: 1px solid var(--line); }
+
+    .correction-body { min-width: 0; }
+    .correction-head {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.5rem 0.85rem;
+      margin-bottom: 0.55rem;
+    }
+    .correction-article {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--ink);
+      text-decoration: none;
+      border-bottom: 1px dashed var(--p-300);
+      line-height: 1.4;
+    }
+    .correction-article:hover {
+      color: var(--p-700);
+      border-bottom-style: solid;
+    }
+    .correction-category {
+      font-family: var(--mono);
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--muted);
+      padding: 0.15rem 0.45rem;
+      background: var(--bg-warm);
+      border-radius: 4px;
+    }
+    .correction-change {
+      margin: 0 0 0.65rem;
+      font-size: 0.92rem;
+      line-height: 1.6;
+      color: var(--text);
+    }
+    .correction-reporter {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.82rem;
+      color: var(--muted);
+      padding-top: 0.6rem;
+      border-top: 1px dashed var(--line);
+    }
+    .correction-reporter svg {
+      width: 14px;
+      height: 14px;
+    }
+    .correction-reporter strong { color: var(--ink-soft); font-weight: 600; }
+
+    /* ============ POLICY ============ */
+    .errata-policy {
+      background: var(--bg-warm);
+      border-bottom: 1px solid var(--line);
+    }
+    .policy-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 0.85rem;
+      counter-reset: policy;
+    }
+    .policy-list li {
+      display: grid;
+      grid-template-columns: 56px 1fr;
+      gap: 1.25rem;
+      padding: 1.25rem 1.5rem;
+      background: var(--bg);
+      border: 1px solid var(--line);
+      border-radius: var(--r-lg);
+      align-items: start;
+    }
+    @media (max-width: 540px) {
+      .policy-list li { grid-template-columns: 1fr; gap: 0.5rem; }
+    }
+    .policy-num {
+      font-family: var(--mono);
+      font-size: 1.6rem;
+      font-weight: 800;
+      color: var(--p-300);
+      line-height: 1;
+    }
+    .policy-list h3 {
+      margin: 0 0 0.4rem;
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--ink);
+    }
+    .policy-list p {
+      margin: 0;
+      line-height: 1.6;
+      color: var(--text);
+      font-size: 0.92rem;
+    }
+    .policy-list strong { color: var(--ink); font-weight: 600; }
+
+    /* ============ CTA ============ */
+    .errata-cta { background: var(--bg); }
+    .cta-card {
+      max-width: 760px;
+      margin: 0 auto;
+      padding: 2.5rem 2rem;
+      background: linear-gradient(135deg, var(--p-700), var(--p-900));
+      color: #fff;
+      border-radius: var(--r-xl);
+      text-align: center;
+    }
+    .cta-card h2 {
+      font-size: clamp(1.4rem, 2.6vw, 1.85rem);
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      margin-bottom: 0.6rem;
+    }
+    .cta-card p {
+      font-size: 1rem;
+      line-height: 1.6;
+      color: rgba(255, 255, 255, 0.85);
+      max-width: 56ch;
+      margin: 0 auto 1.5rem;
+    }
+    .cta-actions {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    .btn-primary,
+    .btn-ghost {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      padding: 0.8rem 1.3rem;
+      border-radius: var(--r);
+      font-size: 0.9rem;
+      font-weight: 700;
+      text-decoration: none;
+    }
+    .btn-primary {
+      background: var(--accent);
+      color: #fff;
+      border: 1px solid var(--accent);
+    }
+    .btn-primary:hover { background: #ff6600; border-color: #ff6600; }
+    .btn-primary svg { width: 14px; height: 14px; }
+    .btn-ghost {
+      background: rgba(255, 255, 255, 0.12);
+      color: #fff;
+      border: 1px solid rgba(255, 255, 255, 0.25);
+    }
+    .btn-ghost:hover { background: rgba(255, 255, 255, 0.2); }
+    .cta-meta {
+      margin: 1.5rem 0 0;
+      font-size: 0.78rem;
+      color: var(--muted);
+      text-align: center;
+    }
+    .cta-meta strong { color: var(--ink); font-weight: 700; }
+  </style>
+</BaseLayout>

@@ -1,0 +1,250 @@
+# =============================================================================
+# robots.txt for Recenzer.cz
+# Last updated: 2026-05-21
+# Spec: https://www.rfc-editor.org/rfc/rfc9309
+# =============================================================================
+
+# -----------------------------------------------------------------------------
+# Default: allow all well-behaved crawlers
+# -----------------------------------------------------------------------------
+User-agent: *
+Allow: /
+
+# Block parametry stránkování — duplicitní content
+Disallow: /*?page=
+Disallow: /*?p=
+Disallow: /*?strana=
+Disallow: /*&page=
+Disallow: /*&p=
+Disallow: /*&strana=
+
+# Block vyhledávací dotazy a interní vyhledávání
+Disallow: /*?q=
+Disallow: /*?s=
+Disallow: /*?search=
+Disallow: /*?hledat=
+Disallow: /*&q=
+Disallow: /*&s=
+Disallow: /*&search=
+Disallow: /*&hledat=
+Disallow: /hledat/
+Disallow: /search/
+Disallow: /vyhledavani/
+
+# Block filtry, řazení, view módy (parametry seznamů)
+Disallow: /*?sort=
+Disallow: /*?filter=
+Disallow: /*?razeni=
+Disallow: /*?filtr=
+Disallow: /*?view=
+Disallow: /*?zobrazeni=
+Disallow: /*&sort=
+Disallow: /*&filter=
+Disallow: /*&razeni=
+Disallow: /*&filtr=
+Disallow: /*&view=
+Disallow: /*&zobrazeni=
+
+# Block tracking a referral parametry (utm_*, ref, gclid…)
+Disallow: /*?utm_
+Disallow: /*&utm_
+Disallow: /*?ref=
+Disallow: /*&ref=
+Disallow: /*?gclid=
+Disallow: /*&gclid=
+Disallow: /*?fbclid=
+Disallow: /*&fbclid=
+Disallow: /*?mc_cid=
+Disallow: /*&mc_cid=
+
+# Block tisku a alternativních zobrazení
+Disallow: /*?print=
+Disallow: /*?tisk=
+Disallow: /*?pdf=
+
+# Block API endpoints a interní backend
+Disallow: /api/
+Disallow: /admin/
+Disallow: /_actions/
+Disallow: /_next/
+Disallow: /_astro/
+
+# Block dočasné / pracovní stránky
+Disallow: /draft/
+Disallow: /preview/
+Disallow: /test/
+Disallow: /tmp/
+
+# Block uživatelské sekce (až budou)
+Disallow: /muj-ucet/
+Disallow: /prihlaseni/
+Disallow: /registrace/
+Disallow: /odhlaseni/
+Disallow: /zapomenute-heslo/
+Disallow: /nastaveni-uctu/
+
+# Block košík / objednávky (až budou)
+Disallow: /kosik/
+Disallow: /objednavka/
+Disallow: /pokladna/
+
+# Block server-side soubory (jen pro jistotu)
+Disallow: /*.json$
+Disallow: /*.csv$
+Disallow: /*.log$
+Disallow: /*.bak$
+
+# Crawl delay — slušné chování (1 s mezi requesty)
+Crawl-delay: 1
+
+# -----------------------------------------------------------------------------
+# Googlebot — bez crawl-delay (Google si určuje sám)
+# -----------------------------------------------------------------------------
+User-agent: Googlebot
+Allow: /
+Disallow: /api/
+Disallow: /admin/
+Disallow: /*?utm_
+Disallow: /*?ref=
+Disallow: /hledat/
+Disallow: /search/
+
+# -----------------------------------------------------------------------------
+# Google-Extended (Google AI Gemini trénink) — ALLOWED
+# Sdílíme obsah s Geminim. Tato volba je editoriální rozhodnutí — chceme
+# být v knowledge graph AI asistentů, kteří odkazují na zdroj.
+# -----------------------------------------------------------------------------
+User-agent: Google-Extended
+Allow: /
+Disallow: /api/
+Disallow: /admin/
+
+# -----------------------------------------------------------------------------
+# Bingbot
+# -----------------------------------------------------------------------------
+User-agent: Bingbot
+Allow: /
+Disallow: /api/
+Disallow: /admin/
+Disallow: /*?utm_
+Disallow: /*?ref=
+Disallow: /hledat/
+
+# -----------------------------------------------------------------------------
+# Seznam (CZ vyhledávač)
+# -----------------------------------------------------------------------------
+User-agent: SeznamBot
+Allow: /
+Disallow: /api/
+Disallow: /admin/
+Disallow: /*?utm_
+Disallow: /hledat/
+
+# -----------------------------------------------------------------------------
+# AI crawlers — explicitní policy
+# Politika: ALLOWED s odkazem na llms.txt (pro vlastní crawl politiku).
+# Důvod: Recenzer.cz citujeme rádi v AI odpovědích, je to organic distribution.
+# Pokud byste chtěli AI bota zakázat, změňte níže Allow → Disallow.
+# -----------------------------------------------------------------------------
+
+# Claude (Anthropic)
+User-agent: ClaudeBot
+Allow: /
+Disallow: /api/
+Disallow: /admin/
+
+User-agent: anthropic-ai
+Allow: /
+Disallow: /api/
+Disallow: /admin/
+
+# ChatGPT (OpenAI)
+User-agent: GPTBot
+Allow: /
+Disallow: /api/
+Disallow: /admin/
+
+User-agent: OAI-SearchBot
+Allow: /
+Disallow: /api/
+Disallow: /admin/
+
+User-agent: ChatGPT-User
+Allow: /
+Disallow: /api/
+Disallow: /admin/
+
+# Perplexity
+User-agent: PerplexityBot
+Allow: /
+Disallow: /api/
+Disallow: /admin/
+
+User-agent: Perplexity-User
+Allow: /
+Disallow: /api/
+Disallow: /admin/
+
+# You.com
+User-agent: YouBot
+Allow: /
+Disallow: /api/
+Disallow: /admin/
+
+# Apple Intelligence
+User-agent: Applebot-Extended
+Allow: /
+Disallow: /api/
+Disallow: /admin/
+
+# Common Crawl (dataset používaný pro trénink LLM)
+User-agent: CCBot
+Allow: /
+Disallow: /api/
+Disallow: /admin/
+
+# Meta AI / Llama
+User-agent: meta-externalagent
+Allow: /
+Disallow: /api/
+Disallow: /admin/
+
+User-agent: FacebookBot
+Allow: /
+Disallow: /api/
+Disallow: /admin/
+
+# -----------------------------------------------------------------------------
+# Scrapers a nežádoucí boti — explicit block
+# -----------------------------------------------------------------------------
+
+# Bytespider (TikTok / ByteDance — agresivní)
+User-agent: Bytespider
+Disallow: /
+
+# SEO scraper tools (pokud chcete blokovat)
+User-agent: AhrefsBot
+Crawl-delay: 10
+
+User-agent: SemrushBot
+Crawl-delay: 10
+
+User-agent: MJ12bot
+Crawl-delay: 10
+
+User-agent: DotBot
+Crawl-delay: 10
+
+# -----------------------------------------------------------------------------
+# Sitemap & feeds
+# -----------------------------------------------------------------------------
+# Hlavní sitemap index, odkazuje na 5 sub-sitemap:
+#   - sitemap-pages.xml      (statické editorial / legal stránky)
+#   - sitemap-articles.xml   (všechny články)
+#   - sitemap-categories.xml (rubriky)
+#   - sitemap-authors.xml    (autorské profily)
+#   - sitemap-images.xml     (image sitemap pro Google Images)
+Sitemap: https://www.recenzer.cz/sitemap.xml
+
+# Atom feed pro novinářské RSS čtečky
+Sitemap: https://www.recenzer.cz/aktualizace.xml

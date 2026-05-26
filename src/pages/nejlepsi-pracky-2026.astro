@@ -1,0 +1,1169 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import Breadcrumbs from "../components/article/Breadcrumbs.astro";
+import ByLine from "../components/article/ByLine.astro";
+import TrustRow from "../components/article/TrustRow.astro";
+import AffiliateDisclosure from "../components/article/AffiliateDisclosure.astro";
+import ProductAcquisitionSection from "../components/article/ProductAcquisitionSection.astro";
+import MakingSection from "../components/article/MakingSection.astro";
+import { ivoMatej, alenaRajnochova } from "../data/people";
+import type {
+  TrustPill,
+  AffiliateDisclosure as AffDisclosure,
+  ProductAcquisition,
+} from "../types/article";
+
+const productAcquisition: ProductAcquisition = {
+  enabled: true,
+  items: [
+    {
+      method: "purchased",
+      note: "5 vítězných modelů + 12 srovnávacích — všechny koupeny redakcí v období 10/2025 — 02/2026. Celková investice 318 940 Kč. Faktury archivovány.",
+    },
+    {
+      product: "Miele WCE 670 WCS (referenční prémiový model)",
+      method: "loaned",
+      note: "Zapůjčen showroomem Miele Praha na 6 týdnů srovnávacího testu (10–11/2025). Vrácen 22. 11. 2025 s protokolem.",
+    },
+  ],
+  affectedRating: {
+    answer: "partial",
+    explanation:
+      "<strong>Většina modelů byla nakoupena</strong>. U <em>jednoho referenčního modelu</em> (Miele WCE 670) jsme přijali zapůjčení od showroomu Miele — nikoliv pro účast v žebříčku, ale jako srovnávací benchmark prémiové kategorie. <strong>Miele tento model neumístili do našeho TOP 7</strong>, naopak — i přes zapůjčení jsme byli kritičtí k jeho cenové dostupnosti. Showroom o naší recenzi nevěděl předem.",
+  },
+  afterTest:
+    "Bosch Serie 6 (vítěz) a LG F4WV510S0E (2. místo) zůstávají v laboratoři pro <strong>5letý dlouhodobý test</strong>. Ostatní zakoupené modely jsme prodali redaktorům nebo darovali škole. Miele WCE 670 byl vrácen do showroomu se servisní zprávou.",
+};
+
+interface TopModel {
+  rank: number;
+  name: string;
+  tagline: string;
+  capacity: string;
+  energyClass: string;
+  rpm: string;
+  noise: string;
+  rating: number;
+  priceFrom: string;
+  winnerLabel?: string;
+  reviewHtml: string;
+  pros: string[];
+  cons: string[];
+  bestFor: string;
+}
+
+const models: TopModel[] = [
+  {
+    rank: 1,
+    name: "Bosch WGG244A0BY",
+    tagline: "Nejlepší pračka roku 2026 — kombinace kvality, úspornosti a spolehlivosti, kterou nikdo jiný zatím nedosáhl.",
+    capacity: "9 kg",
+    energyClass: "A",
+    rpm: "1400",
+    noise: "52",
+    rating: 91,
+    priceFrom: "14 990 Kč",
+    winnerLabel: "VÍTĚZ",
+    reviewHtml: `<p>Bosch Serie 6 WGG244A0BY je <strong>etalonový model</strong> pro českou domácnost. Devítikilová kapacita pokrývá i větší rodiny, energetická třída A je v praxi opravdu plněná (naměřili jsme 0,82 kWh na Eco 40-60). Hluk 52 dB(A) při ždímání 1400 rpm je v dnešní střední třídě nadprůměrně tichý.</p><p>Po čtyřech měsících testu jsme nezjistili žádný strukturální problém. Bezkartáčový motor EcoSilence Drive funguje plynule a ovládací panel je intuitivní. Bosch standardně dává 10 let záruku na motor — pro pračku v této cenové kategorii unikátní.</p>`,
+    pros: [
+      "Reálná spotřeba odpovídá štítku (0,82 kWh / cyklus)",
+      "Tichý chod 52 dB při 1400 rpm",
+      "10 let záruka na motor",
+      "Robustní stavba s ocelovým bubnem",
+    ],
+    cons: [
+      "Žádná Wi-Fi konektivita (pro někoho výhoda)",
+      "Pouze 4 rychlé programy",
+    ],
+    bestFor: "Univerzální volba — rodina 3–5 lidí, středně náročný uživatel.",
+  },
+  {
+    rank: 2,
+    name: "LG F4WV510S0E",
+    tagline: "Nejlepší volba pro velkou rodinu — vysoká kapacita 10,5 kg a AI Direct Drive motor s desetiletou zárukou.",
+    capacity: "10,5 kg",
+    energyClass: "A",
+    rpm: "1400",
+    noise: "54",
+    rating: 89,
+    priceFrom: "16 490 Kč",
+    reviewHtml: `<p>LG F4WV510S0E je <strong>vlajková loď</strong> pro rodiny s vyšším objemem prádla. Kapacita 10,5 kg znamená méně cyklů — místo 5 týdně stačí 3, což v praxi šetří jak elektřinu, tak čas. AI Direct Drive motor přizpůsobuje rytmus prání podle váhy a typu prádla.</p><p>V testu šetrnosti k vláknům dosáhla LG nejlepšího výsledku ze všech 31 testovaných modelů — úbytek 0,3 % vláken za cyklus. Aplikace LG ThinQ je v praxi použitelná, dálkové spuštění funguje spolehlivě.</p>`,
+    pros: [
+      "Velká kapacita 10,5 kg ideální pro 4+ člennou rodinu",
+      "Nejlepší šetrnost k prádlu z testu (0,3 % úbytek vláken)",
+      "Funkční Wi-Fi a app LG ThinQ",
+      "10 let záruka na motor",
+    ],
+    cons: [
+      "Cena o 1 500 Kč vyšší než alternativy",
+      "Hloubka 56 cm — nepasuje do všech sestav",
+    ],
+    bestFor: "Velká rodina (4+ lidí), zájem o smart funkce a šetrnost k oblečení.",
+  },
+  {
+    rank: 3,
+    name: "Miele WCE 670 WCS",
+    tagline: "Prémiová pračka pro náročné — tichý chod 49 dB a deklarovaná životnost 20 let testovaná na 5 000 cyklů.",
+    capacity: "8 kg",
+    energyClass: "A",
+    rpm: "1400",
+    noise: "49",
+    rating: 88,
+    priceFrom: "28 990 Kč",
+    reviewHtml: `<p>Miele je <strong>kategorie sama o sobě</strong>. WCE 670 WCS prošla v testu Stiftung Warentest 5 000 cyklů — to odpovídá zhruba 20 letům běžného domácího provozu. Kvalita materiálů je znát: ocelový plášť, plně litinové komponenty motoru, kabeláž v plastu odolnému proti vibracím.</p><p>Hluk 49 dB je nejnižší ze všech testovaných — pračka může běžet vedle ložnice bez problému. Cena 29 000 Kč je vysoká, ale rozpočítaná na 20 let života vychází na 120 Kč/měsíc — méně než většina dotovaných modelů.</p>`,
+    pros: [
+      "Testovaná životnost 20 let / 5 000 cyklů",
+      "Nejnižší hluk ze všech testovaných (49 dB)",
+      "Plně litinový motor s 10letou zárukou",
+      "Vysoká zbytková hodnota po 5 letech",
+    ],
+    cons: [
+      "Pořizovací cena 29 000 Kč",
+      "Méně programů než u konkurence",
+      "Estetika může působit konzervativně",
+    ],
+    bestFor: "Náročný uživatel, který kupuje na 15–20 let dopředu a chce maximální klid.",
+  },
+  {
+    rank: 4,
+    name: "Samsung WW80T534DAW",
+    tagline: "Univerzální volba s AI Wash — automatické dávkování pracího prostředku a 5 let záruka na motor.",
+    capacity: "8 kg",
+    energyClass: "A",
+    rpm: "1400",
+    noise: "53",
+    rating: 86,
+    priceFrom: "11 490 Kč",
+    reviewHtml: `<p>Samsung WW80T534DAW je <strong>příjemné překvapení</strong> ve střední cenové třídě. AI Wash technologie skutečně funguje — pračka detekuje znečištění a automaticky upravuje množství vody i prostředku. V testu jsme šetřili v průměru 11 % prášku oproti manuálnímu dávkování.</p><p>Slabší stránkou je hluk 53 dB(A) — slyšitelný v sousední místnosti. Software je svižný, dotykový display je intuitivní. Záruka motoru je 5 let, což je standard, ale méně než Bosch/Miele.</p>`,
+    pros: [
+      "AI Wash spolehlivě šetří prostředek",
+      "Nejlepší poměr cena/výkon v 8kg kategorii",
+      "Rychlý a intuitivní dotykový display",
+      "Energetická třída A reálně potvrzená",
+    ],
+    cons: [
+      "Hluk 53 dB při ždímání",
+      "Záruka na motor jen 5 let",
+      "Plastový buben (ne ocelový)",
+    ],
+    bestFor: "Pár nebo malá rodina, příjemné chytré funkce za rozumnou cenu.",
+  },
+  {
+    rank: 5,
+    name: "Beko WUE 6612 WCST",
+    tagline: "Nejlepší poměr cena/výkon — solidní 7 kg pračka do 9 000 Kč pro nenáročného uživatele.",
+    capacity: "7 kg",
+    energyClass: "A",
+    rpm: "1200",
+    noise: "57",
+    rating: 85,
+    priceFrom: "8 490 Kč",
+    reviewHtml: `<p>Beko WUE 6612 WCST je <strong>rozumný kompromis</strong> pro nenáročného uživatele s omezeným rozpočtem. Sedmikilová kapacita a 1200 rpm ždímání pokryjí potřeby páru nebo malé rodiny. Energetická třída A je překvapivě plněná i ve spodním cenovém pásmu.</p><p>Hlučnost 57 dB(A) je vyšší — pračku doporučujeme umístit do koupelny nebo komory, ne otevřené kuchyně. Stavba je z větší části plastová, životnost odhadujeme na 8–10 let intenzivního provozu.</p>`,
+    pros: [
+      "Nejnižší pořizovací cena z TOP 5",
+      "Energetická třída A reálně dodržena",
+      "Kompaktní rozměry (hloubka 45 cm)",
+    ],
+    cons: [
+      "Hlučnost 57 dB při ždímání",
+      "1200 rpm — pomalejší schnutí",
+      "Plastové komponenty, kratší životnost",
+    ],
+    bestFor: "Pár nebo singl s omezeným rozpočtem; pračka do koupelny.",
+  },
+];
+
+const compareRows = [
+  {
+    label: "Kapacita",
+    values: ["9 kg", "10,5 kg", "8 kg", "8 kg", "7 kg"],
+  },
+  {
+    label: "Energetická třída",
+    values: ["A", "A", "A", "A", "A"],
+  },
+  {
+    label: "Otáčky",
+    values: ["1400", "1400", "1400", "1400", "1200"],
+  },
+  {
+    label: "Hluk (dB)",
+    values: ["52", "54", "49", "53", "57"],
+  },
+  {
+    label: "Spotřeba (kWh/cyklus)",
+    values: ["0,82", "0,89", "0,78", "0,86", "0,95"],
+  },
+  {
+    label: "Wi-Fi",
+    values: ["—", "Ano", "Ano", "Ano", "—"],
+  },
+  {
+    label: "Záruka motor",
+    values: ["10 let", "10 let", "10 let", "5 let", "3 roky"],
+  },
+  {
+    label: "Hloubka",
+    values: ["55 cm", "56 cm", "60 cm", "55 cm", "45 cm"],
+  },
+  {
+    label: "Cena od",
+    values: ["14 990 Kč", "16 490 Kč", "28 990 Kč", "11 490 Kč", "8 490 Kč"],
+  },
+  {
+    label: "Naše hodnocení",
+    values: ["91 %", "89 %", "88 %", "86 %", "85 %"],
+  },
+];
+
+const faqs = [
+  {
+    q: "Která pračka má nejlepší poměr cena/výkon v roce 2026?",
+    a: "<strong>Samsung WW80T534DAW</strong> za 11 490 Kč nabízí AI Wash, 8kg kapacitu a třídu A. Pro užší rozpočet pak Beko WUE 6612 WCST za 8 490 Kč.",
+  },
+  {
+    q: "Jaká pračka vydrží nejdéle?",
+    a: "<strong>Miele WCE 670 WCS</strong> — testovaná na 5 000 cyklů, což odpovídá 20 letům běžného provozu. Vyšší pořizovací cena se rozpočítá na nízkou měsíční hodnotu.",
+  },
+  {
+    q: "Stojí za to si pořídit pračku s Wi-Fi?",
+    a: "Pokud chcete spouštět prání mimo domov nebo dostávat upozornění na konec cyklu, ano. Pokud používáte pračku „normálně\", chytré funkce jsou marginálně užitečné. Wi-Fi nemůže nahradit kvalitní bezkartáčový motor.",
+  },
+  {
+    q: "Co je důležité při výběru pračky?",
+    a: "1) Kapacita podle velikosti rodiny (singl 5–6 kg, pár 7 kg, rodina 8+ kg), 2) <strong>reálná spotřeba</strong> (ne jen štítek), 3) hluk při ždímání (do 55 dB pro otevřené prostory), 4) záruka motoru (preferujte 10 let).",
+  },
+];
+
+const trustPills: TrustPill[] = [
+  { kind: "verified-by-expert", label: "Ověřeno odborným garantem" },
+  { kind: "tested-in-lab", label: "Testovací laboratoř Brno · 4 měsíce" },
+  { kind: "sources", label: "31 testovaných modelů" },
+  { kind: "no-sponsorship", label: "Bez sponzoringu" },
+];
+
+const affiliateDisclosure: AffDisclosure = {
+  enabled: true,
+  title: "Affiliate disclosure",
+  bodyHtml:
+    "Tento článek <strong>obsahuje affiliate odkazy</strong> na Heureku a partnerské e-shopy. Když kliknete a koupíte, dostaneme provizi z marže e-shopu — pro vás se cena nemění. Pořadí modelů určuje skóre z metodiky, ne výška provize.",
+  link: { href: "/affiliate-disclosure/", label: "Detail affiliate modelu" },
+};
+
+const credibilityStats = [
+  { label: "Testováno modelů", value: "31", unit: "praček" },
+  { label: "Hodin v laboratoři", value: "560", unit: "hod" },
+  { label: "Měsíců testů", value: "4" },
+  { label: "Konzultací s experty", value: "3" },
+];
+---
+
+<BaseLayout
+  title="Nejlepší pračky 2026 — TOP 5 modelů | Recenzer"
+  description="Otestovali jsme 31 praček v laboratoři po dobu 4 měsíců. Vybíráme 5 nejlepších modelů od 8 do 29 tisíc Kč. Detailní recenze, srovnání parametrů a doporučení podle rozpočtu."
+>
+  <Breadcrumbs items={[
+    { href: "/", label: "Recenzer" },
+    { href: "/domaci-spotrebice/", label: "Domácí spotřebiče" },
+    { href: "/pracky/", label: "Pračky" },
+    { label: "Nejlepší pračky 2026" },
+  ]} />
+
+  <div class="top-wrap">
+    <div class="top-main">
+
+      <header class="top-header">
+        <div class="top-kicker">TOP 5 · Domácí spotřebiče</div>
+        <h1 class="top-title">Nejlepší pračky 2026 — <em>TOP 5 modelů</em></h1>
+        <p class="top-perex">
+          Otestovali jsme <strong>31 praček v laboratoři po 4 měsíce</strong>. Vybrali jsme pět nejlepších modelů od 8 do 29 tisíc Kč. Pro každý rozpočet a každý typ domácnosti.
+        </p>
+      </header>
+
+      <ByLine
+        author={ivoMatej}
+        garant={alenaRajnochova}
+        dates={{ publishedAt: "2026-05-12", updatedAt: "2026-05-22", readingTimeMin: 14 }}
+      />
+
+      <TrustRow pills={trustPills} />
+
+      <AffiliateDisclosure disclosure={affiliateDisclosure} />
+
+      <ProductAcquisitionSection data={productAcquisition} />
+
+      <!-- Intro -->
+      <section class="top-section">
+        <h2>Proč jsme vybrali právě tyto pračky</h2>
+        <p>
+          Z 31 modelů, které jsme za poslední 4 měsíce testovali v naší <a href="/testovaci-laborator/">brněnské laboratoři</a>, jsme vybrali pět, které vynikly v kombinaci spotřeby, hluku, šetrnosti k prádlu a životnosti motoru. <strong>Žádný model na seznamu není dotován výrobcem</strong> — všechny jsme nakupovali za běžnou tržní cenu.
+        </p>
+        <p>
+          Pořadí vychází z váženého součtu: účinnost praní (30 %), spotřeba (20 %), šetrnost k prádlu (15 %), hluk (15 %), rychlost/kapacita (10 %), ovládání a stavba (10 %). Detail <a href="/jak-testujeme/pracky/">v protokolu testování praček v3.2</a>.
+        </p>
+      </section>
+
+      <!-- TOP 5 ranked list -->
+      <section class="top5-list" id="top5">
+        <h2>TOP 5 praček 2026 — žebříček</h2>
+        <p class="top5-lede">
+          Rychlý přehled — klikněte na detail pro plnou recenzi modelu.
+        </p>
+
+        <ol class="top5-cards">
+          {models.map((m) => (
+            <li class:list={["top5-card", m.rank === 1 && "winner"]}>
+              <header class="top5-head">
+                <div class="top5-rank">{m.rank}</div>
+                <div class="top5-info">
+                  {m.winnerLabel && <span class="top5-winner-badge">{m.winnerLabel}</span>}
+                  <h3>{m.name}</h3>
+                  <p>{m.tagline}</p>
+                </div>
+                <div class="top5-price">
+                  <span class="price-label">Cena od</span>
+                  <span class="price-value">{m.priceFrom}</span>
+                </div>
+              </header>
+              <ul class="top5-specs">
+                <li><strong>{m.capacity}</strong> kapacita</li>
+                <li>třída <strong>{m.energyClass}</strong></li>
+                <li><strong>{m.rpm}</strong> ot/min</li>
+                <li><strong>{m.noise}</strong> dB</li>
+                <li class="rating"><strong>{m.rating} %</strong></li>
+              </ul>
+              <div class="top5-actions">
+                <a href={`#detail-${m.rank}`} class="btn-secondary">Detailní recenze</a>
+                <a href="#" class="btn-primary">
+                  Porovnat ceny
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+                    <line x1="5" y1="12" x2="19" y2="12" />
+                    <polyline points="12 5 19 12 12 19" />
+                  </svg>
+                </a>
+              </div>
+            </li>
+          ))}
+        </ol>
+      </section>
+
+      <!-- Detailed reviews -->
+      <section class="top-section" id="detaily">
+        <h2>Detailní recenze TOP 5</h2>
+
+        {models.map((m) => (
+          <article class="detail-card" id={`detail-${m.rank}`}>
+            <header class="detail-head">
+              <div class="detail-rank">#{m.rank}</div>
+              <div>
+                <h3>{m.name}</h3>
+                <p class="detail-tagline">{m.tagline}</p>
+              </div>
+              <div class="detail-rating">
+                <strong>{m.rating}</strong><span>/100</span>
+              </div>
+            </header>
+
+            <div class="detail-specs">
+              <div><span class="spec-label">Kapacita</span><strong>{m.capacity}</strong></div>
+              <div><span class="spec-label">Třída</span><strong>{m.energyClass}</strong></div>
+              <div><span class="spec-label">Otáčky</span><strong>{m.rpm}</strong></div>
+              <div><span class="spec-label">Hluk</span><strong>{m.noise} dB</strong></div>
+              <div><span class="spec-label">Cena od</span><strong>{m.priceFrom}</strong></div>
+            </div>
+
+            <div class="detail-review" set:html={m.reviewHtml}></div>
+
+            <div class="proscons">
+              <div class="proscons-col pros">
+                <h4>
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" aria-hidden="true">
+                    <polyline points="20 6 9 17 4 12" />
+                  </svg>
+                  Co se nám líbí
+                </h4>
+                <ul>{m.pros.map((p) => <li>{p}</li>)}</ul>
+              </div>
+              <div class="proscons-col cons">
+                <h4>
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" aria-hidden="true">
+                    <line x1="18" y1="6" x2="6" y2="18" />
+                    <line x1="6" y1="6" x2="18" y2="18" />
+                  </svg>
+                  Co by mohlo být lepší
+                </h4>
+                <ul>{m.cons.map((c) => <li>{c}</li>)}</ul>
+              </div>
+            </div>
+
+            <div class="detail-bestfor">
+              <strong>Pro koho:</strong> {m.bestFor}
+            </div>
+
+            <div class="detail-cta">
+              <a href="#" class="btn-primary">
+                Porovnat ceny u prodejců
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+                  <line x1="5" y1="12" x2="19" y2="12" />
+                  <polyline points="12 5 19 12 12 19" />
+                </svg>
+              </a>
+            </div>
+          </article>
+        ))}
+      </section>
+
+      <!-- Comparison table -->
+      <section class="top-section" id="srovnani">
+        <h2>Srovnání parametrů TOP 5</h2>
+        <p>
+          Všechny klíčové parametry vedle sebe. Pro mobilní zařízení tabulku posuňte vodorovně.
+        </p>
+        <div class="compare-wrap">
+          <table class="compare-table">
+            <thead>
+              <tr>
+                <th></th>
+                {models.map((m) => (
+                  <th>
+                    <span class="th-rank">#{m.rank}</span>
+                    <span class="th-name">{m.name.split(" ")[0]}</span>
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {compareRows.map((row) => (
+                <tr>
+                  <th class="row-label">{row.label}</th>
+                  {row.values.map((v) => <td>{v}</td>)}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- FAQ -->
+      <section class="top-section" id="faq">
+        <h2>Otázky a odpovědi</h2>
+        <ul class="faq-list">
+          {faqs.map((f) => (
+            <li>
+              <details>
+                <summary>{f.q}</summary>
+                <div class="faq-body" set:html={f.a}></div>
+              </details>
+            </li>
+          ))}
+        </ul>
+      </section>
+
+      <!-- Conclusion -->
+      <section class="top-section" id="zaver">
+        <h2>Závěr — kterou pračku koupit</h2>
+        <p>
+          Pokud chcete <strong>univerzální spolehlivou volbu</strong>, kupte Bosch WGG244A0BY. Pro <strong>velkou rodinu</strong> sáhněte po LG F4WV510S0E. Pokud máte rozpočet a kupujete <strong>na 20 let dopředu</strong>, Miele WCE 670 WCS je investice, která se vyplatí.
+        </p>
+        <p>
+          Pokud chcete <strong>nejlepší poměr cena/výkon</strong>, vyberte Samsung WW80T534DAW. A pro úzký rozpočet je nejlepší volba <strong>Beko WUE 6612 WCST</strong>.
+        </p>
+        <div class="conclusion-actions">
+          <a href="/jak-testujeme/pracky/" class="btn-secondary">Detailní metodika testu</a>
+          <a href="/duveryhodne-zdroje/" class="btn-secondary">Naše zdroje</a>
+        </div>
+      </section>
+    </div>
+
+    <!-- Sticky TOC -->
+    <aside class="top-toc">
+      <div class="toc-card">
+        <p class="toc-title">V tomto článku</p>
+        <ol>
+          <li><a href="#top5"><span>01</span>TOP 5 žebříček</a></li>
+          <li><a href="#detaily"><span>02</span>Detailní recenze</a></li>
+          <li><a href="#srovnani"><span>03</span>Srovnání parametrů</a></li>
+          <li><a href="#faq"><span>04</span>Otázky a odpovědi</a></li>
+          <li><a href="#zaver"><span>05</span>Závěr</a></li>
+        </ol>
+      </div>
+    </aside>
+  </div>
+
+  <MakingSection stats={credibilityStats} />
+
+  <style>
+    .top-wrap {
+      max-width: var(--max-w);
+      margin: 0 auto;
+      padding: 0 var(--gutter) 2rem;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 280px;
+      gap: 2.5rem;
+    }
+
+    .top-main { min-width: 0; }
+
+    @media (max-width: 1080px) {
+      .top-wrap { grid-template-columns: 1fr; }
+      .top-toc { display: none; }
+    }
+
+    /* Header */
+    .top-header { padding-top: 1.5rem; }
+
+    .top-kicker {
+      font-family: var(--mono);
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--p-700);
+      font-weight: 700;
+      margin-bottom: 1.25rem;
+    }
+
+    .top-title {
+      font-size: clamp(2rem, 5vw, 3.25rem);
+      font-weight: 800;
+      line-height: 1.08;
+      letter-spacing: -0.025em;
+      color: var(--ink);
+      margin-bottom: 1.25rem;
+    }
+
+    .top-title em {
+      font-style: italic;
+      color: var(--p-700);
+    }
+
+    .top-perex {
+      font-size: clamp(1.05rem, 1.5vw, 1.2rem);
+      line-height: 1.55;
+      color: var(--ink-soft);
+      margin: 0;
+    }
+
+    .top-perex strong { color: var(--ink); font-weight: 700; }
+
+    /* Section base */
+    .top-section {
+      margin: 3rem 0 3.5rem;
+      scroll-margin-top: 5rem;
+    }
+
+    .top-section h2 {
+      position: relative;
+      display: flex;
+      align-items: baseline;
+      gap: 0.7rem;
+      font-size: clamp(1.55rem, 3vw, 2rem);
+      font-weight: 800;
+      line-height: 1.18;
+      letter-spacing: -0.03em;
+      color: var(--ink);
+      margin-bottom: 1.4rem;
+      padding-bottom: 0.9rem;
+      background-image: linear-gradient(to right, var(--accent) 0 36px, transparent 36px 44px, var(--line) 44px 100%);
+      background-repeat: no-repeat;
+      background-position: left bottom;
+      background-size: 100% 3px;
+    }
+
+    .top-section p {
+      font-size: 16.5px;
+      line-height: 1.75;
+      color: var(--ink-soft);
+      margin: 1rem 0;
+    }
+
+    .top-section p strong { color: var(--ink); font-weight: 700; }
+
+    .top-section p a {
+      color: var(--p-700);
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+
+    /* TOP 5 list */
+    .top5-list { margin: 3rem 0 3.5rem; scroll-margin-top: 5rem; }
+    .top5-lede {
+      font-size: 14.5px;
+      color: var(--muted);
+      margin-bottom: 1.25rem;
+    }
+
+    .top5-cards {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 0.85rem;
+    }
+
+    .top5-card {
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: var(--r-lg);
+      padding: 1.5rem;
+    }
+
+    .top5-card.winner {
+      border-color: var(--p-400);
+      border-left: 4px solid var(--p-500);
+      box-shadow: 0 16px 40px -18px rgba(99, 50, 204, 0.25);
+      background:
+        radial-gradient(700px circle at 100% 0%, rgba(149, 114, 240, 0.08), transparent 55%),
+        #fff;
+    }
+
+    .top5-head {
+      display: grid;
+      grid-template-columns: 56px 1fr auto;
+      gap: 1.25rem;
+      align-items: start;
+    }
+
+    @media (max-width: 640px) {
+      .top5-head {
+        grid-template-columns: 56px 1fr;
+      }
+    }
+
+    .top5-rank {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background: var(--p-50);
+      color: var(--p-700);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--mono);
+      font-size: 1.75rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+    }
+
+    .top5-card.winner .top5-rank {
+      background: var(--p-700);
+      color: #fff;
+    }
+
+    .top5-winner-badge {
+      display: inline-block;
+      font-family: var(--mono);
+      font-size: 10.5px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: #fff;
+      background: var(--accent);
+      padding: 3px 9px;
+      border-radius: 4px;
+      margin-bottom: 0.5rem;
+      font-weight: 700;
+    }
+
+    .top5-info h3 {
+      font-size: 1.25rem;
+      font-weight: 800;
+      color: var(--ink);
+      letter-spacing: -0.015em;
+      margin: 0 0 0.3rem;
+    }
+
+    .top5-info p {
+      font-size: 14px;
+      line-height: 1.55;
+      color: var(--muted);
+      margin: 0;
+    }
+
+    .top5-price {
+      text-align: right;
+      align-self: center;
+    }
+
+    @media (max-width: 640px) {
+      .top5-price { display: none; }
+    }
+
+    .price-label {
+      display: block;
+      font-family: var(--mono);
+      font-size: 10.5px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--muted);
+      font-weight: 700;
+      margin-bottom: 0.2rem;
+    }
+
+    .price-value {
+      display: block;
+      font-size: 1.25rem;
+      font-weight: 800;
+      color: var(--ink);
+      letter-spacing: -0.02em;
+      line-height: 1;
+    }
+
+    .top5-specs {
+      list-style: none;
+      padding: 1rem 0;
+      margin: 1rem 0 0;
+      border-top: 1px dashed var(--line);
+      display: flex;
+      gap: 0.5rem 1.25rem;
+      flex-wrap: wrap;
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .top5-specs li strong {
+      color: var(--ink);
+      font-weight: 700;
+    }
+
+    .top5-specs .rating strong {
+      color: var(--p-700);
+    }
+
+    .top5-actions {
+      display: flex;
+      gap: 0.5rem;
+      margin-top: 1.25rem;
+      flex-wrap: wrap;
+    }
+
+    .btn-primary,
+    .btn-secondary {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      padding: 0.6rem 1.1rem;
+      border-radius: var(--r);
+      font-size: 13.5px;
+      font-weight: 600;
+      text-decoration: none;
+    }
+
+    .btn-primary {
+      background: var(--p-700);
+      color: #fff;
+      border: 1px solid var(--p-700);
+    }
+
+    .btn-primary:hover,
+    .btn-primary:focus-visible {
+      background: var(--p-800);
+      border-color: var(--p-800);
+      color: #fff;
+    }
+
+    .btn-primary svg { width: 14px; height: 14px; }
+
+    .btn-secondary {
+      background: #fff;
+      color: var(--ink);
+      border: 1px solid var(--line);
+    }
+
+    .btn-secondary:hover,
+    .btn-secondary:focus-visible {
+      border-color: var(--p-400);
+      color: var(--p-700);
+    }
+
+    /* Detailed reviews */
+    .detail-card {
+      margin: 2rem 0;
+      padding: 1.75rem;
+      background: var(--bg);
+      border: 1px solid var(--line);
+      border-radius: var(--r-xl);
+      scroll-margin-top: 5rem;
+    }
+
+    .detail-head {
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      gap: 1.25rem;
+      align-items: start;
+      padding-bottom: 1.25rem;
+      margin-bottom: 1.25rem;
+      border-bottom: 1px dashed var(--line);
+    }
+
+    @media (max-width: 640px) {
+      .detail-head { grid-template-columns: auto 1fr; }
+      .detail-rating { grid-column: 1 / -1; justify-self: start; }
+    }
+
+    .detail-rank {
+      font-family: var(--mono);
+      font-size: 1.4rem;
+      font-weight: 800;
+      color: var(--p-700);
+      line-height: 1;
+    }
+
+    .detail-head h3 {
+      font-size: 1.35rem;
+      font-weight: 800;
+      color: var(--ink);
+      letter-spacing: -0.015em;
+      margin: 0 0 0.3rem;
+    }
+
+    .detail-tagline {
+      font-size: 14px;
+      color: var(--muted);
+      line-height: 1.5;
+      margin: 0;
+    }
+
+    .detail-rating {
+      text-align: right;
+      font-family: var(--mono);
+      color: var(--p-700);
+    }
+
+    .detail-rating strong {
+      font-size: 2rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+    }
+
+    .detail-rating span {
+      font-size: 14px;
+      color: var(--muted);
+    }
+
+    .detail-specs {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 0.5rem;
+      padding: 0.85rem 1rem;
+      background: var(--bg-warm);
+      border-radius: var(--r);
+      margin-bottom: 1.25rem;
+    }
+
+    @media (max-width: 640px) {
+      .detail-specs { grid-template-columns: repeat(3, 1fr); }
+    }
+
+    .detail-specs > div {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .detail-specs .spec-label {
+      font-family: var(--mono);
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--muted-2);
+      font-weight: 700;
+    }
+
+    .detail-specs strong {
+      font-size: 14px;
+      color: var(--ink);
+    }
+
+    .detail-review p {
+      font-size: 15px;
+      line-height: 1.7;
+      color: var(--ink-soft);
+      margin-bottom: 0.85rem;
+    }
+
+    .detail-review strong { color: var(--ink); font-weight: 700; }
+
+    /* Pros / Cons */
+    .proscons {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.85rem;
+      margin: 1.25rem 0;
+    }
+
+    @media (max-width: 640px) { .proscons { grid-template-columns: 1fr; } }
+
+    .proscons-col {
+      padding: 1.25rem;
+      border-radius: var(--r-lg);
+    }
+
+    .proscons-col.pros {
+      background: var(--green-bg);
+      border: 1px solid rgba(21, 128, 61, 0.18);
+    }
+
+    .proscons-col.cons {
+      background: var(--red-bg);
+      border: 1px solid rgba(185, 28, 28, 0.18);
+    }
+
+    .proscons-col h4 {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--ink);
+      margin: 0 0 0.85rem;
+      font-weight: 800;
+    }
+
+    .proscons-col h4 svg {
+      width: 16px;
+      height: 16px;
+      padding: 4px;
+      border-radius: 50%;
+      color: #fff;
+    }
+
+    .proscons-col.pros h4 svg { background: var(--green); }
+    .proscons-col.cons h4 svg { background: var(--red); }
+
+    .proscons-col ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .proscons-col li {
+      font-size: 13.5px;
+      line-height: 1.55;
+      color: var(--ink-soft);
+      padding-left: 1.1rem;
+      position: relative;
+    }
+
+    .proscons-col li::before {
+      content: "•";
+      position: absolute;
+      left: 0;
+      color: var(--ink);
+      font-weight: 700;
+    }
+
+    .detail-bestfor {
+      padding: 0.85rem 1.1rem;
+      background: var(--p-50);
+      border-left: 3px solid var(--p-500);
+      border-radius: var(--r-sm);
+      font-size: 14px;
+      line-height: 1.55;
+      color: var(--ink-soft);
+      margin-bottom: 1.25rem;
+    }
+
+    .detail-bestfor strong {
+      color: var(--ink);
+      font-weight: 700;
+      margin-right: 0.3rem;
+    }
+
+    .detail-cta {
+      display: flex;
+      justify-content: flex-end;
+    }
+
+    /* Comparison table */
+    .compare-wrap {
+      margin: 1.5rem 0;
+      overflow-x: auto;
+      border: 1px solid var(--line);
+      border-radius: var(--r-lg);
+    }
+
+    .compare-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13.5px;
+      background: var(--bg);
+      min-width: 640px;
+    }
+
+    .compare-table th,
+    .compare-table td {
+      padding: 0.7rem 1rem;
+      text-align: center;
+      border-bottom: 1px solid var(--line-soft);
+    }
+
+    .compare-table thead th {
+      background: var(--bg-warm);
+      border-bottom: 1px solid var(--line);
+      padding: 0.85rem 1rem;
+    }
+
+    .compare-table thead th:first-child {
+      background: transparent;
+    }
+
+    .th-rank {
+      display: block;
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--p-700);
+      font-weight: 800;
+      margin-bottom: 2px;
+    }
+
+    .th-name {
+      font-size: 13px;
+      color: var(--ink);
+      font-weight: 700;
+    }
+
+    .compare-table tbody th {
+      text-align: left;
+      font-weight: 600;
+      color: var(--muted);
+      font-size: 12.5px;
+      background: var(--bg-warm);
+      width: 200px;
+    }
+
+    .compare-table tbody td {
+      color: var(--ink);
+      font-weight: 600;
+    }
+
+    .compare-table tbody tr:last-child th,
+    .compare-table tbody tr:last-child td {
+      border-bottom: 0;
+      background: var(--p-50);
+      color: var(--p-700);
+      font-weight: 800;
+    }
+
+    /* FAQ */
+    .faq-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .faq-list details {
+      background: var(--bg-warm);
+      border: 1px solid var(--line);
+      border-radius: var(--r-lg);
+      padding: 1rem 1.25rem;
+    }
+
+    .faq-list summary {
+      cursor: pointer;
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--ink);
+      list-style: none;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .faq-list summary::-webkit-details-marker { display: none; }
+
+    .faq-list summary::after {
+      content: "+";
+      font-family: var(--mono);
+      font-weight: 700;
+      color: var(--p-700);
+      font-size: 1.2rem;
+    }
+
+    .faq-list details[open] summary::after { content: "−"; }
+
+    .faq-body {
+      padding-top: 0.85rem;
+      font-size: 14.5px;
+      line-height: 1.6;
+      color: var(--ink-soft);
+    }
+
+    .faq-body strong { color: var(--ink); font-weight: 700; }
+
+    /* Conclusion */
+    .conclusion-actions {
+      display: flex;
+      gap: 0.6rem;
+      flex-wrap: wrap;
+      margin-top: 1.25rem;
+    }
+
+    /* TOC sidebar */
+    .top-toc {
+      min-width: 0;
+      align-self: start;
+    }
+
+    .toc-card {
+      background: var(--bg-warm);
+      border: 1px solid var(--line);
+      border-radius: var(--r-lg);
+      padding: 1.25rem;
+      position: sticky;
+      top: 2rem;
+    }
+
+    .toc-title {
+      font-family: var(--mono);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--ink);
+      font-weight: 700;
+      margin: 0 0 1rem;
+    }
+
+    .toc-card ol {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+    }
+
+    .toc-card a {
+      display: flex;
+      align-items: baseline;
+      gap: 0.6rem;
+      padding: 0.4rem 0.5rem;
+      color: var(--muted);
+      font-size: 13.5px;
+      line-height: 1.4;
+      text-decoration: none;
+      border-radius: var(--r-sm);
+      border-left: 2px solid transparent;
+    }
+
+    .toc-card a span {
+      font-family: var(--mono);
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--muted-2);
+    }
+
+    .toc-card a:hover,
+    .toc-card a:focus-visible {
+      color: var(--ink);
+      background: var(--bg);
+    }
+  </style>
+</BaseLayout>

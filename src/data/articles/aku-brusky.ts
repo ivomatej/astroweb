@@ -170,6 +170,23 @@ export const akuBrusky: Article = {
     link: { href: "/eticky-kodex/#affiliate", label: "Více v Etickém kodexu" },
   },
 
+  productAcquisition: {
+    enabled: true,
+    items: [
+      {
+        method: "purchased",
+        note: "23 brusek, koupeno 11/2023 — 02/2024 v e-shopech Alza, Mountfield, Hornbach a Bauhaus. Celková investice 162 480 Kč. Faktury archivovány.",
+      },
+    ],
+    affectedRating: {
+      answer: "no",
+      explanation:
+        "<strong>Nákupem za běžnou tržní cenu</strong> jsme zajistili plnou nezávislost. Žádný z výrobců neznal naše hodnocení před publikací článku a neměl možnost ovlivnit pořadí v žebříčku. Naše hodnocení vychází výhradně z laboratorních měření a 6týdenního terénního testu.",
+    },
+    afterTest:
+      "Tři vítězné modely zůstaly v naší laboratoři pro <strong>dlouhodobý test trvanlivosti</strong> (běží od 03/2024). Zbylých 20 brusek bylo darováno spolupracující střední odborné škole v Brně-Židenicích.",
+  },
+
   author: ivoMatej,
   garant: jakubNovak,
   dates: {

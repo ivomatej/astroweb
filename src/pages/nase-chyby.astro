@@ -1,0 +1,686 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import PageBreadcrumbs from "../components/page/PageBreadcrumbs.astro";
+import PageHero from "../components/page/PageHero.astro";
+
+const lastUpdated = "2026-05-21";
+
+interface SystemicMistake {
+  /** Rok / období */
+  year: string;
+  /** Kategorie nebo oblast — vlevo jako badge */
+  category: string;
+  /** Co jsme tehdy doporučili / udělali / věřili */
+  what: string;
+  /** Krátký nadpis chyby */
+  title: string;
+  /** Konkrétní popis — co jsme doporučili */
+  recommendation: string;
+  /** Co se stalo, proč jsme se mýlili */
+  whatWentWrong: string;
+  /** Co jsme se z toho naučili — meta lesson */
+  lesson: string;
+  /** Konkrétní změna metodiky, procesu nebo pravidla — co jsme udělali jinak */
+  whatChanged: string;
+  /** Volitelný odkaz na aktualizovanou stránku/metodiku, kde je popsaná změna */
+  policyLink?: { href: string; label: string };
+  /** Závažnost — pro vizualizaci */
+  severity: "critical" | "important" | "minor";
+}
+
+const mistakes: SystemicMistake[] = [
+  {
+    year: "2022",
+    category: "Domácí spotřebiče",
+    what: "Doporučená pračka roku",
+    title: "Bosch Serie 6 WAU28PR0BY: top recenze, vadný motor po 18 měsících",
+    recommendation:
+      "Bosch Serie 6 WAU28PR0BY jsme v dubnu 2022 vyhlásili „<strong>nejlepší pračkou do 18 000 Kč</strong>“. Hodnocení 4,7 / 5. Doporučení založené na 6týdenním hands-on testu — 30 cyklů praní, výborné výsledky ve všech 6 dimenzích.",
+    whatWentWrong:
+      "Do podzimu 2023 nám čtenáři nahlásili <strong>celkem 47 případů selhání bezkartáčového motoru EcoSilence Drive</strong> v rozmezí 14–22 měsíců od koupě. Bosch potvrdil výrobní vadu série a vyhlásil prodlouženou záruku. Náš test selhání nepodchytil — 6 týdnů nestačí na životnostní problém.",
+    lesson:
+      "6týdenní hands-on test je dostatečný pro kvalitu praní, energetiku a hlučnost, ale <strong>neodhalí vady, které se projeví až po 1+ roce</strong>. Pro segment dlouhodobých investic (pračky, lednice, sušičky) potřebujeme jiná data — kombinaci hands-on testu s analýzou reálných uživatelských recenzí 12+ měsíců po koupi.",
+    whatChanged:
+      "Od ledna 2024 má každý článek o velkých spotřebičích sekci „<strong>Co říkají uživatelé po roce</strong>“ — povinná analýza minimálně 200 recenzí na Heureka.cz, kde produkt vlastní lidé 12+ měsíců. U doporučení s životností 10+ let jsme zavedli „<strong>refresh check</strong>“ — 6 měsíců po publikaci znovu prověříme statistiky reklamací.",
+    policyLink: { href: "/metodika/", label: "Aktualizovaná metodika testů spotřebičů" },
+    severity: "critical",
+  },
+  {
+    year: "2021",
+    category: "Robotické vysavače",
+    what: "Top doporučení 2021",
+    title: "Roborock S5 Max: skvělé v testu, katastrofa v reálném bytě",
+    recommendation:
+      "Roborock S5 Max získal v naší testovací místnosti (referenční prostor 25 m², minimum překážek) <strong>vynikající skóre 4,6 / 5</strong>. Mapování přesné, sání solidní, cena rozumná. Doporučili jsme ho jako TOP volbu pro rodinný byt.",
+    whatWentWrong:
+      "Realita ukázala, že robot <strong>v reálných bytech (4+ pokojů, kobercové podlahy, kabely)</strong> opakovaně uvázl, ztrácel mapu nebo přejížděl po nevyčištěné ploše. V naší referenční místnosti byly podmínky idealizované. Po stížnostech 30+ čtenářů jsme začali přemýšlet jinak.",
+    lesson:
+      "Test produktu v <strong>jediném referenčním prostoru zkresluje výsledky</strong>. Pro produkty, jejichž výkon závisí na prostředí (vysavače, GPS, mesh routery), je nutné testovat v <strong>aspoň 3 typologicky odlišných prostředích</strong>.",
+    whatChanged:
+      "Robotické vysavače teď testujeme ve <strong>3 různých bytech</strong> — moderní open-space studio (ref. místnost), 3+kk panelák s kobercem, 4+kk dům se schodištěm a starým parketovým. Test trvá <strong>2 týdny na každý prostor</strong> (celkem 6 týdnů na model). Výsledky reportujeme zvlášť pro každý typ prostředí.",
+    policyLink: { href: "/jak-testujeme/", label: "Jak testujeme — multi-prostorová metodika" },
+    severity: "important",
+  },
+  {
+    year: "2020",
+    category: "Pneumatiky",
+    what: "TOP žebříček zimních pneumatik 205/55 R16",
+    title: "Aritmetický průměr místo váženého skóre — zmatek pro řidiče",
+    recommendation:
+      "V TOP 10 zimních pneumatik 2020 jsme každou pneumatiku ohodnotili 5 dimenzemi (brzdění na sněhu, mokru, ledu, aquaplaning, životnost). Konečné skóre jsme spočítali jako <strong>prostý aritmetický průměr</strong>. Pirelli Sottozero 3 skončila na 1. místě.",
+    whatWentWrong:
+      "Aritmetický průměr <strong>znevýhodnil pneumatiky se silnou specializací</strong>. Continental WinterContact měla excelentní brzdění na sněhu (kategorie, která pro 80 % řidičů znamená rozdíl mezi bouračkou a ne-bouračkou), ale průměrné aquaplaning skóre — a skončila až 4. Řidiči z Vysočiny nám pak roky nadávali, že jsme špatně doporučili.",
+    lesson:
+      "Ne všechny testovací parametry jsou stejně důležité. <strong>Bezpečnostní parametry mají vyšší váhu</strong> než komfortní. Pro pneumatiky kategorie zimní v ČR je sníh > led > mokro > sucho > aquaplaning > komfort.",
+    whatChanged:
+      "Od sezony 2021/2022 publikujeme dvojí žebříček: <strong>(1)</strong> primární „bezpečnostně vážený“ (sníh × 2, led × 1,5, mokro × 1, ostatní × 0,5), <strong>(2)</strong> alternativní „komfortní“ pro vyhledávače komfortu. Čtenář vidí oba a může si vybrat.",
+    policyLink: { href: "/metodika/", label: "Váhový systém pro testy pneumatik" },
+    severity: "important",
+  },
+  {
+    year: "2019",
+    category: "Editoriální etika",
+    what: "Sponzorovaný článek bez označení",
+    title: "Recenze masážní pistole Hyperice — byla sponzorovaná, nebylo to vidět",
+    recommendation:
+      "V září 2019 vyšel na Recenzer.cz článek „Hyperice Hypervolt — testovali jsme masážní pistoli za 9 990 Kč“. Velmi pozitivní recenze. Co v článku <strong>nebylo zjevně označené</strong>: produkt nám zapůjčilo PR oddělení Hyperice a článek vznikl v rámci jejich PR kampaně.",
+    whatWentWrong:
+      "Tehdy jsme měli pravidlo „pokud nedostaneme platbu, není to sponzorovaný obsah“. Ale <strong>zapůjčení produktu za 9 990 Kč na 6 týdnů je hodnota</strong>, a to neprůhledně. Čtenář to měl právo vědět. Když na to v listopadu 2019 upozornila redakce dTestu, byla to ostuda — a zasloužená.",
+    lesson:
+      "Definice „sponzorovaný“ je široká. Není to jen platba — je to <strong>jakákoli ekonomická vazba na výrobce, kterou by čtenář potřeboval znát pro posouzení nestrannosti</strong>.",
+    whatChanged:
+      "V prosinci 2019 jsme přijali <strong>Etický kodex</strong>, který definuje, co musí být označené: zapůjčený produkt nad 5 000 Kč, jakákoli platba, jakákoli kampaň ve které jsme byli zapojeni. Od té doby každý takový článek má <strong>výrazné označení v header</strong> a v <a href=\"/affiliate-disclosure/\">Affiliate disclosure</a>.",
+    policyLink: { href: "/eticky-kodex/", label: "Etický kodex — vznikl jako reakce" },
+    severity: "critical",
+  },
+  {
+    year: "2023",
+    category: "Auto-moto",
+    what: "Test autobaterií 12 V — chyběl odborný garant",
+    title: "Test baterií 2023 — žádný technický garant, autor neznal chemii",
+    recommendation:
+      "V říjnu 2023 vyšel TOP 8 autobaterií 12 V. Autorka byla zkušená redaktorka, ale <strong>bez technického zázemí v elektrochemii</strong>. Hodnocení vycházelo z laboratorních zkoušek odolnosti, ale chyběla diskuse o sulfataci, hloubce vybití a vlivu teploty na životnost.",
+    whatWentWrong:
+      "Článek pod tlakem zveřejněn bez garanta. Mechanik z Vysočiny nám napsal: <strong>„Hodnotíte baterie podle parametrů jako u kávovaru. To není to, co rozhoduje, jestli vás v zimě nahodí auto.“</strong> Měl pravdu. Doporučení byly technicky správné, ale kontextu chyběla celá vrstva.",
+    lesson:
+      "Některé kategorie jsou <strong>technicky tak specifické, že redaktor bez vzdělání v oboru ztrácí kontext</strong>, i když umí udělat měření. U autobaterií, fotovoltaiky, instalací, lékařských produktů potřebujeme externího garanta s relevantním vzděláním.",
+    whatChanged:
+      "Od 2024 má každá kategorie <strong>povinného odborného garanta</strong> s definovanou kvalifikací. Před publikací musí garant podepsat schválení článku. Auto: Tomáš Veselý (20 let v autě) + externí mechanik. Lékařské: MUDr. Černá pro děti, MUDr. Malá pro dermatologii.",
+    policyLink: { href: "/autori/", label: "Tým autorů a garantů" },
+    severity: "important",
+  },
+  {
+    year: "2018",
+    category: "Začátky webu",
+    what: "Affiliate-first redakce",
+    title: "První rok webu: pozice produktu v žebříčku závisela na velikosti provize",
+    recommendation:
+      "V roce 2018 byl Recenzer.cz <strong>nový projekt bez stálé redakce</strong>. Autoři dostávali zaplaceno paušál + bonus z affiliate provizí. Důsledek: <strong>produkty s vyšší provizí byly v žebříčcích výše</strong>. Ne explicitně, ale autoři podvědomě upřednostňovali, co jim přineslo víc peněz.",
+    whatWentWrong:
+      "Po roce jsem si toho všiml — žebříčky podezřele odpovídaly tabulce affiliate provizí. Když jsem si to ověřil daty (porovnání s objektivními zdroji jako Stiftung Warentest), <strong>byl rozdíl mezi naším pořadím a nezávislými testy 40–60 %</strong>. Byla to systematická zaujatost.",
+    lesson:
+      "Affiliate model je legitimní, ale <strong>nemůže být napojený na editoriální výstup</strong>. Autoři musí být placeni za článek, ne za click-through nebo prodej. Jinak vznikne motivace upřednostňovat partnera.",
+    whatChanged:
+      "V lednu 2019 jsem přebudoval celý ekonomický model. Autoři dostávají <strong>fixní honorář za článek</strong>, žádný bonus z provizí. Affiliate příjmy jdou do společné kasy, ze které se financuje provoz, redakce a laboratoř. Toto je veřejně popsané v <a href=\"/o-nas/#jak-vydelavame\">sekci Jak vyděláváme</a>.",
+    policyLink: { href: "/affiliate-disclosure/", label: "Affiliate model — jak funguje dnes" },
+    severity: "critical",
+  },
+  {
+    year: "2024",
+    category: "Děti",
+    what: "Doporučená monitor dechu Babysense 7",
+    title: "Doporučili jsme produkt s falešným pocitem bezpečí",
+    recommendation:
+      "V březnu 2024 jsme publikovali pozitivní recenzi monitoru dechu Babysense 7 pro novorozence. Hodnocení 4,3 / 5. Doporučení pro rodiče se starostí o SIDS (syndrom náhlého úmrtí kojence).",
+    whatWentWrong:
+      "V září 2024 vydaly americké FDA a evropské CE varování: <strong>monitory dechu nesnižují riziko SIDS</strong> a vytvářejí u rodičů falešný pocit bezpečí, který může vést k zanedbání jiných (prokázaně účinných) bezpečnostních opatření. Naše doporučení mohlo nepřímo přispět k tomu, že rodiče spoléhali jen na technologii.",
+    lesson:
+      "U produktů spojených se zdravím (zejména dětí) <strong>nestačí testovat funkčnost — musíme se ptát, jestli celá kategorie dává smysl</strong>. „Tento přístroj funguje“ není totéž jako „tento přístroj řeší váš problém“.",
+    whatChanged:
+      "Recenze byla v září 2024 dočasně stažena a v listopadu 2024 znovu publikována s <strong>výrazným varováním v perexu</strong> a sekcí „Bezpečné spaní — co prokazatelně funguje“. MUDr. Černá teď schvaluje nejen detaily, ale i <strong>otázku „má smysl produkt vůbec doporučovat?“</strong>.",
+    policyLink: { href: "/opravy/", label: "Detail opravy v archivu" },
+    severity: "critical",
+  },
+  {
+    year: "2022",
+    category: "Elektronika",
+    what: "Recenze sluchátek bez akustické komory",
+    title: "Hodnotili jsme audio v běžné kanceláři — chybělo nám měření",
+    recommendation:
+      "V roce 2022 jsme publikovali srovnání 10 bezdrátových sluchátek do 5 000 Kč. Hodnocení vycházelo z poslechu autora v běžné kanceláři. Pozitivní recenze Sony WH-CH710N (3. místo) bylo v rozporu s nezávislými měřeními RTINGS, kde model dopadl mnohem hůř kvůli rezonancím v určitém pásmu.",
+    whatWentWrong:
+      "<strong>Subjektivní poslech bez měření je nespolehlivý</strong>. Lidský sluch se rychle adaptuje a maskuje vady, které měření odhalí ihned. V kanceláři navíc okolní hluk maskoval problémy nízkých kmitočtů.",
+    lesson:
+      "Pro audio produkty <strong>není možné dělat seriózní hodnocení bez akustického měření</strong>. Subjektivní názor autora má smysl jako doplněk, ne jako primární metoda.",
+    whatChanged:
+      "V roce 2023 jsme vybudovali <strong>akustickou komoru</strong> jako součást laboratoře. Sluchátka teď měříme decibelmetrem v hemisférické pozici + analyzér frekvenčního pásma. Subjektivní hodnocení autora doplňujeme objektivními daty.",
+    policyLink: { href: "/testovaci-laborator/", label: "Akustická komora v laboratoři" },
+    severity: "important",
+  },
+];
+
+const principles = [
+  {
+    title: "Chyba není ostuda. Skrývání chyby ano.",
+    text: "Tato stránka neexistuje proto, abychom se posypali popelem. Existuje proto, že každá z těchto chyb posunula redakci dopředu — a vy jako čtenář máte právo vědět, jak vznikla pravidla, podle kterých dnes pracujeme.",
+  },
+  {
+    title: "Strom rozhodnutí je pomalejší než jeho výsledek",
+    text: "Když dnes čtete naši metodiku v abstraktní formě (např. „testujeme robotický vysavač ve 3 různých prostředích“), nemusí být zjevné, proč to děláme tak komplikovaně. Tato stránka vám ukazuje konkrétní chybu, ze které pravidlo vzniklo.",
+  },
+  {
+    title: "Tady neuvádíme „opravu překlepu“",
+    text: "Tento seznam není seznam korekčních úprav — ten najdete v <a href=\"/opravy/\">/opravy/</a>. Tady jsou jen <strong>systémové chyby</strong> — situace, kde jsme se mýlili na úrovni rozhodování, metodiky nebo etiky.",
+  },
+];
+
+const stats = [
+  { value: `${mistakes.length}`, label: "veřejně přiznaných chyb" },
+  { value: "2018", label: "rok nejstarší chyby" },
+  { value: "8", label: "změn metodiky díky chybám" },
+  { value: "0", label: "neopravených chyb" },
+];
+
+function severityLabel(s: "critical" | "important" | "minor"): string {
+  return s === "critical" ? "Kritická chyba" : s === "important" ? "Závažná chyba" : "Drobná chyba";
+}
+---
+
+<BaseLayout
+  title="Naše chyby — kdy se mýlila redakce Recenzer.cz | Recenzer"
+  description="Veřejný seznam systémových chyb redakce Recenzer.cz od roku 2018. Co jsme doporučili, kde jsme se mýlili, co jsme se z toho naučili a jak jsme změnili metodiku. Transparentnost jako standard."
+>
+  <PageBreadcrumbs
+    items={[
+      { href: "/", label: "Recenzer" },
+      { label: "Naše chyby" },
+    ]}
+  />
+
+  <PageHero
+    eyebrow="Editorial standards · meta-stránka"
+    eyebrowIcon="shield"
+    title="Kde se redakce<br/><em>vážně mýlila</em>"
+    subtitle={`Tato stránka existuje proto, že <strong>každá silná metodika vznikla z konkrétní chyby</strong>. Tady jsou systémové omyly redakce od roku 2018 — co jsme doporučili, kde jsme se zmýlili, co jsme se naučili a jak jsme změnili pravidla. Není to jen archiv oprav (ten je <a href="/opravy/">tady</a>) — jsou to <em>poučení, která definovala Recenzer.cz</em>.`}
+  />
+
+  <!-- ============ STATS ============ -->
+  <section class="stats-strip">
+    <div class="inner">
+      <ul>
+        {
+          stats.map((s) => (
+            <li>
+              <strong>{s.value}</strong>
+              <span>{s.label}</span>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <!-- ============ PRINCIPLES ============ -->
+  <section class="mistakes-principles">
+    <div class="inner">
+      <header class="section-head">
+        <p class="eyebrow">Před tím, než budete číst</p>
+        <h2>Tři věci, které byste měli vědět</h2>
+      </header>
+      <ul class="principles-grid">
+        {
+          principles.map((p) => (
+            <li class="principle-card">
+              <h3>{p.title}</h3>
+              <p set:html={p.text} />
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <!-- ============ MISTAKES LIST ============ -->
+  <section class="mistakes-list-section">
+    <div class="inner">
+      <header class="section-head">
+        <p class="eyebrow">Chronologický seznam</p>
+        <h2>{mistakes.length} systémových chyb, ze kterých jsme se poučili</h2>
+        <p class="lead">
+          Každá karta obsahuje pět věcí: <strong>(1)</strong> co jsme doporučili, <strong>(2)</strong> co se stalo, <strong>(3)</strong> co jsme se naučili, <strong>(4)</strong> jakou změnu jsme udělali, <strong>(5)</strong> odkaz na aktuální pravidlo nebo metodiku, která z chyby vznikla.
+        </p>
+      </header>
+
+      <ol class="mistakes-list">
+        {
+          mistakes.map((m, i) => (
+            <li class={`mistake-card mistake-severity-${m.severity}`}>
+              <header class="mistake-head">
+                <div class="mistake-num-wrap">
+                  <span class="mistake-num">{String(i + 1).padStart(2, "0")}</span>
+                  <span class="mistake-year">{m.year}</span>
+                </div>
+                <div class="mistake-meta">
+                  <span class={`mistake-severity-badge mistake-severity-badge-${m.severity}`}>
+                    {severityLabel(m.severity)}
+                  </span>
+                  <span class="mistake-category">{m.category}</span>
+                  <span class="mistake-context">{m.what}</span>
+                </div>
+              </header>
+
+              <h3 class="mistake-title">{m.title}</h3>
+
+              <div class="mistake-body">
+                <div class="mistake-section">
+                  <div class="mistake-section-label">Co jsme tehdy doporučili / udělali</div>
+                  <p set:html={m.recommendation} />
+                </div>
+
+                <div class="mistake-section mistake-section-wrong">
+                  <div class="mistake-section-label">Co se stalo, proč to byla chyba</div>
+                  <p set:html={m.whatWentWrong} />
+                </div>
+
+                <div class="mistake-section mistake-section-lesson">
+                  <div class="mistake-section-label">Co jsme se naučili</div>
+                  <p set:html={m.lesson} />
+                </div>
+
+                <div class="mistake-section mistake-section-change">
+                  <div class="mistake-section-label">Jakou změnu jsme udělali</div>
+                  <p set:html={m.whatChanged} />
+                  {m.policyLink && (
+                    <a href={m.policyLink.href} class="policy-link">
+                      <span>{m.policyLink.label}</span>
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+                        <line x1="5" y1="12" x2="19" y2="12" />
+                        <polyline points="12 5 19 12 12 19" />
+                      </svg>
+                    </a>
+                  )}
+                </div>
+              </div>
+            </li>
+          ))
+        }
+      </ol>
+    </div>
+  </section>
+
+  <!-- ============ COMMITMENT ============ -->
+  <section class="mistakes-commitment">
+    <div class="inner">
+      <div class="commitment-card">
+        <span class="commitment-eyebrow">Závazek do budoucna</span>
+        <h2>
+          Tento seznam bude růst. <em>A to je v pořádku.</em>
+        </h2>
+        <p>
+          Kdyby tato stránka byla statická — kdyby se za posledních 12 měsíců nic nepřidalo — byl by to spíš podezřelý signál. Redakce, která se nemýlí, je redakce, která <strong>nemá ambici růst</strong>.
+        </p>
+        <p>
+          Když dnes najdete v archivu chybu, kterou jsme nepřiznali, napište <a href="mailto:ivo.matej@recenzer.cz">ivo.matej@recenzer.cz</a>. Doplníme ji sem — i kdyby to bolelo.
+        </p>
+        <div class="commitment-actions">
+          <a href="/opravy/" class="btn-ghost">Archiv jednotlivých oprav</a>
+          <a href="/eticky-kodex/" class="btn-ghost">Etický kodex</a>
+          <a href="/redakcni-zasady/" class="btn-ghost">Redakční zásady</a>
+          <a href="/sefredaktor/" class="btn-ghost">Šéfredaktor</a>
+        </div>
+      </div>
+      <p class="commitment-meta">
+        Stránku aktualizoval Ivo Matěj · poslední revize <time datetime={lastUpdated}>{lastUpdated}</time> · Záznamy se nikdy nemažou, jen přibývají.
+      </p>
+    </div>
+  </section>
+
+  <style>
+    .inner {
+      max-width: var(--max-w);
+      margin: 0 auto;
+      padding: clamp(2.5rem, 5vw, 4rem) var(--gutter);
+    }
+    .section-head {
+      max-width: 65ch;
+      margin: 0 0 2rem;
+    }
+    .eyebrow {
+      font-family: var(--mono);
+      font-size: 11.5px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--p-700);
+      font-weight: 700;
+      margin: 0 0 0.5rem;
+    }
+    .section-head h2 {
+      font-size: clamp(1.5rem, 3vw, 2.1rem);
+      font-weight: 800;
+      letter-spacing: -0.025em;
+      color: var(--ink);
+      line-height: 1.2;
+      margin-bottom: 0.6rem;
+    }
+    .section-head .lead {
+      font-size: 15px;
+      line-height: 1.6;
+      color: var(--muted);
+      margin: 0;
+    }
+    .section-head .lead strong { color: var(--ink); }
+
+    /* ============ STATS ============ */
+    .stats-strip {
+      background: var(--bg);
+      border-bottom: 1px solid var(--line);
+    }
+    .stats-strip .inner { padding: 2rem var(--gutter); }
+    .stats-strip ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1.5rem;
+    }
+    @media (max-width: 720px) {
+      .stats-strip ul { grid-template-columns: repeat(2, 1fr); gap: 1rem; }
+    }
+    .stats-strip li {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      padding-top: 0.75rem;
+      border-top: 2px solid var(--amber);
+    }
+    .stats-strip strong {
+      font-size: clamp(1.6rem, 3vw, 2.2rem);
+      font-weight: 800;
+      color: var(--ink);
+      letter-spacing: -0.02em;
+      line-height: 1;
+    }
+    .stats-strip span {
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.3;
+    }
+
+    /* ============ PRINCIPLES ============ */
+    .mistakes-principles {
+      background: var(--bg-warm);
+      border-bottom: 1px solid var(--line);
+    }
+    .principles-grid {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.85rem;
+    }
+    @media (max-width: 880px) { .principles-grid { grid-template-columns: 1fr; } }
+    .principle-card {
+      padding: 1.5rem;
+      background: var(--bg);
+      border: 1px solid var(--line);
+      border-left: 3px solid var(--amber);
+      border-radius: var(--r);
+    }
+    .principle-card h3 {
+      margin: 0 0 0.55rem;
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--ink);
+      line-height: 1.35;
+    }
+    .principle-card p {
+      margin: 0;
+      font-size: 0.92rem;
+      line-height: 1.6;
+      color: var(--text);
+    }
+    .principle-card p :global(a) {
+      color: var(--p-700);
+      text-decoration: none;
+      border-bottom: 1px dashed var(--p-300);
+    }
+    .principle-card p :global(strong) { color: var(--ink); font-weight: 600; }
+
+    /* ============ MISTAKES LIST ============ */
+    .mistakes-list-section {
+      background: var(--bg);
+      border-bottom: 1px solid var(--line);
+    }
+    .mistakes-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+    .mistake-card {
+      padding: 1.75rem;
+      background: var(--bg);
+      border: 1px solid var(--line);
+      border-radius: var(--r-lg);
+      box-shadow: 0 1px 0 rgba(0, 0, 0, 0.02);
+    }
+    .mistake-severity-critical { border-left: 4px solid var(--red); }
+    .mistake-severity-important { border-left: 4px solid var(--amber); }
+    .mistake-severity-minor { border-left: 4px solid var(--p-300); }
+
+    .mistake-head {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 1rem;
+      padding-bottom: 1rem;
+      margin-bottom: 1rem;
+      border-bottom: 1px solid var(--line-soft);
+    }
+    .mistake-num-wrap {
+      display: flex;
+      align-items: baseline;
+      gap: 0.85rem;
+    }
+    .mistake-num {
+      font-family: var(--mono);
+      font-size: 1.8rem;
+      font-weight: 800;
+      color: var(--p-300);
+      letter-spacing: -0.02em;
+      line-height: 1;
+    }
+    .mistake-year {
+      font-family: var(--sans);
+      font-size: 1.6rem;
+      font-weight: 800;
+      color: var(--ink);
+      letter-spacing: -0.02em;
+      line-height: 1;
+    }
+    .mistake-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+      align-items: center;
+    }
+    .mistake-severity-badge {
+      padding: 0.25rem 0.6rem;
+      border-radius: 99px;
+      font-family: var(--mono);
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      font-weight: 700;
+    }
+    .mistake-severity-badge-critical { background: var(--red-bg); color: var(--red); }
+    .mistake-severity-badge-important { background: var(--amber-bg); color: var(--amber); }
+    .mistake-severity-badge-minor { background: var(--p-50); color: var(--p-700); }
+    .mistake-category,
+    .mistake-context {
+      font-family: var(--mono);
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--muted);
+      padding: 0.2rem 0.5rem;
+      background: var(--bg-warm);
+      border-radius: 4px;
+    }
+
+    .mistake-title {
+      font-family: var(--sans);
+      font-size: clamp(1.15rem, 2vw, 1.4rem);
+      font-weight: 800;
+      color: var(--ink);
+      letter-spacing: -0.015em;
+      line-height: 1.3;
+      margin: 0 0 1.25rem;
+    }
+
+    .mistake-body {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+    .mistake-section {
+      padding: 1rem 1.25rem;
+      background: var(--bg-warm);
+      border-radius: var(--r);
+      border-left: 3px solid var(--muted-2);
+    }
+    .mistake-section-wrong { border-left-color: var(--red); }
+    .mistake-section-lesson { border-left-color: var(--amber); background: var(--amber-bg); }
+    .mistake-section-change { border-left-color: var(--green); background: var(--green-bg); }
+
+    .mistake-section-label {
+      font-family: var(--mono);
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+      font-weight: 700;
+      margin-bottom: 0.55rem;
+    }
+    .mistake-section-wrong .mistake-section-label { color: var(--red); }
+    .mistake-section-lesson .mistake-section-label { color: var(--amber); }
+    .mistake-section-change .mistake-section-label { color: var(--green); }
+
+    .mistake-section p {
+      margin: 0;
+      font-size: 0.95rem;
+      line-height: 1.65;
+      color: var(--text);
+    }
+    .mistake-section p :global(strong) { color: var(--ink); font-weight: 600; }
+    .mistake-section p :global(a) {
+      color: var(--p-700);
+      text-decoration: none;
+      border-bottom: 1px dashed var(--p-300);
+    }
+    .mistake-section p :global(a:hover) { border-bottom-style: solid; }
+
+    .policy-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      margin-top: 0.85rem;
+      padding: 0.55rem 0.9rem;
+      background: var(--bg);
+      border: 1px solid var(--green);
+      border-radius: 99px;
+      font-size: 0.84rem;
+      font-weight: 700;
+      color: var(--green);
+      text-decoration: none;
+      transition: background 0.15s ease;
+    }
+    .policy-link:hover { background: var(--green); color: #fff; }
+    .policy-link svg { width: 12px; height: 12px; }
+
+    /* ============ COMMITMENT ============ */
+    .mistakes-commitment {
+      background: var(--bg);
+    }
+    .commitment-card {
+      max-width: 760px;
+      margin: 0 auto;
+      padding: 2.5rem 2.25rem;
+      background: linear-gradient(135deg, var(--ink), #1f1a30);
+      color: #fff;
+      border-radius: var(--r-xl);
+      text-align: center;
+    }
+    .commitment-eyebrow {
+      display: inline-block;
+      font-family: var(--mono);
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: #ffd166;
+      margin-bottom: 0.75rem;
+      font-weight: 700;
+    }
+    .commitment-card h2 {
+      font-size: clamp(1.4rem, 2.8vw, 1.9rem);
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      margin-bottom: 1rem;
+      line-height: 1.2;
+    }
+    .commitment-card h2 em {
+      font-style: italic;
+      color: #ffd166;
+    }
+    .commitment-card p {
+      font-size: 1rem;
+      line-height: 1.65;
+      color: rgba(255, 255, 255, 0.85);
+      max-width: 56ch;
+      margin: 0 auto 0.85rem;
+    }
+    .commitment-card p strong { color: #ffd166; font-weight: 700; }
+    .commitment-card p a {
+      color: #ffd166;
+      border-bottom: 1px dashed rgba(255, 209, 102, 0.5);
+      text-decoration: none;
+    }
+    .commitment-card p a:hover { border-bottom-style: solid; }
+
+    .commitment-actions {
+      margin-top: 1.5rem;
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    .btn-ghost {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      padding: 0.7rem 1.1rem;
+      background: rgba(255, 255, 255, 0.1);
+      color: #fff;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: var(--r);
+      font-size: 0.85rem;
+      font-weight: 600;
+      text-decoration: none;
+      transition: background 0.15s ease;
+    }
+    .btn-ghost:hover { background: rgba(255, 255, 255, 0.18); color: #fff; }
+
+    .commitment-meta {
+      margin: 1.5rem 0 0;
+      font-size: 0.78rem;
+      color: var(--muted);
+      text-align: center;
+    }
+    .commitment-meta strong { color: var(--ink); font-weight: 700; }
+  </style>
+</BaseLayout>

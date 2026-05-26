@@ -1,0 +1,467 @@
+---
+import type {
+  ProductAcquisition,
+  AcquisitionMethod,
+} from "../../types/article";
+
+interface Props {
+  data: ProductAcquisition;
+}
+
+const { data } = Astro.props;
+
+interface MethodMeta {
+  label: string;
+  description: string;
+  iconKey: "cart" | "loan" | "gift" | "pr" | "reader";
+  /** Tone color used for the active card. */
+  tone: "green" | "amber" | "amber" | "red" | "purple";
+}
+
+const methodMeta: Record<AcquisitionMethod, MethodMeta> = {
+  purchased: {
+    label: "Nakoupeno redakcí",
+    description: "Za běžnou tržní cenu, ze stejného e-shopu, kde si ho koupíte i vy",
+    iconKey: "cart",
+    tone: "green",
+  },
+  loaned: {
+    label: "Zapůjčeno výrobcem",
+    description: "Vráceno po dokončení testu (s protokolem o vrácení)",
+    iconKey: "loan",
+    tone: "amber",
+  },
+  donated: {
+    label: "Darováno výrobcem",
+    description: "Zůstává v redakci (pro dlouhodobý test trvanlivosti)",
+    iconKey: "gift",
+    tone: "amber",
+  },
+  "pr-agency": {
+    label: "Od PR agentury",
+    description: "Nevyžádaný test ze strany agentury výrobce",
+    iconKey: "pr",
+    tone: "red",
+  },
+  reader: {
+    label: "Od čtenáře",
+    description: "Crowdsource — produkt zapůjčil/poskytl čtenář",
+    iconKey: "reader",
+    tone: "purple",
+  },
+};
+
+const allMethods: AcquisitionMethod[] = [
+  "purchased",
+  "loaned",
+  "donated",
+  "pr-agency",
+  "reader",
+];
+
+// Které metody se v článku objevily (kvůli active checkboxu)
+const activeMethods = new Set<AcquisitionMethod>(data.items.map((i) => i.method));
+
+const answerLabel = {
+  no: "Ne — výsledek hodnocení to neovlivnilo",
+  partial: "Částečně — viz vysvětlení",
+  yes: "Ano — výsledek hodnocení to ovlivnilo",
+};
+
+const answerTone = {
+  no: "green",
+  partial: "amber",
+  yes: "red",
+};
+---
+
+{
+  data.enabled && (
+    <aside class="acquisition-block" aria-label="Jak jsme produkt získali k testu">
+      <header class="acquisition-head">
+        <div class="acquisition-eyebrow">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+            <path d="M9 11l3 3L22 4" />
+            <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" />
+          </svg>
+          <span>Transparentní disclosure · povinný blok</span>
+        </div>
+        <h2>Jak jsme produkt získali k testu</h2>
+        <p class="acquisition-lede">
+          Podle <a href="/eticky-kodex/">Etického kodexu</a> a EU Směrnice o nekalých obchodních praktikách musíme uvést, jakou cestou se produkt dostal do
+          naší redakce. <strong>Označená políčka platí pro tento článek.</strong>
+        </p>
+      </header>
+
+      <ul class="acquisition-methods" role="list">
+        {
+          allMethods.map((m) => {
+            const meta = methodMeta[m];
+            const isActive = activeMethods.has(m);
+            const matchingItems = data.items.filter((i) => i.method === m);
+            return (
+              <li class={`method-card ${isActive ? "is-active" : "is-inactive"} method-tone-${meta.tone}`}>
+                <div class="method-check" aria-hidden="true">
+                  {isActive ? (
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                      <polyline points="20 6 9 17 4 12" />
+                    </svg>
+                  ) : (
+                    <span class="method-empty-box" />
+                  )}
+                </div>
+                <div class="method-icon" aria-hidden="true">
+                  {meta.iconKey === "cart" && (
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <circle cx="9" cy="21" r="1" />
+                      <circle cx="20" cy="21" r="1" />
+                      <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" />
+                    </svg>
+                  )}
+                  {meta.iconKey === "loan" && (
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <polyline points="1 4 1 10 7 10" />
+                      <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10" />
+                    </svg>
+                  )}
+                  {meta.iconKey === "gift" && (
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <polyline points="20 12 20 22 4 22 4 12" />
+                      <rect x="2" y="7" width="20" height="5" />
+                      <line x1="12" y1="22" x2="12" y2="7" />
+                      <path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7zM12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z" />
+                    </svg>
+                  )}
+                  {meta.iconKey === "pr" && (
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
+                      <path d="M15.54 8.46a5 5 0 0 1 0 7.07" />
+                      <path d="M19.07 4.93a10 10 0 0 1 0 14.14" />
+                    </svg>
+                  )}
+                  {meta.iconKey === "reader" && (
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                      <circle cx="12" cy="7" r="4" />
+                    </svg>
+                  )}
+                </div>
+                <div class="method-body">
+                  <div class="method-label">{meta.label}</div>
+                  <div class="method-desc">{meta.description}</div>
+                  {isActive && matchingItems.length > 0 && (
+                    <ul class="method-items">
+                      {matchingItems.map((it) => (
+                        <li>
+                          {it.product && <strong>{it.product}</strong>}
+                          {it.product && it.note && " — "}
+                          {it.note && <span>{it.note}</span>}
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
+              </li>
+            );
+          })
+        }
+      </ul>
+
+      <div class={`acquisition-answer acquisition-answer-${answerTone[data.affectedRating.answer]}`}>
+        <div class="answer-header">
+          <span class="answer-label">Ovlivnil způsob získání hodnocení?</span>
+          <span class="answer-value">{answerLabel[data.affectedRating.answer]}</span>
+        </div>
+        <p class="answer-explanation" set:html={data.affectedRating.explanation} />
+      </div>
+
+      {data.afterTest && (
+        <div class="acquisition-after">
+          <span class="acquisition-after-label">Co se s produktem stalo po testu</span>
+          <p set:html={data.afterTest} />
+        </div>
+      )}
+
+      <footer class="acquisition-footer">
+        <span>
+          Povinný blok podle <a href="/eticky-kodex/">Etického kodexu</a> a <a href="/affiliate-disclosure/">Affiliate disclosure</a>.
+        </span>
+      </footer>
+    </aside>
+  )
+}
+
+<style>
+  .acquisition-block {
+    max-width: var(--max-w-text);
+    margin: 2.25rem auto;
+    padding: 1.75rem;
+    background: var(--bg);
+    border: 1px solid var(--line);
+    border-radius: var(--r-lg);
+    box-shadow: 0 1px 0 rgba(0, 0, 0, 0.02);
+  }
+
+  .acquisition-head {
+    margin-bottom: 1.25rem;
+    padding-bottom: 1.25rem;
+    border-bottom: 1px dashed var(--line);
+  }
+
+  .acquisition-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--p-700);
+    font-weight: 700;
+    margin-bottom: 0.6rem;
+  }
+  .acquisition-eyebrow svg { width: 13px; height: 13px; }
+
+  .acquisition-head h2 {
+    font-family: var(--sans);
+    font-size: clamp(1.2rem, 2.2vw, 1.5rem);
+    font-weight: 800;
+    color: var(--ink);
+    margin: 0 0 0.5rem;
+    letter-spacing: -0.015em;
+  }
+
+  .acquisition-lede {
+    margin: 0;
+    font-size: 0.92rem;
+    line-height: 1.6;
+    color: var(--text);
+  }
+  .acquisition-lede a {
+    color: var(--p-700);
+    text-decoration: none;
+    border-bottom: 1px dashed var(--p-300);
+  }
+  .acquisition-lede strong { color: var(--ink); font-weight: 600; }
+
+  /* ============ METHODS LIST ============ */
+  .acquisition-methods {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 1.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .method-card {
+    display: grid;
+    grid-template-columns: 28px 36px 1fr;
+    gap: 0.85rem;
+    align-items: start;
+    padding: 0.85rem 1rem;
+    background: var(--bg);
+    border: 1px solid var(--line);
+    border-radius: var(--r);
+    transition: opacity 0.15s ease;
+  }
+  .method-card.is-inactive {
+    opacity: 0.5;
+    background: var(--bg-warm);
+  }
+  .method-card.is-active {
+    border-color: var(--green);
+    background: var(--green-bg);
+  }
+  .method-tone-amber.is-active {
+    border-color: var(--amber);
+    background: var(--amber-bg);
+  }
+  .method-tone-red.is-active {
+    border-color: var(--red);
+    background: var(--red-bg);
+  }
+  .method-tone-purple.is-active {
+    border-color: var(--p-500);
+    background: var(--p-50);
+  }
+
+  .method-check {
+    width: 24px;
+    height: 24px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-top: 0.15rem;
+    background: var(--bg);
+    border: 1.5px solid var(--line);
+  }
+  .method-card.is-active .method-check {
+    background: var(--green);
+    border-color: var(--green);
+    color: #fff;
+  }
+  .method-tone-amber.is-active .method-check {
+    background: var(--amber);
+    border-color: var(--amber);
+  }
+  .method-tone-red.is-active .method-check {
+    background: var(--red);
+    border-color: var(--red);
+  }
+  .method-tone-purple.is-active .method-check {
+    background: var(--p-700);
+    border-color: var(--p-700);
+  }
+  .method-check svg { width: 14px; height: 14px; }
+  .method-empty-box {
+    width: 12px;
+    height: 12px;
+    border-radius: 3px;
+    background: transparent;
+  }
+
+  .method-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    background: var(--bg-warm);
+    color: var(--muted);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .method-card.is-active .method-icon { background: rgba(255, 255, 255, 0.55); color: var(--green); }
+  .method-tone-amber.is-active .method-icon { color: var(--amber); }
+  .method-tone-red.is-active .method-icon { color: var(--red); }
+  .method-tone-purple.is-active .method-icon { color: var(--p-700); }
+  .method-icon svg { width: 18px; height: 18px; }
+
+  .method-body { min-width: 0; }
+  .method-label {
+    font-weight: 700;
+    color: var(--ink);
+    font-size: 0.95rem;
+    margin-bottom: 0.15rem;
+  }
+  .method-desc {
+    font-size: 0.82rem;
+    color: var(--muted);
+    line-height: 1.5;
+  }
+  .method-card.is-active .method-desc { color: var(--ink-soft); }
+
+  .method-items {
+    list-style: none;
+    padding: 0;
+    margin: 0.5rem 0 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    padding-top: 0.5rem;
+    border-top: 1px dashed rgba(0, 0, 0, 0.08);
+  }
+  .method-items li {
+    font-size: 0.85rem;
+    line-height: 1.5;
+    color: var(--ink-soft);
+  }
+  .method-items strong { color: var(--ink); font-weight: 700; }
+
+  /* ============ ANSWER ============ */
+  .acquisition-answer {
+    padding: 1.1rem 1.25rem;
+    border-radius: var(--r);
+    margin-bottom: 1rem;
+  }
+  .acquisition-answer-green {
+    background: var(--green-bg);
+    border: 1px solid rgba(21, 128, 61, 0.22);
+    border-left: 4px solid var(--green);
+  }
+  .acquisition-answer-amber {
+    background: var(--amber-bg);
+    border: 1px solid rgba(180, 83, 9, 0.22);
+    border-left: 4px solid var(--amber);
+  }
+  .acquisition-answer-red {
+    background: var(--red-bg);
+    border: 1px solid rgba(185, 28, 28, 0.22);
+    border-left: 4px solid var(--red);
+  }
+
+  .answer-header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.4rem 0.85rem;
+    margin-bottom: 0.5rem;
+  }
+  .answer-label {
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--muted);
+    font-weight: 700;
+  }
+  .answer-value {
+    font-size: 1rem;
+    font-weight: 800;
+    color: var(--ink);
+  }
+  .acquisition-answer-green .answer-value { color: var(--green); }
+  .acquisition-answer-amber .answer-value { color: var(--amber); }
+  .acquisition-answer-red .answer-value { color: var(--red); }
+
+  .answer-explanation {
+    margin: 0;
+    font-size: 0.9rem;
+    line-height: 1.6;
+    color: var(--text);
+  }
+  .answer-explanation :global(strong) { color: var(--ink); font-weight: 600; }
+
+  /* ============ AFTER TEST ============ */
+  .acquisition-after {
+    padding: 0.9rem 1.1rem;
+    background: var(--bg-warm);
+    border: 1px dashed var(--line);
+    border-radius: var(--r-sm);
+    margin-bottom: 1rem;
+  }
+  .acquisition-after-label {
+    display: block;
+    font-family: var(--mono);
+    font-size: 0.68rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--p-700);
+    font-weight: 700;
+    margin-bottom: 0.4rem;
+  }
+  .acquisition-after p {
+    margin: 0;
+    font-size: 0.85rem;
+    line-height: 1.55;
+    color: var(--text);
+  }
+  .acquisition-after p :global(strong) { color: var(--ink); font-weight: 600; }
+
+  /* ============ FOOTER ============ */
+  .acquisition-footer {
+    padding-top: 1rem;
+    border-top: 1px dashed var(--line);
+    text-align: center;
+    font-size: 0.78rem;
+    color: var(--muted);
+  }
+  .acquisition-footer a {
+    color: var(--p-700);
+    text-decoration: none;
+    border-bottom: 1px dashed var(--p-300);
+  }
+</style>

@@ -1,0 +1,2124 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import Breadcrumbs from "../../components/article/Breadcrumbs.astro";
+import ProductAcquisitionSection from "../../components/article/ProductAcquisitionSection.astro";
+import type { ProductAcquisition } from "../../types/article";
+
+const productAcquisition: ProductAcquisition = {
+  enabled: true,
+  items: [
+    {
+      product: "Bosch WGG244A0BY",
+      method: "purchased",
+      note: "Koupena 09/2024 v Datartu za 14 990 Kč. Faktura archivována pod ID INV-2024-09-1247.",
+    },
+  ],
+  affectedRating: {
+    answer: "no",
+    explanation:
+      "Pračku jsme koupili <strong>za běžnou tržní cenu</strong> v Datartu — ze stejného e-shopu, kde si ji můžete koupit i vy. Bosch ani jeho PR oddělení neznalo naše skóre 4,55/5 před publikací článku. Hodnocení v 6 dimenzích vychází ze 30 cyklů praní v naší <a href=\"/testovaci-laborator/\">testovací laboratoři</a> a nebylo ovlivněné žádnou ekonomickou vazbou na výrobce.",
+  },
+  afterTest:
+    "Pračka <strong>zůstává v redakci pro 5letý dlouhodobý test trvanlivosti</strong>. Po 6 týdnech intenzivního testu pokračuje v reálném provozu jako pračka redakce — sledujeme reálné selhání ložisek, motoru a elektroniky.",
+};
+
+const productName = "Bosch WGG244A0BY";
+const productModel = "WGG244A0BY";
+const productBrand = "Bosch";
+const productCategory = "Pračka s předním plněním";
+
+const overallScore = 4.55;
+const overallScoreHeureka = 91;
+const reviewCount = 2340;
+
+interface QuickSpec {
+  label: string;
+  value: string;
+  hint?: string;
+}
+
+const quickSpecs: QuickSpec[] = [
+  { label: "Kapacita", value: "9 kg" },
+  { label: "Energetická třída", value: "A", hint: "179 kWh/rok" },
+  { label: "Otáčky", value: "1400", hint: "ot/min" },
+  { label: "Hlučnost", value: "52 dB", hint: "praní / 76 dB odstředění" },
+  { label: "Programy", value: "20 programů" },
+  { label: "Záruka motoru", value: "10 let" },
+];
+
+interface ScoreDimension {
+  key: string;
+  title: string;
+  value: number;
+  percent: number;
+  description: string;
+}
+
+const scoreDimensions: ScoreDimension[] = [
+  {
+    key: "washing",
+    title: "Kvalita praní",
+    value: 4.7,
+    percent: 94,
+    description:
+      "Vynikající. V testu na 30 cyklech praní zvládla i tvrdé skvrny (káva, červené víno). Modul AntiStain odhalil 96 % skvrn.",
+  },
+  {
+    key: "energy",
+    title: "Energetika",
+    value: 4.8,
+    percent: 96,
+    description:
+      "Třída A. Naměřená spotřeba 179 kWh/rok je v Eco programu o 22 % nižší než průměr konkurence v této cenové kategorii.",
+  },
+  {
+    key: "noise",
+    title: "Hlučnost",
+    value: 4.5,
+    percent: 90,
+    description:
+      "52 dB při praní je velmi tiché, vhodné i do panelákového bytu. Odstředění při 76 dB je střední průměr, slyšitelné přes stěnu.",
+  },
+  {
+    key: "programs",
+    title: "Programy a funkce",
+    value: 4.3,
+    percent: 86,
+    description:
+      "20 programů včetně Allergy+, sportovní oděv, peří. Reálně využijete 5–6, ale výběr je užitečný. Bez Wi-Fi.",
+  },
+  {
+    key: "design",
+    title: "Design a ergonomie",
+    value: 4.2,
+    percent: 84,
+    description:
+      "Klasický minimalistický design Bosch. Displej jednoduchý, tlačítka intuitivní. Otvírání dveří 180° usnadňuje nakládání.",
+  },
+  {
+    key: "reliability",
+    title: "Spolehlivost",
+    value: 4.8,
+    percent: 96,
+    description:
+      "10letá záruka na motor EcoSilence. Statistická životnost 12–15 let. Vlastní servisní síť Bosch v ČR.",
+  },
+];
+
+interface VerdictItem {
+  text: string;
+  highlight: string;
+}
+
+const proItems: VerdictItem[] = [
+  { highlight: "Rodiny 3–4 osob", text: "kapacita 9 kg pokryje běžné praní 2–3× týdně" },
+  { highlight: "Majitele bytů v panelácích", text: "52 dB při praní je velmi tiché" },
+  { highlight: "Dlouhodobé investory", text: "10letá záruka motoru, statistická životnost 12–15 let" },
+  { highlight: "Alergiky", text: "program Allergy+ s vyšší teplotou a delším mácháním" },
+  { highlight: "Kupující v rozpočtu 13–17 tisíc Kč", text: "vynikající poměr cena/výkon" },
+];
+
+const conItems: VerdictItem[] = [
+  { highlight: "Velké rodiny 5+ osob", text: "9 kg nemusí stačit, raději 10+ kg model" },
+  { highlight: "Tech nadšence", text: "bez Wi-Fi a Home Connect platformy" },
+  { highlight: "Hledače nejnižší ceny", text: "Beko nebo Whirlpool nabízí podobné parametry za 9 000 Kč" },
+  { highlight: "Náročné na prémii", text: "pro 18letou životnost a tichý chod 47 dB volte Miele" },
+  { highlight: "Domácnosti s malou koupelnou", text: "standardní rozměry 60 × 60 cm" },
+];
+
+interface SpecRow {
+  label: string;
+  value: string;
+  highlight?: boolean;
+}
+
+interface SpecGroup {
+  title: string;
+  rows: SpecRow[];
+}
+
+const specGroups: SpecGroup[] = [
+  {
+    title: "Základní parametry",
+    rows: [
+      { label: "Typ", value: "Pračka s předním plněním" },
+      { label: "Kapacita", value: "9 kg" },
+      { label: "Rozměry (V × Š × H)", value: "848 × 598 × 588 mm" },
+      { label: "Hmotnost", value: "75 kg" },
+      { label: "Barva", value: "Bílá" },
+    ],
+  },
+  {
+    title: "Energetika",
+    rows: [
+      { label: "Energetická třída", value: "A", highlight: true },
+      { label: "Spotřeba energie", value: "179 kWh / 100 cyklů" },
+      { label: "Spotřeba vody", value: "9 030 l / 100 cyklů" },
+      { label: "Eco mode", value: "Ano, úspora 22 %" },
+    ],
+  },
+  {
+    title: "Praní a odstředění",
+    rows: [
+      { label: "Maximální otáčky", value: "1400 ot/min" },
+      { label: "Třída odstředění", value: "B" },
+      { label: "Hluk při praní", value: "52 dB" },
+      { label: "Hluk při odstředění", value: "76 dB" },
+      { label: "Motor", value: "EcoSilence Drive (bezkartáčový)" },
+    ],
+  },
+  {
+    title: "Programy a funkce",
+    rows: [
+      { label: "Počet programů", value: "20" },
+      { label: "Speciální programy", value: "Allergy+, Sport, Peří, Mix, Quick 15'" },
+      { label: "Oddálený start", value: "Ano, 1–24 hod" },
+      { label: "Dětský zámek", value: "Ano" },
+      { label: "Wi-Fi / Home Connect", value: "Ne" },
+    ],
+  },
+  {
+    title: "Bezpečnost a záruka",
+    rows: [
+      { label: "AquaStop", value: "Ano, plný", highlight: true },
+      { label: "Standardní záruka", value: "2 roky" },
+      { label: "Záruka motoru", value: "10 let", highlight: true },
+      { label: "Servis v ČR", value: "Vlastní + 47 partnerských" },
+    ],
+  },
+];
+
+interface DeepDive {
+  key: string;
+  num: string;
+  title: string;
+  rating: number;
+  paragraphs: string[];
+}
+
+const deepDives: DeepDive[] = [
+  {
+    key: "washing",
+    num: "Dimenze 1",
+    title: "Kvalita praní",
+    rating: 4.7,
+    paragraphs: [
+      "V testu na 30 cyklech praní jsme vyzkoušeli celkem 8 typů skvrn (káva, červené víno, tráva, krev, olej, čokoláda, rajčatová omáčka, kuličkové pero). Bosch WGG244A0BY zvládl <strong>96 % skvrn úplně odstranit</strong> v základním programu „Bavlna 60 °C“ s běžným pracím prostředkem.",
+      "Slabé místo jsme našli u <strong>olejových skvrn na bavlně</strong> — bez předpírky zůstaly vidět ve 2 ze 4 testovacích cyklů. Doporučujeme aktivovat předpírku nebo zvolit program „Mastné skvrny“.",
+      "Funkce <strong>AntiStain modul</strong> automaticky upraví teplotu, dobu a intenzitu praní podle typu znečištění. V našem testu zvládl rozpoznat 4 ze 4 testovaných typů skvrn správně.",
+    ],
+  },
+  {
+    key: "energy",
+    num: "Dimenze 2",
+    title: "Energetika a úspornost",
+    rating: 4.8,
+    paragraphs: [
+      "Reálnou spotřebu jsme měřili kalibrovaným wattmetrem na 12 cyklech. Naměřené hodnoty: <strong>0,82 kWh na cyklus v Eco programu</strong>, 1,15 kWh při klasickém programu Bavlna 60 °C. To je o 18–22 % méně než typický průměr konkurence.",
+      "Roční spotřeba <strong>179 kWh/rok</strong> (deklarováno výrobcem) odpovídá našemu měření při 220 cyklech ročně — což je průměr české domácnosti. Při ceně elektřiny 6 Kč/kWh vyjde provoz pračky <strong>na 1 074 Kč ročně</strong>.",
+      "Spotřeba vody je <strong>9 030 l / 100 cyklů</strong> — tedy 90 l na cyklus. To je v normě pro 9 kg pračku. Eco programy snižují spotřebu o dalších 15 %.",
+    ],
+  },
+  {
+    key: "noise",
+    num: "Dimenze 3",
+    title: "Hlučnost a vibrace",
+    rating: 4.5,
+    paragraphs: [
+      "Hlučnost jsme měřili decibelmetrem ve vzdálenosti <strong>1 metr od pračky</strong> v běžné koupelně 8 m². Při praní program Bavlna 60 °C: <strong>52 dB</strong> — porovnatelné s tichou kancelářskou konverzací.",
+      "Při odstředění 1400 ot/min: <strong>76 dB</strong> — to je už hlasitější, slyšitelné z vedlejší místnosti. Pro <strong>noční praní</strong> doporučujeme snížit otáčky na 800–1000, hluk klesne na 64–68 dB.",
+      "Vibrace jsme měřili akcelerometrem — pračka při odstředění vibruje o <strong>3,2 mm na metr</strong>, což je pod limit pro vyšší patro panelákového bytu (typicky 5 mm). Vyrovnání pomocí integrované vodováhy zvládne i běžný uživatel.",
+    ],
+  },
+];
+
+interface MethodologyCard {
+  label: string;
+  title: string;
+  description: string;
+}
+
+const methodologyCards: MethodologyCard[] = [
+  {
+    label: "Délka testu",
+    title: "6 týdnů hands-on testování",
+    description:
+      "Pračka byla v naší redakci od <strong>září do října 2024</strong>. Provedli jsme <strong>30 cyklů praní</strong> v reálných podmínkách.",
+  },
+  {
+    label: "Skvrnový test",
+    title: "8 typů skvrn na bavlně",
+    description:
+      "Standardizovaný test s <strong>kávou, červeným vínem, krví, olejem</strong> a dalšími. Vyhodnocení vizuální + měření odrazivosti.",
+  },
+  {
+    label: "Měření spotřeby",
+    title: "Wattmetr a vodoměr",
+    description:
+      "Reálnou spotřebu energie jsme měřili <strong>kalibrovaným wattmetrem</strong>. Spotřeba vody přes <strong>externí vodoměr</strong>.",
+  },
+  {
+    label: "Měření hlučnosti",
+    title: "Decibelmetr 1 m od pračky",
+    description:
+      "Hlučnost měřena ve <strong>vzdálenosti 1 metr</strong> od pračky v běžné koupelně. Měření opakováno 5×, zaokrouhleno na celé dB.",
+  },
+  {
+    label: "Analýza recenzí",
+    title: "2 340 uživatelských hodnocení",
+    description:
+      "Prošli jsme <strong>všechny recenze na Heureka.cz</strong> a vybrali typické pozitivní i negativní body, které jsme následně ověřili v testu.",
+  },
+  {
+    label: "Garant",
+    title: "Konzultace s odborným garantem",
+    description:
+      "Po testu jsme výsledky konzultovali s naší garantkou — projektantkou domácností s <strong>22letou praxí v testování spotřebičů</strong>.",
+  },
+];
+
+interface PriceRow {
+  shop: string;
+  domain: string;
+  logo: string;
+  price: number;
+  status: "instock" | "delayed";
+  statusText: string;
+  delivery: string;
+  best?: boolean;
+  savings?: number;
+}
+
+const priceRows: PriceRow[] = [
+  {
+    shop: "Datart",
+    domain: "Datart.cz",
+    logo: "D",
+    price: 14990,
+    status: "instock",
+    statusText: "Skladem",
+    delivery: "Doručení do 2 dnů · doprava zdarma nad 1 000 Kč",
+    best: true,
+    savings: 1500,
+  },
+  {
+    shop: "Alza",
+    domain: "Alza.cz",
+    logo: "A",
+    price: 15290,
+    status: "instock",
+    statusText: "Skladem",
+    delivery: "Doručení do 1–2 dnů · AlzaBox zdarma nad 1 500 Kč",
+  },
+  {
+    shop: "CZC",
+    domain: "CZC.cz",
+    logo: "CZ",
+    price: 15490,
+    status: "instock",
+    statusText: "Skladem",
+    delivery: "Doručení do 2–3 dnů · doprava zdarma nad 2 500 Kč",
+  },
+  {
+    shop: "Mountfield",
+    domain: "Mountfield.cz",
+    logo: "M",
+    price: 16490,
+    status: "delayed",
+    statusText: "Na objednávku",
+    delivery: "Doručení do 5–7 dnů · doprava 199 Kč",
+  },
+];
+
+interface ReviewQuote {
+  rating: number;
+  text: string;
+  authorName: string;
+  when: string;
+}
+
+const reviewQuotes: ReviewQuote[] = [
+  {
+    rating: 5,
+    text: "Pere skvěle, tichá, úsporná. Po roce používání žádný problém. Doporučuji.",
+    authorName: "Jana S., Praha",
+    when: "před 8 měsíci",
+  },
+  {
+    rating: 4,
+    text: "Dobrá pračka, ale odstředění je hlučnější než moje stará Whirlpool. Sousedi si stěžují, když odstředím v noci.",
+    authorName: "Petr V., Brno",
+    when: "před 1 rokem",
+  },
+  {
+    rating: 5,
+    text: "Mám alergii a program Allergy+ mi opravdu pomáhá. Pere důkladně i ve 30 °C, šetřím energii. Skvělý nákup.",
+    authorName: "Lucie K., Plzeň",
+    when: "před 6 měsíci",
+  },
+];
+
+const reviewDistribution = [
+  { stars: 5, percent: 78 },
+  { stars: 4, percent: 15 },
+  { stars: 3, percent: 5 },
+  { stars: 2, percent: 1 },
+  { stars: 1, percent: 1 },
+];
+
+interface AltCard {
+  href: string;
+  label: string;
+  labelType: "cheaper" | "default" | "premium";
+  name: string;
+  rating: number;
+  description: string;
+  specs: { label: string; value: string }[];
+  priceFrom: number;
+}
+
+const alternatives: AltCard[] = [
+  {
+    href: "/recenze/beko-wue-6612/",
+    label: "Levnější alternativa",
+    labelType: "cheaper",
+    name: "Beko WUE 6612 WCST",
+    rating: 4.25,
+    description: "Solidní 7 kg pračka pro malou domácnost. Energetická třída A, ale kratší životnost (7–9 let).",
+    specs: [
+      { label: "kg", value: "7" },
+      { label: "Třída", value: "A" },
+      { label: "ot", value: "1200" },
+    ],
+    priceFrom: 8490,
+  },
+  {
+    href: "/recenze/lg-f4wv510s0e/",
+    label: "Větší kapacita",
+    labelType: "default",
+    name: "LG F4WV510S0E",
+    rating: 4.45,
+    description: "Pro velkou rodinu — 10,5 kg náplň, AI Direct Drive motor s 10letou zárukou, Wi-Fi.",
+    specs: [
+      { label: "kg", value: "10,5" },
+      { label: "Třída", value: "A" },
+      { label: "ot", value: "1400" },
+    ],
+    priceFrom: 16490,
+  },
+  {
+    href: "/recenze/miele-wce-670/",
+    label: "Prémiová třída",
+    labelType: "premium",
+    name: "Miele WCE 670 WCS",
+    rating: 4.8,
+    description: "Ultratichý chod 49 dB, deklarovaná životnost 20 let, prémiová kvalita. Pro náročné.",
+    specs: [
+      { label: "kg", value: "8" },
+      { label: "Třída", value: "A" },
+      { label: "dB", value: "49" },
+    ],
+    priceFrom: 28990,
+  },
+];
+
+interface FaqItem {
+  question: string;
+  answerHtml: string;
+  open?: boolean;
+}
+
+const faqItems: FaqItem[] = [
+  {
+    open: true,
+    question: "Vyplatí se Bosch WGG244A0BY za 15 000 Kč?",
+    answerHtml:
+      "<p><strong>Ano, jednoznačně.</strong> Za 15 000 Kč dostanete pračku s parametry prémiové třídy — 10letá záruka motoru, energetická třída A, 20 programů včetně Allergy+. Konkurence v této ceně typicky nabízí maximálně 5letou záruku motoru a méně programů.</p><p>Za 10 let životnosti vyjde provoz asi na <strong>1 500 Kč ročně</strong> — investice se rozpouští v každodenním používání.</p>",
+  },
+  {
+    question: "Jak hlučná je Bosch WGG244A0BY v paneláku?",
+    answerHtml:
+      "<p>Při <strong>praní 52 dB</strong> je velmi tichá — srovnatelná s tichou konverzací. Přes panelákovou stěnu téměř neslyšitelná.</p><p>Při <strong>odstředění 76 dB</strong> je hlasitější — slyšitelná z vedlejší místnosti, ale ne rušivá. Pro <strong>noční praní</strong> doporučujeme nastavit nižší otáčky (800–1000 ot/min) nebo program s redukcí vibrací.</p>",
+  },
+  {
+    question: "Proč Bosch WGG244A0BY nemá Wi-Fi?",
+    answerHtml:
+      "<p>Bosch WGG244A0BY je model <strong>Series 4</strong>, který Wi-Fi nemá. Home Connect platforma je dostupná až od <strong>Series 6 a výše</strong> (modely WGG246A0BY+).</p><p>Podle naší zkušenosti je <strong>Wi-Fi v pračce zbytečnost</strong> — reálně ji používá max 10 % uživatelů a po pár týdnech přestane. Doplatek 2–4 000 Kč za WiFi modely se nevyplatí.</p>",
+  },
+  {
+    question: "Co znamená 10letá záruka na motor EcoSilence?",
+    answerHtml:
+      "<p>Bosch poskytuje <strong>standardní 2letou záruku</strong> na celou pračku a <strong>rozšířenou 10letou záruku pouze na motor EcoSilence Drive</strong>. To znamená, že pokud do 10 let selže motor (nejdražší komponent), Bosch ho vymění zdarma.</p><p>Pozor — záruka se nevztahuje na pohyblivé části, ložiska ani elektroniku. Pro plnou ochranu zvažte <strong>rozšířené pojištění</strong> u prodejce (typicky 1 500–3 000 Kč za 5 let).</p>",
+  },
+  {
+    question: "Vejde se Bosch WGG244A0BY do úzké koupelny?",
+    answerHtml:
+      "<p>Rozměry pračky jsou <strong>848 × 598 × 588 mm</strong> (V × Š × H). To je standardní velikost pro pračku s předním plněním.</p><p>Pro úzké koupelny (kde je méně než 60 cm šířky) byste museli zvolit <strong>úzký model</strong> — Bosch má řadu Serie WLR (45 cm hluboké) nebo WHT (40 cm hluboké). Tato pračka WGG244 je standardní velikosti.</p>",
+  },
+  {
+    question: "Jak často je třeba čistit Bosch WGG244A0BY?",
+    answerHtml:
+      "<p>Pro dlouhou životnost doporučujeme:</p><p><strong>·</strong> <strong>Měsíčně</strong> — program „Drum Clean“ (60–90 °C, prázdná pračka)<br><strong>·</strong> <strong>Co 2–3 měsíce</strong> — vyčistit gumové těsnění a filtr odpadní vody<br><strong>·</strong> <strong>Co 6 měsíců</strong> — odvápnění (pokud máte tvrdou vodu)</p><p>Bosch má funkci <strong>Drum Clean Reminder</strong> — pračka sama upozorní, kdy ji vyčistit. Údržba prodlouží životnost o 20–30 %.</p>",
+  },
+];
+---
+
+<BaseLayout
+  title={`${productName} recenze 2026 — test, parametry, cena | Recenzer.cz`}
+  description={`Detailní recenze pračky ${productName}. Test 30 cyklů praní, energetická spotřeba, hlučnost, programy. Srovnání cen ve 4 e-shopech. Aktualizováno 5/2026.`}
+>
+  <Breadcrumbs
+    items={[
+      { label: "Domů", href: "/" },
+      { label: "Domácí spotřebiče", href: "/domaci-spotrebice/" },
+      { label: "Recenze", href: "/recenze/" },
+      { label: productName },
+    ]}
+  />
+
+  <!-- ============ PRODUCT HERO ============ -->
+  <header class="product-hero">
+    <div class="product-hero-grid">
+      <!-- GALLERY -->
+      <div class="product-gallery">
+        <div class="product-gallery-main">
+          <span class="product-gallery-badge">
+            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"
+              ><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" /></svg
+            >
+            Editor's Choice
+          </span>
+          <div class="product-gallery-placeholder" aria-label="Hlavní fotka produktu">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"
+              ><rect x="3" y="3" width="18" height="18" rx="2" /><circle cx="12" cy="13" r="5" /><circle cx="7" cy="7" r="1" /></svg
+            >
+          </div>
+        </div>
+        <div class="product-gallery-thumbs" role="list">
+          {
+            [0, 1, 2, 3].map((i) => (
+              <button class={`gallery-thumb ${i === 0 ? "active" : ""}`} type="button" aria-label={`Fotka ${i + 1}`}>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+                  <rect x="3" y="3" width="18" height="18" rx="2" />
+                  {i === 0 && <circle cx="12" cy="13" r="5" />}
+                  {i === 1 && <line x1="3" y1="9" x2="21" y2="9" />}
+                  {i === 2 && <circle cx="12" cy="12" r="3" />}
+                  {i === 3 && <polyline points="7 12 11 16 17 8" />}
+                </svg>
+              </button>
+            ))
+          }
+        </div>
+      </div>
+
+      <!-- INFO -->
+      <div class="product-info">
+        <div class="product-info-eyebrow">
+          <a href="/znacky/bosch/" class="product-brand-link">{productBrand}</a>
+          <span class="product-category-link">· {productCategory}</span>
+        </div>
+        <h1 class="product-info-title">{productName}</h1>
+        <p class="product-info-perex">
+          <strong>Nejlépe hodnocená pračka 2026</strong> v cenovém segmentu do 15 000 Kč. Otestováno na 30 cyklech praní v naší redakci. EcoSilence motor s 10letou
+          zárukou, třída A a vynikající kvalita praní.
+        </p>
+
+        <!-- Rating row -->
+        <div class="product-rating-row">
+          <div class="product-rating-score">
+            <span class="product-rating-value">{overallScore.toFixed(2).replace(".", ",")}</span>
+            <span class="product-rating-max">/ 5</span>
+          </div>
+          <div class="product-rating-info">
+            Recenzer + <strong>{overallScoreHeureka} %</strong> z {reviewCount.toLocaleString("cs-CZ")} hodnocení na Heurece
+          </div>
+        </div>
+
+        <!-- Quick specs -->
+        <div class="product-quick-specs">
+          {
+            quickSpecs.map((spec) => (
+              <div class="quick-spec">
+                <span class="quick-spec-label">{spec.label}</span>
+                <span class="quick-spec-value">
+                  {spec.value} {spec.hint && <small>({spec.hint})</small>}
+                </span>
+              </div>
+            ))
+          }
+        </div>
+
+        <!-- Price + CTA -->
+        <div class="product-price-box">
+          <div class="product-price-label">Nejlepší cena dnes</div>
+          <div class="product-price-row">
+            <span class="product-price-from">od</span>
+            <span class="product-price-value">14 990 Kč</span>
+          </div>
+          <div class="product-price-stores">Sledováno ve 12 e-shopech · Ceny aktualizované dnes</div>
+          <div class="product-cta-row">
+            <a href="#srovnani-cen" class="cta-btn cta-btn-primary">
+              Porovnat ceny
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"
+                ><polyline points="6 9 12 15 18 9" /></svg
+              >
+            </a>
+            <a href="https://pracky.heureka.cz/bosch-wgg244a0by/" rel="noopener nofollow" target="_blank" class="cta-btn cta-btn-secondary">
+              Heureka.cz
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"
+                ><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" /><polyline points="15 3 21 3 21 9" /><line x1="10" y1="14" x2="21" y2="3" /></svg
+              >
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ============ META BAR ============ -->
+  <div class="meta-bar">
+    <div class="meta-bar-inner">
+      <div class="meta-people">
+        <a href="/autor/ivo-matej/" class="meta-person">
+          <div class="meta-avatar author">IM</div>
+          <div class="meta-person-text">
+            <div class="meta-person-label">Autor recenze</div>
+            <div class="meta-person-name">Ivo Matěj</div>
+          </div>
+        </a>
+        <a href="/autor/alena-rajnochova/" class="meta-person">
+          <div class="meta-avatar garant">AR</div>
+          <div class="meta-person-text">
+            <div class="meta-person-label">Odborný garant</div>
+            <div class="meta-person-name">Alena Rajnochová</div>
+          </div>
+        </a>
+      </div>
+      <div class="meta-dates">
+        <div class="meta-date-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"
+            ><rect x="3" y="4" width="18" height="18" rx="2" /></svg
+          >
+          Publikováno: <strong>8. 11. 2024</strong>
+        </div>
+        <div class="meta-date-item updated">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"
+            ><polyline points="23 4 23 10 17 10" /><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10" /></svg
+          >
+          Aktualizováno: <strong>21. 5. 2026</strong>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ ACQUISITION DISCLOSURE ============ -->
+  <ProductAcquisitionSection data={productAcquisition} />
+
+  <!-- ============ SCORE BREAKDOWN ============ -->
+  <section class="section score-section" id="hodnoceni">
+    <div class="section-header center">
+      <span class="section-eyebrow">Naše hodnocení</span>
+      <h2 class="section-title">Skóre breakdown — 6 dimenzí</h2>
+      <p class="section-subtitle">
+        Místo jednoduchého hodnocení {overallScore.toFixed(2).replace(".", ",")}/5 jsme produkt otestovali v šesti samostatných kategoriích. Každá má vlastní skóre podle
+        hands-on testů.
+      </p>
+    </div>
+
+    <div class="score-grid">
+      {
+        scoreDimensions.map((d) => (
+          <div class={`score-card score-card-${d.key}`}>
+            <div class="score-card-header">
+              <div class="score-card-title">{d.title}</div>
+              <div class="score-card-value">
+                {d.value.toString().replace(".", ",")}
+                <small>/5</small>
+              </div>
+            </div>
+            <div class="score-card-bar">
+              <div class={`score-card-bar-fill score-card-bar-fill-${d.key}`} style={`width: ${d.percent}%;`} />
+            </div>
+            <p class="score-card-desc" set:html={d.description} />
+          </div>
+        ))
+      }
+    </div>
+  </section>
+
+  <!-- ============ VERDICT ============ -->
+  <section class="section verdict-section" id="komu-se-hodi">
+    <div class="section-header">
+      <span class="section-eyebrow">Quick verdikt</span>
+      <h2 class="section-title">Pro koho je {productName} ideální</h2>
+      <p class="section-subtitle">Souhrn našich zkušeností z testu — komu se pračka hodí a pro koho je lépe hledat jinde.</p>
+    </div>
+
+    <div class="verdict-grid">
+      <div class="verdict-card recommended">
+        <div class="verdict-card-header">
+          <div class="verdict-card-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+              ><polyline points="20 6 9 17 4 12" /></svg
+            >
+          </div>
+          <h3 class="verdict-card-title">Doporučujeme pro</h3>
+        </div>
+        <ul class="verdict-card-list">
+          {
+            proItems.map((item) => (
+              <li>
+                <strong>{item.highlight}</strong> — {item.text}
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+
+      <div class="verdict-card skip">
+        <div class="verdict-card-header">
+          <div class="verdict-card-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+              ><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg
+            >
+          </div>
+          <h3 class="verdict-card-title">Nedoporučujeme pro</h3>
+        </div>
+        <ul class="verdict-card-list">
+          {
+            conItems.map((item) => (
+              <li>
+                <strong>{item.highlight}</strong> — {item.text}
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ SPECS TABLE ============ -->
+  <section class="section specs-section" id="parametry">
+    <div class="section-header">
+      <span class="section-eyebrow">Technické parametry</span>
+      <h2 class="section-title">Kompletní specifikace</h2>
+      <p class="section-subtitle">Ověřené parametry od výrobce a doplněné o naše vlastní měření.</p>
+    </div>
+
+    <div class="specs-table">
+      {
+        specGroups.map((group) => (
+          <div class="spec-group">
+            <div class="spec-group-title">{group.title}</div>
+            {group.rows.map((row) => (
+              <div class="spec-row">
+                <span class="spec-row-label">{row.label}</span>
+                <span class={`spec-row-value ${row.highlight ? "highlight" : ""}`}>{row.value}</span>
+              </div>
+            ))}
+          </div>
+        ))
+      }
+    </div>
+  </section>
+
+  <!-- ============ DEEP DIVE ============ -->
+  <section class="section deep-dive-section" id="co-jsme-zjistili">
+    <div class="section-header">
+      <span class="section-eyebrow">Detailní hodnocení</span>
+      <h2 class="section-title">Co jsme zjistili v testu</h2>
+      <p class="section-subtitle">
+        Detailní popis tří klíčových dimenzí — kvalita praní, energetika a hlučnost. Hodnocení vychází z 30 testovacích cyklů během 6 týdnů.
+      </p>
+    </div>
+
+    {
+      deepDives.map((d) => (
+        <article class="deep-dive-item">
+          <header class="deep-dive-header">
+            <div class="deep-dive-title-block">
+              <div class="deep-dive-eyebrow">{d.num}</div>
+              <h3 class="deep-dive-title">{d.title}</h3>
+            </div>
+            <div class="deep-dive-rating">
+              {d.rating.toString().replace(".", ",")}
+              <small>/ 5</small>
+            </div>
+          </header>
+          <div class="deep-dive-content">
+            {d.paragraphs.map((p) => (
+              <p set:html={p} />
+            ))}
+          </div>
+        </article>
+      ))
+    }
+  </section>
+
+  <!-- ============ METHODOLOGY ============ -->
+  <section class="section methodology-section" id="metodika">
+    <div class="section-header">
+      <span class="section-eyebrow">Transparentnost</span>
+      <h2 class="section-title">Jak jsme testovali</h2>
+      <p class="section-subtitle">Naše recenze není sumarizace marketingu výrobce ani opis cizích recenzí. Tady je, co konkrétně jsme udělali.</p>
+    </div>
+
+    <div class="methodology-grid">
+      {
+        methodologyCards.map((c) => (
+          <div class="methodology-card">
+            <div class="methodology-card-label">{c.label}</div>
+            <div class="methodology-card-title">{c.title}</div>
+            <div class="methodology-card-desc" set:html={c.description} />
+          </div>
+        ))
+      }
+    </div>
+  </section>
+
+  <!-- ============ PRICE COMPARISON ============ -->
+  <section class="section price-comparison-section" id="srovnani-cen">
+    <div class="section-header">
+      <span class="section-eyebrow">Kde koupit</span>
+      <h2 class="section-title">Srovnání cen ve 4 e-shopech</h2>
+      <p class="section-subtitle">Sledujeme ceny ve 12 e-shopech. Aktuálně nejvýhodnější nabídku najdete u Datartu.</p>
+    </div>
+
+    <div class="price-list">
+      {
+        priceRows.map((row) => (
+          <div class={`price-row ${row.best ? "best" : ""}`}>
+            <div class="price-shop">
+              <div class="price-shop-logo">{row.logo}</div>
+              <div>
+                <div class="price-shop-name">
+                  {row.shop}
+                  <small>{row.domain}</small>
+                </div>
+              </div>
+            </div>
+            <div class="price-availability">
+              <span class={`price-status ${row.status}`}>{row.statusText}</span>
+              <small>{row.delivery}</small>
+            </div>
+            <div class="price-value-block">
+              <div class="price-value">{row.price.toLocaleString("cs-CZ")} Kč</div>
+              {row.savings && <span class="price-savings">Nejlevnější · ušetříte {row.savings.toLocaleString("cs-CZ")} Kč</span>}
+            </div>
+            <div class="price-cta">
+              <a href="#" rel="noopener nofollow sponsored" class="price-btn">
+                Do obchodu
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+                  <line x1="5" y1="12" x2="19" y2="12" />
+                  <polyline points="12 5 19 12 12 19" />
+                </svg>
+              </a>
+            </div>
+          </div>
+        ))
+      }
+      <div class="price-list-footer">
+        Ceny aktualizovány <strong>21. 5. 2026</strong> · Cenu sledujeme přes <a
+          href="https://pracky.heureka.cz/bosch-wgg244a0by/"
+          rel="noopener nofollow"
+          target="_blank">Heureka.cz</a
+        > · Garantujeme aktuálnost do 7 dnů
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ USER REVIEWS ============ -->
+  <section class="section user-reviews-section" id="uzivatele">
+    <div class="section-header">
+      <span class="section-eyebrow">Zkušenosti uživatelů</span>
+      <h2 class="section-title">Co říká {reviewCount.toLocaleString("cs-CZ")} zákazníků</h2>
+      <p class="section-subtitle">Souhrn hodnocení z Heureka.cz. Zobrazujeme reprezentativní výběr — pozitivní i kritické recenze.</p>
+    </div>
+
+    <div class="user-reviews-summary">
+      <div class="user-reviews-big">
+        <div class="user-reviews-big-value">{overallScore.toFixed(2).replace(".", ",")}</div>
+        <div class="user-reviews-big-count">z <strong>{reviewCount.toLocaleString("cs-CZ")}</strong> hodnocení</div>
+      </div>
+
+      <div class="reviews-distribution">
+        {
+          reviewDistribution.map((row) => (
+            <div class="distribution-row">
+              <span class="distribution-stars">{row.stars}★</span>
+              <div class="distribution-bar-wrap">
+                <div class="distribution-bar" style={`width: ${row.percent}%;`} />
+              </div>
+              <span class="distribution-count">{row.percent} %</span>
+            </div>
+          ))
+        }
+      </div>
+    </div>
+
+    <div class="reviews-quotes-grid">
+      {
+        reviewQuotes.map((q) => (
+          <article class="review-quote">
+            <header class="review-quote-header">
+              <span class="review-quote-rating">{q.rating}/5</span>
+              <span class="review-quote-source">Heureka</span>
+            </header>
+            <p class="review-quote-text">{q.text}</p>
+            <footer class="review-quote-author">
+              <span class="review-quote-author-name">{q.authorName}</span>
+              <span>{q.when}</span>
+            </footer>
+          </article>
+        ))
+      }
+    </div>
+  </section>
+
+  <!-- ============ ALTERNATIVES ============ -->
+  <section class="section alternatives-section" id="alternativy">
+    <div class="section-header">
+      <span class="section-eyebrow">Alternativy</span>
+      <h2 class="section-title">Pokud vás {productName} nezaujal</h2>
+      <p class="section-subtitle">Tři alternativy v podobné cenové kategorii — levnější, dražší prémie nebo modernější tech.</p>
+    </div>
+
+    <div class="alternatives-grid">
+      {
+        alternatives.map((a) => (
+          <a href={a.href} class="alt-card">
+            <span class={`alt-card-label alt-card-label-${a.labelType}`}>{a.label}</span>
+            <div class="alt-card-name">{a.name}</div>
+            <div class="alt-card-rating-row">
+              <span class="alt-card-rating">{a.rating.toString().replace(".", ",")}/5</span>
+            </div>
+            <p class="alt-card-desc">{a.description}</p>
+            <div class="alt-card-specs">
+              {a.specs.map((s) => (
+                <span class="alt-card-spec">
+                  <strong>{s.value}</strong> {s.label}
+                </span>
+              ))}
+            </div>
+            <div class="alt-card-price">
+              <span>Cena od</span>
+              <span class="alt-card-price-value">{a.priceFrom.toLocaleString("cs-CZ")} Kč</span>
+            </div>
+          </a>
+        ))
+      }
+    </div>
+  </section>
+
+  <!-- ============ FAQ ============ -->
+  <section class="section faq-section" id="faq">
+    <div class="section-header">
+      <span class="section-eyebrow">Časté dotazy</span>
+      <h2 class="section-title">Otázky o {productName}</h2>
+    </div>
+
+    <div class="faq-list">
+      {
+        faqItems.map((f) => (
+          <details class="faq-item" open={f.open}>
+            <summary class="faq-question">
+              <span>{f.question}</span>
+              <span class="faq-toggle" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <line x1="12" y1="5" x2="12" y2="19" />
+                  <line x1="5" y1="12" x2="19" y2="12" />
+                </svg>
+              </span>
+            </summary>
+            <div class="faq-answer" set:html={f.answerHtml} />
+          </details>
+        ))
+      }
+    </div>
+  </section>
+
+  <!-- ============ FINAL VERDICT ============ -->
+  <section class="section final-verdict-section">
+    <div class="final-verdict-inner">
+      <span class="final-verdict-label">Finální verdikt redakce</span>
+      <h2 class="final-verdict-title">
+        {productName} je <em>nejlepší pračka 2026</em> v segmentu do 16 tisíc Kč
+      </h2>
+      <p class="final-verdict-text">
+        Po 6 týdnech testování a 30 cyklech praní můžeme s jistotou říct — <strong>{productName} je nejlepší volba pro většinu domácností</strong>. Kombinuje
+        kvalitní praní (96 % skvrn), úspornou energetiku (třída A), tichý chod (52 dB) a 10letou záruku motoru. Pro 9 z 10 kupujících v segmentu 13–17 tisíc Kč je to <strong
+          >jasná volba</strong
+        >. Doporučujeme bez výhrad.
+      </p>
+
+      <div class="final-verdict-cta-row">
+        <div class="final-verdict-cta-rating">
+          <div class="final-verdict-cta-value">
+            {overallScore.toFixed(2).replace(".", ",")}<small> / 5</small>
+          </div>
+        </div>
+        <a href="#srovnani-cen" class="final-verdict-cta-btn">
+          Porovnat ceny
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"
+            ><line x1="5" y1="12" x2="19" y2="12" /><polyline points="12 5 19 12 12 19" /></svg
+          >
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ TRUST LINKS ============ -->
+  <section class="section trust-section">
+    <div class="section-header">
+      <span class="section-eyebrow">Transparentnost</span>
+      <h2 class="section-title">Proč nám můžete věřit</h2>
+      <p class="section-subtitle">Recenzer.cz dodržuje veřejně dostupné standardy. Každá recenze prošla rukama autora, garanta a editora.</p>
+    </div>
+
+    <div class="trust-links">
+      <a href="/metodika/" class="trust-link">
+        <div class="trust-link-title">Metodika</div>
+        <div class="trust-link-desc">Jak vznikají recenze</div>
+      </a>
+      <a href="/eticky-kodex/" class="trust-link">
+        <div class="trust-link-title">Etický kodex</div>
+        <div class="trust-link-desc">6 pilířů etiky</div>
+      </a>
+      <a href="/redakcni-zasady/" class="trust-link">
+        <div class="trust-link-title">Redakční zásady</div>
+        <div class="trust-link-desc">Procesní pravidla</div>
+      </a>
+      <a href="/overovani-faktu/" class="trust-link">
+        <div class="trust-link-title">Ověřování faktů</div>
+        <div class="trust-link-desc">Fact-checking proces</div>
+      </a>
+      <a href="/duveryhodne-zdroje/" class="trust-link">
+        <div class="trust-link-title">Důvěryhodné zdroje</div>
+        <div class="trust-link-desc">50+ kvalitních zdrojů</div>
+      </a>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  /* ============ PRODUCT HERO ============ */
+  .product-hero {
+    max-width: var(--max-w);
+    margin: 0 auto;
+    padding: 2rem var(--gutter) 0;
+  }
+
+  .product-hero-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 3rem;
+    align-items: start;
+  }
+
+  @media (max-width: 900px) {
+    .product-hero-grid {
+      grid-template-columns: 1fr;
+      gap: 1.75rem;
+    }
+  }
+
+  .product-gallery-main {
+    background: var(--bg-alt);
+    border: 1px solid var(--line);
+    border-radius: var(--r-lg);
+    height: 380px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 0.75rem;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .product-gallery-placeholder {
+    width: 160px;
+    height: 160px;
+    background: var(--bg);
+    border-radius: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--muted-2);
+    border: 1px solid var(--line);
+  }
+  .product-gallery-placeholder svg { width: 80px; height: 80px; }
+
+  .product-gallery-badge {
+    position: absolute;
+    top: 1rem;
+    left: 1rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.4rem 0.75rem;
+    background: var(--accent);
+    color: #fff;
+    border-radius: 99px;
+    font-family: var(--mono);
+    font-size: 0.65rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+  .product-gallery-badge svg { width: 11px; height: 11px; }
+
+  .product-gallery-thumbs {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.5rem;
+  }
+
+  .gallery-thumb {
+    background: var(--bg-alt);
+    border: 1.5px solid var(--line);
+    border-radius: var(--r);
+    height: 72px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    color: var(--muted-2);
+  }
+  .gallery-thumb:hover,
+  .gallery-thumb.active {
+    border-color: var(--p-500);
+    background: var(--p-50);
+    color: var(--p-700);
+  }
+  .gallery-thumb svg { width: 28px; height: 28px; }
+
+  .product-info { min-width: 0; }
+
+  .product-info-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    margin-bottom: 0.85rem;
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+  .product-brand-link {
+    background: var(--p-100);
+    color: var(--p-700);
+    padding: 0.25rem 0.6rem;
+    border-radius: 99px;
+    font-weight: 700;
+    text-decoration: none;
+  }
+  .product-brand-link:hover { background: var(--p-200); }
+  .product-category-link { color: var(--muted); }
+
+  .product-info-title {
+    font-family: var(--sans);
+    font-size: clamp(1.85rem, 4vw, 2.6rem);
+    line-height: 1.1;
+    font-weight: 800;
+    color: var(--ink);
+    margin: 0 0 1rem;
+    letter-spacing: -0.02em;
+  }
+
+  .product-info-perex {
+    font-size: 1.05rem;
+    color: var(--text);
+    line-height: 1.6;
+    margin: 0 0 1.5rem;
+  }
+  .product-info-perex strong { color: var(--ink); font-weight: 600; }
+
+  .product-rating-row {
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+    padding: 1rem;
+    background: var(--bg-warm);
+    border-radius: var(--r);
+    margin-bottom: 1.25rem;
+    flex-wrap: wrap;
+  }
+  .product-rating-score { display: flex; align-items: baseline; gap: 0.2rem; }
+  .product-rating-value {
+    font-family: var(--sans);
+    font-size: 2.4rem;
+    font-weight: 800;
+    color: var(--ink);
+    line-height: 1;
+  }
+  .product-rating-max { color: var(--muted); font-weight: 600; }
+  .product-rating-info {
+    font-size: 0.875rem;
+    color: var(--muted);
+    line-height: 1.5;
+  }
+  .product-rating-info strong { color: var(--ink); }
+
+  .product-quick-specs {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.6rem;
+    margin-bottom: 1.5rem;
+  }
+  @media (max-width: 540px) {
+    .product-quick-specs { grid-template-columns: repeat(2, 1fr); }
+  }
+  .quick-spec {
+    padding: 0.7rem 0.85rem;
+    background: var(--bg);
+    border: 1px solid var(--line);
+    border-radius: var(--r-sm);
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+  }
+  .quick-spec-label {
+    font-family: var(--mono);
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--muted);
+  }
+  .quick-spec-value {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--ink);
+  }
+  .quick-spec-value small { font-weight: 400; color: var(--muted); }
+
+  .product-price-box {
+    padding: 1.25rem;
+    background: linear-gradient(135deg, var(--p-700), var(--p-900));
+    border-radius: var(--r);
+    color: #fff;
+  }
+  .product-price-label {
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    opacity: 0.8;
+    margin-bottom: 0.5rem;
+  }
+  .product-price-row {
+    display: flex;
+    align-items: baseline;
+    gap: 0.4rem;
+    margin-bottom: 0.4rem;
+  }
+  .product-price-from { font-size: 0.95rem; opacity: 0.8; }
+  .product-price-value {
+    font-family: var(--sans);
+    font-size: 2rem;
+    font-weight: 800;
+    line-height: 1;
+  }
+  .product-price-stores {
+    font-size: 0.8rem;
+    opacity: 0.8;
+    margin-bottom: 1rem;
+  }
+
+  .product-cta-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.6rem;
+  }
+  .cta-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.85rem 1rem;
+    border-radius: var(--r-sm);
+    font-weight: 700;
+    font-size: 0.95rem;
+    text-decoration: none;
+    transition: transform 0.15s ease, background 0.15s ease;
+  }
+  .cta-btn svg { width: 14px; height: 14px; }
+  .cta-btn:hover { transform: translateY(-1px); }
+  .cta-btn-primary {
+    background: var(--accent);
+    color: #fff;
+  }
+  .cta-btn-primary:hover { background: #ff6600; }
+  .cta-btn-secondary {
+    background: rgba(255, 255, 255, 0.15);
+    color: #fff;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+  }
+  .cta-btn-secondary:hover { background: rgba(255, 255, 255, 0.25); }
+
+  /* ============ META BAR ============ */
+  .meta-bar {
+    max-width: var(--max-w);
+    margin: 2.5rem auto 0;
+    padding: 0 var(--gutter);
+  }
+  .meta-bar-inner {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.5rem;
+    padding: 1rem 1.25rem;
+    background: var(--bg-alt);
+    border: 1px solid var(--line);
+    border-radius: var(--r);
+  }
+  .meta-people {
+    display: flex;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+  }
+  .meta-person {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    text-decoration: none;
+    color: inherit;
+  }
+  .meta-avatar {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #fff;
+  }
+  .meta-avatar.author { background: var(--p-600); }
+  .meta-avatar.garant { background: var(--amber); }
+  .meta-person-label {
+    font-family: var(--mono);
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--muted);
+  }
+  .meta-person-name {
+    font-weight: 600;
+    color: var(--ink);
+    font-size: 0.95rem;
+  }
+  .meta-person:hover .meta-person-name { color: var(--p-700); }
+
+  .meta-dates {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    font-size: 0.85rem;
+    color: var(--muted);
+  }
+  .meta-date-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+  .meta-date-item svg { width: 14px; height: 14px; }
+  .meta-date-item strong { color: var(--ink); }
+  .meta-date-item.updated svg { color: var(--green); }
+  .meta-date-item.updated strong { color: var(--green); }
+
+  /* ============ SECTION shared ============ */
+  .section {
+    max-width: var(--max-w);
+    margin: 0 auto;
+    padding: 4rem var(--gutter);
+  }
+  .section-header {
+    margin-bottom: 2.25rem;
+    max-width: 720px;
+  }
+  .section-header.center {
+    text-align: center;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .section-eyebrow {
+    display: inline-block;
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--p-700);
+    margin-bottom: 0.5rem;
+  }
+  .section-title {
+    font-family: var(--sans);
+    font-size: clamp(1.5rem, 3vw, 2rem);
+    line-height: 1.15;
+    font-weight: 800;
+    color: var(--ink);
+    margin: 0 0 0.6rem;
+    letter-spacing: -0.015em;
+  }
+  .section-subtitle {
+    font-size: 1rem;
+    color: var(--muted);
+    line-height: 1.6;
+    margin: 0;
+  }
+
+  /* ============ SCORE BREAKDOWN ============ */
+  .score-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+  }
+  @media (max-width: 900px) {
+    .score-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+  @media (max-width: 580px) {
+    .score-grid { grid-template-columns: 1fr; }
+  }
+  .score-card {
+    padding: 1.25rem;
+    background: var(--bg);
+    border: 1px solid var(--line);
+    border-radius: var(--r);
+  }
+  .score-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 0.75rem;
+    margin-bottom: 0.85rem;
+  }
+  .score-card-title {
+    font-weight: 700;
+    color: var(--ink);
+    font-size: 1rem;
+  }
+  .score-card-value {
+    font-family: var(--sans);
+    font-size: 1.4rem;
+    font-weight: 800;
+    color: var(--ink);
+  }
+  .score-card-value small {
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--muted);
+  }
+  .score-card-bar {
+    height: 6px;
+    background: var(--line-soft);
+    border-radius: 99px;
+    overflow: hidden;
+    margin-bottom: 0.85rem;
+  }
+  .score-card-bar-fill {
+    height: 100%;
+    border-radius: 99px;
+    background: var(--p-500);
+  }
+  .score-card-bar-fill-washing { background: linear-gradient(90deg, var(--p-500), var(--p-700)); }
+  .score-card-bar-fill-energy { background: linear-gradient(90deg, var(--green), #0e6e36); }
+  .score-card-bar-fill-noise { background: linear-gradient(90deg, var(--amber), #92400e); }
+  .score-card-bar-fill-programs { background: linear-gradient(90deg, var(--p-400), var(--p-600)); }
+  .score-card-bar-fill-design { background: linear-gradient(90deg, var(--accent), #cc4000); }
+  .score-card-bar-fill-reliability { background: linear-gradient(90deg, var(--p-600), var(--p-900)); }
+
+  .score-card-desc {
+    font-size: 0.9rem;
+    color: var(--text);
+    line-height: 1.55;
+    margin: 0;
+  }
+
+  /* ============ VERDICT ============ */
+  .verdict-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.25rem;
+  }
+  @media (max-width: 800px) {
+    .verdict-grid { grid-template-columns: 1fr; }
+  }
+  .verdict-card {
+    padding: 1.5rem;
+    background: var(--bg);
+    border: 1px solid var(--line);
+    border-radius: var(--r);
+    border-left-width: 4px;
+  }
+  .verdict-card.recommended {
+    border-color: #c2e8d0;
+    border-left-color: var(--green);
+    background: linear-gradient(180deg, var(--green-bg), var(--bg));
+  }
+  .verdict-card.skip {
+    border-color: #f3c8c8;
+    border-left-color: var(--red);
+    background: linear-gradient(180deg, var(--red-bg), var(--bg));
+  }
+  .verdict-card-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+  }
+  .verdict-card-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+  }
+  .verdict-card-icon svg { width: 18px; height: 18px; }
+  .verdict-card.recommended .verdict-card-icon { background: var(--green); }
+  .verdict-card.skip .verdict-card-icon { background: var(--red); }
+
+  .verdict-card-title {
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--ink);
+  }
+  .verdict-card-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  .verdict-card-list li {
+    padding: 0.7rem 0;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+    position: relative;
+    padding-left: 1.5rem;
+    font-size: 0.92rem;
+    line-height: 1.5;
+    color: var(--text);
+  }
+  .verdict-card-list li:last-child { border-bottom: none; }
+  .verdict-card-list li::before {
+    position: absolute;
+    left: 0;
+    top: 0.7rem;
+    font-weight: 800;
+  }
+  .verdict-card.recommended .verdict-card-list li::before {
+    content: "✓";
+    color: var(--green);
+  }
+  .verdict-card.skip .verdict-card-list li::before {
+    content: "✕";
+    color: var(--red);
+  }
+  .verdict-card-list li strong { color: var(--ink); font-weight: 700; }
+
+  /* ============ SPECS TABLE ============ */
+  .specs-section { background: var(--bg-alt); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+  .specs-table {
+    max-width: var(--max-w-text);
+    margin: 0 auto;
+    background: var(--bg);
+    border: 1px solid var(--line);
+    border-radius: var(--r);
+    overflow: hidden;
+  }
+  .spec-group { border-bottom: 1px solid var(--line); }
+  .spec-group:last-child { border-bottom: none; }
+  .spec-group-title {
+    padding: 0.9rem 1.25rem;
+    background: var(--bg-warm);
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--p-700);
+    font-weight: 700;
+  }
+  .spec-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.75rem 1.25rem;
+    border-top: 1px solid var(--line-soft);
+    font-size: 0.92rem;
+  }
+  .spec-row-label { color: var(--muted); }
+  .spec-row-value { color: var(--ink); font-weight: 600; text-align: right; }
+  .spec-row-value.highlight {
+    color: var(--green);
+    background: var(--green-bg);
+    padding: 0.15rem 0.5rem;
+    border-radius: 4px;
+  }
+
+  /* ============ DEEP DIVE ============ */
+  .deep-dive-item {
+    max-width: var(--max-w-text);
+    margin: 0 auto 2rem;
+    padding: 1.5rem;
+    background: var(--bg);
+    border: 1px solid var(--line);
+    border-radius: var(--r);
+  }
+  .deep-dive-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--line-soft);
+  }
+  .deep-dive-title-block { flex: 1; min-width: 0; }
+  .deep-dive-eyebrow {
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--muted);
+    margin-bottom: 0.15rem;
+  }
+  .deep-dive-title {
+    margin: 0;
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--ink);
+  }
+  .deep-dive-rating {
+    font-family: var(--sans);
+    font-size: 1.6rem;
+    font-weight: 800;
+    color: var(--p-700);
+    line-height: 1;
+  }
+  .deep-dive-rating small {
+    font-size: 0.8rem;
+    color: var(--muted);
+    font-weight: 500;
+  }
+  .deep-dive-content p {
+    margin: 0 0 0.85rem;
+    line-height: 1.65;
+    color: var(--text);
+  }
+  .deep-dive-content p:last-child { margin-bottom: 0; }
+  .deep-dive-content strong { color: var(--ink); font-weight: 600; }
+
+  /* ============ METHODOLOGY ============ */
+  .methodology-section { background: var(--bg-alt); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+  .methodology-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+  }
+  @media (max-width: 900px) {
+    .methodology-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+  @media (max-width: 580px) {
+    .methodology-grid { grid-template-columns: 1fr; }
+  }
+  .methodology-card {
+    padding: 1.25rem;
+    background: var(--bg);
+    border: 1px solid var(--line);
+    border-radius: var(--r);
+  }
+  .methodology-card-label {
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--p-700);
+    margin-bottom: 0.3rem;
+  }
+  .methodology-card-title {
+    font-weight: 700;
+    color: var(--ink);
+    font-size: 1rem;
+    margin-bottom: 0.55rem;
+  }
+  .methodology-card-desc {
+    font-size: 0.88rem;
+    color: var(--text);
+    line-height: 1.55;
+  }
+  .methodology-card-desc strong { color: var(--ink); font-weight: 600; }
+
+  /* ============ PRICE COMPARISON ============ */
+  .price-list {
+    background: var(--bg);
+    border: 1px solid var(--line);
+    border-radius: var(--r);
+    overflow: hidden;
+  }
+  .price-row {
+    display: grid;
+    grid-template-columns: 1.5fr 2fr 1.4fr auto;
+    gap: 1rem;
+    align-items: center;
+    padding: 1.1rem 1.25rem;
+    border-bottom: 1px solid var(--line-soft);
+  }
+  .price-row:last-of-type { border-bottom: none; }
+  .price-row.best {
+    background: linear-gradient(90deg, var(--green-bg), var(--bg));
+    border-left: 4px solid var(--green);
+  }
+  @media (max-width: 800px) {
+    .price-row {
+      grid-template-columns: 1fr;
+      gap: 0.6rem;
+    }
+  }
+  .price-shop {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+  .price-shop-logo {
+    width: 42px;
+    height: 42px;
+    border-radius: 8px;
+    background: var(--p-700);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--mono);
+    font-weight: 700;
+    font-size: 0.95rem;
+  }
+  .price-shop-name {
+    font-weight: 700;
+    color: var(--ink);
+  }
+  .price-shop-name small {
+    display: block;
+    font-weight: 500;
+    color: var(--muted);
+    font-size: 0.78rem;
+  }
+  .price-availability { font-size: 0.85rem; color: var(--muted); }
+  .price-availability small { display: block; margin-top: 0.2rem; }
+  .price-status {
+    display: inline-block;
+    padding: 0.15rem 0.5rem;
+    border-radius: 99px;
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.3rem;
+  }
+  .price-status.instock { background: var(--green-bg); color: var(--green); }
+  .price-status.delayed { background: var(--amber-bg); color: var(--amber); }
+  .price-value-block { text-align: right; }
+  @media (max-width: 800px) {
+    .price-value-block { text-align: left; }
+  }
+  .price-value {
+    font-family: var(--sans);
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: var(--ink);
+    line-height: 1;
+  }
+  .price-savings {
+    display: block;
+    margin-top: 0.3rem;
+    font-size: 0.78rem;
+    color: var(--green);
+    font-weight: 600;
+  }
+  .price-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.7rem 1.1rem;
+    background: var(--accent);
+    color: #fff;
+    border-radius: var(--r-sm);
+    font-weight: 700;
+    font-size: 0.9rem;
+    text-decoration: none;
+    transition: background 0.15s ease;
+  }
+  .price-btn svg { width: 14px; height: 14px; }
+  .price-btn:hover { background: #ff6600; }
+
+  .price-list-footer {
+    padding: 1rem 1.25rem;
+    background: var(--bg-warm);
+    font-size: 0.85rem;
+    color: var(--muted);
+    text-align: center;
+  }
+  .price-list-footer strong { color: var(--ink); }
+  .price-list-footer a { color: var(--p-700); }
+
+  /* ============ USER REVIEWS ============ */
+  .user-reviews-summary {
+    display: grid;
+    grid-template-columns: 220px 1fr;
+    gap: 2rem;
+    align-items: center;
+    padding: 1.5rem;
+    background: var(--bg);
+    border: 1px solid var(--line);
+    border-radius: var(--r);
+    margin-bottom: 1.5rem;
+  }
+  @media (max-width: 700px) {
+    .user-reviews-summary { grid-template-columns: 1fr; }
+  }
+  .user-reviews-big { text-align: center; }
+  .user-reviews-big-value {
+    font-family: var(--sans);
+    font-size: 3.5rem;
+    font-weight: 800;
+    color: var(--ink);
+    line-height: 1;
+  }
+  .user-reviews-big-count {
+    margin-top: 0.5rem;
+    font-size: 0.88rem;
+    color: var(--muted);
+  }
+  .reviews-distribution {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+  }
+  .distribution-row {
+    display: grid;
+    grid-template-columns: 40px 1fr 50px;
+    gap: 0.6rem;
+    align-items: center;
+  }
+  .distribution-stars {
+    font-family: var(--mono);
+    font-size: 0.85rem;
+    color: var(--ink);
+    font-weight: 600;
+  }
+  .distribution-bar-wrap {
+    height: 8px;
+    background: var(--line-soft);
+    border-radius: 99px;
+    overflow: hidden;
+  }
+  .distribution-bar {
+    height: 100%;
+    background: var(--p-500);
+    border-radius: 99px;
+  }
+  .distribution-count {
+    font-size: 0.8rem;
+    color: var(--muted);
+    text-align: right;
+  }
+
+  .reviews-quotes-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+  }
+  @media (max-width: 900px) {
+    .reviews-quotes-grid { grid-template-columns: 1fr; }
+  }
+  .review-quote {
+    padding: 1.25rem;
+    background: var(--bg);
+    border: 1px solid var(--line);
+    border-radius: var(--r);
+  }
+  .review-quote-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.7rem;
+  }
+  .review-quote-rating {
+    font-family: var(--sans);
+    font-weight: 800;
+    color: var(--ink);
+  }
+  .review-quote-source {
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--muted);
+  }
+  .review-quote-text {
+    margin: 0 0 0.85rem;
+    font-style: italic;
+    line-height: 1.55;
+    color: var(--text);
+  }
+  .review-quote-author {
+    display: flex;
+    justify-content: space-between;
+    gap: 0.5rem;
+    font-size: 0.78rem;
+    color: var(--muted);
+  }
+  .review-quote-author-name { color: var(--ink); font-weight: 600; }
+
+  /* ============ ALTERNATIVES ============ */
+  .alternatives-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+  }
+  @media (max-width: 900px) {
+    .alternatives-grid { grid-template-columns: 1fr; }
+  }
+  .alt-card {
+    display: flex;
+    flex-direction: column;
+    gap: 0.55rem;
+    padding: 1.25rem;
+    background: var(--bg);
+    border: 1px solid var(--line);
+    border-radius: var(--r);
+    text-decoration: none;
+    color: inherit;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+  }
+  .alt-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(20, 16, 50, 0.08);
+  }
+  .alt-card-label {
+    display: inline-block;
+    align-self: flex-start;
+    font-family: var(--mono);
+    font-size: 0.68rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-weight: 700;
+    padding: 0.25rem 0.55rem;
+    border-radius: 99px;
+    background: var(--bg-warm);
+    color: var(--p-700);
+  }
+  .alt-card-label-cheaper { background: var(--green-bg); color: var(--green); }
+  .alt-card-label-premium { background: var(--p-100); color: var(--p-700); }
+
+  .alt-card-name {
+    font-weight: 700;
+    color: var(--ink);
+    font-size: 1.1rem;
+  }
+  .alt-card-rating-row { display: flex; align-items: center; gap: 0.5rem; }
+  .alt-card-rating {
+    font-family: var(--sans);
+    font-weight: 800;
+    color: var(--ink);
+  }
+  .alt-card-desc {
+    margin: 0;
+    font-size: 0.88rem;
+    color: var(--text);
+    line-height: 1.5;
+  }
+  .alt-card-specs {
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+    font-size: 0.8rem;
+    color: var(--muted);
+  }
+  .alt-card-spec strong { color: var(--ink); font-weight: 700; }
+  .alt-card-price {
+    margin-top: auto;
+    padding-top: 0.75rem;
+    border-top: 1px solid var(--line-soft);
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    font-size: 0.85rem;
+    color: var(--muted);
+  }
+  .alt-card-price-value {
+    font-family: var(--sans);
+    font-size: 1.15rem;
+    font-weight: 800;
+    color: var(--ink);
+  }
+
+  /* ============ FAQ ============ */
+  .faq-list {
+    max-width: var(--max-w-text);
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  .faq-item {
+    background: var(--bg);
+    border: 1px solid var(--line);
+    border-radius: var(--r);
+    overflow: hidden;
+  }
+  .faq-item[open] { border-color: var(--p-300); }
+  .faq-question {
+    list-style: none;
+    cursor: pointer;
+    padding: 1rem 1.25rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    font-weight: 700;
+    color: var(--ink);
+    font-size: 1rem;
+  }
+  .faq-question::-webkit-details-marker { display: none; }
+  .faq-toggle {
+    width: 24px;
+    height: 24px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--p-700);
+    transition: transform 0.2s ease;
+  }
+  .faq-toggle svg { width: 16px; height: 16px; }
+  .faq-item[open] .faq-toggle { transform: rotate(45deg); }
+  .faq-answer {
+    padding: 0 1.25rem 1rem;
+    line-height: 1.65;
+    color: var(--text);
+  }
+  .faq-answer p { margin: 0 0 0.65rem; }
+  .faq-answer p:last-child { margin-bottom: 0; }
+  .faq-answer strong { color: var(--ink); font-weight: 600; }
+
+  /* ============ FINAL VERDICT ============ */
+  .final-verdict-section {
+    background: linear-gradient(135deg, var(--ink), #1f1a30);
+    color: #fff;
+    border-radius: var(--r-xl);
+    padding: 3.5rem var(--gutter);
+    margin: 4rem auto;
+    max-width: calc(var(--max-w) - 2 * var(--gutter));
+  }
+  .final-verdict-inner {
+    max-width: 760px;
+    margin: 0 auto;
+  }
+  .final-verdict-label {
+    display: inline-block;
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: #ffd166;
+    margin-bottom: 0.75rem;
+  }
+  .final-verdict-title {
+    font-family: var(--sans);
+    font-size: clamp(1.6rem, 3.5vw, 2.4rem);
+    line-height: 1.15;
+    font-weight: 800;
+    margin: 0 0 1rem;
+    letter-spacing: -0.015em;
+  }
+  .final-verdict-title em { font-style: normal; color: #ffd166; }
+  .final-verdict-text {
+    font-size: 1.05rem;
+    line-height: 1.65;
+    margin: 0 0 1.75rem;
+    color: rgba(255, 255, 255, 0.88);
+  }
+  .final-verdict-text strong { color: #ffd166; font-weight: 700; }
+
+  .final-verdict-cta-row {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 1.25rem;
+    align-items: center;
+  }
+  @media (max-width: 700px) {
+    .final-verdict-cta-row {
+      grid-template-columns: 1fr;
+      text-align: center;
+    }
+  }
+  .final-verdict-cta-value {
+    font-family: var(--sans);
+    font-size: 2.4rem;
+    font-weight: 800;
+    line-height: 1;
+  }
+  .final-verdict-cta-value small { font-size: 1rem; opacity: 0.8; font-weight: 500; }
+  .final-verdict-cta-btn {
+    justify-self: end;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.95rem 1.5rem;
+    background: var(--accent);
+    color: #fff;
+    border-radius: var(--r-sm);
+    font-weight: 700;
+    text-decoration: none;
+    font-size: 0.95rem;
+    transition: background 0.15s ease;
+  }
+  .final-verdict-cta-btn:hover { background: #ff6600; }
+  .final-verdict-cta-btn svg { width: 14px; height: 14px; }
+  @media (max-width: 700px) {
+    .final-verdict-cta-btn { justify-self: center; width: 100%; justify-content: center; }
+  }
+
+  /* ============ TRUST LINKS ============ */
+  .trust-section { padding-top: 0; }
+  .trust-section .section-header { text-align: center; margin-left: auto; margin-right: auto; }
+  .trust-links {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 0.75rem;
+    max-width: var(--max-w-text);
+    margin: 0 auto;
+  }
+  @media (max-width: 900px) {
+    .trust-links { grid-template-columns: repeat(2, 1fr); }
+  }
+  .trust-link {
+    display: block;
+    padding: 1.1rem 0.9rem;
+    background: var(--bg);
+    border: 1px solid var(--line);
+    border-radius: var(--r);
+    text-align: center;
+    text-decoration: none;
+    color: inherit;
+    transition: border-color 0.15s ease, transform 0.15s ease;
+  }
+  .trust-link:hover {
+    border-color: var(--p-300);
+    transform: translateY(-2px);
+  }
+  .trust-link-title {
+    font-weight: 700;
+    color: var(--ink);
+    font-size: 0.92rem;
+    margin-bottom: 0.2rem;
+  }
+  .trust-link-desc {
+    font-size: 0.78rem;
+    color: var(--muted);
+    line-height: 1.4;
+  }
+</style>

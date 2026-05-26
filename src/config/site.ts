@@ -66,12 +66,17 @@ export const site: SiteConfig = {
       {
         heading: "Editorial",
         links: [
+          { href: "/typy-obsahu/", label: "Typy obsahu" },
           { href: "/metodika/", label: "Metodika testů" },
           { href: "/eticky-kodex/", label: "Etický kodex" },
           { href: "/redakcni-zasady/", label: "Redakční zásady" },
           { href: "/overovani-faktu/", label: "Ověřování faktů" },
+          { href: "/pouzivani-ai/", label: "Jak používáme AI" },
           { href: "/duveryhodne-zdroje/", label: "Důvěryhodné zdroje" },
           { href: "/oprava-chyb/", label: "Nahlásit chybu" },
+          { href: "/opravy/", label: "Archiv oprav" },
+          { href: "/nase-chyby/", label: "Naše chyby (lessons)" },
+          { href: "/aktualizace/", label: "Aktualizace webu" },
         ],
       },
       {
@@ -88,15 +93,20 @@ export const site: SiteConfig = {
         heading: "Redakce",
         links: [
           { href: "/o-nas/", label: "O nás" },
+          { href: "/sefredaktor/", label: "Šéfredaktor" },
+          { href: "/impressum/", label: "Impressum" },
+          { href: "/press/", label: "Press & Media kit" },
           { href: "/kariera/", label: "Kariéra" },
           { href: "/kontakt/", label: "Kontakt" },
-          { href: "/inzerce/", label: "Inzerce" },
-          { href: "/tiskove-zpravy/", label: "Tiskové zprávy" },
+          { href: "/pro-znacky-firmy-agentury/", label: "Pro značky a firmy" },
+          { href: "/kodex-ferove-firmy/", label: "Kodex férové firmy" },
+          { href: "/stante-se-testerem/", label: "Staňte se testerem" },
         ],
       },
     ],
 
     legal: [
+      { href: "/impressum/", label: "Impressum" },
       { href: "/zasady-osobnich-udaju/", label: "Zásady ochrany osobních údajů" },
       { href: "/zasady-cookies/", label: "Zásady cookies" },
       { href: "/podminky-pouziti/", label: "Podmínky použití" },

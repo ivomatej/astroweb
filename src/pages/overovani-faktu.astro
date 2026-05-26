@@ -141,6 +141,11 @@ const tools = [
     purpose: "Fakespot, ReviewMeta pro filtrování manipulovaných recenzí.",
     type: "Nástroj",
   },
+  {
+    name: "AI křížový kontrolór",
+    purpose: "Claude 3.5 / GPT-4o jako 1 z 5 kontrolních bodů — identifikuje potenciální rozpory a chybějící citace. Detail v <a href=\"/pouzivani-ai/\">AI politice</a>.",
+    type: "AI nástroj",
+  },
 ];
 
 const examples = [
@@ -280,7 +285,7 @@ const lastUpdated = "2026-04-15";
                 <strong>{t.name}</strong>
                 <span class="tool-type">{t.type}</span>
               </div>
-              <p>{t.purpose}</p>
+              <p set:html={t.purpose} />
             </li>
           ))
         }

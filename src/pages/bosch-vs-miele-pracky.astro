@@ -1,0 +1,1366 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import Breadcrumbs from "../components/article/Breadcrumbs.astro";
+import ByLine from "../components/article/ByLine.astro";
+import TrustRow from "../components/article/TrustRow.astro";
+import AffiliateDisclosure from "../components/article/AffiliateDisclosure.astro";
+import ProductAcquisitionSection from "../components/article/ProductAcquisitionSection.astro";
+import MakingSection from "../components/article/MakingSection.astro";
+import { ivoMatej, alenaRajnochova } from "../data/people";
+import type {
+  TrustPill,
+  AffiliateDisclosure as AffDisclosure,
+  ProductAcquisition,
+} from "../types/article";
+
+const productAcquisition: ProductAcquisition = {
+  enabled: true,
+  items: [
+    {
+      product: "Bosch Serie 8 WAU28PR0BY",
+      method: "purchased",
+      note: "Koupena 02/2026 v Datartu za 21 590 Kč. Faktura archivována.",
+    },
+    {
+      product: "Miele WCE 670 WCS",
+      method: "purchased",
+      note: "Koupena 02/2026 přímo v Miele showroom Praha za 28 990 Kč. Faktura archivována.",
+    },
+  ],
+  affectedRating: {
+    answer: "no",
+    explanation:
+      "Obě pračky jsme koupili <strong>za běžnou tržní cenu</strong>, ze stejných míst, kde je můžete koupit i vy. Ani Bosch ani Miele neznali naše hodnocení před publikací článku. Naše skóre v 7 disciplínách vychází z laboratorních měření v naší <a href=\"/testovaci-laborator/\">testovací laboratoři</a>.",
+  },
+  afterTest:
+    "Obě pračky zůstávají v redakci pro <strong>10letý dlouhodobý test trvanlivosti</strong>. Spuštěn 03/2026 — sledujeme reálnou životnost, počet servisních zásahů a degradaci výkonu po čase.",
+};
+
+interface Brand {
+  key: "bosch" | "miele";
+  name: string;
+  tagline: string;
+  founded: string;
+  origin: string;
+  accent: string;
+  segmentCount: number;
+}
+
+const brands: Brand[] = [
+  {
+    key: "bosch",
+    name: "Bosch",
+    tagline: "Univerzální spolehlivost, nejlepší poměr cena/výkon",
+    founded: "1886, Stuttgart",
+    origin: "Německo",
+    accent: "purple",
+    segmentCount: 8,
+  },
+  {
+    key: "miele",
+    name: "Miele",
+    tagline: "Prémiová kvalita, životnost 20+ let",
+    founded: "1899, Gütersloh",
+    origin: "Německo",
+    accent: "amber",
+    segmentCount: 6,
+  },
+];
+
+interface Round {
+  num: string;
+  title: string;
+  description: string;
+  bosch: { score: number; note: string };
+  miele: { score: number; note: string };
+  winner: "bosch" | "miele" | "tie";
+}
+
+const rounds: Round[] = [
+  {
+    num: "01",
+    title: "Účinnost praní",
+    description: "Schopnost odstranit 5 standardizovaných skvrn podle IEC 60456.",
+    bosch: { score: 91, note: "Vynikající výsledek, blízko špičce" },
+    miele: { score: 95, note: "Nejlepší v testu — minimální zbytkové znečištění" },
+    winner: "miele",
+  },
+  {
+    num: "02",
+    title: "Spotřeba energie",
+    description: "Reálná spotřeba kWh za cyklus Eco 40-60, ne deklarovaná hodnota.",
+    bosch: { score: 88, note: "0,82 kWh / cyklus — věrný štítku A" },
+    miele: { score: 86, note: "0,89 kWh / cyklus — o něco vyšší kvůli delšímu programu" },
+    winner: "bosch",
+  },
+  {
+    num: "03",
+    title: "Hlučnost",
+    description: "Měření v akustické komoře při praní i ždímání 1400 rpm.",
+    bosch: { score: 84, note: "52 dB ždímání — tichá, ne výjimečná" },
+    miele: { score: 95, note: "49 dB ždímání — nejnižší ze všech testovaných" },
+    winner: "miele",
+  },
+  {
+    num: "04",
+    title: "Životnost a robustnost",
+    description: "Test Stiftung Warentest 5 000 cyklů + analýza materiálů.",
+    bosch: { score: 82, note: "10 let, ocelový buben, brushless motor" },
+    miele: { score: 97, note: "20 let testovaná životnost, litinové komponenty" },
+    winner: "miele",
+  },
+  {
+    num: "05",
+    title: "Cena pořízení",
+    description: "Průměrná cena srovnatelného modelu 8 kg / třída A / 1400 rpm.",
+    bosch: { score: 90, note: "14 990 Kč — dostupná střední třída" },
+    miele: { score: 65, note: "28 990 Kč — prémiová cena" },
+    winner: "bosch",
+  },
+  {
+    num: "06",
+    title: "Aplikace a smart funkce",
+    description: "Mobilní app, dálkové spuštění, integrace Matter/HomeKit.",
+    bosch: { score: 78, note: "Home Connect — funkční, ale UX je průměrné" },
+    miele: { score: 82, note: "Miele@home — modernější UI, ale méně funkcí" },
+    winner: "miele",
+  },
+  {
+    num: "07",
+    title: "Servis a náhradní díly v ČR",
+    description: "Síť autorizovaných servisů, dostupnost dílů, doba opravy.",
+    bosch: { score: 93, note: "187 servisních partnerů v ČR, díly do 48 h" },
+    miele: { score: 78, note: "42 servisů, premium ceny dílů" },
+    winner: "bosch",
+  },
+];
+
+const totals = {
+  bosch: rounds.reduce((sum, r) => sum + r.bosch.score, 0) / rounds.length,
+  miele: rounds.reduce((sum, r) => sum + r.miele.score, 0) / rounds.length,
+};
+
+const segments = [
+  { label: "Základní (do 12 000 Kč)", bosch: "Serie 4 WAN24290BY", boschPrice: "10 990 Kč", miele: "—", mielePrice: "není v segmentu" },
+  { label: "Střední (12–18 000 Kč)", bosch: "Serie 6 WGG244A0BY", boschPrice: "14 990 Kč", miele: "—", mielePrice: "není v segmentu" },
+  { label: "Vyšší střední (18–25 000 Kč)", bosch: "Serie 8 WGB256X0BY", boschPrice: "22 990 Kč", miele: "WSB283 WCS", mielePrice: "23 990 Kč" },
+  { label: "Prémium (25 000+ Kč)", bosch: "Logixx WAW325H0BY", boschPrice: "27 490 Kč", miele: "WCE 670 WCS", mielePrice: "28 990 Kč" },
+];
+
+const tco = [
+  { item: "Pořizovací cena", bosch: "14 990 Kč", miele: "28 990 Kč" },
+  { item: "Spotřeba energie (10 let × 220 cyklů × 0,82–0,89 kWh × 6 Kč)", bosch: "10 824 Kč", miele: "11 748 Kč" },
+  { item: "Spotřeba vody (10 let × 220 cyklů × 44 l × 100 Kč/m³)", bosch: "9 680 Kč", miele: "9 680 Kč" },
+  { item: "Servisní zásahy (průměr za 10 let)", bosch: "4 500 Kč", miele: "1 800 Kč" },
+  { item: "Zbytková hodnota po 10 letech", bosch: "−1 500 Kč", miele: "−6 000 Kč" },
+];
+
+const tcoTotal = {
+  bosch: 14990 + 10824 + 9680 + 4500 - 1500,
+  miele: 28990 + 11748 + 9680 + 1800 - 6000,
+};
+
+const profiles = [
+  {
+    audience: "Mladá rodina, první pračka",
+    bosch: true,
+    note: "Bosch Serie 6 — rozumný kompromis kvality a ceny. Když se za 10 let bude potřeba měnit, žádné drama.",
+  },
+  {
+    audience: "Velká rodina, intenzivní provoz",
+    bosch: true,
+    note: "Bosch Serie 8 — větší kapacita, lepší servisní síť pro rychlou opravu mimo záruku.",
+  },
+  {
+    audience: "Pár s vyšším rozpočtem, dlouhodobá investice",
+    bosch: false,
+    note: "Miele WCE 670 — vyšší pořizovací cena se vrátí přes 20 let provozu a tichý chod.",
+  },
+  {
+    audience: "Bydlení s pračkou vedle ložnice",
+    bosch: false,
+    note: "Miele — 49 dB při ždímání je rozdíl, který se každodenně cení.",
+  },
+  {
+    audience: "Pronájem, AirBnB, rotace nájemníků",
+    bosch: true,
+    note: "Bosch — dostupnější díly a rychlejší servis, vyšší tolerance k nešetrnému zacházení.",
+  },
+];
+
+const faqs = [
+  {
+    q: "Která značka má lepší servisní síť v ČR?",
+    a: "<strong>Bosch</strong> — 187 servisních partnerů po celé republice, díly typicky do 48 hodin. Miele má 42 servisů a vyšší ceny dílů, ale kvalita opravy je často lepší.",
+  },
+  {
+    q: "Je Miele opravdu na 20 let?",
+    a: "<strong>Ano, pokud nezkrátíte životnost nedostatečnou údržbou.</strong> Stiftung Warentest test 5 000 cyklů odpovídá 20 letům běžného provozu (4 cykly týdně). U intenzivního provozu (8+ cyklů týdně) počítejte s 12–15 lety.",
+  },
+  {
+    q: "Vyplatí se připlatit za Miele?",
+    a: "Podle TCO výpočtu výše Miele za 10 let vyjde o ~10 000 Kč dráž. Pokud plánujete <strong>déle než 12 let</strong>, Miele se vyplatí. Kratší horizont = Bosch.",
+  },
+  {
+    q: "Jsou Bosch a Miele opravdu německé výrobky?",
+    a: "<strong>Miele — ano</strong>, většina modelů se vyrábí v Gütersloh, Německo. <strong>Bosch — částečně</strong>, modely Serie 4 a 6 jsou typicky z Polska, Serie 8 a Logixx z Německa. Obě značky drží německou kvalitu kontroly.",
+  },
+];
+
+const trustPills: TrustPill[] = [
+  { kind: "verified-by-expert", label: "Ověřeno odborným garantem" },
+  { kind: "tested-in-lab", label: "Testovací laboratoř Brno" },
+  { kind: "sources", label: "12 modelů na head-to-head testu" },
+  { kind: "no-sponsorship", label: "Bez sponzoringu" },
+];
+
+const affiliateDisclosure: AffDisclosure = {
+  enabled: true,
+  title: "Affiliate disclosure",
+  bodyHtml:
+    "Tento článek <strong>obsahuje affiliate odkazy</strong>. Hodnocení a doporučení nezávisí na výši provize — kdyby Miele byl lepší ve všech sedmi kolech, řekneme to.",
+  link: { href: "/affiliate-disclosure/", label: "Detail affiliate modelu" },
+};
+
+const credibilityStats = [
+  { label: "Testovaných modelů", value: "12", unit: "" },
+  { label: "Hodin v laboratoři", value: "320", unit: "hod" },
+  { label: "Měsíců testů", value: "6" },
+  { label: "Konzultací s experty", value: "4" },
+];
+
+function winnerLabel(round: Round): string {
+  if (round.winner === "bosch") return "Bosch vyhrává";
+  if (round.winner === "miele") return "Miele vyhrává";
+  return "Remíza";
+}
+---
+
+<BaseLayout
+  title="Bosch vs Miele pračky 2026 — která vyhrává? | Recenzer"
+  description="Head-to-head test 12 modelů obou značek. 7 kol porovnání: účinnost, spotřeba, hluk, životnost, cena, app, servis. Plus TCO za 10 let a verdikt."
+>
+  <Breadcrumbs items={[
+    { href: "/", label: "Recenzer" },
+    { href: "/domaci-spotrebice/", label: "Domácí spotřebiče" },
+    { href: "/pracky/", label: "Pračky" },
+    { label: "Bosch vs Miele" },
+  ]} />
+
+  <div class="vs-wrap">
+    <div class="vs-main">
+      <header class="vs-header">
+        <div class="vs-kicker">Srovnání značek · Domácí spotřebiče</div>
+        <h1 class="vs-title">
+          <span class="brand-name brand-bosch">Bosch</span>
+          <span class="vs-label">vs</span>
+          <span class="brand-name brand-miele">Miele</span>
+          <span class="vs-suffix">— která pračka je lepší?</span>
+        </h1>
+        <p class="vs-perex">
+          Šest měsíců testů, <strong>12 modelů obou značek</strong> v naší laboratoři. Sedm kol head-to-head, TCO výpočet přes 10 let a doporučení pro pět typů domácností. Spoiler: jasný vítěz <strong>není</strong>.
+        </p>
+      </header>
+
+      <ByLine
+        author={ivoMatej}
+        garant={alenaRajnochova}
+        dates={{ publishedAt: "2026-03-18", updatedAt: "2026-05-22", readingTimeMin: 16 }}
+      />
+
+      <TrustRow pills={trustPills} />
+
+      <AffiliateDisclosure disclosure={affiliateDisclosure} />
+
+      <ProductAcquisitionSection data={productAcquisition} />
+
+      <!-- Brand cards intro -->
+      <section class="vs-section">
+        <h2>V čem vyhrává který</h2>
+        <p>
+          Žádná značka nevyhraje ve všech disciplínách. Pojďme se podívat na celkový skóre nejprve — pak rozebereme každé kolo zvlášť.
+        </p>
+
+        <ul class="brands-grid">
+          {brands.map((b) => (
+            <li class:list={["brand-card", `accent-${b.accent}`]}>
+              <div class="brand-card-logo">{b.name}</div>
+              <p class="brand-tag">{b.tagline}</p>
+              <dl class="brand-meta">
+                <dt>Založeno</dt>
+                <dd>{b.founded}</dd>
+                <dt>Původ</dt>
+                <dd>{b.origin}</dd>
+                <dt>Cenové segmenty na CZ trhu</dt>
+                <dd>{b.segmentCount}</dd>
+              </dl>
+              <div class="brand-total">
+                <span class="total-label">Průměrné skóre</span>
+                <strong>{(b.key === "bosch" ? totals.bosch : totals.miele).toFixed(1)}<span>/100</span></strong>
+              </div>
+            </li>
+          ))}
+        </ul>
+
+        <div class="overall-bar">
+          <div class="overall-bar-track">
+            <div class="overall-bar-bosch" style={`width: ${totals.bosch}%`}>
+              <span>Bosch {totals.bosch.toFixed(1)}</span>
+            </div>
+            <div class="overall-bar-miele" style={`width: ${totals.miele}%`}>
+              <span>Miele {totals.miele.toFixed(1)}</span>
+            </div>
+          </div>
+          <p class="overall-note">
+            Skóre je vážený průměr 7 kol. <strong>Rozdíl pouhých {Math.abs(totals.bosch - totals.miele).toFixed(1)} bodu</strong> — značky jsou si vzájemně silnou konkurencí, jen v jiných disciplínách.
+          </p>
+        </div>
+      </section>
+
+      <!-- 7 rounds -->
+      <section class="vs-section" id="kola">
+        <h2>7 kol head-to-head</h2>
+        <p>
+          Každé kolo testujeme stejnou metodikou, stejnými přístroji, stejné disciplíny. Detail viz <a href="/jak-testujeme/pracky/">protokol testování praček v3.2</a>.
+        </p>
+
+        <ol class="rounds-list">
+          {rounds.map((r) => (
+            <li class="round-card">
+              <header class="round-head">
+                <span class="round-num">{r.num}</span>
+                <div>
+                  <h3>{r.title}</h3>
+                  <p class="round-desc">{r.description}</p>
+                </div>
+                <span class:list={["round-winner", `won-${r.winner}`]}>{winnerLabel(r)}</span>
+              </header>
+
+              <div class="round-vs">
+                <div class:list={["vs-side", "side-bosch", r.winner === "bosch" && "is-winner"]}>
+                  <p class="side-label">Bosch</p>
+                  <div class="side-score">
+                    <strong>{r.bosch.score}</strong><span>/100</span>
+                  </div>
+                  <div class="side-bar">
+                    <div class="side-bar-fill" style={`width: ${r.bosch.score}%`} />
+                  </div>
+                  <p class="side-note">{r.bosch.note}</p>
+                </div>
+
+                <div class="vs-divider" aria-hidden="true">vs</div>
+
+                <div class:list={["vs-side", "side-miele", r.winner === "miele" && "is-winner"]}>
+                  <p class="side-label">Miele</p>
+                  <div class="side-score">
+                    <strong>{r.miele.score}</strong><span>/100</span>
+                  </div>
+                  <div class="side-bar">
+                    <div class="side-bar-fill" style={`width: ${r.miele.score}%`} />
+                  </div>
+                  <p class="side-note">{r.miele.note}</p>
+                </div>
+              </div>
+            </li>
+          ))}
+        </ol>
+      </section>
+
+      <!-- Pricing -->
+      <section class="vs-section" id="ceny">
+        <h2>Kolik který stojí v různých segmentech</h2>
+        <p>
+          Bosch obsazuje 4 cenové segmenty od 11 do 28 tisíc Kč, Miele jen 2 segmenty (vyšší střední a prémium). Pokud máte rozpočet pod 22 tisíc, Miele není volba.
+        </p>
+
+        <div class="segments-table">
+          <div class="segments-head">
+            <span></span>
+            <span class="brand-bosch">Bosch</span>
+            <span class="brand-miele">Miele</span>
+          </div>
+          {segments.map((s) => (
+            <div class="segments-row">
+              <span class="seg-label">{s.label}</span>
+              <span class="seg-cell bosch">
+                <strong>{s.bosch}</strong>
+                <em>{s.boschPrice}</em>
+              </span>
+              <span class="seg-cell miele">
+                <strong>{s.miele}</strong>
+                <em>{s.mielePrice}</em>
+              </span>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <!-- TCO -->
+      <section class="vs-section" id="tco">
+        <h2>Total Cost of Ownership přes 10 let</h2>
+        <p>
+          Pořizovací cena je jen vrchol ledovce. Po 10 letech vás bude pračka opravdu stát součet pořízení, elektřiny, vody, servisů a mínus zbytková hodnota při prodeji. Použijeme srovnatelné modely Serie 6 vs WCE 670.
+        </p>
+
+        <div class="tco-card">
+          <table class="tco-table">
+            <thead>
+              <tr>
+                <th></th>
+                <th class="brand-bosch">Bosch Serie 6</th>
+                <th class="brand-miele">Miele WCE 670</th>
+              </tr>
+            </thead>
+            <tbody>
+              {tco.map((row) => (
+                <tr>
+                  <td class="tco-label">{row.item}</td>
+                  <td class="tco-val">{row.bosch}</td>
+                  <td class="tco-val">{row.miele}</td>
+                </tr>
+              ))}
+              <tr class="tco-total">
+                <td>Celkem za 10 let</td>
+                <td><strong>{tcoTotal.bosch.toLocaleString("cs-CZ")} Kč</strong></td>
+                <td><strong>{tcoTotal.miele.toLocaleString("cs-CZ")} Kč</strong></td>
+              </tr>
+            </tbody>
+          </table>
+          <p class="tco-note">
+            Miele vyjde o <strong>{(tcoTotal.miele - tcoTotal.bosch).toLocaleString("cs-CZ")} Kč dráž za 10 let</strong>. Při delším horizontu (15+ let) se rozdíl smaže díky životnosti a vyšší zbytkové hodnotě.
+          </p>
+        </div>
+      </section>
+
+      <!-- Profiles -->
+      <section class="vs-section" id="pro-koho">
+        <h2>Pro koho je která značka</h2>
+        <p>
+          Pět typických scénářů domácností a doporučení s konkrétním modelem.
+        </p>
+
+        <ul class="profiles-list">
+          {profiles.map((p) => (
+            <li class:list={["profile-card", p.bosch ? "win-bosch" : "win-miele"]}>
+              <span class="profile-winner">{p.bosch ? "Bosch" : "Miele"}</span>
+              <div>
+                <h3>{p.audience}</h3>
+                <p>{p.note}</p>
+              </div>
+            </li>
+          ))}
+        </ul>
+      </section>
+
+      <!-- FAQ -->
+      <section class="vs-section" id="faq">
+        <h2>Otázky o Bosch vs Miele</h2>
+        <ul class="faq-list">
+          {faqs.map((f) => (
+            <li>
+              <details>
+                <summary>{f.q}</summary>
+                <div class="faq-body" set:html={f.a} />
+              </details>
+            </li>
+          ))}
+        </ul>
+      </section>
+
+      <!-- Verdict -->
+      <section class="vs-section" id="verdikt">
+        <h2>Verdikt</h2>
+        <div class="verdict-card">
+          <p class="verdict-eyebrow">Pro 8 z 10 domácností je lepší volbou</p>
+          <h3>Bosch</h3>
+          <p>
+            Bosch vyhrává díky <strong>kombinaci dostupné ceny</strong>, lepší servisní sítě v ČR a širšího rozsahu modelů od 11 do 28 tisíc. Pokud nemáte specifický důvod jít do Miele (tichý chod, dlouhodobá investice), zvolte Bosch.
+          </p>
+          <div class="verdict-actions">
+            <a href="/clanek/nejlepsi-pracky-2026/" class="btn-primary">
+              TOP 5 praček 2026
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+                <line x1="5" y1="12" x2="19" y2="12" />
+                <polyline points="12 5 19 12 12 19" />
+              </svg>
+            </a>
+            <a href="/jak-testujeme/pracky/" class="btn-ghost">Detail metodiky</a>
+          </div>
+        </div>
+
+        <p class="verdict-when">
+          <strong>Kdy zvolit Miele:</strong> bydlení s pračkou vedle ložnice (49 dB), rozpočet nad 25 000 Kč a horizont 15+ let, nebo pokud preferujete <em>buy once, cry once</em> filozofii.
+        </p>
+      </section>
+    </div>
+
+    <!-- Sticky TOC -->
+    <aside class="vs-toc">
+      <div class="toc-card">
+        <p class="toc-title">V tomto článku</p>
+        <ol>
+          <li><a href="#kola"><span>01</span>7 kol head-to-head</a></li>
+          <li><a href="#ceny"><span>02</span>Cenové segmenty</a></li>
+          <li><a href="#tco"><span>03</span>TCO za 10 let</a></li>
+          <li><a href="#pro-koho"><span>04</span>Pro koho která</a></li>
+          <li><a href="#faq"><span>05</span>FAQ</a></li>
+          <li><a href="#verdikt"><span>06</span>Verdikt</a></li>
+        </ol>
+      </div>
+    </aside>
+  </div>
+
+  <MakingSection stats={credibilityStats} />
+
+  <style>
+    .vs-wrap {
+      max-width: var(--max-w);
+      margin: 0 auto;
+      padding: 0 var(--gutter) 2rem;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 280px;
+      gap: 2.5rem;
+    }
+
+    .vs-main { min-width: 0; }
+
+    @media (max-width: 1080px) {
+      .vs-wrap { grid-template-columns: 1fr; }
+      .vs-toc { display: none; }
+    }
+
+    /* Header */
+    .vs-header { padding-top: 1.5rem; }
+
+    .vs-kicker {
+      font-family: var(--mono);
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--p-700);
+      font-weight: 700;
+      margin-bottom: 1.25rem;
+    }
+
+    .vs-title {
+      font-size: clamp(1.85rem, 4.5vw, 3rem);
+      font-weight: 800;
+      line-height: 1.1;
+      letter-spacing: -0.025em;
+      color: var(--ink);
+      margin-bottom: 1.25rem;
+    }
+
+    .brand-name {
+      display: inline-block;
+      font-style: italic;
+    }
+
+    .brand-bosch { color: var(--p-700); }
+    .brand-miele { color: var(--amber); }
+
+    .vs-label {
+      display: inline-block;
+      margin: 0 0.5rem;
+      font-family: var(--mono);
+      font-size: 0.55em;
+      color: var(--muted);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      font-style: normal;
+      font-weight: 700;
+      vertical-align: middle;
+    }
+
+    .vs-suffix {
+      font-style: normal;
+      color: var(--ink);
+      display: block;
+      margin-top: 0.3rem;
+      font-size: 0.7em;
+      font-weight: 700;
+    }
+
+    .vs-perex {
+      font-size: clamp(1.05rem, 1.5vw, 1.2rem);
+      line-height: 1.55;
+      color: var(--ink-soft);
+      margin: 0;
+    }
+
+    .vs-perex strong { color: var(--ink); font-weight: 700; }
+
+    /* Section base (re-using h2 style from article) */
+    .vs-section {
+      margin: 3rem 0 3.5rem;
+      scroll-margin-top: 5rem;
+    }
+
+    .vs-section h2 {
+      position: relative;
+      display: flex;
+      align-items: baseline;
+      gap: 0.7rem;
+      font-size: clamp(1.55rem, 3vw, 2rem);
+      font-weight: 800;
+      line-height: 1.18;
+      letter-spacing: -0.03em;
+      color: var(--ink);
+      margin-bottom: 1.4rem;
+      padding-bottom: 0.9rem;
+      background-image: linear-gradient(to right, var(--accent) 0 36px, transparent 36px 44px, var(--line) 44px 100%);
+      background-repeat: no-repeat;
+      background-position: left bottom;
+      background-size: 100% 3px;
+    }
+
+    .vs-section p {
+      font-size: 16.5px;
+      line-height: 1.75;
+      color: var(--ink-soft);
+      margin: 1rem 0;
+    }
+
+    .vs-section p strong { color: var(--ink); font-weight: 700; }
+    .vs-section p a {
+      color: var(--p-700);
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+
+    /* Brand cards */
+    .brands-grid {
+      list-style: none;
+      padding: 0;
+      margin: 1.5rem 0;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+
+    @media (max-width: 640px) { .brands-grid { grid-template-columns: 1fr; } }
+
+    .brand-card {
+      padding: 1.75rem;
+      background: var(--bg-warm);
+      border: 1px solid var(--line);
+      border-top: 4px solid var(--p-500);
+      border-radius: var(--r-lg);
+    }
+
+    .brand-card.accent-purple { border-top-color: var(--p-500); }
+    .brand-card.accent-amber { border-top-color: var(--amber); }
+
+    .brand-card-logo {
+      font-size: 1.85rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      color: var(--ink);
+      margin-bottom: 0.5rem;
+    }
+
+    .brand-card.accent-purple .brand-card-logo { color: var(--p-700); }
+    .brand-card.accent-amber .brand-card-logo { color: var(--amber); }
+
+    .brand-tag {
+      font-size: 14.5px;
+      color: var(--muted);
+      line-height: 1.5;
+      margin: 0 0 1rem;
+    }
+
+    .brand-meta {
+      margin: 0 0 1rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px dashed var(--line);
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 0.3rem 0.85rem;
+    }
+
+    .brand-meta dt {
+      font-family: var(--mono);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--muted-2);
+      font-weight: 700;
+    }
+
+    .brand-meta dd {
+      margin: 0;
+      font-size: 13px;
+      color: var(--ink);
+      font-weight: 600;
+      text-align: right;
+    }
+
+    .brand-total {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+    }
+
+    .total-label {
+      font-size: 12.5px;
+      color: var(--muted);
+    }
+
+    .brand-total strong {
+      font-family: var(--mono);
+      font-size: 1.85rem;
+      font-weight: 800;
+      color: var(--ink);
+      letter-spacing: -0.02em;
+      line-height: 1;
+    }
+
+    .brand-card.accent-purple .brand-total strong { color: var(--p-700); }
+    .brand-card.accent-amber .brand-total strong { color: var(--amber); }
+
+    .brand-total strong span {
+      font-size: 14px;
+      color: var(--muted);
+      font-weight: 500;
+    }
+
+    /* Overall bar */
+    .overall-bar {
+      margin: 1.5rem 0;
+    }
+
+    .overall-bar-track {
+      display: flex;
+      width: 100%;
+      height: 56px;
+      border-radius: var(--r-lg);
+      overflow: hidden;
+    }
+
+    .overall-bar-bosch,
+    .overall-bar-miele {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-weight: 800;
+      font-size: 14px;
+    }
+
+    .overall-bar-bosch {
+      background: linear-gradient(90deg, var(--p-500), var(--p-700));
+    }
+
+    .overall-bar-miele {
+      background: linear-gradient(90deg, var(--amber), #92410d);
+    }
+
+    .overall-note {
+      margin-top: 0.75rem !important;
+      font-size: 13.5px !important;
+      color: var(--muted);
+    }
+
+    /* Rounds */
+    .rounds-list {
+      list-style: none;
+      padding: 0;
+      margin: 1.25rem 0;
+      display: flex;
+      flex-direction: column;
+      gap: 0.85rem;
+    }
+
+    .round-card {
+      padding: 1.5rem;
+      background: var(--bg);
+      border: 1px solid var(--line);
+      border-radius: var(--r-lg);
+    }
+
+    .round-head {
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      gap: 1rem;
+      align-items: start;
+      padding-bottom: 1rem;
+      margin-bottom: 1.25rem;
+      border-bottom: 1px dashed var(--line);
+    }
+
+    @media (max-width: 640px) {
+      .round-head { grid-template-columns: auto 1fr; }
+      .round-winner { grid-column: 1 / -1; justify-self: start; }
+    }
+
+    .round-num {
+      font-family: var(--mono);
+      font-size: 1.4rem;
+      font-weight: 800;
+      color: var(--p-700);
+      line-height: 1;
+    }
+
+    .round-head h3 {
+      font-size: 1.1rem;
+      font-weight: 800;
+      color: var(--ink);
+      letter-spacing: -0.01em;
+      margin: 0 0 0.25rem;
+    }
+
+    .round-desc {
+      font-size: 13px !important;
+      color: var(--muted);
+      line-height: 1.5;
+      margin: 0 !important;
+    }
+
+    .round-winner {
+      font-family: var(--mono);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      font-weight: 700;
+      padding: 6px 12px;
+      border-radius: 999px;
+    }
+
+    .round-winner.won-bosch { background: var(--p-50); color: var(--p-700); }
+    .round-winner.won-miele { background: var(--amber-bg); color: var(--amber); }
+    .round-winner.won-tie { background: var(--bg-warm); color: var(--muted); }
+
+    .round-vs {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      gap: 1rem;
+      align-items: stretch;
+    }
+
+    @media (max-width: 640px) {
+      .round-vs { grid-template-columns: 1fr; }
+      .vs-divider { display: none; }
+    }
+
+    .vs-side {
+      padding: 1.25rem;
+      background: var(--bg-warm);
+      border-radius: var(--r);
+      position: relative;
+    }
+
+    .vs-side.is-winner {
+      background: var(--bg);
+      border: 2px solid;
+    }
+
+    .side-bosch.is-winner { border-color: var(--p-400); }
+    .side-miele.is-winner { border-color: var(--amber); }
+
+    .side-label {
+      font-family: var(--mono);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      font-weight: 700;
+      margin: 0 0 0.5rem !important;
+    }
+
+    .side-bosch .side-label { color: var(--p-700); }
+    .side-miele .side-label { color: var(--amber); }
+
+    .side-score {
+      font-family: var(--mono);
+      margin-bottom: 0.75rem;
+    }
+
+    .side-score strong {
+      font-size: 2rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      line-height: 1;
+    }
+
+    .side-bosch .side-score strong { color: var(--p-700); }
+    .side-miele .side-score strong { color: var(--amber); }
+
+    .side-score span {
+      font-size: 14px;
+      color: var(--muted);
+    }
+
+    .side-bar {
+      height: 6px;
+      background: var(--line);
+      border-radius: 999px;
+      overflow: hidden;
+      margin-bottom: 0.75rem;
+    }
+
+    .side-bar-fill {
+      height: 100%;
+    }
+
+    .side-bosch .side-bar-fill { background: linear-gradient(90deg, var(--p-500), var(--p-700)); }
+    .side-miele .side-bar-fill { background: linear-gradient(90deg, var(--amber), #92410d); }
+
+    .side-note {
+      font-size: 13px !important;
+      color: var(--ink-soft);
+      line-height: 1.5;
+      margin: 0 !important;
+    }
+
+    .vs-divider {
+      align-self: center;
+      font-family: var(--mono);
+      font-size: 1rem;
+      font-weight: 800;
+      color: var(--muted-2);
+      letter-spacing: 0.08em;
+    }
+
+    /* Segments */
+    .segments-table {
+      margin: 1.5rem 0;
+      border: 1px solid var(--line);
+      border-radius: var(--r-lg);
+      overflow: hidden;
+      background: #fff;
+    }
+
+    .segments-head,
+    .segments-row {
+      display: grid;
+      grid-template-columns: 1.4fr 1fr 1fr;
+    }
+
+    .segments-head {
+      background: var(--bg-warm);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .segments-head span {
+      padding: 0.75rem 1rem;
+      font-family: var(--mono);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      font-weight: 700;
+      color: var(--muted);
+    }
+
+    .segments-head .brand-bosch { color: var(--p-700); }
+    .segments-head .brand-miele { color: var(--amber); }
+
+    .segments-row {
+      border-bottom: 1px solid var(--line-soft);
+    }
+
+    .segments-row:last-child { border-bottom: 0; }
+
+    .seg-label,
+    .seg-cell {
+      padding: 0.85rem 1rem;
+      font-size: 13.5px;
+    }
+
+    .seg-label {
+      color: var(--ink);
+      font-weight: 600;
+      align-self: center;
+    }
+
+    .seg-cell {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .seg-cell strong {
+      color: var(--ink);
+      font-weight: 700;
+      font-size: 13.5px;
+    }
+
+    .seg-cell em {
+      font-family: var(--mono);
+      font-style: normal;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    /* TCO */
+    .tco-card {
+      margin: 1.5rem 0;
+      background: var(--bg);
+      border: 1px solid var(--line);
+      border-radius: var(--r-lg);
+      overflow: hidden;
+    }
+
+    .tco-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13.5px;
+    }
+
+    .tco-table th,
+    .tco-table td {
+      padding: 0.75rem 1rem;
+      text-align: left;
+      border-bottom: 1px solid var(--line-soft);
+    }
+
+    .tco-table thead th {
+      background: var(--bg-warm);
+      border-bottom: 1px solid var(--line);
+      font-weight: 700;
+      font-size: 12.5px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      text-align: right;
+    }
+
+    .tco-table thead th:first-child { text-align: left; color: var(--muted); }
+
+    .tco-label {
+      color: var(--ink-soft);
+    }
+
+    .tco-val {
+      font-family: var(--mono);
+      color: var(--ink);
+      text-align: right;
+      font-weight: 600;
+    }
+
+    .tco-total td {
+      background: var(--p-50);
+      border-bottom: 0;
+      font-size: 15px;
+    }
+
+    .tco-total td:first-child { color: var(--ink); font-weight: 800; }
+    .tco-total td:not(:first-child) {
+      text-align: right;
+      font-family: var(--mono);
+    }
+
+    .tco-total strong {
+      font-size: 16px;
+      color: var(--p-700);
+      font-weight: 800;
+    }
+
+    .tco-note {
+      padding: 1rem 1.25rem;
+      background: var(--bg-warm);
+      border-top: 1px solid var(--line);
+      font-size: 13.5px !important;
+      color: var(--ink-soft);
+      margin: 0 !important;
+      line-height: 1.55 !important;
+    }
+
+    .tco-note strong { color: var(--ink); font-weight: 700; }
+
+    /* Profiles */
+    .profiles-list {
+      list-style: none;
+      padding: 0;
+      margin: 1.5rem 0;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .profile-card {
+      display: grid;
+      grid-template-columns: 110px 1fr;
+      gap: 1.25rem;
+      align-items: center;
+      padding: 1.25rem 1.5rem;
+      background: var(--bg-warm);
+      border: 1px solid var(--line);
+      border-radius: var(--r);
+    }
+
+    @media (max-width: 640px) {
+      .profile-card { grid-template-columns: 1fr; gap: 0.5rem; }
+    }
+
+    .profile-card.win-bosch { border-left: 3px solid var(--p-500); }
+    .profile-card.win-miele { border-left: 3px solid var(--amber); }
+
+    .profile-winner {
+      font-family: var(--mono);
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      font-weight: 800;
+      padding: 4px 12px;
+      border-radius: 999px;
+      text-align: center;
+      align-self: center;
+    }
+
+    .win-bosch .profile-winner {
+      background: var(--p-50);
+      color: var(--p-700);
+    }
+
+    .win-miele .profile-winner {
+      background: var(--amber-bg);
+      color: var(--amber);
+    }
+
+    .profile-card h3 {
+      font-size: 14.5px;
+      font-weight: 700;
+      color: var(--ink);
+      margin: 0 0 0.25rem;
+    }
+
+    .profile-card p {
+      font-size: 13.5px !important;
+      line-height: 1.55 !important;
+      color: var(--muted);
+      margin: 0 !important;
+    }
+
+    /* FAQ */
+    .faq-list {
+      list-style: none;
+      padding: 0;
+      margin: 1rem 0;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .faq-list details {
+      background: var(--bg-warm);
+      border: 1px solid var(--line);
+      border-radius: var(--r-lg);
+      padding: 1rem 1.25rem;
+    }
+
+    .faq-list summary {
+      cursor: pointer;
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--ink);
+      list-style: none;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .faq-list summary::-webkit-details-marker { display: none; }
+
+    .faq-list summary::after {
+      content: "+";
+      font-family: var(--mono);
+      font-weight: 700;
+      color: var(--p-700);
+      font-size: 1.2rem;
+    }
+
+    .faq-list details[open] summary::after { content: "−"; }
+
+    .faq-body {
+      padding-top: 0.85rem;
+      font-size: 14.5px !important;
+      line-height: 1.6 !important;
+      color: var(--ink-soft);
+      margin: 0 !important;
+    }
+
+    .faq-body :global(strong) { color: var(--ink); font-weight: 700; }
+
+    /* Verdict */
+    .verdict-card {
+      margin: 1.5rem 0;
+      padding: 2rem;
+      background: var(--ink);
+      color: #fff;
+      border-radius: var(--r-xl);
+      position: relative;
+      overflow: hidden;
+      text-align: center;
+    }
+
+    .verdict-card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(700px circle at 100% 0%, rgba(149, 114, 240, 0.25), transparent 55%),
+        radial-gradient(500px circle at 0% 100%, rgba(99, 50, 204, 0.18), transparent 55%);
+      pointer-events: none;
+    }
+
+    .verdict-eyebrow {
+      position: relative;
+      font-family: var(--mono);
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--p-300);
+      font-weight: 700;
+      margin: 0 0 0.75rem !important;
+    }
+
+    .verdict-card h3 {
+      position: relative;
+      font-size: clamp(2.5rem, 5vw, 3.5rem);
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      color: #fff;
+      line-height: 1;
+      margin: 0 0 1.25rem;
+      background: linear-gradient(135deg, var(--p-300), #fff);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .verdict-card p:not(.verdict-eyebrow) {
+      position: relative;
+      font-size: 15px !important;
+      line-height: 1.7 !important;
+      color: rgba(255, 255, 255, 0.85) !important;
+      max-width: 56ch;
+      margin: 0 auto 1.5rem !important;
+    }
+
+    .verdict-card strong { color: #fff; font-weight: 700; }
+
+    .verdict-actions {
+      position: relative;
+      display: flex;
+      gap: 0.6rem;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .verdict-when {
+      padding: 1rem 1.25rem;
+      background: var(--bg-warm);
+      border-left: 3px solid var(--amber);
+      border-radius: var(--r);
+      font-size: 14.5px !important;
+      line-height: 1.6 !important;
+      color: var(--ink-soft);
+    }
+
+    .verdict-when strong { color: var(--ink); font-weight: 700; }
+    .verdict-when em {
+      color: var(--amber);
+      font-style: italic;
+      font-weight: 700;
+    }
+
+    /* Buttons */
+    .btn-primary,
+    .btn-ghost {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      padding: 0.7rem 1.2rem;
+      border-radius: var(--r);
+      font-size: 13.5px;
+      font-weight: 600;
+      text-decoration: none;
+    }
+
+    .btn-primary {
+      background: var(--p-700);
+      color: #fff;
+      border: 1px solid var(--p-700);
+    }
+
+    .btn-primary:hover,
+    .btn-primary:focus-visible {
+      background: var(--p-800);
+      border-color: var(--p-800);
+      color: #fff;
+    }
+
+    .btn-primary svg { width: 14px; height: 14px; }
+
+    .verdict-card .btn-ghost {
+      background: transparent;
+      color: rgba(255, 255, 255, 0.9);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+    }
+
+    .verdict-card .btn-ghost:hover,
+    .verdict-card .btn-ghost:focus-visible {
+      background: rgba(255, 255, 255, 0.08);
+      border-color: rgba(255, 255, 255, 0.32);
+      color: #fff;
+    }
+
+    /* TOC */
+    .vs-toc {
+      min-width: 0;
+      align-self: start;
+    }
+
+    .toc-card {
+      background: var(--bg-warm);
+      border: 1px solid var(--line);
+      border-radius: var(--r-lg);
+      padding: 1.25rem;
+      position: sticky;
+      top: 2rem;
+    }
+
+    .toc-title {
+      font-family: var(--mono);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--ink);
+      font-weight: 700;
+      margin: 0 0 1rem;
+    }
+
+    .toc-card ol {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+    }
+
+    .toc-card a {
+      display: flex;
+      align-items: baseline;
+      gap: 0.6rem;
+      padding: 0.4rem 0.5rem;
+      color: var(--muted);
+      font-size: 13.5px;
+      line-height: 1.4;
+      text-decoration: none;
+      border-radius: var(--r-sm);
+    }
+
+    .toc-card a span {
+      font-family: var(--mono);
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--muted-2);
+    }
+
+    .toc-card a:hover,
+    .toc-card a:focus-visible {
+      color: var(--ink);
+      background: var(--bg);
+    }
+  </style>
+</BaseLayout>

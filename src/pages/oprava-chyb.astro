@@ -267,7 +267,7 @@ const lastUpdated = "2026-04-15";
         <p class="eyebrow">Transparentnost</p>
         <h2>Poslední opravy</h2>
         <p class="lead">
-          Posledních 5 oprav, které jsme zveřejnili v článcích. Plný archiv najdete v Historii revizí každého článku.
+          Posledních 5 oprav, které jsme zveřejnili v článcích. Plný chronologický archiv najdete na stránce <a href="/opravy/">/opravy/</a>.
         </p>
       </header>
       <ol class="recent-list">
@@ -285,6 +285,15 @@ const lastUpdated = "2026-04-15";
           ))
         }
       </ol>
+      <div class="ox-recent-cta">
+        <a href="/opravy/" class="ox-archive-link">
+          Otevřít kompletní archiv oprav
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+            <line x1="5" y1="12" x2="19" y2="12" />
+            <polyline points="12 5 19 12 12 19" />
+          </svg>
+        </a>
+      </div>
     </div>
   </section>
 
@@ -707,6 +716,28 @@ const lastUpdated = "2026-04-15";
       color: var(--ink-soft);
       font-weight: 600;
     }
+
+    .ox-recent-cta {
+      margin-top: 1.5rem;
+      text-align: center;
+    }
+
+    .ox-archive-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.85rem 1.4rem;
+      background: var(--p-700);
+      color: #fff;
+      border-radius: var(--r);
+      font-weight: 700;
+      font-size: 0.92rem;
+      text-decoration: none;
+      transition: background 0.15s ease;
+    }
+
+    .ox-archive-link:hover { background: var(--p-800); color: #fff; }
+    .ox-archive-link svg { width: 14px; height: 14px; }
 
     /* Related */
     .ox-related { background: var(--bg); }

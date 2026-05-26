@@ -1,0 +1,1388 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import PageBreadcrumbs from "../components/page/PageBreadcrumbs.astro";
+import PageHero from "../components/page/PageHero.astro";
+import { ivoMatej, alenaRajnochova, jakubNovak } from "../data/people";
+
+const lastUpdated = "2026-05-21";
+
+interface FactsheetRow {
+  label: string;
+  value: string;
+  note?: string;
+}
+
+const factsheet: FactsheetRow[] = [
+  { label: "Název webu", value: "Recenzer.cz", note: "+ SK mutace Recenzer.sk" },
+  { label: "Provozovatel", value: "Converso Group s.r.o.", note: "IČO 09322035" },
+  { label: "Sídlo redakce", value: "Praha 7 + laboratoř Brno-Židenice" },
+  { label: "Šéfredaktor", value: "Ivo Matěj", note: "v této roli od 2016" },
+  { label: "Založeno", value: "2016", note: "10 let v provozu" },
+  { label: "Tým", value: "8 interních + 6 externích garantů", note: "14 lidí celkem" },
+  { label: "Kategorií produktů", value: "4 000+", note: "k 5/2026" },
+  { label: "Publikovaných článků", value: "8 200+" },
+  { label: "Měsíční návštěvnost", value: "≈ 1,2 mil. unikátních / měsíc" },
+  { label: "Testovací laboratoř", value: "180 m², 32 přístrojů", note: "Brno-Židenice" },
+  { label: "Mediální tým", value: "Ivo Matěj + Alena Rajnochová", note: "k dispozici pro rozhovory" },
+  { label: "Licence obsahu", value: "Citace dle § 31 AZ", note: "Plné převzetí jen po dohodě" },
+];
+
+interface PressTopic {
+  topic: string;
+  whoComments: string;
+  email: string;
+  examples: string[];
+}
+
+const pressTopics: PressTopic[] = [
+  {
+    topic: "Affiliate marketing a média v ČR",
+    whoComments: "Ivo Matěj (šéfredaktor)",
+    email: "ivo.matej@recenzer.cz",
+    examples: ["MarketingFest 2024 keynote", "Lupa.cz, Marketing & Media, CzechCrunch interview"],
+  },
+  {
+    topic: "Recenzní žurnalistika a důvěra v online média",
+    whoComments: "Ivo Matěj + Lucie Horáková (editorka)",
+    email: "redakce@recenzer.cz",
+    examples: ["Médiajournal odborný článek 8/2023", "Forbes ČR rozhovor 10/2023"],
+  },
+  {
+    topic: "Energetika a životnost domácích spotřebičů",
+    whoComments: "Alena Rajnochová (hlavní redaktorka)",
+    email: "alena@recenzer.cz",
+    examples: ["Vesmír 5/2023 článek", "dTest, iDNES.cz citace"],
+  },
+  {
+    topic: "Elektronářadí — bezpečnost a kvalita",
+    whoComments: "Jakub Novák, DiS. (odborný garant)",
+    email: "jakub.novak@zamecnictvi-novak.cz",
+    examples: ["Profi nářadí, Stavba magazín"],
+  },
+  {
+    topic: "AI v redakční práci a transparentnost",
+    whoComments: "Ivo Matěj",
+    email: "ivo.matej@recenzer.cz",
+    examples: ["AI politika v. 2.1 publikovaná 5/2026"],
+  },
+  {
+    topic: "Spotřebitelská práva a transparentnost cen",
+    whoComments: "Petr Svoboda (redaktor — finance)",
+    email: "petr@recenzer.cz",
+    examples: ["Měšec.cz, Peníze.cz, Investiční magazín"],
+  },
+];
+
+interface PressRelease {
+  date: string;
+  title: string;
+  href?: string;
+  excerpt: string;
+  topic: string;
+}
+
+const pressReleases: PressRelease[] = [
+  {
+    date: "2026-05-21",
+    title: "Recenzer.cz publikuje transparentní AI politiku verze 2.1",
+    excerpt:
+      "Český spotřebitelský web jako jeden z prvních v ČR detailně zveřejnil, jakým způsobem používá AI nástroje (Claude, GPT-4, Perplexity) v redakční práci, včetně 7 explicit no-AI zón.",
+    topic: "Editorial standards",
+  },
+  {
+    date: "2026-05-21",
+    title: "Spuštěna meta-stránka „Naše chyby“ — 8 systémových omylů redakce",
+    excerpt:
+      "Recenzer.cz veřejně přiznává osm systémových chyb od založení v roce 2016 — od doporučení vadné pračky až po absenci akustické komory. Wirecutter-style transparentnost.",
+    topic: "Editorial standards",
+  },
+  {
+    date: "2026-04-30",
+    title: "Změna testovací metodiky pro zimní pneumatiky",
+    excerpt:
+      "Aritmetický průměr nahrazen bezpečnostně váženým skóre (sníh × 2, led × 1,5). Reaguje na kritiku řidičů z Vysočiny po sezoně 2020/21.",
+    topic: "Methodology",
+  },
+  {
+    date: "2026-04-22",
+    title: "Vychází srovnání Bosch vs Miele pračky 2026",
+    excerpt:
+      "Detailní 7kolové srovnání dvou nejprodávanějších značek na CZ trhu. TCO za 10 let, audience profiles, verdikt pro 5 různých kupujících.",
+    topic: "Domácí spotřebiče",
+  },
+  {
+    date: "2026-02-08",
+    title: "Recenzer.cz spouští 24h monitoring cen ve 12 e-shopech",
+    excerpt:
+      "Automatický AI agent obchází Heureku, Alzu, Datart a dalších 9 e-shopů. Sleduje 1 240 produktů, při změně > 15 % posílá redakci notifikaci.",
+    topic: "Site features",
+  },
+  {
+    date: "2025-11-12",
+    title: "Redakční tým přiznává aritmetickou chybu v testu letních pneumatik",
+    excerpt:
+      "Brzdná dráha Michelin Primacy 4 na mokru opravena ze 33,5 m na 34,8 m. Detail v archivu oprav. Šéfredaktor zveřejnil postup pro interní rekontrolu.",
+    topic: "Corrections",
+  },
+];
+
+interface Spokesperson {
+  slug: string;
+  name: string;
+  role: string;
+  initials: string;
+  topics: string[];
+  email: string;
+  bio: string;
+}
+
+const spokespeople: Spokesperson[] = [
+  {
+    slug: ivoMatej.slug,
+    name: ivoMatej.name,
+    role: "Šéfredaktor · zakladatel",
+    initials: ivoMatej.initials ?? "IM",
+    topics: ["Affiliate marketing", "Recenzní žurnalistika", "AI v médiích", "Editorial standards"],
+    email: ivoMatej.contactEmail ?? "ivo.matej@recenzer.cz",
+    bio:
+      "Vede Recenzer.cz od roku 2016. 17 let v online marketingu, předtím affiliate manager. Spoluautor knihy „Co si nekupovat 2024“ (Grada), keynote speaker MarketingFest 2024.",
+  },
+  {
+    slug: alenaRajnochova.slug,
+    name: alenaRajnochova.name,
+    role: "Hlavní redaktorka · domácí spotřebiče",
+    initials: alenaRajnochova.initials ?? "AR",
+    topics: ["Pračky", "Sušičky", "Myčky", "Energetika domácnosti", "Štítky EU"],
+    email: alenaRajnochova.contactEmail ?? "alena@recenzer.cz",
+    bio:
+      "8 let v redakcích recenzních portálů, Mgr. žurnalistika UK. Členka Syndikátu novinářů ČR. Konzultantka Stiftung Warentest pro CZ trh. Citována v dTest, iDNES.cz.",
+  },
+  {
+    slug: jakubNovak.slug,
+    name: jakubNovak.name,
+    role: "Odborný garant · elektronářadí",
+    initials: jakubNovak.initials ?? "JN",
+    topics: ["Aku brusky", "Pily", "Vrtačky", "Bezpečnost práce", "Svářecí technika"],
+    email: "jakub.novak@zamecnictvi-novak.cz",
+    bio:
+      "18 let praxe v profesionálním zámečnictví. Svářečský průkaz ČSN EN ISO 9606-1 (metoda 135 + 141), člen Cechu zámečníků a kovářů ČR. Vlastník zámečnické provozovny v Brně.",
+  },
+];
+
+interface BrandColor {
+  name: string;
+  hex: string;
+  usage: string;
+}
+
+const brandColors: BrandColor[] = [
+  { name: "Purple 700 (primary)", hex: "#4f24a8", usage: "Hlavní accent, links, CTA" },
+  { name: "Purple 900 (dark)", hex: "#2e1466", usage: "Headers, dark gradients" },
+  { name: "Accent orange", hex: "#ff4f00", usage: "CTA tlačítka, badges" },
+  { name: "Ink (text primary)", hex: "#15131e", usage: "Body text, headlines" },
+  { name: "Bg warm", hex: "#f6f3fb", usage: "Section backgrounds" },
+  { name: "Mono font", hex: "JetBrains Mono", usage: "Eyebrows, code, mono labels" },
+];
+
+interface AssetItem {
+  kind: "logo" | "photo" | "doc";
+  title: string;
+  format: string;
+  size: string;
+  note?: string;
+  filename: string;
+}
+
+const downloadableAssets: AssetItem[] = [
+  { kind: "logo", title: "Logo Recenzer.cz", format: "SVG", size: "1,2 kB", filename: "recenzer-logo.svg", note: "Vektor, plně škálovatelné" },
+  { kind: "logo", title: "Logo barevné — pozitiv", format: "PNG", size: "12 kB", filename: "recenzer-logo-color.png", note: "1200 × 400 px, transparentní" },
+  { kind: "logo", title: "Logo bílá varianta — negativ", format: "PNG", size: "10 kB", filename: "recenzer-logo-white.png", note: "Pro tmavé pozadí" },
+  { kind: "logo", title: "Favicon set", format: "ICO + PNG", size: "8 kB", filename: "favicon-set.zip", note: "16, 32, 192, 512 px" },
+  { kind: "photo", title: "Foto Ivo Matěj — portrét", format: "JPG", size: "1,8 MB", filename: "ivo-matej-portrait.jpg", note: "1600 × 2000 px, 300 DPI" },
+  { kind: "photo", title: "Foto laboratoř Brno", format: "JPG", size: "4,2 MB", filename: "laboratory-brno.jpg", note: "4K, 300 DPI" },
+  { kind: "photo", title: "Foto redakce", format: "JPG", size: "3,1 MB", filename: "team-photo.jpg", note: "Tým srpen 2025" },
+  { kind: "doc", title: "Media kit PDF", format: "PDF", size: "2,4 MB", filename: "recenzer-media-kit-2026.pdf", note: "Kompletní press balíček" },
+  { kind: "doc", title: "Brand guidelines", format: "PDF", size: "1,1 MB", filename: "recenzer-brand-guidelines.pdf", note: "Logo, barvy, typografie" },
+  { kind: "doc", title: "Factsheet 2026", format: "PDF", size: "180 kB", filename: "recenzer-factsheet-2026.pdf", note: "Jednostránkový fact sheet" },
+];
+
+const stats = [
+  { value: "10 let", label: "v provozu od 2016" },
+  { value: "1,2 mil.", label: "unikátních návštěvníků / měsíc" },
+  { value: "14", label: "lidí v redakci" },
+  { value: "~24 h", label: "průměrný čas reakce na press" },
+];
+
+function formatCzechDate(iso: string): string {
+  const d = new Date(iso);
+  return `${d.getDate()}. ${d.getMonth() + 1}. ${d.getFullYear()}`;
+}
+---
+
+<BaseLayout
+  title="Press & Media kit — pro novináře | Recenzer.cz"
+  description="Press kit Recenzer.cz pro novináře — přímý kontakt na šéfredaktora, factsheet, témata pro rozhovory, archiv tiskových zpráv, ke stažení loga a fotky redakce."
+>
+  <PageBreadcrumbs
+    items={[
+      { href: "/", label: "Recenzer" },
+      { label: "Press & Media kit" },
+    ]}
+  />
+
+  <PageHero
+    eyebrow="Press · media kit"
+    eyebrowIcon="mail"
+    title="Press &<br/><em>Media kit</em>"
+    subtitle={`Centralizovaný balíček pro novináře, agentury a média. Najdete tady <strong>přímý kontakt na šéfredaktora</strong>, factsheet o webu, témata, ke kterým jsme schopni komentovat, archiv tiskových zpráv a balíček materiálů ke stažení. Stav k <time datetime="${lastUpdated}">${lastUpdated}</time>.`}
+  />
+
+  <!-- ============ STATS ============ -->
+  <section class="stats-strip">
+    <div class="inner">
+      <ul>
+        {
+          stats.map((s) => (
+            <li>
+              <strong>{s.value}</strong>
+              <span>{s.label}</span>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <!-- ============ PRESS CONTACT ============ -->
+  <section class="press-contact">
+    <div class="inner contact-grid">
+      <div class="contact-main">
+        <header class="section-head">
+          <p class="eyebrow">Přímý press kontakt</p>
+          <h2>Pište přímo šéfredaktorovi, ne na obecný e-mail</h2>
+          <p class="lead">
+            Pro press dotazy reaguju do <strong>24 hodin v pracovní dny</strong>. Mimo pracovní dobu posílejte SMS — odpovím při nejbližší příležitosti.
+          </p>
+        </header>
+
+        <div class="contact-cards">
+          <a href="mailto:press@recenzer.cz?subject=Press%20request" class="contact-card contact-primary">
+            <span class="contact-label">Press e-mail</span>
+            <strong class="contact-value">press@recenzer.cz</strong>
+            <span class="contact-note">Mířeno přímo na šéfredaktora Ivo Matěje</span>
+          </a>
+          <a href="mailto:ivo.matej@recenzer.cz" class="contact-card">
+            <span class="contact-label">Osobní e-mail šéfredaktora</span>
+            <strong class="contact-value">ivo.matej@recenzer.cz</strong>
+            <span class="contact-note">Pro citlivé / důvěrné dotazy</span>
+          </a>
+          <div class="contact-card contact-placeholder">
+            <span class="contact-label">Press telefon</span>
+            <strong class="contact-value">Doplnit pevné číslo redakce</strong>
+            <span class="contact-note">Po–Pá 9:00–17:00</span>
+          </div>
+          <a href="/sefredaktor/" class="contact-card">
+            <span class="contact-label">Plný profil + pravomoci</span>
+            <strong class="contact-value">/sefredaktor/</strong>
+            <span class="contact-note">Editor-in-chief stránka</span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ FACTSHEET ============ -->
+  <section class="press-factsheet">
+    <div class="inner">
+      <header class="section-head">
+        <p class="eyebrow">Factsheet</p>
+        <h2>Fakta o webu na jedno místo</h2>
+        <p class="lead">
+          Vše, co rychle potřebujete pro článek. Kompletní verze ke stažení jako <a href="#assets">PDF factsheet</a>.
+        </p>
+      </header>
+      <div class="factsheet-table-wrap">
+        <table class="factsheet-table">
+          <tbody>
+            {
+              factsheet.map((row) => (
+                <tr>
+                  <td class="fs-label">{row.label}</td>
+                  <td class="fs-value">
+                    <strong>{row.value}</strong>
+                    {row.note && <span class="fs-note">{row.note}</span>}
+                  </td>
+                </tr>
+              ))
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ SPOKESPEOPLE ============ -->
+  <section class="press-spokespeople">
+    <div class="inner">
+      <header class="section-head">
+        <p class="eyebrow">K dispozici pro rozhovory</p>
+        <h2>{spokespeople.length} mluvčí podle tématu</h2>
+        <p class="lead">
+          Pro rychlou orientaci, kdo komentuje co. <strong>Přímé e-maily jsou na jejich osobní schránky</strong> — žádná press agentura mezi vámi.
+        </p>
+      </header>
+      <ul class="spk-grid">
+        {
+          spokespeople.map((p) => (
+            <li class="spk-card">
+              <div class="spk-head">
+                <div class="spk-avatar">{p.initials}</div>
+                <div class="spk-id">
+                  <a href={`/autor/${p.slug}/`} class="spk-name">
+                    {p.name}
+                  </a>
+                  <span class="spk-role">{p.role}</span>
+                </div>
+              </div>
+              <p class="spk-bio">{p.bio}</p>
+              <div class="spk-topics">
+                <span class="spk-topics-label">Komentuje</span>
+                <ul>
+                  {p.topics.map((t) => <li>{t}</li>)}
+                </ul>
+              </div>
+              <a href={`mailto:${p.email}?subject=Press%20request`} class="spk-mail">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                  <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
+                  <polyline points="22,6 12,13 2,6" />
+                </svg>
+                {p.email}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <!-- ============ PRESS TOPICS ============ -->
+  <section class="press-topics">
+    <div class="inner">
+      <header class="section-head">
+        <p class="eyebrow">Co umíme komentovat</p>
+        <h2>{pressTopics.length} témat, ke kterým máme co říct</h2>
+        <p class="lead">
+          Když připravujete článek nebo reportáž, podívejte se, jestli vám můžeme dodat citaci či expertní pohled.
+        </p>
+      </header>
+      <ul class="topics-list">
+        {
+          pressTopics.map((t) => (
+            <li class="topic-card">
+              <h3>{t.topic}</h3>
+              <div class="topic-meta">
+                <span class="topic-who">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                    <circle cx="12" cy="7" r="4" />
+                  </svg>
+                  <strong>{t.whoComments}</strong>
+                </span>
+                <a href={`mailto:${t.email}?subject=Press%20request`} class="topic-email">
+                  {t.email}
+                </a>
+              </div>
+              {t.examples.length > 0 && (
+                <div class="topic-examples">
+                  <span class="topic-examples-label">Dříve citováno</span>
+                  <ul>
+                    {t.examples.map((e) => <li>{e}</li>)}
+                  </ul>
+                </div>
+              )}
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <!-- ============ PRESS RELEASES ============ -->
+  <section class="press-releases" id="tiskove-zpravy">
+    <div class="inner">
+      <header class="section-head">
+        <p class="eyebrow">Tiskové zprávy</p>
+        <h2>Archiv tiskových zpráv</h2>
+        <p class="lead">
+          Tiskové zprávy redakce — od nových editoriálních politik po retraction notices. Pro odběr nových zpráv přidejte <a href="/aktualizace.xml">/aktualizace.xml</a> do své RSS čtečky.
+        </p>
+      </header>
+      <ol class="releases-list">
+        {
+          pressReleases.map((pr) => (
+            <li class="release-item">
+              <div class="release-meta">
+                <time class="release-date" datetime={pr.date}>{formatCzechDate(pr.date)}</time>
+                <span class="release-topic">{pr.topic}</span>
+              </div>
+              <h3 class="release-title">{pr.title}</h3>
+              <p class="release-excerpt">{pr.excerpt}</p>
+              <div class="release-actions">
+                <a href={`mailto:press@recenzer.cz?subject=Full%20text:%20${encodeURIComponent(pr.title)}`} class="release-link">
+                  Vyžádat plný text
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+                    <line x1="5" y1="12" x2="19" y2="12" />
+                    <polyline points="12 5 19 12 12 19" />
+                  </svg>
+                </a>
+              </div>
+            </li>
+          ))
+        }
+      </ol>
+      <div class="releases-cta">
+        <a href="/aktualizace/" class="releases-cta-link">
+          Kompletní archiv aktualizací (50+ záznamů)
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+            <line x1="5" y1="12" x2="19" y2="12" />
+            <polyline points="12 5 19 12 12 19" />
+          </svg>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ DOWNLOADABLE ASSETS ============ -->
+  <section class="press-assets" id="assets">
+    <div class="inner">
+      <header class="section-head">
+        <p class="eyebrow">Ke stažení · brand assets</p>
+        <h2>Logo, fotky, dokumenty</h2>
+        <p class="lead">
+          Všechny soubory jsou licencované pro <strong>citace, reporty a editoriální použití</strong> s atribucí „Foto / logo: Recenzer.cz". Pro komerční použití kontaktujte
+          <a href="mailto:press@recenzer.cz">press@recenzer.cz</a>.
+        </p>
+      </header>
+      <ul class="assets-grid">
+        {
+          downloadableAssets.map((a) => (
+            <li class={`asset-card asset-${a.kind}`}>
+              <div class="asset-icon" aria-hidden="true">
+                {a.kind === "logo" && (
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10" />
+                    <path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
+                  </svg>
+                )}
+                {a.kind === "photo" && (
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="3" width="18" height="18" rx="2" />
+                    <circle cx="9" cy="9" r="2" />
+                    <path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21" />
+                  </svg>
+                )}
+                {a.kind === "doc" && (
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                    <polyline points="14 2 14 8 20 8" />
+                  </svg>
+                )}
+              </div>
+              <div class="asset-body">
+                <strong class="asset-title">{a.title}</strong>
+                <div class="asset-specs">
+                  <span class="asset-format">{a.format}</span>
+                  <span class="asset-size">{a.size}</span>
+                </div>
+                {a.note && <p class="asset-note">{a.note}</p>}
+              </div>
+              <a href={`/press/${a.filename}`} download class="asset-download" aria-label={`Stáhnout ${a.title}`}>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                  <polyline points="7 10 12 15 17 10" />
+                  <line x1="12" y1="15" x2="12" y2="3" />
+                </svg>
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+      <p class="assets-note">
+        Soubory jsou placeholdery — finální assets aktualizujeme s release v.2.1 media kitu (plánováno 06/2026).
+      </p>
+    </div>
+  </section>
+
+  <!-- ============ BRAND COLORS ============ -->
+  <section class="press-brand">
+    <div class="inner">
+      <header class="section-head">
+        <p class="eyebrow">Brand guidelines</p>
+        <h2>Barvy a typografie</h2>
+        <p class="lead">
+          Pro reprodukci loga a vizuální identity dodržujte tyto barvy a fonty. Plné guidelines v <a href="#assets">PDF brand guidelines</a>.
+        </p>
+      </header>
+      <ul class="colors-grid">
+        {
+          brandColors.map((c) => (
+            <li class="color-card">
+              <div class="color-swatch" style={`background: ${c.hex};`}>
+                {c.name.includes("Mono font") && (
+                  <span class="color-mono-label">Aa</span>
+                )}
+              </div>
+              <div class="color-body">
+                <strong class="color-name">{c.name}</strong>
+                <code class="color-hex">{c.hex}</code>
+                <p class="color-usage">{c.usage}</p>
+              </div>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <!-- ============ MEDIA CITATIONS ============ -->
+  <section class="press-citations">
+    <div class="inner">
+      <header class="section-head">
+        <p class="eyebrow">Recenzer.cz v médiích</p>
+        <h2>Kde nás citovali</h2>
+        <p class="lead">
+          Konkrétní URL článků s naší citací. Plný seznam s detaily najdete v <a href="/autor/ivo-matej/#media-detailed">profilech autorů</a>.
+        </p>
+      </header>
+      <ul class="citations-grid">
+        {
+          ivoMatej.mediaCitationsDetailed?.slice(0, 6).map((m) => (
+            <li class="citation-card">
+              <div class="citation-head">
+                <span class="citation-outlet">{m.outlet}</span>
+                <time datetime={m.date}>{formatCzechDate(m.date)}</time>
+              </div>
+              <h3 class="citation-title">
+                <a href={m.href} rel="noopener" target="_blank">
+                  {m.title}
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+                    <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+                    <polyline points="15 3 21 3 21 9" />
+                    <line x1="10" y1="14" x2="21" y2="3" />
+                  </svg>
+                </a>
+              </h3>
+              {m.excerpt && <p class="citation-excerpt">„{m.excerpt}“</p>}
+            </li>
+          ))
+        }
+      </ul>
+      <p class="citations-cta">
+        <a href="/autori/" class="citations-cta-link">Více citací v profilech autorů</a>
+      </p>
+    </div>
+  </section>
+
+  <!-- ============ CTA ============ -->
+  <section class="press-cta">
+    <div class="inner">
+      <div class="cta-card">
+        <span class="cta-eyebrow">Pro novináře</span>
+        <h2>Připravujete článek? Napište nám.</h2>
+        <p>
+          Citace, expertní pohled, fact-check vašeho textu, hloubková konzultace — co potřebujete. Odpovídáme v pracovní dny do 24 hodin.
+        </p>
+        <div class="cta-actions">
+          <a href="mailto:press@recenzer.cz?subject=Press%20request" class="btn-primary">
+            press@recenzer.cz
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+              <line x1="5" y1="12" x2="19" y2="12" />
+              <polyline points="12 5 19 12 12 19" />
+            </svg>
+          </a>
+          <a href="/sefredaktor/" class="btn-ghost">Profil šéfredaktora</a>
+          <a href="/impressum/" class="btn-ghost">Impressum</a>
+          <a href="/aktualizace.xml" class="btn-ghost">Atom feed</a>
+        </div>
+      </div>
+      <p class="cta-meta">
+        Media kit aktualizujeme průběžně · poslední verze <time datetime={lastUpdated}>{lastUpdated}</time>.
+      </p>
+    </div>
+  </section>
+
+  <style>
+    .inner {
+      max-width: var(--max-w);
+      margin: 0 auto;
+      padding: clamp(2.5rem, 5vw, 4rem) var(--gutter);
+    }
+    .section-head {
+      max-width: 65ch;
+      margin: 0 0 2rem;
+    }
+    .eyebrow {
+      font-family: var(--mono);
+      font-size: 11.5px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--p-700);
+      font-weight: 700;
+      margin: 0 0 0.5rem;
+    }
+    .section-head h2 {
+      font-size: clamp(1.5rem, 3vw, 2.1rem);
+      font-weight: 800;
+      letter-spacing: -0.025em;
+      color: var(--ink);
+      line-height: 1.2;
+      margin-bottom: 0.6rem;
+    }
+    .section-head .lead {
+      font-size: 15px;
+      line-height: 1.6;
+      color: var(--muted);
+      margin: 0;
+    }
+    .section-head .lead strong { color: var(--ink); }
+    .section-head .lead a {
+      color: var(--p-700);
+      text-decoration: none;
+      border-bottom: 1px dashed var(--p-300);
+    }
+
+    /* ============ STATS ============ */
+    .stats-strip {
+      background: var(--bg);
+      border-bottom: 1px solid var(--line);
+    }
+    .stats-strip .inner { padding: 2rem var(--gutter); }
+    .stats-strip ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1.5rem;
+    }
+    @media (max-width: 720px) {
+      .stats-strip ul { grid-template-columns: repeat(2, 1fr); gap: 1rem; }
+    }
+    .stats-strip li {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      padding-top: 0.75rem;
+      border-top: 2px solid var(--p-200);
+    }
+    .stats-strip strong {
+      font-size: clamp(1.5rem, 2.7vw, 2rem);
+      font-weight: 800;
+      color: var(--ink);
+      letter-spacing: -0.02em;
+      line-height: 1;
+    }
+    .stats-strip span {
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.3;
+    }
+
+    /* ============ CONTACT ============ */
+    .press-contact {
+      background: var(--bg-warm);
+      border-bottom: 1px solid var(--line);
+    }
+    .contact-cards {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 0.85rem;
+    }
+    @media (max-width: 720px) { .contact-cards { grid-template-columns: 1fr; } }
+    .contact-card {
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+      padding: 1.25rem 1.4rem;
+      background: var(--bg);
+      border: 1px solid var(--line);
+      border-radius: var(--r);
+      text-decoration: none;
+      color: inherit;
+      transition: border-color 0.15s ease, transform 0.15s ease;
+    }
+    .contact-card:hover {
+      border-color: var(--p-300);
+      transform: translateY(-1px);
+    }
+    .contact-primary {
+      background: linear-gradient(135deg, var(--p-700), var(--p-900));
+      border-color: var(--p-700);
+      color: #fff;
+    }
+    .contact-primary:hover {
+      background: linear-gradient(135deg, var(--p-800), var(--p-900));
+      border-color: var(--p-800);
+      color: #fff;
+    }
+    .contact-label {
+      font-family: var(--mono);
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+      font-weight: 700;
+    }
+    .contact-primary .contact-label { color: rgba(255, 255, 255, 0.7); }
+    .contact-value {
+      font-size: 1.1rem;
+      font-weight: 800;
+      color: var(--ink);
+      letter-spacing: -0.01em;
+    }
+    .contact-primary .contact-value { color: #fff; }
+    .contact-note {
+      font-size: 0.82rem;
+      color: var(--muted);
+    }
+    .contact-primary .contact-note { color: rgba(255, 255, 255, 0.7); }
+    .contact-placeholder .contact-value { color: var(--amber); font-style: italic; }
+
+    /* ============ FACTSHEET ============ */
+    .press-factsheet {
+      background: var(--bg);
+      border-bottom: 1px solid var(--line);
+    }
+    .factsheet-table-wrap {
+      max-width: var(--max-w-text);
+      overflow-x: auto;
+      border: 1px solid var(--line);
+      border-radius: var(--r);
+    }
+    .factsheet-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.92rem;
+    }
+    .factsheet-table tbody td {
+      padding: 0.85rem 1.1rem;
+      border-bottom: 1px solid var(--line-soft);
+      vertical-align: top;
+    }
+    .factsheet-table tbody tr:last-child td { border-bottom: none; }
+    .factsheet-table tbody tr:hover td { background: var(--bg-warm); }
+    .fs-label {
+      width: 35%;
+      font-family: var(--mono);
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--muted);
+      font-weight: 700;
+    }
+    .fs-value {
+      color: var(--text);
+    }
+    .fs-value strong {
+      color: var(--ink);
+      font-weight: 700;
+    }
+    .fs-note {
+      display: block;
+      margin-top: 0.2rem;
+      font-size: 0.78rem;
+      color: var(--muted);
+    }
+
+    /* ============ SPOKESPEOPLE ============ */
+    .press-spokespeople {
+      background: var(--bg-alt);
+      border-bottom: 1px solid var(--line);
+    }
+    .spk-grid {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1rem;
+    }
+    @media (max-width: 900px) { .spk-grid { grid-template-columns: 1fr; } }
+    .spk-card {
+      padding: 1.5rem;
+      background: var(--bg);
+      border: 1px solid var(--line);
+      border-radius: var(--r-lg);
+      display: flex;
+      flex-direction: column;
+      gap: 0.85rem;
+    }
+    .spk-head {
+      display: flex;
+      align-items: center;
+      gap: 0.85rem;
+    }
+    .spk-avatar {
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--p-100), var(--p-200));
+      color: var(--p-700);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 18px;
+      flex-shrink: 0;
+    }
+    .spk-id { display: flex; flex-direction: column; gap: 0.15rem; }
+    .spk-name {
+      font-weight: 800;
+      color: var(--ink);
+      font-size: 1.05rem;
+      text-decoration: none;
+      border-bottom: 1px dashed var(--p-300);
+      align-self: flex-start;
+    }
+    .spk-name:hover { color: var(--p-700); border-bottom-style: solid; }
+    .spk-role {
+      font-family: var(--mono);
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--muted);
+    }
+    .spk-bio {
+      margin: 0;
+      font-size: 0.88rem;
+      line-height: 1.6;
+      color: var(--text);
+    }
+    .spk-topics {
+      padding: 0.85rem 1rem;
+      background: var(--bg-warm);
+      border-radius: var(--r-sm);
+    }
+    .spk-topics-label {
+      display: block;
+      font-family: var(--mono);
+      font-size: 0.68rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--p-700);
+      font-weight: 700;
+      margin-bottom: 0.4rem;
+    }
+    .spk-topics ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.3rem;
+    }
+    .spk-topics li {
+      font-family: var(--mono);
+      font-size: 0.72rem;
+      color: var(--ink);
+      padding: 0.15rem 0.5rem;
+      background: var(--bg);
+      border: 1px solid var(--line);
+      border-radius: 99px;
+    }
+    .spk-mail {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      padding: 0.6rem 0.9rem;
+      background: var(--p-700);
+      color: #fff;
+      border-radius: var(--r-sm);
+      font-size: 0.85rem;
+      font-weight: 700;
+      text-decoration: none;
+      transition: background 0.15s ease;
+      word-break: break-all;
+    }
+    .spk-mail:hover { background: var(--p-800); }
+    .spk-mail svg { width: 14px; height: 14px; flex-shrink: 0; }
+
+    /* ============ TOPICS ============ */
+    .press-topics {
+      background: var(--bg);
+      border-bottom: 1px solid var(--line);
+    }
+    .topics-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 0.85rem;
+    }
+    @media (max-width: 800px) { .topics-list { grid-template-columns: 1fr; } }
+    .topic-card {
+      padding: 1.4rem 1.5rem;
+      background: var(--bg-warm);
+      border: 1px solid var(--line);
+      border-left: 3px solid var(--p-500);
+      border-radius: var(--r);
+    }
+    .topic-card h3 {
+      margin: 0 0 0.85rem;
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--ink);
+    }
+    .topic-meta {
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+      margin-bottom: 0.85rem;
+      padding-bottom: 0.85rem;
+      border-bottom: 1px dashed var(--line);
+    }
+    .topic-who {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.88rem;
+      color: var(--muted);
+    }
+    .topic-who svg { width: 14px; height: 14px; color: var(--p-700); }
+    .topic-who strong { color: var(--ink); font-weight: 600; }
+    .topic-email {
+      align-self: flex-start;
+      font-family: var(--mono);
+      font-size: 0.78rem;
+      color: var(--p-700);
+      text-decoration: none;
+      padding: 0.2rem 0.55rem;
+      background: var(--p-50);
+      border-radius: 4px;
+    }
+    .topic-email:hover { background: var(--p-100); }
+    .topic-examples-label {
+      display: block;
+      font-family: var(--mono);
+      font-size: 0.68rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+      margin-bottom: 0.4rem;
+    }
+    .topic-examples ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 0.2rem;
+    }
+    .topic-examples li {
+      font-size: 0.82rem;
+      color: var(--ink-soft);
+      line-height: 1.5;
+      padding-left: 1rem;
+      position: relative;
+    }
+    .topic-examples li::before {
+      content: "›";
+      position: absolute;
+      left: 0;
+      color: var(--p-700);
+      font-weight: 800;
+    }
+
+    /* ============ PRESS RELEASES ============ */
+    .press-releases {
+      background: var(--bg-warm);
+      border-bottom: 1px solid var(--line);
+    }
+    .releases-list {
+      list-style: none;
+      padding: 0;
+      margin: 0 0 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.85rem;
+    }
+    .release-item {
+      padding: 1.25rem 1.4rem;
+      background: var(--bg);
+      border: 1px solid var(--line);
+      border-radius: var(--r);
+      transition: border-color 0.15s ease;
+    }
+    .release-item:hover { border-color: var(--p-300); }
+    .release-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem 1rem;
+      align-items: center;
+      margin-bottom: 0.55rem;
+    }
+    .release-date {
+      font-family: var(--mono);
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: var(--ink);
+    }
+    .release-topic {
+      font-family: var(--mono);
+      font-size: 0.68rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--p-700);
+      padding: 0.15rem 0.5rem;
+      background: var(--p-50);
+      border-radius: 4px;
+      font-weight: 700;
+    }
+    .release-title {
+      margin: 0 0 0.55rem;
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--ink);
+      line-height: 1.4;
+    }
+    .release-excerpt {
+      margin: 0 0 0.85rem;
+      font-size: 0.92rem;
+      line-height: 1.6;
+      color: var(--text);
+    }
+    .release-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--p-700);
+      text-decoration: none;
+      padding: 0.45rem 0.9rem;
+      background: var(--p-50);
+      border-radius: 99px;
+      transition: background 0.15s ease;
+    }
+    .release-link:hover { background: var(--p-100); }
+    .release-link svg { width: 12px; height: 12px; }
+    .releases-cta { text-align: center; }
+    .releases-cta-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.85rem 1.4rem;
+      background: var(--p-700);
+      color: #fff;
+      border-radius: var(--r);
+      font-size: 0.92rem;
+      font-weight: 700;
+      text-decoration: none;
+    }
+    .releases-cta-link:hover { background: var(--p-800); color: #fff; }
+    .releases-cta-link svg { width: 14px; height: 14px; }
+
+    /* ============ ASSETS ============ */
+    .press-assets {
+      background: var(--bg);
+      border-bottom: 1px solid var(--line);
+    }
+    .assets-grid {
+      list-style: none;
+      padding: 0;
+      margin: 0 0 1.25rem;
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 0.75rem;
+    }
+    @media (max-width: 800px) { .assets-grid { grid-template-columns: 1fr; } }
+    .asset-card {
+      display: grid;
+      grid-template-columns: 48px 1fr 40px;
+      gap: 1rem;
+      align-items: center;
+      padding: 1rem 1.2rem;
+      background: var(--bg-warm);
+      border: 1px solid var(--line);
+      border-radius: var(--r);
+    }
+    .asset-logo .asset-icon { background: var(--p-50); color: var(--p-700); }
+    .asset-photo .asset-icon { background: var(--green-bg); color: var(--green); }
+    .asset-doc .asset-icon { background: var(--amber-bg); color: var(--amber); }
+    .asset-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .asset-icon svg { width: 22px; height: 22px; }
+    .asset-title {
+      display: block;
+      color: var(--ink);
+      font-weight: 700;
+      font-size: 0.95rem;
+      margin-bottom: 0.25rem;
+    }
+    .asset-specs {
+      display: flex;
+      gap: 0.6rem;
+      font-family: var(--mono);
+      font-size: 0.72rem;
+      color: var(--muted);
+      margin-bottom: 0.2rem;
+    }
+    .asset-format {
+      padding: 0.1rem 0.45rem;
+      background: var(--bg);
+      border-radius: 4px;
+      font-weight: 700;
+    }
+    .asset-note {
+      margin: 0;
+      font-size: 0.78rem;
+      color: var(--muted);
+      line-height: 1.45;
+    }
+    .asset-download {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: var(--p-700);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-decoration: none;
+      transition: background 0.15s ease, transform 0.15s ease;
+    }
+    .asset-download:hover { background: var(--p-800); transform: translateY(-1px); }
+    .asset-download svg { width: 16px; height: 16px; }
+    .assets-note {
+      margin: 0;
+      padding: 0.75rem 1rem;
+      background: var(--amber-bg);
+      border: 1px solid rgba(180, 83, 9, 0.18);
+      border-radius: var(--r-sm);
+      font-size: 0.82rem;
+      color: var(--amber);
+      font-style: italic;
+    }
+
+    /* ============ BRAND COLORS ============ */
+    .press-brand {
+      background: var(--bg-alt);
+      border-bottom: 1px solid var(--line);
+    }
+    .colors-grid {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.85rem;
+    }
+    @media (max-width: 800px) { .colors-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 480px) { .colors-grid { grid-template-columns: 1fr; } }
+    .color-card {
+      background: var(--bg);
+      border: 1px solid var(--line);
+      border-radius: var(--r);
+      overflow: hidden;
+    }
+    .color-swatch {
+      height: 90px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-family: var(--mono);
+      font-size: 2rem;
+      font-weight: 700;
+    }
+    .color-mono-label {
+      background: var(--ink);
+      color: #fff;
+      padding: 0.5rem 1rem;
+      border-radius: 4px;
+      font-size: 1.4rem;
+    }
+    .color-body {
+      padding: 0.85rem 1rem;
+    }
+    .color-name {
+      display: block;
+      color: var(--ink);
+      font-weight: 700;
+      font-size: 0.92rem;
+      margin-bottom: 0.25rem;
+    }
+    .color-hex {
+      display: inline-block;
+      font-family: var(--mono);
+      font-size: 0.78rem;
+      color: var(--p-700);
+      padding: 0.1rem 0.45rem;
+      background: var(--p-50);
+      border-radius: 4px;
+      margin-bottom: 0.45rem;
+    }
+    .color-usage {
+      margin: 0;
+      font-size: 0.8rem;
+      color: var(--muted);
+      line-height: 1.45;
+    }
+
+    /* ============ MEDIA CITATIONS ============ */
+    .press-citations {
+      background: var(--bg);
+      border-bottom: 1px solid var(--line);
+    }
+    .citations-grid {
+      list-style: none;
+      padding: 0;
+      margin: 0 0 1rem;
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 0.85rem;
+    }
+    @media (max-width: 800px) { .citations-grid { grid-template-columns: 1fr; } }
+    .citation-card {
+      padding: 1.25rem 1.4rem;
+      background: var(--bg-warm);
+      border: 1px solid var(--line);
+      border-left: 3px solid var(--p-500);
+      border-radius: var(--r);
+    }
+    .citation-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 0.55rem;
+    }
+    .citation-outlet {
+      font-family: var(--mono);
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--p-700);
+      font-weight: 700;
+      padding: 0.2rem 0.55rem;
+      background: var(--p-50);
+      border-radius: 4px;
+    }
+    .citation-card time {
+      font-family: var(--mono);
+      font-size: 0.72rem;
+      color: var(--muted);
+    }
+    .citation-title {
+      margin: 0 0 0.55rem;
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--ink);
+      line-height: 1.4;
+    }
+    .citation-title a {
+      color: var(--ink);
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+    .citation-title a:hover { color: var(--p-700); }
+    .citation-title svg { width: 11px; height: 11px; color: var(--muted); }
+    .citation-excerpt {
+      margin: 0;
+      font-size: 0.85rem;
+      font-style: italic;
+      color: var(--ink-soft);
+      line-height: 1.55;
+    }
+    .citations-cta {
+      text-align: center;
+      margin: 0;
+    }
+    .citations-cta-link {
+      color: var(--p-700);
+      text-decoration: none;
+      border-bottom: 1px dashed var(--p-300);
+      font-weight: 600;
+    }
+
+    /* ============ CTA ============ */
+    .press-cta { background: var(--bg-warm); }
+    .cta-card {
+      max-width: 760px;
+      margin: 0 auto;
+      padding: 2.5rem 2rem;
+      background: linear-gradient(135deg, var(--ink), #1f1a30);
+      color: #fff;
+      border-radius: var(--r-xl);
+      text-align: center;
+    }
+    .cta-eyebrow {
+      display: inline-block;
+      font-family: var(--mono);
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: #ffd166;
+      margin-bottom: 0.75rem;
+      font-weight: 700;
+    }
+    .cta-card h2 {
+      font-size: clamp(1.4rem, 2.6vw, 1.85rem);
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      margin-bottom: 0.6rem;
+    }
+    .cta-card p {
+      font-size: 1rem;
+      line-height: 1.6;
+      color: rgba(255, 255, 255, 0.85);
+      max-width: 56ch;
+      margin: 0 auto 1.5rem;
+    }
+    .cta-actions {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    .btn-primary,
+    .btn-ghost {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      padding: 0.8rem 1.3rem;
+      border-radius: var(--r);
+      font-size: 0.9rem;
+      font-weight: 700;
+      text-decoration: none;
+    }
+    .btn-primary {
+      background: var(--accent);
+      color: #fff;
+      border: 1px solid var(--accent);
+    }
+    .btn-primary:hover { background: #ff6600; }
+    .btn-primary svg { width: 14px; height: 14px; }
+    .btn-ghost {
+      background: rgba(255, 255, 255, 0.12);
+      color: #fff;
+      border: 1px solid rgba(255, 255, 255, 0.25);
+    }
+    .btn-ghost:hover { background: rgba(255, 255, 255, 0.2); }
+    .cta-meta {
+      margin: 1.5rem 0 0;
+      font-size: 0.78rem;
+      color: var(--muted);
+      text-align: center;
+    }
+  </style>
+</BaseLayout>

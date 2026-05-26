@@ -19,13 +19,13 @@ const steps = [
   },
   {
     num: "02",
-    title: "Hluboký research",
-    text: "Projdeme oficiální materiály výrobců, zahraniční testy (Stiftung Warentest, Which?, dTest), normy a recenze reálných uživatelů. Nikdy nestačí jeden zdroj.",
+    title: "Hluboký research (s pomocí AI)",
+    text: "Projdeme oficiální materiály výrobců, zahraniční testy (Stiftung Warentest, Which?, dTest), normy a recenze reálných uživatelů. Nikdy nestačí jeden zdroj. AI nástroje (Claude, Perplexity) používáme k <strong>mapování dostupných zdrojů</strong>, ale každý zdroj následně manuálně otevřeme a ověříme. Detail v <a href=\"/pouzivani-ai/\">AI politice</a>.",
   },
   {
     num: "03",
     title: "Měření v laboratoři",
-    text: "Modely fyzicky kupujeme za běžnou tržní cenu. Měříme stejnou metodikou, stejnými přístroji, stejné disciplíny. Pět opakování na model.",
+    text: "Modely fyzicky kupujeme za běžnou tržní cenu. Měříme stejnou metodikou, stejnými přístroji, stejné disciplíny. Pět opakování na model. <strong>Laboratoř je 100 % lidská</strong> — AI nikdy nenahrazuje hands-on test.",
   },
   {
     num: "04",
@@ -55,6 +55,10 @@ const qualityPoints = [
   {
     title: "Veřejná oprava chyb",
     text: "Nikdy nemažeme historii. Když uděláme chybu, opravíme ji do 48 h, zveřejníme v Historii revizí a vysvětlíme.",
+  },
+  {
+    title: "Transparentní použití AI",
+    text: "AI je nástroj pro research, monitoring cen a sumarizaci dat — <strong>nikoli autor článků</strong>. Žádný text v článku není AI-generated. Detailní rozpis na stránce <a href=\"/pouzivani-ai/\">Jak používáme AI</a>.",
   },
 ];
 ---
@@ -121,7 +125,7 @@ const qualityPoints = [
               </div>
               <div>
                 <h3>{q.title}</h3>
-                <p>{q.text}</p>
+                <p set:html={q.text} />
               </div>
             </li>
           ))
