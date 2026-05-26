@@ -85,7 +85,7 @@ const currentYear = new Date().getFullYear();
     {
       columns.map((column) => (
         <div class="foot-col">
-          <h5>{column.heading}</h5>
+          <h3>{column.heading}</h3>
           <ul>
             {column.links.map((link) => (
               <li>
@@ -202,14 +202,15 @@ const currentYear = new Date().getFullYear();
     height: 15px;
   }
 
-  .foot-col h5 {
+  .foot-col h3 {
     font-family: var(--mono);
+    /* Vizuálně malý mono caps label, ale sémanticky h3 — heading order */
     font-size: 11.5px;
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.1em;
     color: #fff;
-    margin-bottom: 0.75rem;
+    margin: 0 0 0.75rem;
   }
 
   .foot-col ul {

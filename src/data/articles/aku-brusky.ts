@@ -16,7 +16,7 @@ const sectionUvod = `
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
   </div>
   <div>
-    <h4>Pro koho je tento průvodce</h4>
+    <h3>Pro koho je tento průvodce</h3>
     <p>Pro lidi, kteří chtějí pochopit, <strong>proč</strong> doporučujeme zrovna ty modely. Stojí 18 minut čtení a ušetří vám případné výdaje za špatnou volbu na 5 let dopředu.</p>
   </div>
 </div>
@@ -117,7 +117,7 @@ const sectionKotouc = `
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
   </div>
   <div>
-    <h4>Pozor na kompatibilitu kotoučů</h4>
+    <h3>Pozor na kompatibilitu kotoučů</h3>
     <p>Brusku 115 mm <strong>nelze osadit kotoučem 125 mm</strong> ani s redukcí. Maximální otáčky kotouče <strong>musí být ≥ otáčky brusky</strong> — jinak hrozí roztržení kotouče za chodu.</p>
   </div>
 </div>
@@ -435,7 +435,7 @@ export const akuBrusky: Article = {
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
   </div>
   <div>
-    <h4>Pravidlo, které funguje v 9 z 10 případů</h4>
+    <h3>Pravidlo, které funguje v 9 z 10 případů</h3>
     <p>Pokud nevíte, do jaké škatulky patříte, kupte si <strong>profil pokročilého kutila</strong> (18 V / 125 mm / 2× 5 Ah brushless). Stojí o 30 % víc než hobby model, ale vydrží vám 8–10 let místo 3–4.</p>
   </div>
 </div>
