@@ -186,14 +186,41 @@ import PageBreadcrumbs from "../components/page/PageBreadcrumbs.astro";
         return total;
       }
 
+      // Map result.kind to a CSS class — drives chip color and left border.
+      function kindClass(kind) {
+        const k = (kind || "").toLowerCase();
+        if (k.startsWith("článek") || k === "žebříček" || k === "srovnání") return "k-article";
+        if (k === "rubrika")        return "k-category";
+        if (k.startsWith("slovník")) return "k-glossary";
+        if (k === "značka")         return "k-brand";
+        if (k === "magazín")        return "k-magazine";
+        if (k === "rozhovor")       return "k-interview";
+        if (k === "diskuze")        return "k-forum";
+        if (k === "autor")          return "k-person";
+        if (k === "standardy")      return "k-standards";
+        if (k === "korekce")        return "k-corrections";
+        if (k === "právní")         return "k-legal";
+        if (k === "rozcestník" || k === "navigace") return "k-hub";
+        return "k-page";
+      }
+
+      // Build a breadcrumb-style URL display from "/clanek/aku-brusky/".
+      function urlCrumb(url) {
+        const parts = (url || "").split("/").filter(Boolean);
+        if (!parts.length) return "recenzer.cz";
+        return "recenzer.cz <span aria-hidden=\"true\">›</span> " +
+          parts.map(escapeHtml).join(" <span aria-hidden=\"true\">›</span> ");
+      }
+
       function renderResults(entries, qTokens) {
         list.innerHTML = entries
-          .map(({ entry, score }) => {
+          .map(({ entry }) => {
             const title = highlight(entry.title, qTokens);
             const desc  = highlight(entry.desc,  qTokens);
             const hint  = entry.hint ? escapeHtml(entry.hint) : "";
+            const cls   = kindClass(entry.kind);
             return (
-              '<li class="search-result">' +
+              '<li class="search-result ' + cls + '">' +
                 '<a href="' + escapeHtml(entry.url) + '">' +
                   '<div class="result-head">' +
                     '<span class="result-kind">' + escapeHtml(entry.kind) + '</span>' +
@@ -201,7 +228,7 @@ import PageBreadcrumbs from "../components/page/PageBreadcrumbs.astro";
                   '</div>' +
                   '<h3 class="result-title">' + title + '</h3>' +
                   (desc ? '<p class="result-desc">' + desc + '</p>' : '') +
-                  '<span class="result-url">' + escapeHtml(entry.url) + '</span>' +
+                  '<span class="result-url">' + urlCrumb(entry.url) + '</span>' +
                 '</a>' +
               '</li>'
             );
@@ -439,12 +466,32 @@ import PageBreadcrumbs from "../components/page/PageBreadcrumbs.astro";
       gap: 0.65rem;
     }
 
+    /* ============ KIND COLOR TOKENS ============
+       Each .k-* class sets 3 custom properties used downstream:
+         --kc-bg     — chip background
+         --kc-text   — chip text + left-border accent
+         --kc-border — visible left-border accent color
+    */
+    .k-article    { --kc-bg: var(--p-50);    --kc-text: var(--p-700);  --kc-border: var(--p-500); }
+    .k-category   { --kc-bg: #e0f2fe;        --kc-text: #075985;       --kc-border: #0284c7; }
+    .k-glossary   { --kc-bg: var(--green-bg);--kc-text: var(--green-text); --kc-border: var(--green); }
+    .k-brand      { --kc-bg: var(--amber-bg);--kc-text: var(--amber-text); --kc-border: var(--amber); }
+    .k-magazine   { --kc-bg: #fce7f3;        --kc-text: #9d174d;       --kc-border: #db2777; }
+    .k-interview  { --kc-bg: #ccfbf1;        --kc-text: #115e59;       --kc-border: #14b8a6; }
+    .k-forum      { --kc-bg: #fff7ed;        --kc-text: #9a3412;       --kc-border: #ea580c; }
+    .k-person     { --kc-bg: #e0e7ff;        --kc-text: #3730a3;       --kc-border: #6366f1; }
+    .k-standards  { --kc-bg: #dcfce7;        --kc-text: #14532d;       --kc-border: #16a34a; }
+    .k-corrections{ --kc-bg: #fee2e2;        --kc-text: #991414;       --kc-border: #dc2626; }
+    .k-legal      { --kc-bg: #f1f5f9;        --kc-text: #475569;       --kc-border: #64748b; }
+    .k-hub        { --kc-bg: #f3e8ff;        --kc-text: #6b21a8;       --kc-border: #a855f7; }
+    .k-page       { --kc-bg: #f1f5f9;        --kc-text: #334155;       --kc-border: #64748b; }
+
     .search-result a {
       display: block;
-      padding: 1.1rem 1.3rem;
-      background: var(--bg-warm);
+      padding: 1.1rem 1.3rem 1rem;
+      background: #fff;
       border: 1px solid var(--line);
-      border-left: 4px solid var(--p-500);
+      border-left: 4px solid var(--kc-border, var(--p-500));
       border-radius: var(--r-lg);
       text-decoration: none;
       color: var(--ink);
@@ -453,8 +500,7 @@ import PageBreadcrumbs from "../components/page/PageBreadcrumbs.astro";
 
     .search-result a:hover,
     .search-result a:focus-visible {
-      border-left-color: var(--p-700);
-      border-color: var(--p-400);
+      border-color: var(--kc-border, var(--p-400));
       transform: translateY(-1px);
       box-shadow: 0 12px 24px -16px rgba(46, 20, 102, 0.24);
       outline: none;
@@ -464,24 +510,31 @@ import PageBreadcrumbs from "../components/page/PageBreadcrumbs.astro";
       display: flex;
       gap: 0.6rem;
       align-items: center;
+      flex-wrap: wrap;
+      margin-bottom: 0.5rem;
+    }
+
+    .result-kind {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      padding: 2px 9px;
+      border-radius: 999px;
+      background: var(--kc-bg, var(--p-50));
+      color: var(--kc-text, var(--p-700));
       font-family: var(--mono);
       font-size: 10.5px;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      color: var(--p-700);
       font-weight: 700;
-      margin-bottom: 0.4rem;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      white-space: nowrap;
     }
 
     .result-hint {
+      font-size: 12.5px;
       color: var(--muted);
-      font-weight: 600;
-    }
-
-    .result-hint::before {
-      content: "·";
-      margin-right: 0.55rem;
-      color: var(--muted-2);
+      font-weight: 500;
+      line-height: 1.3;
     }
 
     .result-title {
@@ -493,18 +546,30 @@ import PageBreadcrumbs from "../components/page/PageBreadcrumbs.astro";
       margin: 0 0 0.35rem;
     }
 
+    .search-result a:hover .result-title,
+    .search-result a:focus-visible .result-title {
+      color: var(--kc-text, var(--p-700));
+    }
+
     .result-desc {
-      margin: 0 0 0.55rem;
+      margin: 0 0 0.65rem;
       font-size: 13.5px;
       line-height: 1.55;
       color: var(--ink-soft);
     }
 
     .result-url {
+      display: block;
       font-family: var(--mono);
       font-size: 11.5px;
       color: var(--muted-2);
       letter-spacing: 0.02em;
+      line-height: 1.4;
+    }
+
+    .result-url span {
+      color: var(--line);
+      padding: 0 0.25rem;
     }
 
     .search-result mark {
