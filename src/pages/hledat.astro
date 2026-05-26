@@ -1,0 +1,609 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import PageBreadcrumbs from "../components/page/PageBreadcrumbs.astro";
+---
+
+<BaseLayout
+  title="Hledat | Recenzer.cz"
+  description="Vyhledávání v recenzích, slovníku, značkách, rubrikách a editoriálních stránkách Recenzer.cz."
+  noIndex
+>
+  <PageBreadcrumbs items={[{ href: "/", label: "Recenzer" }, { label: "Hledat" }]} />
+
+  <section class="search-page">
+    <div class="inner">
+      <header class="search-head">
+        <p class="eyebrow">Vyhledávání</p>
+        <h1>Hledat na Recenzer.cz</h1>
+        <p class="lead">
+          Hledá v <strong id="search-count">…</strong> recenzích, slovníkových
+          heslech, značkách, rubrikách a editoriálních stránkách. Diakritika a
+          velikost písmen nehraje roli.
+        </p>
+
+        <form class="search-form" method="get" action="/hledat/" role="search">
+          <label for="search-input" class="visually-hidden">Hledaný výraz</label>
+          <div class="search-input-wrap">
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              aria-hidden="true"
+              class="search-icon"
+            >
+              <circle cx="11" cy="11" r="8" />
+              <line x1="21" y1="21" x2="16.65" y2="16.65" />
+            </svg>
+            <input
+              id="search-input"
+              type="search"
+              name="q"
+              placeholder="Např. pračka, kickback, Bosch, slovník…"
+              autocomplete="off"
+              autocapitalize="off"
+              autocorrect="off"
+              spellcheck="false"
+            />
+            <button type="submit" class="search-submit">Hledat</button>
+          </div>
+        </form>
+      </header>
+
+      <p id="search-status" class="search-status" aria-live="polite">
+        Načítám index…
+      </p>
+
+      <ol id="search-results" class="search-results"></ol>
+
+      <section id="search-empty" class="search-empty" hidden>
+        <h2>Žádné výsledky</h2>
+        <p>
+          Zkuste obecnější výraz nebo se podívejte na rozcestníky:
+        </p>
+        <ul class="empty-links">
+          <li><a href="/mapa-webu/">Mapa webu</a></li>
+          <li><a href="/slovnik/">Slovník pojmů</a></li>
+          <li><a href="/znacky/">Značky výrobců</a></li>
+          <li><a href="/diskuze/">Diskuze / fórum</a></li>
+        </ul>
+      </section>
+
+      <section id="search-initial" class="search-initial">
+        <h2>Co můžete hledat</h2>
+        <ul class="initial-grid">
+          <li><strong>Produkty a kategorie</strong><span>pračka, aku bruska, autobaterie, zimní pneu, kávovar…</span></li>
+          <li><strong>Slovníkové pojmy</strong><span>brushless, kickback, AquaStop, ΔE displeje…</span></li>
+          <li><strong>Značky</strong><span>Bosch, Miele, Makita, Samsung…</span></li>
+          <li><strong>Editoriální stránky</strong><span>metodika, laboratoř, etický kodex, naše chyby…</span></li>
+        </ul>
+      </section>
+    </div>
+  </section>
+
+  <script is:inline>
+    /* eslint-disable */
+    (function () {
+      const qs = (s, root) => (root || document).querySelector(s);
+
+      const input    = qs("#search-input");
+      const status   = qs("#search-status");
+      const list     = qs("#search-results");
+      const empty    = qs("#search-empty");
+      const initial  = qs("#search-initial");
+      const countEl  = qs("#search-count");
+      const form     = qs(".search-form");
+
+      // Diacritic-insensitive normalization (strip combining marks U+0300–036F)
+      const COMBINING = /[̀-ͯ]/g;
+      function fold(s) {
+        return (s || "")
+          .toString()
+          .normalize("NFD")
+          .replace(COMBINING, "")
+          .toLowerCase();
+      }
+
+      // Tokenize query into 1+ char tokens
+      function tokens(q) {
+        return fold(q)
+          .replace(/[^a-z0-9\s+\-]/gi, " ")
+          .split(/\s+/)
+          .filter((t) => t.length >= 1);
+      }
+
+      function escapeHtml(s) {
+        return (s || "")
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/"/g, "&quot;");
+      }
+
+      function highlight(text, qTokens) {
+        if (!text || !qTokens.length) return escapeHtml(text);
+        const folded = fold(text);
+        const ranges = [];
+        for (const t of qTokens) {
+          if (t.length < 2) continue;
+          let idx = 0;
+          while ((idx = folded.indexOf(t, idx)) !== -1) {
+            ranges.push([idx, idx + t.length]);
+            idx += t.length;
+          }
+        }
+        if (!ranges.length) return escapeHtml(text);
+        ranges.sort((a, b) => a[0] - b[0]);
+        // merge overlaps
+        const merged = [ranges[0]];
+        for (let i = 1; i < ranges.length; i++) {
+          const last = merged[merged.length - 1];
+          if (ranges[i][0] <= last[1]) {
+            last[1] = Math.max(last[1], ranges[i][1]);
+          } else {
+            merged.push(ranges[i]);
+          }
+        }
+        let out = "";
+        let cursor = 0;
+        for (const [start, end] of merged) {
+          out += escapeHtml(text.slice(cursor, start));
+          out += "<mark>" + escapeHtml(text.slice(start, end)) + "</mark>";
+          cursor = end;
+        }
+        out += escapeHtml(text.slice(cursor));
+        return out;
+      }
+
+      // Score one entry against tokens.
+      // - exact title token = 5
+      // - title prefix token = 3
+      // - title contains token = 2
+      // - desc contains token = 1
+      // - tag exact = 4
+      // Each token contributes once; tokens that don't match anywhere drop the entry.
+      function scoreEntry(entry, qTokens) {
+        const fTitle = fold(entry.title);
+        const fDesc  = fold(entry.desc);
+        const fHint  = fold(entry.hint || "");
+        const fTags  = (entry.tags || []).map(fold);
+
+        let total = 0;
+        for (const t of qTokens) {
+          let hit = 0;
+          // Exact tag match
+          if (fTags.includes(t)) hit = Math.max(hit, 4);
+          // Title word boundary match
+          if (fTitle === t) hit = Math.max(hit, 5);
+          else if (fTitle.startsWith(t + " ") || fTitle.endsWith(" " + t) || fTitle.includes(" " + t + " ")) hit = Math.max(hit, 3);
+          else if (fTitle.includes(t)) hit = Math.max(hit, 2);
+          // Description/hint contains
+          if (fDesc.includes(t))  hit = Math.max(hit, 1);
+          if (fHint.includes(t))  hit = Math.max(hit, 1);
+          if (!hit) return 0; // every token must match somewhere
+          total += hit;
+        }
+        return total;
+      }
+
+      function renderResults(entries, qTokens) {
+        list.innerHTML = entries
+          .map(({ entry, score }) => {
+            const title = highlight(entry.title, qTokens);
+            const desc  = highlight(entry.desc,  qTokens);
+            const hint  = entry.hint ? escapeHtml(entry.hint) : "";
+            return (
+              '<li class="search-result">' +
+                '<a href="' + escapeHtml(entry.url) + '">' +
+                  '<div class="result-head">' +
+                    '<span class="result-kind">' + escapeHtml(entry.kind) + '</span>' +
+                    (hint ? '<span class="result-hint">' + hint + '</span>' : '') +
+                  '</div>' +
+                  '<h3 class="result-title">' + title + '</h3>' +
+                  (desc ? '<p class="result-desc">' + desc + '</p>' : '') +
+                  '<span class="result-url">' + escapeHtml(entry.url) + '</span>' +
+                '</a>' +
+              '</li>'
+            );
+          })
+          .join("");
+      }
+
+      // Read initial query from URL
+      const urlQuery = new URLSearchParams(window.location.search).get("q") || "";
+      if (urlQuery) input.value = urlQuery;
+      input.focus();
+
+      // Update document title with current query
+      function updateTitle(q) {
+        document.title = q
+          ? '„' + q + '" — vyhledávání | Recenzer.cz'
+          : "Hledat | Recenzer.cz";
+      }
+      updateTitle(urlQuery);
+
+      // Fetch index, then run query
+      fetch("/search-index.json", { cache: "force-cache" })
+        .then((r) => {
+          if (!r.ok) throw new Error("HTTP " + r.status);
+          return r.json();
+        })
+        .then((data) => {
+          const all = data.entries || [];
+          if (countEl) countEl.textContent = String(all.length);
+
+          function run(q) {
+            const qt = tokens(q);
+            if (!qt.length) {
+              status.hidden = false;
+              status.textContent = "Zadejte hledaný výraz.";
+              list.innerHTML = "";
+              empty.hidden = true;
+              initial.hidden = false;
+              return;
+            }
+            initial.hidden = true;
+            const scored = [];
+            for (const e of all) {
+              const s = scoreEntry(e, qt);
+              if (s > 0) scored.push({ entry: e, score: s });
+            }
+            scored.sort((a, b) => b.score - a.score || a.entry.title.localeCompare(b.entry.title, "cs"));
+
+            if (!scored.length) {
+              status.hidden = false;
+              status.textContent = 'Pro „' + q + '" nebyly nalezeny žádné výsledky.';
+              list.innerHTML = "";
+              empty.hidden = false;
+              return;
+            }
+            empty.hidden = true;
+            const word = scored.length === 1 ? "výsledek" : scored.length < 5 ? "výsledky" : "výsledků";
+            status.hidden = false;
+            status.textContent = "Nalezeno " + scored.length + " " + word + ' pro „' + q + '"';
+            renderResults(scored, qt);
+          }
+
+          if (urlQuery) {
+            run(urlQuery);
+          } else {
+            status.hidden = true;
+            initial.hidden = false;
+          }
+
+          // Live search as the user types — debounced, updates URL without reload.
+          let debounce;
+          input.addEventListener("input", () => {
+            clearTimeout(debounce);
+            debounce = setTimeout(() => {
+              const q = input.value.trim();
+              const url = new URL(window.location.href);
+              if (q) url.searchParams.set("q", q);
+              else url.searchParams.delete("q");
+              window.history.replaceState({}, "", url);
+              updateTitle(q);
+              run(q);
+            }, 120);
+          });
+        })
+        .catch((err) => {
+          status.textContent = "Vyhledávací index se nepodařilo načíst. " + (err && err.message ? "(" + err.message + ")" : "");
+        });
+
+      // Submit handler: prevent default if JS is active, just run inline.
+      form.addEventListener("submit", function (e) {
+        e.preventDefault();
+        input.dispatchEvent(new Event("input"));
+        input.focus();
+      });
+    })();
+  </script>
+
+  <style>
+    .inner {
+      max-width: var(--max-w);
+      margin: 0 auto;
+      padding: clamp(2rem, 4vw, 3.5rem) var(--gutter) clamp(3rem, 5vw, 5rem);
+    }
+
+    .search-head {
+      max-width: 760px;
+      margin: 0 auto 2.5rem;
+      text-align: center;
+    }
+
+    .eyebrow {
+      font-family: var(--mono);
+      font-size: 11.5px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--p-700);
+      font-weight: 700;
+      margin: 0 0 0.6rem;
+    }
+
+    .search-head h1 {
+      font-size: clamp(1.8rem, 4vw, 2.6rem);
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      color: var(--ink);
+      line-height: 1.15;
+      margin: 0 0 0.85rem;
+    }
+
+    .lead {
+      font-size: 15px;
+      line-height: 1.6;
+      color: var(--muted);
+      margin: 0 0 2rem;
+    }
+
+    .lead strong { color: var(--ink); font-weight: 700; }
+
+    .search-form {
+      width: 100%;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    .search-input-wrap {
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem 0.5rem 0.5rem 1rem;
+      background: #fff;
+      border: 2px solid var(--p-700);
+      border-radius: 999px;
+      box-shadow: 0 8px 24px -12px rgba(46, 20, 102, 0.22);
+    }
+
+    .search-input-wrap:focus-within {
+      border-color: var(--p-500);
+      box-shadow: 0 0 0 4px rgba(122, 79, 227, 0.18);
+    }
+
+    .search-icon {
+      width: 18px;
+      height: 18px;
+      color: var(--p-700);
+      flex-shrink: 0;
+    }
+
+    .search-input-wrap input[type="search"] {
+      border: 0;
+      background: transparent;
+      padding: 0.75rem 0;
+      font-size: 16px;
+      color: var(--ink);
+      font-family: inherit;
+      width: 100%;
+    }
+
+    .search-input-wrap input[type="search"]:focus {
+      outline: none;
+    }
+
+    .search-input-wrap input[type="search"]::-webkit-search-cancel-button {
+      -webkit-appearance: none;
+      appearance: none;
+    }
+
+    .search-submit {
+      padding: 0.7rem 1.4rem;
+      border: 0;
+      border-radius: 999px;
+      background: var(--p-700);
+      color: #fff;
+      font-weight: 700;
+      font-size: 14px;
+      font-family: inherit;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+
+    .search-submit:hover,
+    .search-submit:focus-visible {
+      background: var(--p-800);
+    }
+
+    .visually-hidden {
+      position: absolute;
+      width: 1px; height: 1px;
+      padding: 0; margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    .search-status {
+      max-width: 760px;
+      margin: 0 auto 1.5rem;
+      text-align: center;
+      font-size: 14px;
+      color: var(--muted);
+      font-family: var(--mono);
+      letter-spacing: 0.02em;
+    }
+
+    .search-status[hidden] { display: none; }
+
+    .search-results {
+      list-style: none;
+      padding: 0;
+      margin: 0 auto;
+      max-width: 760px;
+      display: flex;
+      flex-direction: column;
+      gap: 0.65rem;
+    }
+
+    .search-result a {
+      display: block;
+      padding: 1.1rem 1.3rem;
+      background: var(--bg-warm);
+      border: 1px solid var(--line);
+      border-left: 4px solid var(--p-500);
+      border-radius: var(--r-lg);
+      text-decoration: none;
+      color: var(--ink);
+      transition: border-color 0.15s, transform 0.15s, box-shadow 0.15s;
+    }
+
+    .search-result a:hover,
+    .search-result a:focus-visible {
+      border-left-color: var(--p-700);
+      border-color: var(--p-400);
+      transform: translateY(-1px);
+      box-shadow: 0 12px 24px -16px rgba(46, 20, 102, 0.24);
+      outline: none;
+    }
+
+    .result-head {
+      display: flex;
+      gap: 0.6rem;
+      align-items: center;
+      font-family: var(--mono);
+      font-size: 10.5px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--p-700);
+      font-weight: 700;
+      margin-bottom: 0.4rem;
+    }
+
+    .result-hint {
+      color: var(--muted);
+      font-weight: 600;
+    }
+
+    .result-hint::before {
+      content: "·";
+      margin-right: 0.55rem;
+      color: var(--muted-2);
+    }
+
+    .result-title {
+      font-size: 1.05rem;
+      font-weight: 800;
+      color: var(--ink);
+      letter-spacing: -0.015em;
+      line-height: 1.3;
+      margin: 0 0 0.35rem;
+    }
+
+    .result-desc {
+      margin: 0 0 0.55rem;
+      font-size: 13.5px;
+      line-height: 1.55;
+      color: var(--ink-soft);
+    }
+
+    .result-url {
+      font-family: var(--mono);
+      font-size: 11.5px;
+      color: var(--muted-2);
+      letter-spacing: 0.02em;
+    }
+
+    .search-result mark {
+      background: #fef08a;
+      color: inherit;
+      padding: 0 1px;
+      border-radius: 2px;
+      font-weight: 700;
+    }
+
+    .search-empty,
+    .search-initial {
+      max-width: 760px;
+      margin: 2rem auto 0;
+      padding: 1.5rem 1.75rem;
+      background: var(--bg-warm);
+      border: 1px solid var(--line);
+      border-radius: var(--r-lg);
+    }
+
+    .search-empty[hidden],
+    .search-initial[hidden] { display: none; }
+
+    .search-empty h2,
+    .search-initial h2 {
+      font-size: 1.1rem;
+      font-weight: 800;
+      color: var(--ink);
+      letter-spacing: -0.015em;
+      margin: 0 0 0.75rem;
+    }
+
+    .search-empty p {
+      font-size: 14.5px;
+      color: var(--ink-soft);
+      line-height: 1.6;
+      margin: 0 0 0.85rem;
+    }
+
+    .empty-links {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    .empty-links a {
+      display: inline-block;
+      padding: 0.45rem 0.85rem;
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      color: var(--p-700);
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .empty-links a:hover,
+    .empty-links a:focus-visible {
+      border-color: var(--p-400);
+      background: var(--p-50);
+    }
+
+    .initial-grid {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 0.75rem;
+    }
+
+    @media (max-width: 600px) {
+      .initial-grid { grid-template-columns: 1fr; }
+    }
+
+    .initial-grid li {
+      padding: 0.85rem 1rem;
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: var(--r);
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+
+    .initial-grid strong {
+      color: var(--ink);
+      font-weight: 700;
+      font-size: 13.5px;
+    }
+
+    .initial-grid span {
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+  </style>
+</BaseLayout>

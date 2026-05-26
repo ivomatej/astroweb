@@ -27,14 +27,30 @@ const isActive = (href: string): boolean =>
     </nav>
 
     <div class="masthead-right">
-      <button type="button" class="search-pill" aria-label="Hledat">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-          <circle cx="11" cy="11" r="8" />
-          <line x1="21" y1="21" x2="16.65" y2="16.65" />
-        </svg>
-        <span>Hledat recenzi…</span>
-        <kbd>⌘K</kbd>
-      </button>
+      <form
+        class="search-pill"
+        role="search"
+        action="/hledat/"
+        method="get"
+        aria-label="Vyhledávání na webu"
+      >
+        <button type="submit" class="search-pill-btn" aria-label="Hledat">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <circle cx="11" cy="11" r="8" />
+            <line x1="21" y1="21" x2="16.65" y2="16.65" />
+          </svg>
+        </button>
+        <label for="masthead-search-q" class="visually-hidden">Hledaný výraz</label>
+        <input
+          id="masthead-search-q"
+          type="search"
+          name="q"
+          placeholder="Hledat recenzi…"
+          autocomplete="off"
+          autocapitalize="off"
+          spellcheck="false"
+        />
+      </form>
 
       <a href="/newsletter/" class="masthead-account" aria-label="Odebírat newsletter">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
@@ -119,34 +135,82 @@ const isActive = (href: string): boolean =>
   .search-pill {
     display: inline-flex;
     align-items: center;
-    gap: 0.5rem;
-    padding: 0.4rem 0.85rem;
+    gap: 0.25rem;
+    padding: 0.3rem 0.4rem 0.3rem 0.5rem;
     border-radius: 999px;
     background: rgba(255, 255, 255, 0.08);
     color: rgba(255, 255, 255, 0.85);
-    font-size: 13px;
     border: 1px solid rgba(255, 255, 255, 0.08);
     transition: background 0.15s, border-color 0.15s;
+    min-width: 220px;
   }
 
   .search-pill:hover,
-  .search-pill:focus-visible {
+  .search-pill:focus-within {
     background: rgba(255, 255, 255, 0.14);
-    border-color: rgba(255, 255, 255, 0.18);
+    border-color: rgba(255, 255, 255, 0.22);
   }
 
-  .search-pill svg {
+  .search-pill-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 26px;
+    height: 26px;
+    padding: 0;
+    background: transparent;
+    border: 0;
+    border-radius: 50%;
+    color: rgba(255, 255, 255, 0.78);
+    cursor: pointer;
+  }
+
+  .search-pill-btn:hover,
+  .search-pill-btn:focus-visible {
+    color: #fff;
+    background: rgba(255, 255, 255, 0.14);
+    outline: none;
+  }
+
+  .search-pill-btn svg {
     width: 14px;
     height: 14px;
   }
 
-  .search-pill kbd {
-    font-family: var(--mono);
-    font-size: 11px;
-    padding: 1px 5px;
-    border-radius: 4px;
-    background: rgba(255, 255, 255, 0.12);
-    color: rgba(255, 255, 255, 0.7);
+  .search-pill input[type="search"] {
+    flex: 1;
+    min-width: 0;
+    padding: 0.3rem 0.4rem;
+    background: transparent;
+    border: 0;
+    color: #fff;
+    font-size: 13px;
+    font-family: inherit;
+  }
+
+  .search-pill input[type="search"]::placeholder {
+    color: rgba(255, 255, 255, 0.55);
+  }
+
+  .search-pill input[type="search"]:focus {
+    outline: none;
+  }
+
+  .search-pill input[type="search"]::-webkit-search-cancel-button {
+    -webkit-appearance: none;
+    appearance: none;
+  }
+
+  .visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
   }
 
   .masthead-account {
@@ -174,8 +238,12 @@ const isActive = (href: string): boolean =>
 
   @media (max-width: 960px) {
     .nav { display: none; }
-    .search-pill span { display: none; }
-    .search-pill kbd { display: none; }
+    .search-pill { min-width: 0; }
+    .search-pill input[type="search"] { width: 140px; flex: 0 0 auto; }
+  }
+
+  @media (max-width: 480px) {
+    .search-pill input[type="search"] { width: 100px; }
   }
 
   @media (max-width: 560px) {
