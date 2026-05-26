@@ -510,43 +510,35 @@ export const akuBrusky: Article = {
 </p>
 <div class="glossary-box">
   <div class="glossary-grid">
-    <a href="/slovnik/brushless-motor/" class="glossary-item">
+    <a href="/slovnik/pojem/brushless-motor/" class="glossary-item">
       <div class="glossary-term">Brushless motor</div>
       <div class="glossary-def">Bezkartáčový elektromotor s elektronickou regulací. Vyšší účinnost, delší životnost, lepší výkon pod zátěží než klasický komutátorový motor.</div>
     </a>
-    <a href="/slovnik/kickback/" class="glossary-item">
-      <div class="glossary-term">Kickback (zpětný ráz)</div>
-      <div class="glossary-def">Náhlé vytržení brusky z ruky způsobené zaseknutím kotouče v materiálu. Kickback control elektronicky vypne motor během milisekund.</div>
+    <a href="/slovnik/pojem/kickback-control/" class="glossary-item">
+      <div class="glossary-term">KickBack Control</div>
+      <div class="glossary-def">Bezpečnostní senzor detekující náhlé zaseknutí kotouče v materiálu — během 50 ms odpojí motor od baterie a zabrání vytržení brusky z ruky.</div>
     </a>
-    <a href="/slovnik/epta/" class="glossary-item">
-      <div class="glossary-term">EPTA</div>
-      <div class="glossary-def">European Power Tool Association — standardizovaná metoda měření hmotnosti nástroje včetně baterie pro férové porovnání mezi výrobci.</div>
+    <a href="/slovnik/pojem/nominalni-vykon/" class="glossary-item">
+      <div class="glossary-term">Nominální výkon (W)</div>
+      <div class="glossary-def">Trvalý výkon motoru, ne marketingové „peak power". U aku brusek bývá reálný výstupní výkon o 30–40 % nižší než hodnota udaná na obalu.</div>
     </a>
-    <a href="/slovnik/soft-start/" class="glossary-item">
-      <div class="glossary-term">Soft-start</div>
-      <div class="glossary-def">Plynulé zrychlení motoru z 0 na pracovní otáčky. Šetří elektroniku, baterii i ruku uživatele před prudkou reakcí nástroje.</div>
+    <a href="/slovnik/pojem/anti-vibration/" class="glossary-item">
+      <div class="glossary-term">Anti-vibration (AVS)</div>
+      <div class="glossary-def">Tlumení vibrací rukojeti. Bez AVS překračuje bruska 6 m/s² — bezpečný limit dle EN ISO 5349 je 1–3 hodiny denně místo 8.</div>
     </a>
-    <a href="/slovnik/ah/" class="glossary-item">
-      <div class="glossary-term">Ah (ampérhodina)</div>
-      <div class="glossary-def">Jednotka kapacity akumulátoru. Pro aku brusku je minimum 4,0 Ah, doporučení 5,0–6,0 Ah, profi-použití 8+ Ah.</div>
+    <a href="/slovnik/pojem/li-ion-baterie-ah/" class="glossary-item">
+      <div class="glossary-term">Li-Ion baterie (Ah)</div>
+      <div class="glossary-def">Kapacita akumulátoru v Ampérhodinách. Pro aku brusku 125 mm je minimum 4,0 Ah, doporučení 5,0–6,0 Ah, profi-použití 8+ Ah.</div>
     </a>
-    <a href="/slovnik/volnobezne-otacky/" class="glossary-item">
-      <div class="glossary-term">Volnoběžné otáčky vs. pod zátěží</div>
-      <div class="glossary-def">Volnoběh = bez zatížení, marketingová hodnota. Otáčky pod zátěží = reálný výkon při řezání. Pokles do 20 % značí špičkový motor.</div>
-    </a>
-    <a href="/slovnik/li-ion-21700/" class="glossary-item">
-      <div class="glossary-term">Li-Ion 21700</div>
-      <div class="glossary-def">Novější typ článku baterie s pr. 21 mm, schopný trvalého výboje 30–40 A. Vhodnější pro brusky než starší 18650 (max 20 A).</div>
-    </a>
-    <a href="/slovnik/ekosystem/" class="glossary-item">
-      <div class="glossary-term">Ekosystém nářadí</div>
-      <div class="glossary-def">Platforma jedné značky se sdíleným typem baterie a nabíječky napříč nástroji (Bosch Pro, Makita LXT, Milwaukee M18, DeWalt XR).</div>
+    <a href="/slovnik/pojem/kroutici-moment/" class="glossary-item">
+      <div class="glossary-term">Kroutící moment (Nm)</div>
+      <div class="glossary-def">Síla otáčení, kterou nářadí přenese na vrták nebo kotouč. U brusek určuje, jak hluboko se zařízne před zpomalením otáček pod zátěží.</div>
     </a>
   </div>
   <a class="glossary-cta" href="/slovnik/">
     <div class="gc-text">
       <strong>Otevřít rozcestník slovníku</strong>
-      <span>342 hesel · elektronářadí, spotřebiče, zahrada, auto</span>
+      <span>18 hesel ve startovní sadě · elektronářadí, spotřebiče, zahrada, auto, elektronika</span>
     </div>
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
       <line x1="5" y1="12" x2="19" y2="12"/>

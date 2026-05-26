@@ -59,9 +59,9 @@ export const site: SiteConfig = {
           { href: "/domaci-spotrebice/", label: "Domácí spotřebiče" },
           { href: "/zahrada/", label: "Zahrada" },
           { href: "/auto/", label: "Auto" },
-          { href: "/sport/", label: "Sport & outdoor" },
-          { href: "/elektronika/", label: "Elektronika" },
+          { href: "/navody/", label: "Návody" },
           { href: "/znacky/", label: "Značky výrobců" },
+          { href: "/magazin/", label: "Magazín" },
         ],
       },
       {

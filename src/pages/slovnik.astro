@@ -167,7 +167,7 @@ const sortedLetters = Object.keys(byLetter).sort();
                 const cat = glossaryCategories.find((c) => c.slug === t.categorySlug);
                 return (
                   <li>
-                    <a href={`/slovnik/${t.slug}/`} class="term-card">
+                    <a href={`/slovnik/pojem/${t.slug}/`} class="term-card">
                       <div class="term-head">
                         <strong class="term-name">{t.term}</strong>
                         {cat && <span class={`term-cat term-cat-${cat.tone}`}>{cat.name}</span>}

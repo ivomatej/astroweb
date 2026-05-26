@@ -496,11 +496,10 @@ function formatCzechDate(iso: string): string {
                 </div>
                 {a.note && <p class="asset-note">{a.note}</p>}
               </div>
-              <a href={`/press/${a.filename}`} download class="asset-download" aria-label={`Stáhnout ${a.title}`}>
+              <a href={`mailto:press@recenzer.cz?subject=Press%20kit%20asset:%20${encodeURIComponent(a.title)}&body=Dobr%C3%BD%20den%2C%0A%0Apros%C3%ADm%20o%20zasl%C3%A1n%C3%AD%20press%20kit%20assetu%3A%20${encodeURIComponent(a.title)}%20(${encodeURIComponent(a.filename)}).%0A%0AD%C4%9Bkuji.`} class="asset-download" aria-label={`Vyžádat ${a.title} e-mailem`} title="Soubory dostupné na vyžádání e-mailem">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                  <polyline points="7 10 12 15 17 10" />
-                  <line x1="12" y1="15" x2="12" y2="3" />
+                  <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
+                  <polyline points="22,6 12,13 2,6" />
                 </svg>
               </a>
             </li>
@@ -508,7 +507,9 @@ function formatCzechDate(iso: string): string {
         }
       </ul>
       <p class="assets-note">
-        Soubory jsou placeholdery — finální assets aktualizujeme s release v.2.1 media kitu (plánováno 06/2026).
+        <strong>Soubory ke stažení dostupné na vyžádání e-mailem.</strong> Klikněte na ikonu obálky u
+        konkrétního assetu — otevře se předvyplněný e-mail. Odpovídáme do 24 hodin v pracovní dny.
+        Finální self-serve download portál vydáváme s release v.2.1 media kitu (plánováno 06/2026).
       </p>
     </div>
   </section>

@@ -45,6 +45,32 @@ const { category, articleCount } = Astro.props;
       )
     }
   </div>
+
+  {
+    category.editorialNote && (
+      <aside class="cat-page-note" aria-labelledby="cat-note-heading">
+        <div class="cat-page-note-inner">
+          <p class="cat-page-note-eyebrow" id="cat-note-heading">
+            Slovo redakce ke kategorii
+          </p>
+          <div class="cat-page-note-body" set:html={category.editorialNote} />
+          {category.editorialNoteBy && (
+            <p class="cat-page-note-by">
+              —{" "}
+              {category.editorialNoteBy.href ? (
+                <a href={category.editorialNoteBy.href}>
+                  {category.editorialNoteBy.name}
+                </a>
+              ) : (
+                <span>{category.editorialNoteBy.name}</span>
+              )}
+              , {category.editorialNoteBy.role}
+            </p>
+          )}
+        </div>
+      </aside>
+    )
+  }
 </header>
 
 <style>
@@ -152,5 +178,76 @@ const { category, articleCount } = Astro.props;
     font-size: 12.5px;
     font-weight: 600;
     border-radius: 999px;
+  }
+
+  .cat-page-note {
+    background: var(--surface-2, #f7f6f4);
+    border-top: 1px solid var(--line);
+  }
+
+  .cat-page-note-inner {
+    max-width: var(--max-w);
+    margin: 0 auto;
+    padding: clamp(1.75rem, 3.5vw, 2.5rem) var(--gutter);
+  }
+
+  .cat-page-note-eyebrow {
+    font-family: var(--mono);
+    font-size: 11.5px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--accent-fg);
+    font-weight: 700;
+    margin-bottom: 0.85rem;
+  }
+
+  .cat-page-note-body {
+    max-width: 72ch;
+    font-size: 15.5px;
+    line-height: 1.65;
+    color: var(--ink-soft);
+  }
+
+  .cat-page-note-body :global(p) {
+    margin-bottom: 0.85rem;
+  }
+
+  .cat-page-note-body :global(p:last-child) {
+    margin-bottom: 0;
+  }
+
+  .cat-page-note-body :global(strong) {
+    color: var(--ink);
+    font-weight: 700;
+  }
+
+  .cat-page-note-body :global(em) {
+    font-style: italic;
+    color: var(--ink);
+  }
+
+  .cat-page-note-body :global(a) {
+    color: var(--accent-text, var(--accent-fg));
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 2px;
+  }
+
+  .cat-page-note-by {
+    margin-top: 1rem;
+    font-size: 13px;
+    color: var(--muted);
+    font-style: italic;
+  }
+
+  .cat-page-note-by a {
+    color: var(--accent-text, var(--accent-fg));
+    text-decoration: none;
+    font-style: normal;
+    font-weight: 600;
+  }
+
+  .cat-page-note-by a:hover {
+    text-decoration: underline;
   }
 </style>

@@ -55,7 +55,7 @@ const lastUpdated = "2026-05-21";
           <ul class="terms-list">
             {terms.map((t) => (
               <li>
-                <a href={`/slovnik/${t.slug}/`} class="term-card">
+                <a href={`/slovnik/pojem/${t.slug}/`} class="term-card">
                   <strong class="term-name">{t.term}</strong>
                   <p class="term-def">{t.shortDef}</p>
                   {t.aliases && t.aliases.length > 0 && (
