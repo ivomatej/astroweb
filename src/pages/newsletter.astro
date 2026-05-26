@@ -265,8 +265,10 @@ const faqs = [
                 {p.icon === "lock" && (<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>)}
                 {p.icon === "exit" && (<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>)}
               </div>
-              <h3>{p.title}</h3>
-              <p>{p.text}</p>
+              <div class="promise-body">
+                <h3>{p.title}</h3>
+                <p>{p.text}</p>
+              </div>
             </li>
           ))
         }
@@ -836,6 +838,7 @@ const faqs = [
       background: var(--bg-warm);
       border: 1px solid var(--line);
       border-radius: var(--r-lg);
+      align-items: start;
     }
 
     .promise-ic {
@@ -850,6 +853,8 @@ const faqs = [
     }
 
     .promise-ic svg { width: 22px; height: 22px; }
+
+    .promise-body { min-width: 0; }
 
     .promises-grid h3 {
       font-size: 1rem;
