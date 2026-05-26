@@ -150,7 +150,7 @@ function PostBlock(post: ForumPost, isOP = false): string {
                 <strong>Pro publikaci odpovědi je nutná registrace</strong>, která bude dostupná po spuštění backendu (NestJS).
               </p>
               <p>
-                Mezitím můžete moderátora kontaktovat e-mailem — <a href={`mailto:diskuze@recenzer.cz?subject=Reply%20to:%20${encodeURIComponent(thread.title)}`}>diskuze@recenzer.cz</a>.
+                Mezitím můžete moderátora kontaktovat e-mailem — <a href={`mailto:redakce@recenzer.cz?subject=Diskuze%20—%20${encodeURIComponent(thread.title)}`}>redakce@recenzer.cz</a>.
               </p>
             </div>
           </section>
@@ -158,7 +158,7 @@ function PostBlock(post: ForumPost, isOP = false): string {
 
         {thread.status === "locked" && (
           <section class="locked-notice">
-            <strong>🔒 Vlákno je uzamčeno.</strong> Nové odpovědi nelze publikovat. Pokud máte otázku, vytvořte nové vlákno nebo napište na <a href="mailto:diskuze@recenzer.cz">diskuze@recenzer.cz</a>.
+            <strong>🔒 Vlákno je uzamčeno.</strong> Nové odpovědi nelze publikovat. Pokud máte otázku, vytvořte nové vlákno nebo napište na <a href="mailto:redakce@recenzer.cz">redakce@recenzer.cz</a>.
           </section>
         )}
       </article>

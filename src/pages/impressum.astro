@@ -326,6 +326,87 @@ const legalBadges: LegalBadge[] = [
       </div>
     </section>
 
+    <!-- EMAIL DIRECTORY — kanonický seznam -->
+    <section class="impressum-emails">
+      <div class="impressum-emails-inner">
+        <header>
+          <span class="impressum-emails-eyebrow">Kanonický soupis</span>
+          <h2 class="impressum-emails-title">7 e-mailových schránek — co kam patří</h2>
+          <p class="impressum-emails-sub">
+            Toto je <strong>úplný a jediný oficiální seznam</strong> e-mailových adres Recenzer.cz. <strong>Žádné jiné aliasy ani osobní adresy autorů</strong> nepoužíváme — všechny dotazy směřujte sem. Pokud někde na webu narazíte na e-mail mimo tento seznam, je to chyba — nahlaste ji prosím.
+          </p>
+        </header>
+
+        <table class="email-table">
+          <thead>
+            <tr>
+              <th>E-mail</th>
+              <th>K čemu slouží</th>
+              <th>Odpovídá</th>
+              <th>SLA</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><a href="mailto:ivo.matej@recenzer.cz"><code>ivo.matej@recenzer.cz</code></a></td>
+              <td>Osobní šéfredaktor — stížnosti na obsah, právní podněty, citlivé záležitosti</td>
+              <td>Ivo Matěj osobně</td>
+              <td>24 h v PD</td>
+            </tr>
+            <tr>
+              <td><a href="mailto:info@recenzer.cz"><code>info@recenzer.cz</code></a></td>
+              <td>Obecné dotazy, pokud nevíte, kam přesně psát</td>
+              <td>Asistentka redakce</td>
+              <td>48 h</td>
+            </tr>
+            <tr>
+              <td><a href="mailto:redakce@recenzer.cz"><code>redakce@recenzer.cz</code></a></td>
+              <td>
+                Tipy na témata, dotazy k článkům, opravy chyb, návrhy do slovníku, dotazy na konkrétního autora.
+                <strong>Pohlcuje</strong>: alena@, marie@, jana@, martin@, tomas@, petr@, lucie@, diskuze@, eticky@, opravy@
+              </td>
+              <td>Tým 8 redaktorů (rotace)</td>
+              <td>48 h v PD</td>
+            </tr>
+            <tr>
+              <td><a href="mailto:obchod@recenzer.cz"><code>obchod@recenzer.cz</code></a></td>
+              <td>Komerční spolupráce, partnerství se značkami, inzerce, B2B nabídky</td>
+              <td>Ivo Matěj + obchodní oddělení</td>
+              <td>48 h v PD</td>
+            </tr>
+            <tr>
+              <td><a href="mailto:press@recenzer.cz"><code>press@recenzer.cz</code></a></td>
+              <td>Pro novináře — citace, expertní pohled, prohlídka laboratoře, tiskové zprávy</td>
+              <td>Ivo Matěj (šéfredaktor)</td>
+              <td>24 h v PD</td>
+            </tr>
+            <tr>
+              <td><a href="mailto:kariera@recenzer.cz"><code>kariera@recenzer.cz</code></a></td>
+              <td>
+                Otevřené pozice, stáže, komunitní tester program.
+                <strong>Pohlcuje</strong>: testeri@
+              </td>
+              <td>Hiring manager dané pozice</td>
+              <td>5 PD</td>
+            </tr>
+            <tr>
+              <td><a href="mailto:gdpr@recenzer.cz"><code>gdpr@recenzer.cz</code></a></td>
+              <td>
+                Žádosti dle GDPR, ochrana osobních údajů, dotazy k cookies a přístupnosti.
+                <strong>Pohlcuje</strong>: pristupnost@
+              </td>
+              <td>Pověřenec pro GDPR (Ivo Matěj)</td>
+              <td>30 dnů (zákonná lhůta)</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <p class="impressum-emails-note">
+          <strong>Pravidlo aliasů:</strong> všechny e-maily v tomto seznamu jsou skutečné funkční schránky monitorované konkrétními lidmi. Adresy autorů typu <code>alena@recenzer.cz</code> v minulosti existovaly — <strong>nyní jsou všechny pohlceny do <code>redakce@recenzer.cz</code></strong> kvůli zastupitelnosti (dovolená, nemoc). Pokud chcete poslat e-mail konkrétnímu autorovi, použijte <code>redakce@recenzer.cz</code> s předmětem „Pro [jméno autora]".
+        </p>
+      </div>
+    </section>
+
     <!-- LEGAL DECLARATIONS -->
     <section class="impressum-legal">
       <div class="impressum-legal-inner">
@@ -659,6 +740,112 @@ const legalBadges: LegalBadge[] = [
     font-size: 0.85rem;
     color: var(--muted);
     line-height: 1.5;
+  }
+
+  /* ============ EMAIL DIRECTORY ============ */
+  .impressum-emails {
+    background: var(--bg);
+    border-top: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+  }
+  .impressum-emails-inner {
+    max-width: var(--max-w);
+    margin: 0 auto;
+    padding: 3rem var(--gutter);
+  }
+  .impressum-emails-eyebrow {
+    display: inline-block;
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--p-700);
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+  }
+  .impressum-emails-title {
+    font-family: var(--sans);
+    font-size: clamp(1.4rem, 2.6vw, 1.8rem);
+    font-weight: 800;
+    color: var(--ink);
+    margin: 0 0 0.6rem;
+    letter-spacing: -0.015em;
+  }
+  .impressum-emails-sub {
+    margin: 0 0 1.5rem;
+    max-width: 70ch;
+    color: var(--text);
+    line-height: 1.6;
+    font-size: 0.95rem;
+  }
+  .impressum-emails-sub strong { color: var(--ink); }
+  .email-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+    background: var(--bg-warm);
+    border: 1px solid var(--line);
+    border-radius: var(--r);
+    overflow: hidden;
+    margin-bottom: 1.25rem;
+  }
+  .email-table thead th {
+    padding: 0.85rem 1rem;
+    background: var(--bg);
+    border-bottom: 2px solid var(--p-200);
+    text-align: left;
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--p-700);
+    font-weight: 700;
+  }
+  .email-table tbody td {
+    padding: 0.85rem 1rem;
+    border-bottom: 1px solid var(--line-soft);
+    vertical-align: top;
+    color: var(--text);
+    line-height: 1.55;
+  }
+  .email-table tbody tr:last-child td { border-bottom: none; }
+  .email-table tbody tr:hover td { background: var(--bg); }
+  .email-table code {
+    font-family: var(--mono);
+    font-size: 0.82rem;
+    background: var(--p-50);
+    color: var(--p-700);
+    padding: 0.1rem 0.4rem;
+    border-radius: 3px;
+    word-break: break-word;
+  }
+  .email-table a {
+    color: var(--p-700);
+    text-decoration: none;
+  }
+  .email-table a:hover { color: var(--p-900); }
+  .email-table strong { color: var(--ink); font-weight: 600; }
+  .impressum-emails-note {
+    padding: 1.1rem 1.3rem;
+    background: var(--amber-bg);
+    border-left: 3px solid var(--amber);
+    border-radius: var(--r-sm);
+    font-size: 0.88rem;
+    line-height: 1.6;
+    color: var(--text);
+    margin: 0;
+  }
+  .impressum-emails-note strong { color: var(--ink); font-weight: 700; }
+  .impressum-emails-note code {
+    font-family: var(--mono);
+    font-size: 0.82rem;
+    background: var(--bg);
+    color: var(--amber-text);
+    padding: 0.1rem 0.4rem;
+    border-radius: 3px;
+  }
+  @media (max-width: 720px) {
+    .email-table { display: block; overflow-x: auto; }
   }
 
   /* ============ LEGAL DECLARATIONS ============ */

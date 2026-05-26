@@ -1,0 +1,22 @@
+# Cloudflare Pages redirects
+# Spec: https://developers.cloudflare.com/pages/configuration/redirects/
+
+# Common alias for testovací laboratoř — short URL, intuitive
+/laborator              /testovaci-laborator/         301
+/laborator/             /testovaci-laborator/         301
+
+# Press URL variants
+/tiskove-zpravy         /press/#tiskove-zpravy        301
+/tiskove-zpravy/        /press/#tiskove-zpravy        301
+/media-kit              /press/                       301
+/media-kit/             /press/                       301
+
+# Inzerce (referenced from footer but no separate page)
+/inzerce                /pro-znacky-firmy-agentury/   301
+/inzerce/               /pro-znacky-firmy-agentury/   301
+
+# Latin variants without Czech diacritics
+/o-firme                /impressum/                   301
+/o-firme/               /impressum/                   301
+/sef-redaktor           /sefredaktor/                 301
+/sef-redaktor/          /sefredaktor/                 301

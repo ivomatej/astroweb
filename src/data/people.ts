@@ -230,10 +230,10 @@ export const alenaRajnochova: AuthorProfile = {
     },
   ],
   links: [
-    { href: "mailto:alena@recenzer.cz", label: "E-mail" },
+    { href: "mailto:redakce@recenzer.cz?subject=Pro%20Alenu%20Rajnochovou", label: "E-mail (přes redakci)" },
     { href: "https://www.linkedin.com/in/alena-rajnochova", label: "LinkedIn" },
   ],
-  contactEmail: "alena@recenzer.cz",
+  contactEmail: "redakce@recenzer.cz",
 };
 
 export const marieMullerova: AuthorProfile = {
@@ -290,10 +290,10 @@ export const marieMullerova: AuthorProfile = {
     },
   ],
   links: [
-    { href: "mailto:marie@recenzer.cz", label: "E-mail" },
+    { href: "mailto:redakce@recenzer.cz?subject=Pro%20Marii%20Müllerovou", label: "E-mail (přes redakci)" },
     { href: "https://www.linkedin.com/in/marie-mullerova", label: "LinkedIn" },
   ],
-  contactEmail: "marie@recenzer.cz",
+  contactEmail: "redakce@recenzer.cz",
 };
 
 export const janaNovakova: AuthorProfile = {
@@ -355,10 +355,10 @@ export const janaNovakova: AuthorProfile = {
     },
   ],
   links: [
-    { href: "mailto:jana@recenzer.cz", label: "E-mail" },
+    { href: "mailto:redakce@recenzer.cz?subject=Pro%20Janu%20Novákovou", label: "E-mail (přes redakci)" },
     { href: "https://www.linkedin.com/in/jana-novakova-recenzer", label: "LinkedIn" },
   ],
-  contactEmail: "jana@recenzer.cz",
+  contactEmail: "redakce@recenzer.cz",
 };
 
 export const martinProchazka: AuthorProfile = {
@@ -424,10 +424,10 @@ export const martinProchazka: AuthorProfile = {
     },
   ],
   links: [
-    { href: "mailto:martin@recenzer.cz", label: "E-mail" },
+    { href: "mailto:redakce@recenzer.cz?subject=Pro%20Martina%20Procházku", label: "E-mail (přes redakci)" },
     { href: "https://www.linkedin.com/in/martin-prochazka-triathlon", label: "LinkedIn" },
   ],
-  contactEmail: "martin@recenzer.cz",
+  contactEmail: "redakce@recenzer.cz",
 };
 
 export const tomasVesely: AuthorProfile = {
@@ -484,10 +484,10 @@ export const tomasVesely: AuthorProfile = {
     },
   ],
   links: [
-    { href: "mailto:tomas@recenzer.cz", label: "E-mail" },
+    { href: "mailto:redakce@recenzer.cz?subject=Pro%20Tomáše%20Veselého", label: "E-mail (přes redakci)" },
     { href: "https://www.linkedin.com/in/tomas-vesely-auto", label: "LinkedIn" },
   ],
-  contactEmail: "tomas@recenzer.cz",
+  contactEmail: "redakce@recenzer.cz",
 };
 
 export const petrSvoboda: AuthorProfile = {
@@ -555,10 +555,10 @@ export const petrSvoboda: AuthorProfile = {
     },
   ],
   links: [
-    { href: "mailto:petr@recenzer.cz", label: "E-mail" },
+    { href: "mailto:redakce@recenzer.cz?subject=Pro%20Petra%20Svobodu", label: "E-mail (přes redakci)" },
     { href: "https://www.linkedin.com/in/petr-svoboda-finance", label: "LinkedIn" },
   ],
-  contactEmail: "petr@recenzer.cz",
+  contactEmail: "redakce@recenzer.cz",
 };
 
 export const lucieHorakova: AuthorProfile = {
@@ -599,10 +599,10 @@ export const lucieHorakova: AuthorProfile = {
     },
   ],
   links: [
-    { href: "mailto:lucie@recenzer.cz", label: "E-mail" },
+    { href: "mailto:redakce@recenzer.cz?subject=Pro%20Lucii%20Horákovou", label: "E-mail (přes redakci)" },
     { href: "https://www.linkedin.com/in/lucie-horakova-editor", label: "LinkedIn" },
   ],
-  contactEmail: "lucie@recenzer.cz",
+  contactEmail: "redakce@recenzer.cz",
 };
 
 // External experts

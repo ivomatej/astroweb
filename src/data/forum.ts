@@ -447,7 +447,7 @@ export const forumThreads: ForumThread[] = [
 <li><strong>moderator</strong> — má moderační práva</li>
 </ul>
 
-<p>Moderátoři jsou <strong>Ivo Matěj</strong> a <strong>Alena Rajnochová</strong>. Pokud něco nesedí, kontaktujte je přes <a href="mailto:diskuze@recenzer.cz">diskuze@recenzer.cz</a>.</p>
+<p>Moderátoři jsou <strong>Ivo Matěj</strong> a <strong>Alena Rajnochová</strong>. Pokud něco nesedí, kontaktujte je přes <a href="mailto:redakce@recenzer.cz">redakce@recenzer.cz</a>.</p>
 
 <p><strong>Vlákno je uzamčeno</strong> — pro otázky k pravidlům pište e-mailem.</p>
       `,

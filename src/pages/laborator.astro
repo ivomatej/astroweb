@@ -1,0 +1,13 @@
+---
+/*
+ * Alias / redirect: /laborator/ → /testovaci-laborator/
+ *
+ * Lidé (i Google) intuitivně očekávají kratší URL /laborator/.
+ * Aby nebyl 404, vytváříme prerendered redirect stránku.
+ * Static Astro nemá serverové 301, ale prerender + meta refresh + canonical
+ * dělá totéž z pohledu prohlížeče i crawlerů.
+ *
+ * Cloudflare Pages dodatečně respektuje public/_redirects pro skutečné 301.
+ */
+return Astro.redirect("/testovaci-laborator/", 301);
+---
