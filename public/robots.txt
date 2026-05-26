@@ -246,5 +246,8 @@ Crawl-delay: 10
 #   - sitemap-images.xml     (image sitemap pro Google Images)
 Sitemap: https://www.recenzer.cz/sitemap.xml
 
-# Atom feed pro novinářské RSS čtečky
+# RSS feed všech publikovaných článků (pro LLM crawlery & RSS čtečky)
+Sitemap: https://www.recenzer.cz/rss.xml
+
+# Atom feed aktualizací webu
 Sitemap: https://www.recenzer.cz/aktualizace.xml

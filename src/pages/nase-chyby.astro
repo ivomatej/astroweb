@@ -169,8 +169,8 @@ const principles = [
     text: "Když dnes čtete naši metodiku v abstraktní formě (např. „testujeme robotický vysavač ve 3 různých prostředích“), nemusí být zjevné, proč to děláme tak komplikovaně. Tato stránka vám ukazuje konkrétní chybu, ze které pravidlo vzniklo.",
   },
   {
-    title: "Tady neuvádíme „opravu překlepu“",
-    text: "Tento seznam není seznam korekčních úprav — ten najdete v <a href=\"/opravy/\">/opravy/</a>. Tady jsou jen <strong>systémové chyby</strong> — situace, kde jsme se mýlili na úrovni rozhodování, metodiky nebo etiky.",
+    title: "Dva typy záznamů, dva časové horizonty",
+    text: "<strong>Tato stránka:</strong> systémové chyby — situace, kde jsme se mýlili v rozhodnutí, metodice nebo etice. Vedeme je od <strong>vzniku Recenzer.cz v roce 2016</strong>, nejstarší doložená je z 2018.<br/><br/><strong><a href=\"/opravy/\">Archiv oprav</a>:</strong> jednotlivé korekce konkrétních článků (špatná hodnota, ukončený model, oprava odkazu). Vedeme od <strong>ledna 2025</strong>, kdy jsme zavedli formální tracking. Starší korekce existovaly, ale nebyly systematicky zaznamenávané.",
   },
 ];
 
@@ -188,7 +188,7 @@ function severityLabel(s: "critical" | "important" | "minor"): string {
 
 <BaseLayout
   title="Naše chyby — kdy se mýlila redakce Recenzer.cz | Recenzer"
-  description="Veřejný seznam systémových chyb redakce Recenzer.cz od roku 2018. Co jsme doporučili, kde jsme se mýlili, co jsme se z toho naučili a jak jsme změnili metodiku. Transparentnost jako standard."
+  description="Veřejný seznam systémových chyb redakce Recenzer.cz (nejstarší doložená z 2018). Co jsme doporučili, kde jsme se mýlili, co jsme se z toho naučili a jak jsme změnili metodiku. Jednotlivé opravy článků jsou v archivu /opravy/ od ledna 2025."
 >
   <PageBreadcrumbs
     items={[
@@ -201,7 +201,7 @@ function severityLabel(s: "critical" | "important" | "minor"): string {
     eyebrow="Editorial standards · meta-stránka"
     eyebrowIcon="shield"
     title="Kde se redakce<br/><em>vážně mýlila</em>"
-    subtitle={`Tato stránka existuje proto, že <strong>každá silná metodika vznikla z konkrétní chyby</strong>. Tady jsou systémové omyly redakce od roku 2018 — co jsme doporučili, kde jsme se zmýlili, co jsme se naučili a jak jsme změnili pravidla. Není to jen archiv oprav (ten je <a href="/opravy/">tady</a>) — jsou to <em>poučení, která definovala Recenzer.cz</em>.`}
+    subtitle={`Tato stránka existuje proto, že <strong>každá silná metodika vznikla z konkrétní chyby</strong>. Tady jsou systémové omyly redakce — co jsme doporučili, kde jsme se zmýlili, co jsme se naučili a jak jsme změnili pravidla. Nejstarší doložená chyba je z roku <strong>2018</strong>. Není to seznam oprav konkrétních článků (ten je v <a href="/opravy/">/opravy/</a> od ledna 2025) — jsou to <em>poučení, která definovala Recenzer.cz</em>.`}
   />
 
   <!-- ============ STATS ============ -->

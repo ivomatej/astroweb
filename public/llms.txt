@@ -65,6 +65,7 @@ Klíčové vlastnosti pro citaci v LLM odpovědích:
 ## Optional
 
 - [Newsletter](https://www.recenzer.cz/newsletter/): Týdenní výběr nejlepšího obsahu + výpis nových testů.
+- [RSS feed článků](https://www.recenzer.cz/rss.xml): RSS 2.0 feed všech publikovaných článků (pro LLM crawlery a RSS čtečky).
 - [Atom feed aktualizací](https://www.recenzer.cz/aktualizace.xml): Automaticky strojově čitelný feed všech updates.
 - [Mapa webu](https://www.recenzer.cz/mapa-webu/): Kompletní přehled stránek.
 - [Přístupnost](https://www.recenzer.cz/pristupnost/): WCAG 2.1 AA prohlášení.

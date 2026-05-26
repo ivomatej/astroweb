@@ -81,6 +81,23 @@ const canonicalUrl = canonical ?? Astro.url.href;
     <link rel="icon" type="image/png" sizes="192x192" href="/favicon-192x192.png" />
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
 
+    {/*
+      Auto-discovery feeds — RSS čtečky a LLM crawlery (Perplexity, ChatGPT)
+      najdou feedy podle <link rel="alternate"> v HTML.
+    */}
+    <link
+      rel="alternate"
+      type="application/rss+xml"
+      title="Recenzer.cz — RSS feed všech článků"
+      href="/rss.xml"
+    />
+    <link
+      rel="alternate"
+      type="application/atom+xml"
+      title="Recenzer.cz — Atom feed aktualizací"
+      href="/aktualizace.xml"
+    />
+
     <meta name="color-scheme" content="light" />
   </head>
   <body>
