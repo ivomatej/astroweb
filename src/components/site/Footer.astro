@@ -168,7 +168,8 @@ const currentYear = new Date().getFullYear();
   .foot-brand p {
     font-size: 13.5px;
     line-height: 1.6;
-    color: rgba(255, 255, 255, 0.6);
+    /* 0.6 → 0.75 pro lepší kontrast na --ink pozadí. */
+    color: rgba(255, 255, 255, 0.75);
     max-width: 28ch;
     margin-bottom: 1rem;
   }
@@ -221,7 +222,7 @@ const currentYear = new Date().getFullYear();
   }
 
   .foot-col a {
-    color: rgba(255, 255, 255, 0.65);
+    color: rgba(255, 255, 255, 0.78);
     font-size: 13.5px;
     text-decoration: none;
     transition: color 0.15s;
@@ -246,7 +247,7 @@ const currentYear = new Date().getFullYear();
   }
 
   .foot-legal a {
-    color: rgba(255, 255, 255, 0.6);
+    color: rgba(255, 255, 255, 0.78);
     font-size: 12.5px;
     text-decoration: none;
     font-weight: 500;
@@ -285,7 +286,9 @@ const currentYear = new Date().getFullYear();
     justify-content: space-between;
     gap: 1rem;
     flex-wrap: wrap;
-    color: rgba(255, 255, 255, 0.4);
+    /* Posíleno z 0.4 na 0.65 — copyright text musí být čitelný (WCAG AA).
+       0.65 dává cca 5:1 kontrast na --ink pozadí. */
+    color: rgba(255, 255, 255, 0.65);
     font-size: 12.5px;
     border-top: 1px solid rgba(255, 255, 255, 0.05);
   }

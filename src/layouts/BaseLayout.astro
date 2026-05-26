@@ -32,6 +32,36 @@ const canonicalUrl = canonical ?? Astro.url.href;
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    {/*
+      PRELOAD KRITICKÝCH FONTŮ — co nejvýše v <head>, aby browser
+      začal stahovat dřív, než dorazí ke <link> na CSS.
+      Crossorigin je u fontů povinné.
+    */}
+    <link
+      rel="preload"
+      href="/fonts/Figtree-VariableFont_wght.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin="anonymous"
+    />
+    <link
+      rel="preload"
+      href="/fonts/JetBrainsMono-VariableFont_wght.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin="anonymous"
+    />
+
+    {/*
+      DNS-PREFETCH pro affiliate destinace.
+      Bez fetchu jen DNS — minimální cena, ale ušetří 50–150 ms,
+      pokud uživatel klikne na produktový odkaz.
+    */}
+    <link rel="dns-prefetch" href="https://www.heureka.cz" />
+    <link rel="dns-prefetch" href="https://www.alza.cz" />
+    <link rel="dns-prefetch" href="https://www.datart.cz" />
+
     <meta name="description" content={description} />
     {noIndex && <meta name="robots" content="noindex" />}
 
@@ -50,21 +80,6 @@ const canonicalUrl = canonical ?? Astro.url.href;
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
     <link rel="icon" type="image/png" sizes="192x192" href="/favicon-192x192.png" />
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
-
-    <link
-      rel="preload"
-      href="/fonts/Figtree-VariableFont_wght.woff2"
-      as="font"
-      type="font/woff2"
-      crossorigin
-    />
-    <link
-      rel="preload"
-      href="/fonts/JetBrainsMono-VariableFont_wght.woff2"
-      as="font"
-      type="font/woff2"
-      crossorigin
-    />
 
     <meta name="color-scheme" content="light" />
   </head>

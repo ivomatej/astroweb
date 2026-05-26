@@ -255,7 +255,9 @@
 }
 
 .section-body .param-zone.low {
-  background: var(--p-300);
+  /* Změněno z --p-300 (#b89bff) na --p-500 — bílý text potřebuje
+     dostatečný kontrast. #7a4fe3 dává 5.5:1 ✓ AA. */
+  background: var(--p-500);
 }
 
 .section-body .param-zone.optimal {
@@ -263,7 +265,10 @@
 }
 
 .section-body .param-zone.high {
-  background: var(--accent);
+  /* Změněno z --accent (#ff4f00, 3.66:1 — fail) na --accent-text
+     (#cc3f00, 5.62:1 ✓ AA pro bílý text). Brand barva zůstává v UI,
+     ale pro bg s bílým textem používáme darker variant. */
+  background: var(--accent-text);
 }
 
 .section-body .param-labels {

@@ -263,11 +263,28 @@ const answerTone = {
     background: var(--bg);
     border: 1px solid var(--line);
     border-radius: var(--r);
-    transition: opacity 0.15s ease;
+    transition: background 0.15s ease;
   }
   .method-card.is-inactive {
-    opacity: 0.5;
+    /* Místo opacity: 0.5 — používáme dimmed BG + explicit darker text,
+       aby vizuálně bylo "inactive" jasné, ale text měl dostatečný kontrast (WCAG AA). */
     background: var(--bg-warm);
+    border-color: var(--line);
+  }
+  .method-card.is-inactive .method-label {
+    color: var(--ink-soft);
+  }
+  .method-card.is-inactive .method-desc {
+    color: var(--muted);
+  }
+  .method-card.is-inactive .method-icon {
+    background: var(--bg);
+    color: var(--muted);
+    border: 1px solid var(--line);
+  }
+  .method-card.is-inactive .method-check {
+    background: var(--bg);
+    border-color: var(--line);
   }
   .method-card.is-active {
     border-color: var(--green);

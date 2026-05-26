@@ -51,7 +51,7 @@ const formattedAvg = rating.average.toFixed(1).replace(".", ",");
     </div>
 
     <div class="rating-card-right">
-      <div class="rating-stars" aria-label={`Hodnocení ${formattedAvg} z 5`}>
+      <div class="rating-stars" role="img" aria-label={`Hodnocení ${formattedAvg} z 5`}>
         {
           Array.from({ length: fullStars }).map(() => (
             <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">

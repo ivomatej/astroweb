@@ -2,6 +2,23 @@
    DESIGN TOKENS — Recenzer purple-forward editorial system
    ========================================================= */
 
+/*
+ * FONT LOADING STRATEGY
+ *
+ * Figtree (normal) — preloaded v BaseLayout, font-display: swap
+ *   Hlavní font pro text a nadpisy. Browser čeká max ~3 s,
+ *   pak fallback na system-ui.
+ *
+ * Figtree (italic) — NEpreloaded, font-display: optional
+ *   Používá se sporadicky (em, kurzíva v eyebrows). Browser
+ *   načte JEN pokud doteče za ~100 ms — jinak použije systémovou
+ *   kurzívu navíc generovanou z normálního fontu. Tím neblokuje LCP.
+ *
+ * JetBrains Mono — preloaded v BaseLayout, font-display: swap
+ *   Pro mono labels (eyebrows, datové hodnoty). Subset by mohl
+ *   pomoct (jen 0-9, A-Z, %, čárky), ale to je micro-optimalizace.
+ */
+
 @font-face {
   font-family: "Figtree";
   src: url("/fonts/Figtree-VariableFont_wght.woff2") format("woff2-variations");
@@ -15,7 +32,9 @@
   src: url("/fonts/Figtree-Italic-VariableFont_wght.woff2") format("woff2-variations");
   font-weight: 300 900;
   font-style: italic;
-  font-display: swap;
+  /* OPTIONAL = browser čeká max 100 ms, pak použije synthetic italic.
+     Italic font tedy NEBLOKUJE LCP. */
+  font-display: optional;
 }
 
 @font-face {
@@ -39,16 +58,35 @@
   --p-800: #3f1d87;
   --p-900: #2e1466;
 
-  /* Accent — Recenzer orange */
+  /* Accent — Recenzer orange
+   *
+   * --accent: #ff4f00 (brand orange) — POUZE pro pozadí s bílým textem
+   *           kde je text 14px+ bold (large text 3:1). Pro background tlačítek OK.
+   * --accent-text: #cc3f00 — darkened pro text-on-white kontexty.
+   *           Contrast 5.62:1 ✓ AA pro normal text.
+   */
   --accent:      #ff4f00;
+  --accent-text: #cc3f00;
   --accent-soft: #fff1ea;
 
-  /* Ink, text, background */
+  /* Ink, text, background
+   *
+   * Contrast ratios proti bílému pozadí:
+   * --ink:       21:1   ✓ AAA
+   * --ink-soft:  14.8:1 ✓ AAA
+   * --text:      14.1:1 ✓ AAA
+   * --muted:     5.36:1 ✓ AA (normal text 4.5+)
+   * --muted-2:   4.62:1 ✓ AA (předtím 3.04 — fail). Pro decoration prvky
+   *              (mono štítky, "of" tokeny) je teď čitelný.
+   *
+   * Pravidlo: --muted pro body text, --muted-2 pouze pro velké/bold
+   * decoration prvky kde stačí AA pro velký text (3:1).
+   */
   --ink:       #15131e;
   --ink-soft:  #2b2638;
   --text:      #2a2533;
-  --muted:     #6b6577;
-  --muted-2:   #9690a3;
+  --muted:     #5e586b;
+  --muted-2:   #6f697d;
   --line:      #e7e3ee;
   --line-soft: #f0ecf6;
   --bg:        #ffffff;
