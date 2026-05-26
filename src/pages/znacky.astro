@@ -1,0 +1,365 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import PageBreadcrumbs from "../components/page/PageBreadcrumbs.astro";
+import PageHero from "../components/page/PageHero.astro";
+import { getAllBrands, tierMeta } from "../data/brands";
+
+const allBrands = getAllBrands();
+const lastUpdated = "2026-05-21";
+
+const stats = [
+  { value: `${allBrands.length}`, label: "značek v databázi" },
+  { value: "87", label: "značek pod auditem Kodexu" },
+  { value: "0–100", label: "skóre dle Kodexu férové firmy" },
+  { value: "1×/rok", label: "kompletní audit" },
+];
+
+const categoryCounts = {
+  Doporučená: allBrands.filter((b) => b.category === "Doporučená").length,
+  Solidní: allBrands.filter((b) => b.category === "Solidní").length,
+  Sledovaná: allBrands.filter((b) => b.category === "Sledovaná").length,
+  Nedoporučovaná: allBrands.filter((b) => b.category === "Nedoporučovaná").length,
+};
+---
+
+<BaseLayout
+  title="Značky výrobců — profily a hodnocení podle Kodexu | Recenzer.cz"
+  description={`Profily ${allBrands.length} značek výrobců — Bosch, Miele, Makita, Samsung a další. Historie, philozofie, produktové řady, servis v ČR, slabiny a bodové skóre podle Kodexu férové firmy.`}
+>
+  <PageBreadcrumbs items={[{ href: "/", label: "Recenzer" }, { label: "Značky" }]} />
+
+  <PageHero
+    eyebrow="Profily značek · audit Kodexu férové firmy"
+    eyebrowIcon="shield"
+    title="Značky<br/><em>za produkty</em>"
+    subtitle={`Detailní profily ${allBrands.length} značek — historie, philozofie, produktové řady, servis v ČR. Plus naše bodové <strong>skóre podle <a href=\"/kodex-ferove-firmy/\">Kodexu férové firmy</a></strong>. Hodnotíme nejen produkt, ale i firmu za ním.`}
+  />
+
+  <!-- ============ STATS ============ -->
+  <section class="stats-strip">
+    <div class="inner">
+      <ul>
+        {
+          stats.map((s) => (
+            <li>
+              <strong>{s.value}</strong>
+              <span>{s.label}</span>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <!-- ============ LEGEND ============ -->
+  <section class="brands-legend">
+    <div class="inner">
+      <header class="section-head">
+        <p class="eyebrow">Klasifikace značek</p>
+        <h2>4 kategorie podle skóre Kodexu</h2>
+        <p class="lead">
+          Skóre se počítá ze 7 pilířů Kodexu férové firmy (pravdivé info, servis ČR, záruky, žádná manipulace recenzí, transparentnost změn, odpovědné PR, bezpečnost).
+        </p>
+      </header>
+      <ul class="legend-grid">
+        <li class="legend-card legend-green">
+          <strong>Doporučená</strong>
+          <span>85–100 bodů</span>
+          <p>Důvěryhodný partner pro spotřebitele.</p>
+          <span class="legend-count">{categoryCounts.Doporučená} značek</span>
+        </li>
+        <li class="legend-card legend-amber">
+          <strong>Solidní</strong>
+          <span>70–84 bodů</span>
+          <p>Splňuje většinu pilířů, drobné výhrady.</p>
+          <span class="legend-count">{categoryCounts.Solidní} značek</span>
+        </li>
+        <li class="legend-card legend-amber">
+          <strong>Sledovaná</strong>
+          <span>50–69 bodů</span>
+          <p>Otázky kolem některých pilířů.</p>
+          <span class="legend-count">{categoryCounts.Sledovaná} značek</span>
+        </li>
+        <li class="legend-card legend-red">
+          <strong>Nedoporučovaná</strong>
+          <span>0–49 bodů</span>
+          <p>Závažné nedostatky.</p>
+          <span class="legend-count">{categoryCounts.Nedoporučovaná} značek</span>
+        </li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ============ BRANDS LIST ============ -->
+  <section class="brands-list">
+    <div class="inner">
+      <header class="section-head">
+        <p class="eyebrow">{allBrands.length} značek</p>
+        <h2>Seřazené podle našeho skóre</h2>
+        <p class="lead">
+          Veřejné jsou jen značky s plnou profilovou stránkou. <strong>Dalších 83 značek hodnotíme interně</strong> a postupně zveřejňujeme jejich profily.
+        </p>
+      </header>
+      <ul class="brands-grid">
+        {
+          allBrands.map((b) => (
+            <li class={`brand-card brand-tone-${b.tone}`}>
+              <header class="brand-head">
+                <div class="brand-logo" aria-hidden="true">
+                  <span>{b.name.slice(0, 2).toUpperCase()}</span>
+                </div>
+                <div class="brand-id">
+                  <strong class="brand-name">{b.name}</strong>
+                  <span class="brand-meta">
+                    {b.country} · est. {b.founded}
+                  </span>
+                </div>
+                <div class={`brand-score brand-score-${b.tone}`}>
+                  <strong>{b.kodexScore}</strong>
+                  <span>/ 100</span>
+                </div>
+              </header>
+              <p class="brand-tagline">{b.tagline}</p>
+              <div class="brand-tags">
+                <span class={`brand-category brand-category-${b.tone}`}>{b.category}</span>
+                <span class="brand-tier">{tierMeta[b.tier].label}</span>
+                <span class="brand-revenue">{b.revenue}</span>
+              </div>
+              <footer class="brand-footer">
+                <span class="brand-products">{b.productLines.length} produktových řad</span>
+                <a href={`/znacky/${b.slug}/`} class="brand-link">
+                  Detail značky
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+                    <line x1="5" y1="12" x2="19" y2="12" />
+                    <polyline points="12 5 19 12 12 19" />
+                  </svg>
+                </a>
+              </footer>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <!-- ============ CTA ============ -->
+  <section class="brands-cta">
+    <div class="inner">
+      <div class="cta-card">
+        <h2>Chybí vám značka, kterou hledáte?</h2>
+        <p>
+          Hodnotíme aktuálně 87 značek, ale veřejné profily máme jen pro {allBrands.length}. <strong>Pošlete název značky</strong>, kterou hledáte — pokud máme dostatek dat, sepíšeme profil přednostně.
+        </p>
+        <div class="cta-actions">
+          <a href="mailto:redakce@recenzer.cz?subject=Žádost%20o%20profil%20značky" class="btn-primary">
+            redakce@recenzer.cz
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+              <line x1="5" y1="12" x2="19" y2="12" />
+              <polyline points="12 5 19 12 12 19" />
+            </svg>
+          </a>
+          <a href="/kodex-ferove-firmy/" class="btn-ghost">Kodex férové firmy</a>
+          <a href="/metodika/" class="btn-ghost">Metodika testů</a>
+        </div>
+      </div>
+      <p class="cta-meta">
+        Aktualizace značek průběžně · poslední revize <time datetime={lastUpdated}>{lastUpdated}</time>.
+      </p>
+    </div>
+  </section>
+
+  <style>
+    .inner { max-width: var(--max-w); margin: 0 auto; padding: clamp(2.5rem, 5vw, 4rem) var(--gutter); }
+    .section-head { max-width: 65ch; margin: 0 0 2rem; }
+    .eyebrow {
+      font-family: var(--mono); font-size: 11.5px; text-transform: uppercase;
+      letter-spacing: 0.1em; color: var(--p-700); font-weight: 700; margin: 0 0 0.5rem;
+    }
+    .section-head h2 {
+      font-size: clamp(1.5rem, 3vw, 2.1rem); font-weight: 800; letter-spacing: -0.025em;
+      color: var(--ink); line-height: 1.2; margin-bottom: 0.6rem;
+    }
+    .section-head .lead { font-size: 15px; line-height: 1.6; color: var(--muted); margin: 0; }
+    .section-head .lead strong { color: var(--ink); }
+    .section-head .lead a { color: var(--p-700); text-decoration: none; border-bottom: 1px dashed var(--p-300); }
+
+    /* Stats */
+    .stats-strip { background: var(--bg); border-bottom: 1px solid var(--line); }
+    .stats-strip .inner { padding: 2rem var(--gutter); }
+    .stats-strip ul {
+      list-style: none; padding: 0; margin: 0;
+      display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.5rem;
+    }
+    @media (max-width: 720px) { .stats-strip ul { grid-template-columns: repeat(2, 1fr); gap: 1rem; } }
+    .stats-strip li {
+      display: flex; flex-direction: column; gap: 4px;
+      padding-top: 0.75rem; border-top: 2px solid var(--p-200);
+    }
+    .stats-strip strong {
+      font-size: clamp(1.4rem, 2.5vw, 1.9rem); font-weight: 800;
+      color: var(--ink); letter-spacing: -0.02em; line-height: 1;
+    }
+    .stats-strip span { font-size: 12px; color: var(--muted); line-height: 1.3; }
+
+    /* Legend */
+    .brands-legend { background: var(--bg-warm); border-bottom: 1px solid var(--line); }
+    .legend-grid {
+      list-style: none; padding: 0; margin: 0;
+      display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.75rem;
+    }
+    @media (max-width: 800px) { .legend-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 480px) { .legend-grid { grid-template-columns: 1fr; } }
+    .legend-card {
+      padding: 1.25rem; background: var(--bg);
+      border: 1px solid var(--line); border-radius: var(--r);
+      display: flex; flex-direction: column; gap: 0.45rem;
+    }
+    .legend-green { border-left: 3px solid var(--green); }
+    .legend-amber { border-left: 3px solid var(--amber); }
+    .legend-red { border-left: 3px solid var(--red); }
+    .legend-card strong { font-size: 1.05rem; color: var(--ink); font-weight: 800; }
+    .legend-green strong { color: var(--green); }
+    .legend-red strong { color: var(--red); }
+    .legend-card > span {
+      font-family: var(--mono); font-size: 0.78rem; color: var(--p-700);
+      padding: 0.15rem 0.55rem; background: var(--p-50);
+      border-radius: 4px; align-self: flex-start; font-weight: 700;
+    }
+    .legend-card p {
+      margin: 0; font-size: 0.85rem; line-height: 1.5; color: var(--text);
+    }
+    .legend-count {
+      font-family: var(--mono); font-size: 0.72rem !important;
+      color: var(--muted) !important; background: none !important;
+      padding: 0 !important; margin-top: auto;
+    }
+
+    /* Brands list */
+    .brands-list { background: var(--bg); border-bottom: 1px solid var(--line); }
+    .brands-grid {
+      list-style: none; padding: 0; margin: 0;
+      display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem;
+    }
+    @media (max-width: 800px) { .brands-grid { grid-template-columns: 1fr; } }
+    .brand-card {
+      padding: 1.5rem; background: var(--bg-warm);
+      border: 1px solid var(--line); border-radius: var(--r-lg);
+      display: flex; flex-direction: column; gap: 1rem;
+    }
+    .brand-tone-green { border-left: 4px solid var(--green); }
+    .brand-tone-amber { border-left: 4px solid var(--amber); }
+    .brand-tone-red { border-left: 4px solid var(--red); }
+
+    .brand-head {
+      display: grid; grid-template-columns: 56px 1fr auto; gap: 0.85rem;
+      align-items: center;
+    }
+    .brand-logo {
+      width: 56px; height: 56px; border-radius: 14px;
+      background: linear-gradient(135deg, var(--p-100), var(--p-200));
+      color: var(--p-700);
+      display: flex; align-items: center; justify-content: center;
+      font-family: var(--sans); font-weight: 800; font-size: 1.2rem;
+      letter-spacing: -0.02em;
+    }
+    .brand-name {
+      display: block; font-size: 1.15rem; font-weight: 800;
+      color: var(--ink); letter-spacing: -0.015em;
+    }
+    .brand-meta {
+      font-family: var(--mono); font-size: 0.72rem;
+      text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted);
+    }
+    .brand-score {
+      display: flex; flex-direction: column; align-items: center;
+      padding: 0.55rem 0.85rem; border-radius: var(--r-sm);
+      background: var(--p-50); min-width: 70px;
+    }
+    .brand-score-green { background: var(--green-bg); }
+    .brand-score-amber { background: var(--amber-bg); }
+    .brand-score-red { background: var(--red-bg); }
+    .brand-score strong {
+      font-family: var(--sans); font-size: 1.6rem; font-weight: 800;
+      color: var(--p-700); line-height: 1;
+    }
+    .brand-score-green strong { color: var(--green); }
+    .brand-score-amber strong { color: var(--amber); }
+    .brand-score-red strong { color: var(--red); }
+    .brand-score span {
+      font-family: var(--mono); font-size: 0.65rem;
+      color: var(--muted); margin-top: 0.15rem;
+    }
+
+    .brand-tagline {
+      margin: 0; font-size: 0.95rem; line-height: 1.55; color: var(--text);
+    }
+
+    .brand-tags {
+      display: flex; flex-wrap: wrap; gap: 0.4rem;
+    }
+    .brand-category, .brand-tier, .brand-revenue {
+      font-family: var(--mono); font-size: 0.68rem;
+      text-transform: uppercase; letter-spacing: 0.08em;
+      padding: 0.15rem 0.5rem; border-radius: 99px; font-weight: 700;
+    }
+    .brand-category {
+      background: var(--p-50); color: var(--p-700);
+    }
+    .brand-category-green { background: var(--green-bg); color: var(--green); }
+    .brand-category-amber { background: var(--amber-bg); color: var(--amber); }
+    .brand-category-red { background: var(--red-bg); color: var(--red); }
+    .brand-tier {
+      background: var(--bg); color: var(--muted); border: 1px solid var(--line);
+    }
+    .brand-revenue {
+      background: var(--bg); color: var(--ink-soft); border: 1px solid var(--line);
+    }
+
+    .brand-footer {
+      display: flex; justify-content: space-between; align-items: center;
+      padding-top: 0.85rem; border-top: 1px dashed var(--line);
+    }
+    .brand-products { font-size: 0.82rem; color: var(--muted); }
+    .brand-link {
+      display: inline-flex; align-items: center; gap: 0.4rem;
+      padding: 0.5rem 0.85rem; background: var(--p-700); color: #fff;
+      border-radius: var(--r-sm); font-size: 0.85rem; font-weight: 700;
+      text-decoration: none; transition: background 0.15s ease;
+    }
+    .brand-link:hover { background: var(--p-800); color: #fff; }
+    .brand-link svg { width: 12px; height: 12px; }
+
+    /* CTA */
+    .brands-cta { background: var(--bg); }
+    .cta-card {
+      max-width: 760px; margin: 0 auto;
+      padding: 2.5rem 2rem;
+      background: linear-gradient(135deg, var(--p-700), var(--p-900));
+      color: #fff; border-radius: var(--r-xl); text-align: center;
+    }
+    .cta-card h2 {
+      font-size: clamp(1.4rem, 2.6vw, 1.85rem); font-weight: 800;
+      letter-spacing: -0.02em; margin-bottom: 0.6rem;
+    }
+    .cta-card p {
+      font-size: 1rem; line-height: 1.6; color: rgba(255, 255, 255, 0.85);
+      max-width: 56ch; margin: 0 auto 1.5rem;
+    }
+    .cta-card p strong { color: #ffd166; font-weight: 700; }
+    .cta-actions { display: flex; gap: 0.5rem; flex-wrap: wrap; justify-content: center; }
+    .btn-primary, .btn-ghost {
+      display: inline-flex; align-items: center; gap: 0.45rem;
+      padding: 0.8rem 1.3rem; border-radius: var(--r);
+      font-size: 0.9rem; font-weight: 700; text-decoration: none;
+    }
+    .btn-primary { background: var(--accent); color: #fff; border: 1px solid var(--accent); }
+    .btn-primary:hover { background: #ff6600; }
+    .btn-primary svg { width: 14px; height: 14px; }
+    .btn-ghost {
+      background: rgba(255, 255, 255, 0.12); color: #fff;
+      border: 1px solid rgba(255, 255, 255, 0.25);
+    }
+    .btn-ghost:hover { background: rgba(255, 255, 255, 0.2); }
+    .cta-meta { margin: 1.5rem 0 0; font-size: 0.78rem; color: var(--muted); text-align: center; }
+  </style>
+</BaseLayout>

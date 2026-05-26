@@ -35,6 +35,15 @@ const editorial = [
   { href: "/pristupnost/", label: "Přístupnost" },
 ];
 
+const glossary = [
+  { href: "/slovnik/", label: "Slovník pojmů (rozcestník)" },
+  { href: "/slovnik/elektronaradi/", label: "Elektronářadí — slovník" },
+  { href: "/slovnik/domaci-spotrebice/", label: "Domácí spotřebiče — slovník" },
+  { href: "/slovnik/elektronika/", label: "Elektronika a IT — slovník" },
+  { href: "/slovnik/zahrada/", label: "Zahrada — slovník" },
+  { href: "/slovnik/auto/", label: "Auto a doprava — slovník" },
+];
+
 const people = [
   { href: "/autori/", label: "Autoři a odborníci (rozcestník)" },
   { href: "/autor/ivo-matej/", label: "Ivo Matěj — šéfredaktor" },
@@ -47,6 +56,7 @@ const business = [
   { href: "/kontakt/", label: "Kontakt" },
   { href: "/impressum/", label: "Impressum — údaje o firmě" },
   { href: "/press/", label: "Press & Media kit (pro novináře)" },
+  { href: "/znacky/", label: "Značky výrobců (rozcestník)" },
   { href: "/pro-znacky-firmy-agentury/", label: "Pro značky, firmy a agentury" },
   { href: "/kodex-ferove-firmy/", label: "Kodex férové firmy (B2B standard)" },
   { href: "/kariera/", label: "Kariéra (6 otevřených pozic)" },
@@ -188,6 +198,13 @@ const legal = [
           </header>
           <ul class="link-list">
             {people.map((l) => <li><a href={l.href}>{l.label}</a></li>)}
+          </ul>
+          <header class="col-head" style="margin-top: 1.5rem;">
+            <p class="eyebrow">Slovník pojmů</p>
+            <h2>Terminologie testů</h2>
+          </header>
+          <ul class="link-list">
+            {glossary.map((l) => <li><a href={l.href}>{l.label}</a></li>)}
           </ul>
         </div>
 

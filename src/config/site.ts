@@ -61,6 +61,7 @@ export const site: SiteConfig = {
           { href: "/auto/", label: "Auto" },
           { href: "/sport/", label: "Sport & outdoor" },
           { href: "/elektronika/", label: "Elektronika" },
+          { href: "/znacky/", label: "Značky výrobců" },
         ],
       },
       {
@@ -82,11 +83,12 @@ export const site: SiteConfig = {
       {
         heading: "Komunita",
         links: [
-          { href: "/diskuze/", label: "Diskuze / fórum" },
-          { href: "/komentare/", label: "Nejnovější komentáře" },
           { href: "/slovnik/", label: "Slovník pojmů" },
+          { href: "/magazin/", label: "Magazín / novinky" },
+          { href: "/rozhovory/", label: "Rozhovory s odborníky" },
+          { href: "/recenze-eshopu/", label: "Recenze e-shopů" },
+          { href: "/diskuze/", label: "Diskuze / fórum" },
           { href: "/navody/", label: "Návody" },
-          { href: "/nejlepsi/", label: "TOP žebříčky" },
         ],
       },
       {

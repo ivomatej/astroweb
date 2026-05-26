@@ -1,0 +1,179 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import PageBreadcrumbs from "../components/page/PageBreadcrumbs.astro";
+import PageHero from "../components/page/PageHero.astro";
+import { getAllEshops } from "../data/eshops";
+
+const eshops = getAllEshops();
+
+function formatCzechDate(iso: string): string {
+  const d = new Date(iso);
+  return `${d.getDate()}. ${d.getMonth() + 1}. ${d.getFullYear()}`;
+}
+
+const verdictTone: Record<string, string> = {
+  "doporučujeme": "green",
+  "doporučujeme s výhradami": "amber",
+  "nedoporučujeme": "red",
+};
+---
+
+<BaseLayout
+  title="Recenze e-shopů — kde nakupovat | Recenzer.cz"
+  description={`${eshops.length} recenzí českých e-shopů. Doručení, reklamace, podpora, cena. Hodnotíme nákupní zážitek, ne produkty.`}
+>
+  <PageBreadcrumbs items={[{ href: "/", label: "Recenzer" }, { label: "Recenze e-shopů" }]} />
+
+  <PageHero
+    eyebrow="Recenze e-shopů · nákupní zážitek"
+    eyebrowIcon="check"
+    title="Recenze<br/><em>e-shopů</em>"
+    subtitle={`${eshops.length} hodnocených e-shopů — Datart, Alza a další. <strong>Hodnotíme nákupní zážitek</strong> — doručení, reklamace, podpora — ne produkty. Reálné objednávky placené z naší kasy, testované reklamace.`}
+  />
+
+  <section class="esh-list">
+    <div class="inner">
+      <ul class="esh-grid">
+        {
+          eshops.map((e) => (
+            <li class={`esh-card esh-tone-${verdictTone[e.verdict]}`}>
+              <header class="esh-head">
+                <div class="esh-logo" aria-hidden="true">
+                  <span>{e.name.slice(0, 2).toUpperCase()}</span>
+                </div>
+                <div class="esh-id">
+                  <strong>{e.name}</strong>
+                  <a href={e.website} rel="noopener" target="_blank">{e.domain}</a>
+                </div>
+                <div class={`esh-score esh-score-${verdictTone[e.verdict]}`}>
+                  <strong>{e.overallScore}</strong>
+                  <span>/ 100</span>
+                </div>
+              </header>
+              <p class="esh-tagline">{e.tagline}</p>
+              <div class="esh-quick">
+                <div>
+                  <span>Sortiment</span>
+                  <strong>{e.specialization}</strong>
+                </div>
+                <div>
+                  <span>Provoz od</span>
+                  <strong>{e.founded}</strong>
+                </div>
+                <div>
+                  <span>Verdikt</span>
+                  <strong class={`verdict-${verdictTone[e.verdict]}`}>{e.verdict}</strong>
+                </div>
+              </div>
+              <footer>
+                <span class="esh-updated">
+                  Aktualizováno <time datetime={e.updatedAt}>{formatCzechDate(e.updatedAt)}</time>
+                </span>
+                <a href={`/recenze-eshopu/${e.slug}/`} class="esh-link">
+                  Plná recenze
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+                    <line x1="5" y1="12" x2="19" y2="12" />
+                    <polyline points="12 5 19 12 12 19" />
+                  </svg>
+                </a>
+              </footer>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <style>
+    .inner { max-width: var(--max-w); margin: 0 auto; padding: clamp(2.5rem, 5vw, 4rem) var(--gutter); }
+    .esh-list { background: var(--bg-warm); }
+    .esh-grid {
+      list-style: none; padding: 0; margin: 0;
+      display: flex; flex-direction: column; gap: 1rem;
+    }
+    .esh-card {
+      padding: 1.75rem 2rem; background: var(--bg);
+      border: 1px solid var(--line); border-radius: var(--r-lg);
+    }
+    .esh-tone-green { border-left: 4px solid var(--green); }
+    .esh-tone-amber { border-left: 4px solid var(--amber); }
+    .esh-tone-red { border-left: 4px solid var(--red); }
+
+    .esh-head {
+      display: grid; grid-template-columns: 60px 1fr auto; gap: 1rem;
+      align-items: center; margin-bottom: 1rem;
+    }
+    .esh-logo {
+      width: 60px; height: 60px; border-radius: 16px;
+      background: linear-gradient(135deg, var(--p-100), var(--p-200));
+      color: var(--p-700);
+      display: flex; align-items: center; justify-content: center;
+      font-family: var(--sans); font-weight: 800; font-size: 1.2rem;
+    }
+    .esh-id strong {
+      display: block; font-size: 1.2rem; color: var(--ink);
+      font-weight: 800; letter-spacing: -0.015em;
+    }
+    .esh-id a {
+      font-family: var(--mono); font-size: 0.82rem;
+      color: var(--p-700); text-decoration: none;
+      border-bottom: 1px dashed var(--p-300);
+    }
+    .esh-score {
+      padding: 0.6rem 0.95rem; border-radius: var(--r-sm);
+      text-align: center; min-width: 80px;
+      background: var(--p-50);
+    }
+    .esh-score-green { background: var(--green-bg); }
+    .esh-score-amber { background: var(--amber-bg); }
+    .esh-score-red { background: var(--red-bg); }
+    .esh-score strong {
+      display: block; font-family: var(--sans); font-weight: 800;
+      font-size: 1.8rem; color: var(--p-700); line-height: 1;
+    }
+    .esh-score-green strong { color: var(--green); }
+    .esh-score-amber strong { color: var(--amber); }
+    .esh-score-red strong { color: var(--red); }
+    .esh-score span {
+      font-family: var(--mono); font-size: 0.7rem; color: var(--muted);
+    }
+
+    .esh-tagline {
+      margin: 0 0 1.25rem; font-size: 1rem; line-height: 1.6; color: var(--text);
+    }
+
+    .esh-quick {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.6rem;
+      margin-bottom: 1rem;
+    }
+    @media (max-width: 600px) { .esh-quick { grid-template-columns: 1fr; } }
+    .esh-quick > div {
+      padding: 0.7rem 0.9rem; background: var(--bg-warm);
+      border: 1px solid var(--line); border-radius: var(--r-sm);
+    }
+    .esh-quick span {
+      display: block; font-family: var(--mono); font-size: 0.62rem;
+      text-transform: uppercase; letter-spacing: 0.08em;
+      color: var(--muted); margin-bottom: 0.15rem;
+    }
+    .esh-quick strong { font-size: 0.88rem; color: var(--ink); font-weight: 600; }
+    .verdict-green { color: var(--green) !important; }
+    .verdict-amber { color: var(--amber) !important; }
+    .verdict-red { color: var(--red) !important; }
+
+    .esh-card footer {
+      display: flex; flex-wrap: wrap; gap: 0.5rem 1rem;
+      align-items: center; padding-top: 0.85rem;
+      border-top: 1px dashed var(--line);
+    }
+    .esh-updated { font-size: 0.82rem; color: var(--muted); }
+    .esh-link {
+      margin-left: auto; display: inline-flex; align-items: center; gap: 0.4rem;
+      padding: 0.55rem 1rem; background: var(--p-700); color: #fff;
+      border-radius: var(--r-sm); font-size: 0.88rem; font-weight: 700;
+      text-decoration: none; transition: background 0.15s ease;
+    }
+    .esh-link:hover { background: var(--p-800); color: #fff; }
+    .esh-link svg { width: 12px; height: 12px; }
+  </style>
+</BaseLayout>

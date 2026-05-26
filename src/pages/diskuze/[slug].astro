@@ -1,0 +1,440 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import PageBreadcrumbs from "../../components/page/PageBreadcrumbs.astro";
+import {
+  forumThreads,
+  getThreadBySlug,
+  categoryMeta,
+  badgeMeta,
+  type ForumPost,
+} from "../../data/forum";
+
+export function getStaticPaths() {
+  return forumThreads.map((t) => ({ params: { slug: t.slug } }));
+}
+
+const { slug } = Astro.params;
+const thread = getThreadBySlug(slug!);
+if (!thread) return Astro.redirect("/diskuze/");
+
+const catMeta = categoryMeta[thread.category];
+
+const statusLabel: Record<string, { label: string; tone: string }> = {
+  open: { label: "Otevřené pro diskuzi", tone: "purple" },
+  resolved: { label: "Vyřešeno", tone: "green" },
+  locked: { label: "Uzamčeno (read-only)", tone: "muted" },
+};
+const statMeta = statusLabel[thread.status];
+
+const relatedThreads = forumThreads
+  .filter((t) => t.slug !== thread.slug && t.category === thread.category)
+  .slice(0, 3);
+
+function formatCzechDate(iso: string): string {
+  const d = new Date(iso);
+  return `${d.getDate()}. ${d.getMonth() + 1}. ${d.getFullYear()}`;
+}
+
+function PostBlock(post: ForumPost, isOP = false): string {
+  // Helper to render — but we'll inline JSX rendering below
+  return post.id;
+}
+---
+
+<BaseLayout
+  title={`${thread.title} | Diskuze Recenzer.cz`}
+  description={`Diskuzní vlákno v kategorii ${catMeta.label}. ${thread.replyCount} odpovědí, ${thread.viewCount} zobrazení.`}
+>
+  <PageBreadcrumbs
+    items={[
+      { href: "/", label: "Recenzer" },
+      { href: "/diskuze/", label: "Diskuze" },
+      { label: thread.title.slice(0, 50) + (thread.title.length > 50 ? "…" : "") },
+    ]}
+  />
+
+  <!-- HERO -->
+  <header class="thread-hero">
+    <div class="inner">
+      <div class="hero-meta">
+        <span class={`thread-cat cat-tone-${catMeta.tone}`}>{catMeta.label}</span>
+        <span class={`thread-status status-${statMeta.tone}`}>{statMeta.label}</span>
+        {thread.isPinned && <span class="pinned">📌 Připnuto</span>}
+      </div>
+      <h1>{thread.title}</h1>
+      <div class="hero-stats">
+        <span><strong>{thread.replyCount}</strong> odpovědí</span>
+        <span>·</span>
+        <span><strong>{thread.viewCount.toLocaleString("cs-CZ")}</strong> zobrazení</span>
+        <span>·</span>
+        <span>Založeno <time datetime={thread.createdAt}>{formatCzechDate(thread.createdAt)}</time></span>
+        <span>·</span>
+        <span>Poslední aktivita <strong>{thread.lastActivityRelative}</strong></span>
+      </div>
+    </div>
+  </header>
+
+  <!-- THREAD CONTENT -->
+  <section class="thread-section">
+    <div class="inner thread-grid">
+      <article class="thread-main">
+        <!-- ORIGINAL POST -->
+        <article class="post post-op">
+          <header class="post-head">
+            <div class="post-avatar">{thread.originalPost.authorInitials}</div>
+            <div class="post-author">
+              <strong>{thread.originalPost.authorName}</strong>
+              {thread.originalPost.badge && (
+                <span class={`post-badge badge-${badgeMeta[thread.originalPost.badge].tone}`}>
+                  {badgeMeta[thread.originalPost.badge].label}
+                </span>
+              )}
+              <time class="post-time" datetime={thread.originalPost.createdAt}>{thread.originalPost.relativeTime}</time>
+            </div>
+            <span class="op-label">Původní příspěvek</span>
+          </header>
+          <div class="post-body" set:html={thread.originalPost.bodyHtml} />
+          <footer class="post-footer">
+            <span class="likes">
+              <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+              </svg>
+              {thread.originalPost.likes} liked
+            </span>
+          </footer>
+        </article>
+
+        <!-- REPLIES -->
+        {thread.replies.length > 0 && (
+          <section class="replies-section">
+            <h2 class="replies-title">{thread.replies.length} {thread.replies.length === 1 ? "odpověď" : thread.replies.length < 5 ? "odpovědi" : "odpovědí"}</h2>
+            <ol class="replies-list">
+              {
+                thread.replies.map((reply, i) => (
+                  <li class="post post-reply">
+                    <header class="post-head">
+                      <div class="post-avatar">{reply.authorInitials}</div>
+                      <div class="post-author">
+                        <strong>{reply.authorName}</strong>
+                        {reply.badge && (
+                          <span class={`post-badge badge-${badgeMeta[reply.badge].tone}`}>
+                            {badgeMeta[reply.badge].label}
+                          </span>
+                        )}
+                        <time class="post-time" datetime={reply.createdAt}>{reply.relativeTime}</time>
+                      </div>
+                      <span class="reply-num">#{i + 1}</span>
+                    </header>
+                    <div class="post-body" set:html={reply.bodyHtml} />
+                    <footer class="post-footer">
+                      <span class="likes">
+                        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                          <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+                        </svg>
+                        {reply.likes}
+                      </span>
+                    </footer>
+                  </li>
+                ))
+              }
+            </ol>
+          </section>
+        )}
+
+        <!-- REPLY FORM PLACEHOLDER -->
+        {thread.status !== "locked" && (
+          <section class="reply-form">
+            <h2>Přidat odpověď</h2>
+            <div class="form-placeholder">
+              <p>
+                <strong>Pro publikaci odpovědi je nutná registrace</strong>, která bude dostupná po spuštění backendu (NestJS).
+              </p>
+              <p>
+                Mezitím můžete moderátora kontaktovat e-mailem — <a href={`mailto:diskuze@recenzer.cz?subject=Reply%20to:%20${encodeURIComponent(thread.title)}`}>diskuze@recenzer.cz</a>.
+              </p>
+            </div>
+          </section>
+        )}
+
+        {thread.status === "locked" && (
+          <section class="locked-notice">
+            <strong>🔒 Vlákno je uzamčeno.</strong> Nové odpovědi nelze publikovat. Pokud máte otázku, vytvořte nové vlákno nebo napište na <a href="mailto:diskuze@recenzer.cz">diskuze@recenzer.cz</a>.
+          </section>
+        )}
+      </article>
+
+      <!-- ASIDE -->
+      <aside class="thread-aside">
+        <div class="aside-card">
+          <span class="aside-eyebrow">Detail vlákna</span>
+          <dl>
+            <div><dt>Kategorie</dt><dd>{catMeta.label}</dd></div>
+            <div><dt>Stav</dt><dd>{statMeta.label}</dd></div>
+            <div><dt>Autor</dt><dd>{thread.authorName}</dd></div>
+            <div><dt>Založeno</dt><dd>{formatCzechDate(thread.createdAt)}</dd></div>
+            <div><dt>Odpovědí</dt><dd>{thread.replyCount}</dd></div>
+            <div><dt>Zobrazení</dt><dd>{thread.viewCount.toLocaleString("cs-CZ")}</dd></div>
+          </dl>
+        </div>
+
+        {thread.relatedArticles && thread.relatedArticles.length > 0 && (
+          <div class="aside-card">
+            <span class="aside-eyebrow">Související články</span>
+            <ul class="aside-list">
+              {
+                thread.relatedArticles.map((a) => (
+                  <li>
+                    <a href={a.href}>
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                        <polyline points="14 2 14 8 20 8" />
+                      </svg>
+                      <span>{a.title}</span>
+                    </a>
+                  </li>
+                ))
+              }
+            </ul>
+          </div>
+        )}
+
+        {relatedThreads.length > 0 && (
+          <div class="aside-card">
+            <span class="aside-eyebrow">Další v kategorii {catMeta.label}</span>
+            <ul class="aside-list">
+              {
+                relatedThreads.map((t) => (
+                  <li>
+                    <a href={`/diskuze/${t.slug}/`}>
+                      <span class="related-thread-title">{t.title}</span>
+                      <span class="related-thread-meta">{t.replyCount} odpovědí</span>
+                    </a>
+                  </li>
+                ))
+              }
+            </ul>
+            <a href="/diskuze/" class="aside-cta">
+              Všechna vlákna →
+            </a>
+          </div>
+        )}
+      </aside>
+    </div>
+  </section>
+
+  <style>
+    .inner { max-width: var(--max-w); margin: 0 auto; padding: clamp(2rem, 4vw, 3.5rem) var(--gutter); }
+
+    /* HERO */
+    .thread-hero {
+      background: linear-gradient(135deg, var(--ink), #1f1a30); color: #fff;
+      border-bottom: 1px solid var(--line);
+    }
+    .thread-hero .inner { padding: clamp(2.5rem, 5vw, 4rem) var(--gutter); }
+    .hero-meta {
+      display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1.25rem;
+    }
+    .thread-cat, .thread-status, .pinned {
+      font-family: var(--mono); font-size: 0.7rem;
+      text-transform: uppercase; letter-spacing: 0.08em;
+      padding: 0.25rem 0.6rem; border-radius: 99px; font-weight: 700;
+    }
+    .thread-cat { background: rgba(255, 255, 255, 0.15); color: #fff; }
+    .thread-cat.cat-tone-purple { background: rgba(149, 114, 240, 0.25); color: #d8c8ff; }
+    .thread-cat.cat-tone-amber { background: rgba(180, 83, 9, 0.25); color: #fdf3e1; }
+    .thread-cat.cat-tone-red { background: rgba(185, 28, 28, 0.25); color: #fbeaea; }
+    .thread-cat.cat-tone-green { background: rgba(21, 128, 61, 0.25); color: #d4ecd9; }
+    .thread-cat.cat-tone-blue { background: rgba(10, 79, 163, 0.25); color: #e8f0fa; }
+    .thread-status { background: rgba(255, 255, 255, 0.1); color: rgba(255, 255, 255, 0.85); }
+    .status-green { background: rgba(21, 128, 61, 0.3); color: #d4ecd9; }
+    .pinned { background: rgba(255, 79, 0, 0.25); color: #ffd1b3; }
+
+    .thread-hero h1 {
+      font-family: var(--sans); font-size: clamp(1.5rem, 3.5vw, 2.4rem);
+      font-weight: 800; letter-spacing: -0.025em; color: #fff;
+      line-height: 1.2; margin: 0 0 1rem; max-width: 28ch;
+    }
+    .hero-stats {
+      display: flex; flex-wrap: wrap; gap: 0.4rem;
+      font-size: 0.88rem; color: rgba(255, 255, 255, 0.75);
+    }
+    .hero-stats strong { color: #ffd166; font-weight: 700; }
+
+    /* CONTENT */
+    .thread-section { background: var(--bg-warm); }
+    .thread-grid {
+      display: grid; grid-template-columns: 1fr 300px; gap: 2rem; align-items: start;
+    }
+    @media (max-width: 900px) { .thread-grid { grid-template-columns: 1fr; } }
+
+    /* POST */
+    .post {
+      padding: 1.5rem 1.75rem; background: var(--bg);
+      border: 1px solid var(--line); border-radius: var(--r-lg);
+      margin-bottom: 0.85rem;
+    }
+    .post-op { border-left: 4px solid var(--accent); }
+    .post-reply { border-left: 3px solid var(--p-300); }
+
+    .post-head {
+      display: flex; align-items: center; gap: 0.85rem;
+      margin-bottom: 1.1rem; padding-bottom: 0.85rem;
+      border-bottom: 1px dashed var(--line);
+    }
+    .post-avatar {
+      width: 44px; height: 44px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--p-100), var(--p-200));
+      color: var(--p-700);
+      display: flex; align-items: center; justify-content: center;
+      font-family: var(--mono); font-weight: 800; font-size: 0.85rem;
+    }
+    .post-author {
+      display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem;
+      flex: 1;
+    }
+    .post-author strong { color: var(--ink); font-size: 0.98rem; font-weight: 700; }
+    .post-badge {
+      font-family: var(--mono); font-size: 0.6rem;
+      text-transform: uppercase; letter-spacing: 0.06em;
+      padding: 0.15rem 0.5rem; border-radius: 99px; font-weight: 700;
+    }
+    .badge-green { background: var(--green-bg); color: var(--green); }
+    .badge-amber { background: var(--amber-bg); color: var(--amber); }
+    .badge-purple { background: var(--p-50); color: var(--p-700); }
+    .badge-red { background: var(--red-bg); color: var(--red); }
+
+    .post-time {
+      font-family: var(--mono); font-size: 0.78rem; color: var(--muted);
+    }
+    .op-label, .reply-num {
+      margin-left: auto; font-family: var(--mono); font-size: 0.7rem;
+      text-transform: uppercase; letter-spacing: 0.06em;
+      color: var(--accent); padding: 0.15rem 0.55rem;
+      background: var(--accent-soft); border-radius: 4px;
+      font-weight: 700;
+    }
+    .reply-num { color: var(--muted); background: var(--bg-warm); }
+
+    .post-body :global(p) {
+      margin: 0 0 0.85rem; line-height: 1.7; color: var(--text); font-size: 0.95rem;
+    }
+    .post-body :global(p:last-child) { margin-bottom: 0; }
+    .post-body :global(ul), .post-body :global(ol) {
+      margin: 0 0 0.85rem; padding-left: 1.5rem;
+    }
+    .post-body :global(li) {
+      margin: 0 0 0.4rem; line-height: 1.6; color: var(--text);
+    }
+    .post-body :global(strong) { color: var(--ink); font-weight: 700; }
+    .post-body :global(a) {
+      color: var(--p-700); text-decoration: none;
+      border-bottom: 1px dashed var(--p-300);
+    }
+    .post-body :global(h2) {
+      font-family: var(--sans); font-size: 1.1rem; font-weight: 800;
+      color: var(--ink); margin: 1.25rem 0 0.6rem;
+    }
+
+    .post-footer {
+      display: flex; align-items: center; gap: 1rem;
+      padding-top: 0.85rem; border-top: 1px dashed var(--line);
+    }
+    .likes {
+      display: inline-flex; align-items: center; gap: 0.35rem;
+      font-size: 0.85rem; color: var(--muted);
+    }
+    .likes svg { width: 14px; height: 14px; color: var(--red); }
+
+    /* REPLIES */
+    .replies-section { margin-top: 1.5rem; }
+    .replies-title {
+      font-family: var(--sans); font-size: 1.15rem; font-weight: 800;
+      color: var(--ink); margin: 0 0 1rem; letter-spacing: -0.015em;
+    }
+    .replies-list {
+      list-style: none; padding: 0; margin: 0;
+    }
+
+    /* REPLY FORM */
+    .reply-form {
+      margin-top: 1.5rem; padding: 1.75rem;
+      background: var(--p-50); border: 1px dashed var(--p-300);
+      border-radius: var(--r-lg);
+    }
+    .reply-form h2 {
+      margin: 0 0 0.85rem; font-size: 1.1rem; font-weight: 800;
+      color: var(--p-700); letter-spacing: -0.015em;
+    }
+    .form-placeholder p {
+      margin: 0 0 0.85rem; line-height: 1.65; color: var(--text); font-size: 0.92rem;
+    }
+    .form-placeholder p:last-child { margin: 0; }
+    .form-placeholder strong { color: var(--ink); font-weight: 700; }
+    .form-placeholder a {
+      color: var(--p-700); text-decoration: none;
+      border-bottom: 1px dashed var(--p-300); font-weight: 600;
+    }
+
+    .locked-notice {
+      margin-top: 1.5rem; padding: 1.25rem 1.5rem;
+      background: var(--bg-warm); border: 1px solid var(--line);
+      border-left: 4px solid var(--muted-2); border-radius: var(--r);
+      font-size: 0.95rem; line-height: 1.6; color: var(--text);
+    }
+    .locked-notice strong { color: var(--ink); }
+    .locked-notice a {
+      color: var(--p-700); text-decoration: none;
+      border-bottom: 1px dashed var(--p-300);
+    }
+
+    /* ASIDE */
+    .thread-aside {
+      display: flex; flex-direction: column; gap: 0.85rem;
+      position: sticky; top: 1rem;
+    }
+    @media (max-width: 900px) { .thread-aside { position: static; } }
+    .aside-card {
+      padding: 1.25rem; background: var(--bg);
+      border: 1px solid var(--line); border-radius: var(--r);
+    }
+    .aside-eyebrow {
+      display: block; font-family: var(--mono);
+      font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.08em;
+      color: var(--p-700); font-weight: 700; margin-bottom: 0.85rem;
+    }
+    .aside-card dl {
+      margin: 0; display: flex; flex-direction: column; gap: 0.45rem;
+    }
+    .aside-card dl > div {
+      display: flex; justify-content: space-between; gap: 0.5rem;
+      font-size: 0.85rem;
+    }
+    .aside-card dt { color: var(--muted); font-family: var(--mono); font-size: 0.72rem;
+      text-transform: uppercase; letter-spacing: 0.06em; }
+    .aside-card dd { margin: 0; color: var(--ink); font-weight: 600; text-align: right; }
+
+    .aside-list {
+      list-style: none; padding: 0; margin: 0;
+      display: flex; flex-direction: column; gap: 0.5rem;
+    }
+    .aside-list li a {
+      display: flex; gap: 0.5rem; align-items: flex-start;
+      padding: 0.7rem 0.85rem; background: var(--bg-warm);
+      border-radius: var(--r-sm); color: var(--ink);
+      text-decoration: none; font-size: 0.88rem; line-height: 1.4;
+      transition: background 0.15s ease;
+    }
+    .aside-list li a:hover { background: var(--p-50); color: var(--p-700); }
+    .aside-list svg { width: 13px; height: 13px; color: var(--p-700); flex-shrink: 0; margin-top: 0.15rem; }
+    .related-thread-title { flex: 1; font-weight: 600; }
+    .related-thread-meta {
+      font-family: var(--mono); font-size: 0.72rem; color: var(--muted);
+      white-space: nowrap;
+    }
+    .aside-cta {
+      display: inline-block; margin-top: 0.85rem;
+      font-size: 0.85rem; color: var(--p-700); font-weight: 600;
+      text-decoration: none; border-bottom: 1px dashed var(--p-300);
+    }
+  </style>
+</BaseLayout>

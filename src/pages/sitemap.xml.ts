@@ -21,6 +21,9 @@ const subSitemaps: SubSitemap[] = [
   { loc: "/sitemap-articles.xml", lastmod: SITEMAP_LASTMOD },
   { loc: "/sitemap-categories.xml", lastmod: SITEMAP_LASTMOD },
   { loc: "/sitemap-authors.xml", lastmod: SITEMAP_LASTMOD },
+  { loc: "/sitemap-glossary.xml", lastmod: SITEMAP_LASTMOD },
+  { loc: "/sitemap-brands.xml", lastmod: SITEMAP_LASTMOD },
+  { loc: "/sitemap-content.xml", lastmod: SITEMAP_LASTMOD },
   { loc: "/sitemap-images.xml", lastmod: SITEMAP_LASTMOD },
 ];
 

@@ -1,0 +1,262 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import PageBreadcrumbs from "../../components/page/PageBreadcrumbs.astro";
+import {
+  glossaryCategories,
+  getCategoryBySlug,
+  getTermsByCategory,
+} from "../../data/glossary";
+
+export function getStaticPaths() {
+  return glossaryCategories.map((c) => ({ params: { kategorie: c.slug } }));
+}
+
+const { kategorie } = Astro.params;
+const category = getCategoryBySlug(kategorie!);
+if (!category) return Astro.redirect("/slovnik/");
+
+const terms = getTermsByCategory(category.slug);
+const otherCategories = glossaryCategories.filter((c) => c.slug !== category.slug);
+
+const lastUpdated = "2026-05-21";
+---
+
+<BaseLayout
+  title={`Slovník — ${category.name} (${terms.length} pojmů) | Recenzer.cz`}
+  description={`${terms.length} odborných termínů z oblasti ${category.name.toLowerCase()}. ${category.description}`}
+>
+  <PageBreadcrumbs
+    items={[
+      { href: "/", label: "Recenzer" },
+      { href: "/slovnik/", label: "Slovník" },
+      { label: category.name },
+    ]}
+  />
+
+  <!-- ============ HERO ============ -->
+  <header class={`cat-hero cat-tone-${category.tone}`}>
+    <div class="inner">
+      <span class={`cat-badge cat-badge-${category.tone}`}>Kategorie slovníku</span>
+      <h1 class="cat-title">{category.name}</h1>
+      <p class="cat-desc">{category.description}</p>
+      <div class="cat-meta">
+        <span><strong>{terms.length}</strong> termínů v této kategorii</span>
+        <span>·</span>
+        <a href="/slovnik/" class="cat-back">← Všechny kategorie</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- ============ TERMS ============ -->
+  <section class="cat-terms">
+    <div class="inner">
+      {
+        terms.length > 0 ? (
+          <ul class="terms-list">
+            {terms.map((t) => (
+              <li>
+                <a href={`/slovnik/${t.slug}/`} class="term-card">
+                  <strong class="term-name">{t.term}</strong>
+                  <p class="term-def">{t.shortDef}</p>
+                  {t.aliases && t.aliases.length > 0 && (
+                    <div class="term-aliases">
+                      <span class="term-aliases-label">Také známé jako</span>
+                      <span>{t.aliases.join(", ")}</span>
+                    </div>
+                  )}
+                  <span class="term-arrow" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                      <line x1="5" y1="12" x2="19" y2="12" />
+                      <polyline points="12 5 19 12 12 19" />
+                    </svg>
+                  </span>
+                </a>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p class="empty-state">
+            V této kategorii zatím nejsou žádné termíny. <a href="mailto:redakce@recenzer.cz">Navrhněte první</a>.
+          </p>
+        )
+      }
+    </div>
+  </section>
+
+  <!-- ============ OTHER CATEGORIES ============ -->
+  <section class="cat-other">
+    <div class="inner">
+      <header class="section-head">
+        <h2>Další kategorie slovníku</h2>
+      </header>
+      <ul class="other-grid">
+        {
+          otherCategories.map((c) => {
+            const cnt = getTermsByCategory(c.slug).length;
+            return (
+              <li>
+                <a href={`/slovnik/${c.slug}/`} class={`other-card other-tone-${c.tone}`}>
+                  <strong>{c.name}</strong>
+                  <span>{cnt} termínů</span>
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+                    <line x1="5" y1="12" x2="19" y2="12" />
+                    <polyline points="12 5 19 12 12 19" />
+                  </svg>
+                </a>
+              </li>
+            );
+          })
+        }
+      </ul>
+      <p class="other-all">
+        <a href="/slovnik/">Vrátit se na rozcestník slovníku</a>
+      </p>
+    </div>
+  </section>
+
+  <style>
+    .inner { max-width: var(--max-w); margin: 0 auto; padding: clamp(2rem, 4vw, 3.5rem) var(--gutter); }
+    .section-head { max-width: 65ch; margin: 0 0 1.5rem; }
+    .section-head h2 {
+      font-size: clamp(1.3rem, 2.5vw, 1.7rem); font-weight: 800;
+      color: var(--ink); margin: 0; letter-spacing: -0.02em;
+    }
+
+    /* HERO */
+    .cat-hero {
+      background:
+        radial-gradient(900px circle at 90% 0%, rgba(149, 114, 240, 0.14), transparent 55%),
+        var(--bg);
+      border-bottom: 1px solid var(--line);
+    }
+    .cat-tone-amber {
+      background:
+        radial-gradient(900px circle at 90% 0%, rgba(180, 83, 9, 0.12), transparent 55%),
+        var(--bg);
+    }
+    .cat-tone-green {
+      background:
+        radial-gradient(900px circle at 90% 0%, rgba(21, 128, 61, 0.12), transparent 55%),
+        var(--bg);
+    }
+    .cat-tone-red {
+      background:
+        radial-gradient(900px circle at 90% 0%, rgba(185, 28, 28, 0.12), transparent 55%),
+        var(--bg);
+    }
+    .cat-tone-blue {
+      background:
+        radial-gradient(900px circle at 90% 0%, rgba(10, 79, 163, 0.12), transparent 55%),
+        var(--bg);
+    }
+
+    .cat-badge {
+      display: inline-block; font-family: var(--mono);
+      font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.1em;
+      font-weight: 700; padding: 0.25rem 0.6rem; border-radius: 99px;
+      background: var(--p-50); color: var(--p-700); margin-bottom: 1rem;
+    }
+    .cat-badge-amber { background: var(--amber-bg); color: var(--amber); }
+    .cat-badge-green { background: var(--green-bg); color: var(--green); }
+    .cat-badge-red { background: var(--red-bg); color: var(--red); }
+    .cat-badge-blue { background: #e8f0fa; color: #0a4fa3; }
+
+    .cat-title {
+      font-family: var(--sans); font-size: clamp(1.8rem, 4vw, 2.8rem);
+      font-weight: 800; letter-spacing: -0.025em; color: var(--ink);
+      line-height: 1.1; margin: 0 0 0.85rem;
+    }
+    .cat-desc {
+      font-size: 1.1rem; line-height: 1.55; color: var(--ink-soft);
+      margin: 0 0 1rem; max-width: 60ch;
+    }
+    .cat-meta {
+      display: inline-flex; flex-wrap: wrap; align-items: center; gap: 0.5rem;
+      font-size: 0.92rem; color: var(--muted);
+    }
+    .cat-meta strong { color: var(--ink); font-weight: 700; }
+    .cat-back {
+      color: var(--p-700); text-decoration: none;
+      border-bottom: 1px dashed var(--p-300); font-weight: 600;
+    }
+
+    /* TERMS */
+    .cat-terms { background: var(--bg-warm); border-bottom: 1px solid var(--line); }
+    .terms-list {
+      list-style: none; padding: 0; margin: 0;
+      display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.85rem;
+    }
+    @media (max-width: 800px) { .terms-list { grid-template-columns: 1fr; } }
+    .term-card {
+      position: relative;
+      display: block; padding: 1.25rem 3rem 1.25rem 1.4rem;
+      background: var(--bg); border: 1px solid var(--line);
+      border-radius: var(--r); text-decoration: none; color: inherit;
+      transition: border-color 0.15s ease, transform 0.15s ease;
+    }
+    .term-card:hover { border-color: var(--p-300); transform: translateY(-2px); }
+    .term-name {
+      display: block; font-size: 1.1rem; font-weight: 800;
+      color: var(--ink); letter-spacing: -0.015em; margin-bottom: 0.45rem;
+    }
+    .term-def {
+      margin: 0; font-size: 0.92rem; line-height: 1.6; color: var(--text);
+    }
+    .term-aliases {
+      margin-top: 0.65rem; padding-top: 0.65rem;
+      border-top: 1px dashed var(--line);
+      font-size: 0.82rem;
+    }
+    .term-aliases-label {
+      font-family: var(--mono); text-transform: uppercase;
+      letter-spacing: 0.06em; color: var(--muted); margin-right: 0.4rem;
+    }
+    .term-aliases span:not(.term-aliases-label) { color: var(--ink-soft); }
+    .term-arrow {
+      position: absolute; right: 1rem; top: 50%; transform: translateY(-50%);
+      color: var(--p-500);
+    }
+    .term-arrow svg { width: 16px; height: 16px; }
+    .term-card:hover .term-arrow { color: var(--p-700); }
+    .empty-state {
+      text-align: center; padding: 3rem;
+      color: var(--muted); font-size: 1rem;
+    }
+    .empty-state a { color: var(--p-700); text-decoration: none; border-bottom: 1px dashed var(--p-300); }
+
+    /* OTHER */
+    .cat-other { background: var(--bg); }
+    .other-grid {
+      list-style: none; padding: 0; margin: 0 0 1.5rem;
+      display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.75rem;
+    }
+    @media (max-width: 720px) { .other-grid { grid-template-columns: 1fr; } }
+    .other-card {
+      display: grid; grid-template-columns: 1fr auto auto; gap: 0.75rem;
+      padding: 1rem 1.3rem; background: var(--bg-warm);
+      border: 1px solid var(--line); border-radius: var(--r);
+      text-decoration: none; color: inherit; align-items: center;
+      transition: border-color 0.15s ease;
+    }
+    .other-card:hover { border-color: var(--p-300); }
+    .other-card strong { color: var(--ink); font-weight: 700; font-size: 1rem; }
+    .other-card span:not(strong) {
+      font-family: var(--mono); font-size: 0.72rem; color: var(--p-700);
+      padding: 0.15rem 0.5rem; background: var(--p-50); border-radius: 4px;
+    }
+    .other-tone-amber .other-card span:not(strong),
+    .other-card.other-tone-amber span:not(strong) { background: var(--amber-bg); color: var(--amber); }
+    .other-tone-green .other-card span:not(strong),
+    .other-card.other-tone-green span:not(strong) { background: var(--green-bg); color: var(--green); }
+    .other-tone-red .other-card span:not(strong),
+    .other-card.other-tone-red span:not(strong) { background: var(--red-bg); color: var(--red); }
+    .other-tone-blue .other-card span:not(strong),
+    .other-card.other-tone-blue span:not(strong) { background: #e8f0fa; color: #0a4fa3; }
+    .other-card svg { width: 14px; height: 14px; color: var(--p-500); }
+    .other-all { text-align: center; margin: 0; }
+    .other-all a {
+      color: var(--p-700); text-decoration: none;
+      border-bottom: 1px dashed var(--p-300); font-weight: 600;
+    }
+  </style>
+</BaseLayout>
