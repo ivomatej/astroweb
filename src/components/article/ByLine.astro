@@ -19,55 +19,38 @@ const updatedHuman = dates.updatedAt ? formatCzechDate(dates.updatedAt) : undefi
 ---
 
 {/*
-  3-column layout (desktop / tablet):
-    Col 1 — Meta: Publikováno / Aktualizováno / Doba čtení stacked
-    Col 2 — Autor avatar + name + role
-    Col 3 — Odborný garant avatar + name + role (only if provided)
+  3-column byline strip:
+    Col 1 — Publikováno / Aktualizováno / Doba čtení, stacked
+    Col 2 — Author
+    Col 3 — Odborný garant (only rendered if provided)
 
-  On mobile (≤640 px) the grid collapses to one column so each cell
-  reads as a stacked block.
+  Each column is equal-width. No vertical dividers or extra eyebrows
+  — clean rows, just label + value per meta line.
 */}
 <div class:list={["byline", { "has-garant": !!garant }]}>
   <div class="byline-col byline-meta">
-    <span class="byline-meta-row">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-        <rect x="3" y="4" width="18" height="18" rx="2" />
-        <line x1="16" y1="2" x2="16" y2="6" />
-        <line x1="8" y1="2" x2="8" y2="6" />
-      </svg>
-      <span>
-        <span class="byline-meta-label">Publikováno</span>
-        <strong><time datetime={dates.publishedAt}>{publishedHuman}</time></strong>
-      </span>
-    </span>
+    <div class="byline-meta-row">
+      <span class="byline-meta-label">Publikováno</span>
+      <strong class="byline-meta-value">
+        <time datetime={dates.publishedAt}>{publishedHuman}</time>
+      </strong>
+    </div>
 
     {
       updatedHuman && (
-        <span class="byline-meta-row">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-            <polyline points="23 4 23 10 17 10" />
-            <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10" />
-          </svg>
-          <span>
-            <span class="byline-meta-label">Aktualizováno</span>
-            <span class="upd-tag">
-              <time datetime={dates.updatedAt}>{updatedHuman}</time>
-            </span>
-          </span>
-        </span>
+        <div class="byline-meta-row">
+          <span class="byline-meta-label">Aktualizováno</span>
+          <strong class="byline-meta-value">
+            <time datetime={dates.updatedAt}>{updatedHuman}</time>
+          </strong>
+        </div>
       )
     }
 
-    <span class="byline-meta-row">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-        <circle cx="12" cy="12" r="10" />
-        <polyline points="12 6 12 12 16 14" />
-      </svg>
-      <span>
-        <span class="byline-meta-label">Doba čtení</span>
-        <strong>{dates.readingTimeMin} min</strong>
-      </span>
-    </span>
+    <div class="byline-meta-row">
+      <span class="byline-meta-label">Doba čtení</span>
+      <strong class="byline-meta-value">{dates.readingTimeMin} min</strong>
+    </div>
   </div>
 
   <div class="byline-col byline-person">
@@ -120,14 +103,13 @@ const updatedHuman = dates.updatedAt ? formatCzechDate(dates.updatedAt) : undefi
     border-top: 1px solid var(--line);
     border-bottom: 1px solid var(--line);
     display: grid;
-    grid-template-columns: 1fr 1fr;       /* default: meta + author */
-    gap: 1.25rem 1.75rem;
-    align-items: start;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.25rem 2rem;
+    align-items: center;
   }
 
-  /* With a garant the grid grows to three columns. */
   .byline.has-garant {
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr);
+    grid-template-columns: 1fr 1fr 1fr;
   }
 
   @media (max-width: 720px) {
@@ -142,63 +124,35 @@ const updatedHuman = dates.updatedAt ? formatCzechDate(dates.updatedAt) : undefi
     min-width: 0;
   }
 
-  /* Visual divider between columns on desktop only.
-     The first column has no left border. */
-  @media (min-width: 721px) {
-    .byline-col + .byline-col {
-      border-left: 1px solid var(--line);
-      padding-left: 1.5rem;
-    }
-  }
-
-  /* ============ Meta column ============ */
+  /* ============ Meta column ============
+   * One row per meta item: label on the left, value bold on the right.
+   * No icons / no uppercase eyebrows — keeps the strip visually quiet
+   * so the people columns get the focus.
+   */
   .byline-meta {
     display: flex;
     flex-direction: column;
-    gap: 0.55rem;
-    font-size: 13px;
+    gap: 0.45rem;
+    font-size: 13.5px;
     color: var(--muted);
   }
 
   .byline-meta-row {
     display: flex;
-    align-items: flex-start;
-    gap: 0.5rem;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 0.75rem;
     line-height: 1.35;
   }
 
-  .byline-meta-row > svg {
-    width: 14px;
-    height: 14px;
-    color: var(--muted-2);
-    flex-shrink: 0;
-    margin-top: 1px;
-  }
-
   .byline-meta-label {
-    display: block;
-    font-size: 10.5px;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
     color: var(--muted);
-    font-weight: 600;
-    margin-bottom: 1px;
   }
 
-  .byline-meta-row strong {
+  .byline-meta-value {
     color: var(--ink);
     font-weight: 700;
-    font-size: 13.5px;
-  }
-
-  .upd-tag {
-    display: inline-block;
-    padding: 1px 8px;
-    background: var(--green-bg);
-    color: var(--green-text);
-    border-radius: 999px;
-    font-size: 12.5px;
-    font-weight: 600;
+    font-variant-numeric: tabular-nums;
   }
 
   /* ============ Person column (autor / garant) ============ */
@@ -246,12 +200,11 @@ const updatedHuman = dates.updatedAt ? formatCzechDate(dates.updatedAt) : undefi
   }
 
   .byline-label {
-    font-size: 10.5px;
+    font-size: 11.5px;
     text-transform: uppercase;
-    letter-spacing: 0.08em;
+    letter-spacing: 0.06em;
     color: var(--muted);
     font-weight: 600;
-    margin-bottom: 1px;
   }
 
   .byline-name {
