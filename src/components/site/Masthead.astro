@@ -122,7 +122,7 @@ const isActive = (href: string): boolean =>
     transition: opacity 0.18s ease-out;
   }
 
-  body:has(.nav-item.has-mega.is-open) .page-backdrop {
+  body:has(.mega-panel[data-state="open"]) .page-backdrop {
     opacity: 1;
     pointer-events: auto;
   }
@@ -249,26 +249,16 @@ const isActive = (href: string): boolean =>
     transition: transform 0.18s, color 0.15s;
   }
 
-  .nav-item.is-open .nav-chev {
+  .nav-item:has(.mega-panel[data-state="open"]) .nav-chev {
     color: #fff;
     transform: rotate(180deg);
   }
 
   /*
-   * Mega-panel show / hide — JS is the SOLE source of truth.
-   *
-   * Earlier versions tried CSS :hover (got stuck in Astro dev mode
-   * due to dev-toolbar shadow DOM pointer events) and then mixed
-   * :focus-within (still got stuck because focus inside the panel
-   * kept the rule matching). The deterministic answer is: only
-   * .is-open controls visibility. JS owns the state.
-   *
-   * :global() bypasses Astro scoping since the panel element lives in
-   * MegaMenu's scope, not Masthead's.
+   * Mega-panel visibility lives on the panel itself via [data-state].
+   * Defined inside MegaMenu.astro's scope so we don't need :global()
+   * acrobatics here. Masthead JS toggles the attribute.
    */
-  .nav-item.has-mega.is-open > :global(.mega-panel) {
-    display: block;
-  }
 
   .masthead-right {
     margin-left: auto;
@@ -473,39 +463,51 @@ const isActive = (href: string): boolean =>
     const items = document.querySelectorAll(".nav-item.has-mega");
     if (!items.length) return;
 
-    // 180 ms is enough for the cursor to cross the masthead → panel
-    // seam without flicker, short enough that an accidental
-    // mouseleave actually closes the panel quickly.
     const CLOSE_DELAY = 180;
 
-    function closeAll() {
+    // Force every panel back to "closed" on init — defends against
+    // dev-mode HMR carrying over a stale data-state="open" from a
+    // previous render of the masthead.
+    document.querySelectorAll(".mega-panel").forEach((p) => {
+      p.setAttribute("data-state", "closed");
+    });
+
+    function closeAllPanels() {
+      document.querySelectorAll('.mega-panel[data-state="open"]').forEach((p) => {
+        p.setAttribute("data-state", "closed");
+      });
       items.forEach((it) => {
-        it.classList.remove("is-open");
-        const trigger = it.querySelector("a[aria-haspopup]");
-        if (trigger) trigger.setAttribute("aria-expanded", "false");
+        const t = it.querySelector("a[aria-haspopup]");
+        if (t) t.setAttribute("aria-expanded", "false");
       });
     }
 
     items.forEach((it) => {
       const trigger = it.querySelector("a[aria-haspopup]");
       const panel   = it.querySelector(".mega-panel");
-      if (!trigger) return;
+      if (!trigger || !panel) return;
 
       let closeTimer = 0;
 
       function open() {
         clearTimeout(closeTimer);
-        // Close any sibling panel that might be open.
-        items.forEach((other) => {
-          if (other !== it) other.classList.remove("is-open");
+        // Close every sibling panel first (max one open at a time).
+        document.querySelectorAll('.mega-panel[data-state="open"]').forEach((p) => {
+          if (p !== panel) p.setAttribute("data-state", "closed");
         });
-        it.classList.add("is-open");
+        items.forEach((other) => {
+          if (other !== it) {
+            const t = other.querySelector("a[aria-haspopup]");
+            if (t) t.setAttribute("aria-expanded", "false");
+          }
+        });
+        panel.setAttribute("data-state", "open");
         trigger.setAttribute("aria-expanded", "true");
       }
 
       function closeNow() {
         clearTimeout(closeTimer);
-        it.classList.remove("is-open");
+        panel.setAttribute("data-state", "closed");
         trigger.setAttribute("aria-expanded", "false");
       }
 
@@ -518,44 +520,44 @@ const isActive = (href: string): boolean =>
         clearTimeout(closeTimer);
       }
 
-      // Mouseenter / mouseleave fire when the cursor crosses the
-      // GEOMETRIC box of the element. The mega-panel sits below the
-      // masthead in absolute position so it's geometrically separate
-      // from .nav-item — we have to listen on both. Quick traversal
-      // (nav-item → panel or panel → nav-item) cancels the close.
+      // The .mega-panel lives in position: absolute below the
+      // masthead, so it's geometrically separate from .nav-item.
+      // Listen on both so cursor traversal between the two doesn't
+      // accidentally trigger the close timer.
       it.addEventListener("mouseenter", open);
       it.addEventListener("mouseleave", scheduleClose);
+      panel.addEventListener("mouseenter", cancelClose);
+      panel.addEventListener("mouseleave", scheduleClose);
 
-      if (panel) {
-        panel.addEventListener("mouseenter", cancelClose);
-        panel.addEventListener("mouseleave", scheduleClose);
-      }
-
-      // Keyboard path — focus moves into trigger or any descendant
-      // (panel link). Closing on focusout-outside is immediate.
+      // Keyboard: Tab onto trigger or into panel descendant.
       it.addEventListener("focusin", open);
       it.addEventListener("focusout", (e) => {
         if (!it.contains(e.relatedTarget)) closeNow();
       });
     });
 
-    // ESC closes any open panel and returns focus to the trigger.
+    // ESC closes any open panel + returns focus to the matching trigger.
     document.addEventListener("keydown", (e) => {
       if (e.key !== "Escape") return;
-      const focused = document.activeElement && document.activeElement.closest(".nav-item.has-mega");
-      const open    = document.querySelector(".nav-item.has-mega.is-open");
-      if (!open && !focused) return;
-      closeAll();
-      if (focused) {
-        const trigger = focused.querySelector("a[aria-haspopup]");
-        if (trigger) trigger.focus();
+      const openPanel = document.querySelector('.mega-panel[data-state="open"]');
+      if (!openPanel) return;
+      const parentLi = openPanel.closest(".nav-item.has-mega");
+      closeAllPanels();
+      if (parentLi) {
+        const t = parentLi.querySelector("a[aria-haspopup]");
+        if (t) t.focus();
       }
     });
 
     // Click anywhere outside the nav closes panels immediately.
     document.addEventListener("click", (e) => {
-      const insideNav = e.target.closest && e.target.closest(".nav-item.has-mega");
-      if (!insideNav) closeAll();
+      if (!e.target.closest || !e.target.closest(".nav-item.has-mega")) {
+        closeAllPanels();
+      }
     });
+
+    // Defensive: if the cursor leaves the document entirely (e.g.,
+    // user switches tabs / window-defocus), force-close everything.
+    document.addEventListener("mouseleave", closeAllPanels);
   })();
 </script>

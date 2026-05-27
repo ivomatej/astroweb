@@ -43,6 +43,7 @@ function iconPath(icon: MegaMenuIcon): string {
 
 <div
   class="mega-panel"
+  data-state="closed"
   role="region"
   aria-labelledby={labelledBy}
 >
@@ -102,6 +103,14 @@ function iconPath(icon: MegaMenuIcon): string {
    * fallback in case JS doesn't load). When .has-mega:hover or
    * .has-mega.is-open is matched, we override the hidden attribute.
    */
+  /*
+   * Visibility is JS-controlled via [data-state] attribute. The
+   * default rule pins display: none and the [data-state="open"]
+   * variant flips to display: block. Using a data attribute (not
+   * a class) keeps the contract explicit and easy to spot in
+   * DevTools: open the inspector, look at the panel, see exactly
+   * which state it's in.
+   */
   .mega-panel {
     display: none;
     position: absolute;
@@ -113,6 +122,10 @@ function iconPath(icon: MegaMenuIcon): string {
     color: var(--ink);
     border-top: 1px solid var(--line);
     box-shadow: 0 14px 40px -18px rgba(15, 19, 30, 0.28);
+  }
+
+  .mega-panel[data-state="open"] {
+    display: block;
   }
 
   .mega-inner {
