@@ -63,14 +63,6 @@ const isActive = (href: string): boolean =>
           <line x1="21" y1="21" x2="16.65" y2="16.65" />
         </svg>
       </a>
-
-      <a href="/newsletter/" class="masthead-account" aria-label="Odebírat newsletter">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-          <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
-          <polyline points="22,6 12,13 2,6" />
-        </svg>
-        <span>Newsletter</span>
-      </a>
     </div>
   </div>
 </header>
@@ -256,30 +248,7 @@ const isActive = (href: string): boolean =>
     height: 16px;
   }
 
-  .masthead-account {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.4rem;
-    font-size: 13px;
-    color: rgba(255, 255, 255, 0.85);
-    text-decoration: none;
-    padding: 0.4rem 0.75rem;
-    border-radius: var(--r-sm);
-    border: 1px solid rgba(255, 255, 255, 0.12);
-  }
-
-  .masthead-account:hover,
-  .masthead-account:focus-visible {
-    color: #fff;
-    border-color: rgba(255, 255, 255, 0.28);
-  }
-
-  .masthead-account svg {
-    width: 14px;
-    height: 14px;
-  }
-
-  @media (max-width: 960px) {
+@media (max-width: 960px) {
     .nav { display: none; }
     .search-pill { min-width: 0; }
     .search-pill input[type="search"] { width: 160px; flex: 0 0 auto; }
@@ -295,7 +264,4 @@ const isActive = (href: string): boolean =>
     .search-icon-link { display: inline-flex; }
   }
 
-  @media (max-width: 560px) {
-    .masthead-account span { display: none; }
-  }
 </style>

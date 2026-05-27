@@ -51,6 +51,16 @@ export const site: SiteConfig = {
      * which overrides selected columns. The first two columns are the most
      * likely candidates for category-specific overrides (top articles, trends).
      */
+    /*
+     * Footer information architecture — strict no-duplicate policy.
+     * Every link appears in exactly one place. Main columns hold the
+     * site's editorial / content / about navigation. The bottom legal
+     * row holds purely legal + utility nav (impressum, privacy, cookies,
+     * terms, sitemap, accessibility statement). Earlier we had
+     * "Důvěryhodné zdroje" and "Diskuze" duplicated in both, plus
+     * "Magazín" and "Návody" duplicated within the columns themselves —
+     * audit flagged it as inconsistent mental model. Cleaned up.
+     */
     columns: [
       {
         heading: "Kategorie",
@@ -61,7 +71,6 @@ export const site: SiteConfig = {
           { href: "/auto/", label: "Auto" },
           { href: "/navody/", label: "Návody" },
           { href: "/znacky/", label: "Značky výrobců" },
-          { href: "/magazin/", label: "Magazín" },
         ],
       },
       {
@@ -88,7 +97,7 @@ export const site: SiteConfig = {
           { href: "/rozhovory/", label: "Rozhovory s odborníky" },
           { href: "/recenze-eshopu/", label: "Recenze e-shopů" },
           { href: "/diskuze/", label: "Diskuze / fórum" },
-          { href: "/navody/", label: "Návody" },
+          { href: "/newsletter/", label: "Newsletter" },
         ],
       },
       {
@@ -96,7 +105,7 @@ export const site: SiteConfig = {
         links: [
           { href: "/o-nas/", label: "O nás" },
           { href: "/sefredaktor/", label: "Šéfredaktor" },
-          { href: "/impressum/", label: "Impressum" },
+          { href: "/autori/", label: "Autoři" },
           { href: "/press/", label: "Press & Media kit" },
           { href: "/kariera/", label: "Kariéra" },
           { href: "/kontakt/", label: "Kontakt" },
@@ -112,9 +121,8 @@ export const site: SiteConfig = {
       { href: "/zasady-osobnich-udaju/", label: "Zásady ochrany osobních údajů" },
       { href: "/zasady-cookies/", label: "Zásady cookies" },
       { href: "/podminky-pouziti/", label: "Podmínky použití" },
+      { href: "/pristupnost/", label: "Prohlášení o přístupnosti" },
       { href: "/mapa-webu/", label: "Mapa webu" },
-      { href: "/duveryhodne-zdroje/", label: "Důvěryhodné zdroje" },
-      { href: "/diskuze/", label: "Diskuze / fórum" },
     ],
   },
 };

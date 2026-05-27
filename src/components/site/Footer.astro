@@ -13,15 +13,18 @@ interface Props {
   categoryContext?: FooterCategoryContext;
 
   /**
-   * Hide the global newsletter band above the footer.
-   * Pages that are themselves the newsletter signup destination
-   * (e.g. /newsletter/) should set this so the visitor doesn't see
-   * two competing dark signup CTAs back-to-back.
+   * Show a newsletter signup band above the footer.
+   *
+   * OPT-IN by design — repeating a generic "subscribe" promo on every
+   * single page (about-us, impressum, legal pages, author profiles…)
+   * is the classic low-value boilerplate that HCU raters penalize.
+   * Pages that already engage the reader (homepage, article body)
+   * can opt in; trust / legal / utility pages should not.
    */
-  hideNewsletterBand?: boolean;
+  showNewsletterBand?: boolean;
 }
 
-const { categoryContext, hideNewsletterBand = false } = Astro.props;
+const { categoryContext, showNewsletterBand = false } = Astro.props;
 
 const defaults = site.footer.columns;
 const columns: FooterColumn[] =
@@ -36,7 +39,7 @@ const currentYear = new Date().getFullYear();
 ---
 
 <footer class="foot">
-  {!hideNewsletterBand && <Newsletter />}
+  {showNewsletterBand && <Newsletter />}
 
   <div class="foot-inner">
     <div class="foot-brand">

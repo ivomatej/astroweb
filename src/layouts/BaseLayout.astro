@@ -14,11 +14,14 @@ interface Props {
   noIndex?: boolean;
   footerCategoryContext?: FooterCategoryContext;
   /**
-   * Suppress the global newsletter-signup band that normally sits above
-   * the footer. Use on pages that already include a signup form
-   * (e.g. /newsletter/) so visitors don't see two dark CTAs back-to-back.
+   * Opt this page into the global newsletter band above the footer.
+   *
+   * Default: OFF. The promo box is generic boilerplate when rendered
+   * on every page, and HCU raters flag exactly that pattern. Only opt
+   * in where the visitor has high engagement intent (homepage, article
+   * body). Trust / legal / author / utility pages get nothing.
    */
-  hideNewsletterBand?: boolean;
+  showNewsletterBand?: boolean;
 }
 
 const {
@@ -28,7 +31,7 @@ const {
   ogImage,
   noIndex = false,
   footerCategoryContext,
-  hideNewsletterBand = false,
+  showNewsletterBand = false,
 } = Astro.props;
 
 const canonicalUrl = canonical ?? Astro.url.href;
@@ -119,7 +122,7 @@ const canonicalUrl = canonical ?? Astro.url.href;
 
     <Footer
       categoryContext={footerCategoryContext}
-      hideNewsletterBand={hideNewsletterBand}
+      showNewsletterBand={showNewsletterBand}
     />
 
     <CookieConsent />
