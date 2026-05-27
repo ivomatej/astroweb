@@ -38,30 +38,26 @@ if (!article) {
 }
 
 /*
- * Article page order — per audit §3.4.
+ * Article page order.
  *
+ * Main column:
  *   1. Breadcrumb
  *   2. H1 + perex (ArticleHeader)
- *   3. ⚡ TLDR box — POVÝŠENO nahoru (AI Overviews / featured snippets
- *      čtou prvních 150 slov; TLDR má dát hlavní odpověď okamžitě)
- *   4. Sticky meta card (ByLine) — autor + garant + datum + share,
- *      sticky na desktopu aby autorita zůstala vidět při čtení
- *   5. Inline TOC — POVÝŠENO; pro mobil je to single jump-list, na
- *      desktopu navíc duplikováno do sidebaru se scroll-spy
- *   6. Trust badges (TrustRow) — konsolidované, jedna vizuální banda
- *   7. Hero obrázek
- *   8. Affiliate + Product acquisition wrapped in <details open>
- *      accordion — sbalitelné ale otevřené default
- *   9. Article body sections (H2 ↓)
- *  10. NextCta
- *  11. MethodologySection — metodika ve zkratce
- *  12. RatingSection
- *  13. HistorySection
- *  14. GarantSection — plný author/garant bio
- *  15. RelatedArticles
- *  16. CommentsSection
- *  17. ReportErrorSection
- *  18. MakingSection — full-width "jak jsme to dělali" stats
+ *   3. ⚡ TLDR
+ *   4. ByLine
+ *   5. Inline TOC (mobile/tablet; desktop has the sidebar duplicate)
+ *   6. Hero image
+ *   7. Affiliate + Product acquisition in <details open> accordion
+ *   8. Article body sections (H2 ↓)
+ *   9. NextCta · Methodology · Rating · History · GarantSection ·
+ *      RelatedArticles · CommentsSection · ReportErrorSection
+ *  10. MakingSection (full-width)
+ *
+ * Right sidebar (desktop ≥1024 px, anchored at top, NOT sticky):
+ *   • Table of contents with scroll-spy
+ *   • Trust badges (TrustRow) — moved here from main column so they
+ *     don't compete with body content for vertical space
+ *   • Share row (copy link / e-mail / print)
  */
 ---
 
@@ -92,8 +88,6 @@ if (!article) {
       />
 
       <TableOfContents sections={article.sections} variant="inline" />
-
-      <TrustRow pills={article.trustPills} />
 
       <Figure figure={article.cover} hero />
 
@@ -148,6 +142,13 @@ if (!article) {
 
     <aside class="article-sidebar">
       <TableOfContents sections={article.sections} variant="sidebar" />
+
+      <div class="side-card side-trust">
+        <div class="side-card-head">
+          <span class="side-card-title">Záruky článku</span>
+        </div>
+        <TrustRow pills={article.trustPills} />
+      </div>
 
       <div class="side-card side-share">
         <div class="side-card-head">
@@ -319,6 +320,32 @@ if (!article) {
     letter-spacing: 0.1em;
     color: var(--ink);
     font-weight: 700;
+  }
+
+  /*
+   * Inside the sidebar, TrustRow's row layout breaks down — the 4 pills
+   * wrap awkwardly in the narrow column. Override to stack vertically
+   * and tighten visual weight so they read as a list rather than tags.
+   */
+  .side-trust :global(.trust-row) {
+    flex-direction: column;
+    gap: 0.55rem;
+    margin: 0;
+  }
+
+  .side-trust :global(.trust-pill) {
+    font-size: 12.5px;
+    line-height: 1.35;
+    color: var(--ink-soft);
+    align-items: flex-start;
+  }
+
+  .side-trust :global(.trust-pill svg) {
+    width: 14px;
+    height: 14px;
+    color: var(--green);
+    flex-shrink: 0;
+    margin-top: 1px;
   }
 
   /* ============ Sidebar share row ============ */
