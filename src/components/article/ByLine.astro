@@ -430,21 +430,31 @@ const showAsUpdated = dates.significantUpdate === true && !!updatedHuman;
     margin-top: 1px;
   }
 
+  /*
+   * Explicit font-weight: 400 everywhere inside the popover body —
+   * the bio paragraph, its inline <strong> tags, and the credentials
+   * list items. Without the explicit declaration the browser was
+   * still hinting the text slightly heavier (Figtree variable font
+   * can drift toward 500 if any ancestor declares a heavier weight).
+   * User wanted the body of the popover to read as one even
+   * regular-weight block. Only .bp-name (the header) stays bold.
+   */
   .bp-bio {
     font-size: 13.5px;
     line-height: 1.55;
     color: var(--ink-soft);
+    font-weight: 400;
     margin: 0;
   }
 
-  .bp-bio :global(p) { margin: 0 0 0.5rem; }
+  .bp-bio :global(p) {
+    margin: 0 0 0.5rem;
+    font-weight: 400;
+  }
   .bp-bio :global(p:last-child) { margin-bottom: 0; }
-  /* Per user preference — keep <strong> semantically present but
-     drop the visual bold inside the popover so the bio reads as one
-     even paragraph. */
   .bp-bio :global(strong) {
     color: var(--ink-soft);
-    font-weight: inherit;
+    font-weight: 400;
   }
 
   /*
@@ -469,6 +479,11 @@ const showAsUpdated = dates.significantUpdate === true && !!updatedHuman;
     font-size: 13.5px;
     line-height: 1.45;
     color: var(--ink-soft);
+    font-weight: 400;
+  }
+
+  .bp-creds li > span {
+    font-weight: 400;
   }
 
   .bp-check {
