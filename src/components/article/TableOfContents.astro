@@ -3,12 +3,48 @@ import type { ArticleSectionData } from "../../types/article";
 
 interface Props {
   sections: ArticleSectionData[];
+  /**
+   * "sidebar" — desktop sticky rail (existing behavior, hidden ≤1080 px).
+   * "inline" — collapsible block placed inline above the article body
+   *            so mobile users get a jump-list at the top.
+   */
+  variant?: "sidebar" | "inline";
 }
 
-const { sections } = Astro.props;
+const { sections, variant = "sidebar" } = Astro.props;
 ---
 
-<aside class="toc-aside">
+<aside class:list={["toc-aside", `toc-${variant}`]}>
+  {variant === "inline" ? (
+    <details class="side-card toc-inline-details" open>
+      <summary class="side-card-head">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+          <line x1="8" y1="6" x2="21" y2="6" />
+          <line x1="8" y1="12" x2="21" y2="12" />
+          <line x1="8" y1="18" x2="21" y2="18" />
+          <line x1="3" y1="6" x2="3.01" y2="6" />
+          <line x1="3" y1="12" x2="3.01" y2="12" />
+          <line x1="3" y1="18" x2="3.01" y2="18" />
+        </svg>
+        <span class="side-card-title">V tomto článku</span>
+        <span class="toc-chev" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <polyline points="6 9 12 15 18 9" />
+          </svg>
+        </span>
+      </summary>
+      <ol class="toc-list">
+        {sections.map((section) => (
+          <li>
+            <a href={`#${section.id}`} data-toc-target={section.id}>
+              <span class="toc-num">{section.num}</span>
+              <span class="toc-label">{section.tocLabel ?? section.title}</span>
+            </a>
+          </li>
+        ))}
+      </ol>
+    </details>
+  ) : (
   <div class="side-card">
     <div class="side-card-head">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
@@ -34,6 +70,7 @@ const { sections } = Astro.props;
       }
     </ol>
   </div>
+  )}
 </aside>
 
 <script>
@@ -165,5 +202,56 @@ const { sections } = Astro.props;
 
   .toc-list a.active .toc-num {
     color: var(--p-600);
+  }
+
+  /* ============ Inline variant — mobile + below desktop ============ */
+  .toc-inline {
+    margin: 1.25rem 0 1.5rem;
+  }
+
+  .toc-inline-details summary {
+    cursor: pointer;
+    list-style: none;
+    user-select: none;
+    margin-bottom: 0;
+    justify-content: flex-start;
+    gap: 0.5rem;
+  }
+
+  .toc-inline-details summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .toc-inline .toc-chev {
+    margin-left: auto;
+    display: inline-flex;
+    width: 20px;
+    height: 20px;
+    align-items: center;
+    justify-content: center;
+    color: var(--p-700);
+    transition: transform 0.18s ease-out;
+  }
+
+  .toc-inline-details[open] .toc-chev {
+    transform: rotate(180deg);
+  }
+
+  .toc-inline .toc-chev svg {
+    width: 14px;
+    height: 14px;
+  }
+
+  .toc-inline .toc-list {
+    margin-top: 1rem;
+  }
+
+  /* Hide inline TOC on desktop (sidebar takes over) */
+  @media (min-width: 1024px) {
+    .toc-inline { display: none; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .toc-inline .toc-chev { transition: none; }
   }
 </style>

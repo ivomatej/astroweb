@@ -36,6 +36,33 @@ const article = getArticleBySlug(slug!);
 if (!article) {
   return Astro.redirect("/404");
 }
+
+/*
+ * Article page order — per audit §3.4.
+ *
+ *   1. Breadcrumb
+ *   2. H1 + perex (ArticleHeader)
+ *   3. ⚡ TLDR box — POVÝŠENO nahoru (AI Overviews / featured snippets
+ *      čtou prvních 150 slov; TLDR má dát hlavní odpověď okamžitě)
+ *   4. Sticky meta card (ByLine) — autor + garant + datum + share,
+ *      sticky na desktopu aby autorita zůstala vidět při čtení
+ *   5. Inline TOC — POVÝŠENO; pro mobil je to single jump-list, na
+ *      desktopu navíc duplikováno do sidebaru se scroll-spy
+ *   6. Trust badges (TrustRow) — konsolidované, jedna vizuální banda
+ *   7. Hero obrázek
+ *   8. Affiliate + Product acquisition wrapped in <details open>
+ *      accordion — sbalitelné ale otevřené default
+ *   9. Article body sections (H2 ↓)
+ *  10. NextCta
+ *  11. MethodologySection — metodika ve zkratce
+ *  12. RatingSection
+ *  13. HistorySection
+ *  14. GarantSection — plný author/garant bio
+ *  15. RelatedArticles
+ *  16. CommentsSection
+ *  17. ReportErrorSection
+ *  18. MakingSection — full-width "jak jsme to dělali" stats
+ */
 ---
 
 <BaseLayout
@@ -56,23 +83,41 @@ if (!article) {
         perex={article.perex}
       />
 
-      <ByLine
-        author={article.author}
-        garant={article.garant}
-        dates={article.dates}
-      />
+      <TLDR tldr={article.tldr} />
+
+      <div class="byline-sticky">
+        <ByLine
+          author={article.author}
+          garant={article.garant}
+          dates={article.dates}
+        />
+      </div>
+
+      <TableOfContents sections={article.sections} variant="inline" />
 
       <TrustRow pills={article.trustPills} />
 
-      <AffiliateDisclosure disclosure={article.affiliateDisclosure} />
+      <Figure figure={article.cover} hero />
 
-      {article.productAcquisition && <ProductAcquisitionSection data={article.productAcquisition} />}
+      <details class="disclosure-accordion" open>
+        <summary>
+          <span class="acc-eyebrow">Transparentnost</span>
+          <span class="acc-title">Jak jsme produkt získali a co jsou affiliate odkazy</span>
+          <span class="acc-chev" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <polyline points="6 9 12 15 18 9" />
+            </svg>
+          </span>
+        </summary>
+        <div class="acc-body">
+          <AffiliateDisclosure disclosure={article.affiliateDisclosure} />
+          {article.productAcquisition && (
+            <ProductAcquisitionSection data={article.productAcquisition} />
+          )}
+        </div>
+      </details>
 
       <article class="article-body">
-        <TLDR tldr={article.tldr} />
-
-        <Figure figure={article.cover} hero />
-
         {
           article.sections.map((section) => (
             <ArticleSection section={section} />
@@ -82,12 +127,6 @@ if (!article) {
 
       {article.nextCta && <NextCta cta={article.nextCta} />}
 
-      {
-        article.relatedArticles.length > 0 && (
-          <RelatedArticles items={article.relatedArticles} />
-        )
-      }
-
       {article.methodology && <MethodologySection methodology={article.methodology} />}
 
       {article.rating && <RatingSection rating={article.rating} />}
@@ -96,6 +135,12 @@ if (!article) {
 
       <GarantSection author={article.author} garant={article.garant} />
 
+      {
+        article.relatedArticles.length > 0 && (
+          <RelatedArticles items={article.relatedArticles} />
+        )
+      }
+
       {article.comments.enabled && <CommentsSection comments={article.comments} />}
 
       {article.reportErrorHref && (
@@ -103,7 +148,70 @@ if (!article) {
       )}
     </div>
 
-    <TableOfContents sections={article.sections} />
+    <aside class="article-sidebar">
+      <TableOfContents sections={article.sections} variant="sidebar" />
+
+      <div class="side-card side-author">
+        <div class="side-card-head">
+          <span class="side-card-title">Autor článku</span>
+        </div>
+        <a class="side-author-row" href={`/autor/${article.author.slug}/`}>
+          <span class="side-author-avatar">
+            {article.author.photoUrl
+              ? <img src={article.author.photoUrl} alt={article.author.name} />
+              : <span>{article.author.initials ?? article.author.name.slice(0, 2)}</span>}
+          </span>
+          <span class="side-author-text">
+            <strong>{article.author.name}</strong>
+            <span>{article.author.role}</span>
+          </span>
+        </a>
+        {article.garant && (
+          <a class="side-author-row side-author-garant" href={`/autor/${article.garant.slug}/`}>
+            <span class="side-author-avatar garant">
+              {article.garant.photoUrl
+                ? <img src={article.garant.photoUrl} alt={article.garant.name} />
+                : <span>{article.garant.initials ?? article.garant.name.slice(0, 2)}</span>}
+            </span>
+            <span class="side-author-text">
+              <em>Odborný garant</em>
+              <strong>{article.garant.name}</strong>
+            </span>
+          </a>
+        )}
+      </div>
+
+      <div class="side-card side-share">
+        <div class="side-card-head">
+          <span class="side-card-title">Sdílet článek</span>
+        </div>
+        <div class="side-share-row" role="group" aria-label="Sdílení článku">
+          <button type="button" data-share="copy" class="share-btn" aria-label="Zkopírovat odkaz">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+              <rect x="9" y="9" width="13" height="13" rx="2" />
+              <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+            </svg>
+            <span>Odkaz</span>
+          </button>
+          <a class="share-btn" data-share="email" href="#" aria-label="Sdílet e-mailem">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+              <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
+              <polyline points="22,6 12,13 2,6" />
+            </svg>
+            <span>E-mail</span>
+          </a>
+          <button type="button" data-share="print" class="share-btn" aria-label="Vytisknout článek">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+              <polyline points="6 9 6 2 18 2 18 9" />
+              <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2" />
+              <rect x="6" y="14" width="12" height="8" />
+            </svg>
+            <span>Tisk</span>
+          </button>
+        </div>
+        <p class="side-share-toast" data-share-toast hidden>Odkaz zkopírován ✓</p>
+      </div>
+    </aside>
   </div>
 
   <MakingSection stats={article.credibilityStats} />
@@ -119,17 +227,320 @@ if (!article) {
     gap: 2.5rem;
   }
 
-  .article-main {
-    min-width: 0;
+  .article-main { min-width: 0; }
+
+  .article-body { margin-top: 0; }
+
+  /*
+   * Sticky ByLine — autor + garant + datum + share zůstávají
+   * viditelné při scrollování delším článkem. Top offset musí
+   * counter-balance the sticky masthead height.
+   */
+  .byline-sticky {
+    position: sticky;
+    top: 60px;
+    z-index: 5;
+    background: var(--bg);
+    margin: 0 -0.25rem 1rem;
+    padding: 0 0.25rem;
   }
 
-  .article-body {
-    margin-top: 0;
+  /* Sidebar — sticky TOC on desktop only. Inline TOC handles mobile. */
+  .article-sidebar {
+    display: none;
+  }
+
+  @media (min-width: 1024px) {
+    .article-sidebar {
+      display: block;
+      position: sticky;
+      top: 80px;
+      align-self: start;
+      max-height: calc(100vh - 100px);
+      overflow-y: auto;
+    }
   }
 
   @media (max-width: 1080px) {
     .article-wrap {
       grid-template-columns: 1fr;
     }
+    .byline-sticky { position: static; }
+  }
+
+  /* ============ Disclosure accordion ============ */
+  .disclosure-accordion {
+    margin: 1.5rem 0 2rem;
+    background: var(--bg-warm);
+    border: 1px solid var(--line);
+    border-radius: var(--r-lg);
+    overflow: hidden;
+  }
+
+  .disclosure-accordion[open] {
+    border-color: var(--p-200);
+  }
+
+  .disclosure-accordion summary {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: 0.75rem;
+    align-items: center;
+    padding: 0.85rem 1.1rem;
+    cursor: pointer;
+    list-style: none;
+    user-select: none;
+  }
+
+  .disclosure-accordion summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .acc-eyebrow {
+    font-family: var(--mono);
+    font-size: 10.5px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--p-700);
+    font-weight: 700;
+    padding: 3px 9px;
+    background: var(--p-50);
+    border-radius: 999px;
+  }
+
+  .acc-title {
+    font-weight: 700;
+    font-size: 14.5px;
+    color: var(--ink);
+    line-height: 1.4;
+  }
+
+  .acc-chev {
+    display: inline-flex;
+    width: 22px;
+    height: 22px;
+    align-items: center;
+    justify-content: center;
+    color: var(--p-700);
+    transition: transform 0.18s ease-out;
+  }
+
+  .disclosure-accordion[open] .acc-chev {
+    transform: rotate(180deg);
+  }
+
+  .acc-chev svg { width: 16px; height: 16px; }
+
+  .acc-body {
+    padding: 0.4rem 1.1rem 1.1rem;
+    border-top: 1px solid var(--line);
+    background: #fff;
+  }
+
+  /* Reset any vertical margin coming from child block components. */
+  .acc-body > :first-child { margin-top: 0.85rem; }
+  .acc-body > :last-child  { margin-bottom: 0; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .acc-chev { transition: none; }
+  }
+
+  /* ============ Sidebar mini author card ============ */
+  .side-card {
+    background: var(--bg-warm);
+    border: 1px solid var(--line);
+    border-radius: var(--r-lg);
+    padding: 1.1rem 1.15rem;
+    margin-top: 1rem;
+  }
+
+  .side-card-head {
+    margin-bottom: 0.75rem;
+  }
+
+  .side-card-title {
+    font-family: var(--mono);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--ink);
+    font-weight: 700;
+  }
+
+  .side-author-row {
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    padding: 0.55rem 0;
+    text-decoration: none;
+    color: var(--ink);
+    border-radius: var(--r);
+  }
+
+  .side-author-row + .side-author-row {
+    border-top: 1px dashed var(--line);
+    margin-top: 0.5rem;
+    padding-top: 0.85rem;
+  }
+
+  .side-author-row:hover strong,
+  .side-author-row:focus-visible strong {
+    color: var(--p-700);
+  }
+
+  .side-author-avatar {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background: var(--p-100);
+    color: var(--p-700);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    font-size: 13px;
+    flex-shrink: 0;
+    overflow: hidden;
+  }
+
+  .side-author-avatar.garant {
+    background: var(--amber-bg);
+    color: var(--amber-text);
+  }
+
+  .side-author-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .side-author-text {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    line-height: 1.35;
+    min-width: 0;
+  }
+
+  .side-author-text strong {
+    font-size: 14px;
+    color: var(--ink);
+    font-weight: 700;
+  }
+
+  .side-author-text span,
+  .side-author-text em {
+    font-size: 12px;
+    color: var(--muted);
+    font-style: normal;
+  }
+
+  .side-author-text em {
+    font-family: var(--mono);
+    font-size: 10.5px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--amber-text);
+    font-weight: 700;
+  }
+
+  /* ============ Sidebar share row ============ */
+  .side-share-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.4rem;
+  }
+
+  .share-btn {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.25rem;
+    padding: 0.55rem 0.3rem;
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: var(--r);
+    color: var(--ink-soft);
+    cursor: pointer;
+    font: inherit;
+    font-size: 11px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: border-color 0.15s, color 0.15s, transform 0.15s;
+  }
+
+  .share-btn:hover,
+  .share-btn:focus-visible {
+    border-color: var(--p-400);
+    color: var(--p-700);
+    transform: translateY(-1px);
+    outline: none;
+  }
+
+  .share-btn svg {
+    width: 16px;
+    height: 16px;
+  }
+
+  .side-share-toast {
+    margin: 0.65rem 0 0;
+    padding: 0.45rem 0.7rem;
+    background: var(--green-bg);
+    color: var(--green-text);
+    font-size: 12px;
+    font-weight: 600;
+    text-align: center;
+    border-radius: var(--r-sm);
+  }
+
+  .side-share-toast[hidden] {
+    display: none;
   }
 </style>
+
+<script is:inline>
+  /*
+   * Article sidebar share buttons — copy URL to clipboard, mailto:,
+   * window.print(). No third-party share widgets (no FB pixel, no
+   * Twitter tracking).
+   */
+  (function () {
+    const toast = document.querySelector("[data-share-toast]");
+    const showToast = () => {
+      if (!toast) return;
+      toast.hidden = false;
+      setTimeout(() => { toast.hidden = true; }, 2200);
+    };
+
+    document.querySelectorAll("[data-share]").forEach((el) => {
+      const kind = el.getAttribute("data-share");
+      if (kind === "email" && el.tagName === "A") {
+        const subject = encodeURIComponent(document.title);
+        const body = encodeURIComponent(window.location.href);
+        el.setAttribute("href", "mailto:?subject=" + subject + "&body=" + body);
+        return;
+      }
+      el.addEventListener("click", function (ev) {
+        if (kind === "copy") {
+          ev.preventDefault();
+          const url = window.location.href;
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(url).then(showToast).catch(showToast);
+          } else {
+            const ta = document.createElement("textarea");
+            ta.value = url;
+            document.body.appendChild(ta);
+            ta.select();
+            try { document.execCommand("copy"); } catch (e) {}
+            document.body.removeChild(ta);
+            showToast();
+          }
+        } else if (kind === "print") {
+          ev.preventDefault();
+          window.print();
+        }
+      });
+    });
+  })();
+</script>
