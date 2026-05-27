@@ -1,6 +1,20 @@
 /* =========================================================
    ARTICLE BODY CONTENT — rich patterns rendered via set:html
    callouts, steps, params, tables, expert quotes, citations
+   =========================================================
+
+   ── Callout pattern guide (max 3 visuals across the whole article)
+       1. .callout.warn          → AMBER — safety, compatibility,
+                                   "something can break / hurt you"
+       2. .callout.info           → PURPLE — rules, tips, definitions,
+       .callout.success          (alias: legacy data still using
+       .garant-tip              "success" lands in purple; .garant-tip
+                                   is the same family, just with named
+                                   attribution + avatar)
+       3. .expert-quote          → PURPLE LEFT BORDER on light bg —
+                                   garant pull quote with avatar
+   The dark TLDR banner above the article is a STRUCTURAL element,
+   not a callout — one per article, always at the top.
    ========================================================= */
 
 .section-body p {
@@ -95,7 +109,15 @@
   border: 1px solid;
 }
 
-.section-body .callout.info {
+/*
+ * Two callout colors only — see "callout pattern" comment at the top
+ * of this file. .success was retired (collapsed into .info) so the
+ * reader doesn't have to learn which of three colors carries which
+ * semantic. .info covers rules / tips / recommendations; .warn covers
+ * safety / compatibility / something-can-break warnings.
+ */
+.section-body .callout.info,
+.section-body .callout.success {
   background: var(--p-50);
   border-color: rgba(99, 50, 204, 0.18);
 }
@@ -103,11 +125,6 @@
 .section-body .callout.warn {
   background: var(--amber-bg);
   border-color: rgba(180, 83, 9, 0.2);
-}
-
-.section-body .callout.success {
-  background: var(--green-bg);
-  border-color: rgba(21, 128, 61, 0.18);
 }
 
 .section-body .callout-ic {
@@ -121,16 +138,13 @@
   justify-content: center;
 }
 
-.section-body .callout.info .callout-ic {
+.section-body .callout.info .callout-ic,
+.section-body .callout.success .callout-ic {
   color: var(--p-700);
 }
 
 .section-body .callout.warn .callout-ic {
   color: var(--amber);
-}
-
-.section-body .callout.success .callout-ic {
-  color: var(--green);
 }
 
 .section-body .callout-ic svg {
@@ -344,17 +358,23 @@
   background: var(--bg-warm);
 }
 
-/* ---------- Expert quote (garant pull quote) ---------- */
+/* ---------- Expert quote (garant pull quote) ----------
+ * Third callout pattern — distinguished from .callout.info by a
+ * stronger left border accent + avatar layout. No solid dark fill;
+ * the page already has TLDR for "dark = unmissable structural
+ * element" and we don't want a second dark block to compete.
+ */
 
 .section-body .expert-quote {
   display: flex;
   gap: 1rem;
   margin: 1.75rem 0;
-  padding: 1.25rem;
-  background: var(--p-900);
-  color: #fff;
+  padding: 1.25rem 1.4rem;
+  background: var(--bg-warm);
+  color: var(--ink);
+  border: 1px solid var(--line);
+  border-left: 4px solid var(--p-600);
   border-radius: var(--r-lg);
-  border-left: 4px solid var(--p-400);
 }
 
 .section-body .expert-avatar {
@@ -362,8 +382,6 @@
   width: 42px;
   height: 42px;
   border-radius: 50%;
-  /* p-400 + p-900 dávalo borderline 4.36:1. Změna na světlejší bg (p-100)
-     a tmavší text (p-700) zvyšuje kontrast na 7+ :1. */
   background: var(--p-100);
   color: var(--p-700);
   display: inline-flex;
@@ -374,10 +392,11 @@
 }
 
 .section-body .expert-label {
-  font-size: 11px;
+  font-family: var(--mono);
+  font-size: 10.5px;
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  color: var(--p-300);
+  color: var(--p-700);
   font-weight: 700;
   margin-bottom: 0.4rem;
 }
@@ -386,27 +405,32 @@
   font-size: 15px;
   line-height: 1.6;
   margin-bottom: 0.75rem;
-  color: rgba(255, 255, 255, 0.92);
+  color: var(--ink-soft);
 }
 
 .section-body .expert-text strong {
-  color: #fff;
+  color: var(--ink);
   font-weight: 700;
 }
 
 .section-body .expert-attribution {
   font-weight: 700;
   font-size: 14px;
-  color: #fff;
+  color: var(--ink);
 }
 
 .section-body .expert-creds {
   font-size: 12px;
-  color: rgba(255, 255, 255, 0.6);
+  color: var(--muted);
   margin-top: 2px;
 }
 
-/* ---------- Garant tip (inline pull box) ---------- */
+/* ---------- Garant tip (inline pull box) ----------
+ * Visually folded into the "info/tip" family (purple), same as
+ * .callout.info. Distinguished from .callout.info only by the
+ * avatar + named attribution — it's a specific person's tip, not
+ * a generic article aside.
+ */
 
 .section-body .garant-tip {
   display: grid;
@@ -414,9 +438,9 @@
   gap: 0.9rem;
   padding: 1.1rem 1.25rem;
   margin: 1.5rem 0;
-  background: var(--bg-warm);
-  border: 1px solid var(--line);
-  border-left: 3px solid var(--amber);
+  background: var(--p-50);
+  border: 1px solid rgba(99, 50, 204, 0.18);
+  border-left: 3px solid var(--p-600);
   border-radius: var(--r-lg);
 }
 
@@ -424,8 +448,8 @@
   width: 42px;
   height: 42px;
   border-radius: 50%;
-  background: var(--amber-bg);
-  color: var(--amber);
+  background: var(--p-100);
+  color: var(--p-700);
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -448,7 +472,7 @@
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  color: var(--amber);
+  color: var(--p-700);
 }
 
 .section-body .garant-who {
