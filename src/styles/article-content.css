@@ -87,6 +87,7 @@
 
 .section-body .callout {
   display: flex;
+  align-items: flex-start;
   gap: 1rem;
   padding: 1.25rem;
   border-radius: var(--r-lg);
@@ -137,9 +138,17 @@
   height: 16px;
 }
 
+/*
+ * Inside a callout the heading inherits .section-body h3's 2 rem
+ * top margin, which pushed the title down while the icon stayed
+ * anchored at the top of the flex row. Reset all vertical margin
+ * on first/last children so the box is visually centered.
+ */
 .section-body .callout h3,
 .section-body .callout h4 {
-  margin-bottom: 0.3rem;
+  margin: 0 0 0.3rem;
+  font-size: 1rem;
+  line-height: 1.35;
 }
 
 .section-body .callout p {
@@ -147,6 +156,9 @@
   font-size: 14.5px;
   color: var(--ink-soft);
 }
+
+.section-body .callout > div > :first-child { margin-top: 0; }
+.section-body .callout > div > :last-child  { margin-bottom: 0; }
 
 /* ---------- Step block ---------- */
 
