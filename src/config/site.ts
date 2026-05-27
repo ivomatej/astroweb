@@ -20,11 +20,13 @@ export const site: SiteConfig = {
   },
 
   primaryNav: [
-    { href: "/elektronarad/", label: "Elektronářadí" },
     { href: "/domaci-spotrebice/", label: "Spotřebiče" },
+    { href: "/elektronarad/", label: "Elektronářadí" },
     { href: "/zahrada/", label: "Zahrada" },
     { href: "/auto/", label: "Auto" },
+    { href: "/sluzby/", label: "Služby" },
     { href: "/navody/", label: "Návody" },
+    { href: "/magazin/", label: "Novinky" },
   ],
 
   newsletter: {
