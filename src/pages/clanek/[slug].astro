@@ -42,17 +42,18 @@ if (!article) {
  *
  * Main column:
  *   1. Breadcrumb
- *   2. ArticleHeader — H1, then ByLine (autor + garant + dates)
- *      injected via slot, then perex. Credentials sit between the
- *      headline and the supporting paragraph.
- *   3. Hero image
- *   4. ⚡ TLDR
- *   5. Inline TOC (mobile/tablet; desktop has the sidebar duplicate)
- *   6. Affiliate + Product acquisition in <details open> accordion
- *   7. Article body sections (H2 ↓)
- *   8. NextCta · Methodology · Rating · History · GarantSection ·
+ *   2. H1 + perex (ArticleHeader)
+ *   3. ByLine (autor + garant + dates) — sits just under the perex
+ *      so the headline + intro reads together as one block, then the
+ *      byline answers "kdo a kdy"
+ *   4. Hero image
+ *   5. ⚡ TLDR
+ *   6. Inline TOC (mobile/tablet; desktop has the sidebar duplicate)
+ *   7. Affiliate + Product acquisition in <details open> accordion
+ *   8. Article body sections (H2 ↓)
+ *   9. NextCta · Methodology · Rating · History · GarantSection ·
  *      RelatedArticles · CommentsSection · ReportErrorSection
- *   9. MakingSection (full-width)
+ *  10. MakingSection (full-width)
  *
  * Right sidebar (desktop ≥1024 px, anchored at top, NOT sticky):
  *   • Table of contents with scroll-spy
@@ -77,13 +78,13 @@ if (!article) {
       <ArticleHeader
         title={article.title}
         perex={article.perex}
-      >
-        <ByLine
-          author={article.author}
-          garant={article.garant}
-          dates={article.dates}
-        />
-      </ArticleHeader>
+      />
+
+      <ByLine
+        author={article.author}
+        garant={article.garant}
+        dates={article.dates}
+      />
 
       <Figure figure={article.cover} hero />
 
