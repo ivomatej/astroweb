@@ -1,6 +1,7 @@
 ---
 import { site } from "../../config/site";
 import MegaMenu from "./MegaMenu.astro";
+import MobileNav from "./MobileNav.astro";
 
 const pathname = Astro.url.pathname;
 const isActive = (href: string): boolean =>
@@ -86,9 +87,24 @@ const isActive = (href: string): boolean =>
         </svg>
         <span>Účet</span>
       </a>
+
+      <button
+        type="button"
+        class="burger"
+        data-mobile-nav-trigger
+        aria-label="Otevřít menu"
+        aria-controls="mobile-nav-drawer"
+        aria-expanded="false"
+      >
+        <span class="burger-bar"></span>
+        <span class="burger-bar"></span>
+        <span class="burger-bar"></span>
+      </button>
     </div>
   </div>
 </header>
+
+<MobileNav />
 
 <style>
   .masthead-sentinel {
@@ -363,8 +379,45 @@ const isActive = (href: string): boolean =>
     height: 14px;
   }
 
+  /*
+   * Burger button — only visible at ≤960 px where the desktop nav
+   * collapses. Three-bar icon; the bars get a faint white tint that
+   * fits the masthead's purple background.
+   */
+  .burger {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    width: 36px;
+    height: 36px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    cursor: pointer;
+    padding: 0;
+    transition: background 0.15s, border-color 0.15s;
+  }
+
+  .burger:hover,
+  .burger:focus-visible {
+    background: rgba(255, 255, 255, 0.18);
+    border-color: rgba(255, 255, 255, 0.32);
+    outline: none;
+  }
+
+  .burger-bar {
+    display: block;
+    width: 16px;
+    height: 2px;
+    background: #fff;
+    border-radius: 999px;
+  }
+
   @media (max-width: 960px) {
     .nav { display: none; }
+    .burger { display: inline-flex; }
   }
 
   /*

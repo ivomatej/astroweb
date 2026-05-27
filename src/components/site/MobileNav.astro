@@ -1,0 +1,546 @@
+---
+/**
+ * Mobile / tablet burger-menu drawer.
+ *
+ * Renders the same primary nav + mega-menu data as the desktop, but as
+ * a slide-in panel from the right with native <details> accordions.
+ * Hierarchy:
+ *
+ *   Level 1: primary nav category   (.mn-l1)
+ *     → Level 2: section              (.mn-l2)
+ *       → Level 3: leaf link          (.mn-l3)
+ *
+ * Native <details> handles expand/collapse — no JS needed for the
+ * accordions themselves. JS only handles drawer open/close and body
+ * scroll lock.
+ *
+ * "Doporučené značky" row is intentionally omitted on mobile (user
+ * preference — too much clutter for narrow viewports).
+ */
+import { site } from "../../config/site";
+---
+
+<div class="mn-backdrop" data-mobile-nav-backdrop hidden></div>
+
+<aside
+  id="mobile-nav-drawer"
+  class="mn-drawer"
+  data-mobile-nav-drawer
+  aria-hidden="true"
+  aria-label="Hlavní menu"
+>
+  <header class="mn-head">
+    <span class="mn-head-title">Menu</span>
+    <button
+      type="button"
+      class="mn-close"
+      data-mobile-nav-close
+      aria-label="Zavřít menu"
+    >
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+        <line x1="18" y1="6" x2="6" y2="18" />
+        <line x1="6" y1="6" x2="18" y2="18" />
+      </svg>
+    </button>
+  </header>
+
+  <nav class="mn-nav" aria-label="Mobilní navigace">
+    <ol class="mn-list">
+      {
+        site.primaryNav.map((link) => {
+          const hasMega = !!link.mega;
+          return (
+            <li class="mn-item">
+              {hasMega && link.mega ? (
+                <details class="mn-l1">
+                  <summary>
+                    <span class="mn-l1-label">{link.label}</span>
+                    <svg
+                      class="mn-chev"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2.5"
+                      aria-hidden="true"
+                    >
+                      <polyline points="6 9 12 15 18 9" />
+                    </svg>
+                  </summary>
+
+                  <div class="mn-l1-body">
+                    <a class="mn-overview" href={link.href}>
+                      Otevřít přehled
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+                        <line x1="5" y1="12" x2="19" y2="12" />
+                        <polyline points="12 5 19 12 12 19" />
+                      </svg>
+                    </a>
+
+                    <ol class="mn-sections">
+                      {link.mega.sections.map((section) => (
+                        <li>
+                          <details class="mn-l2">
+                            <summary>
+                              <span class="mn-l2-label">{section.title}</span>
+                              <svg
+                                class="mn-chev"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2.5"
+                                aria-hidden="true"
+                              >
+                                <polyline points="6 9 12 15 18 9" />
+                              </svg>
+                            </summary>
+
+                            <ol class="mn-leaves">
+                              {section.links.map((leaf) => (
+                                <li>
+                                  <a class="mn-l3" href={leaf.href}>{leaf.label}</a>
+                                </li>
+                              ))}
+                              {section.showMore && (
+                                <li>
+                                  <a class="mn-l3 mn-l3-more" href={section.showMore.href}>
+                                    {section.showMore.label}
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+                                      <line x1="5" y1="12" x2="19" y2="12" />
+                                      <polyline points="12 5 19 12 12 19" />
+                                    </svg>
+                                  </a>
+                                </li>
+                              )}
+                            </ol>
+                          </details>
+                        </li>
+                      ))}
+                    </ol>
+                  </div>
+                </details>
+              ) : (
+                <a class="mn-l1 mn-l1-flat" href={link.href}>
+                  <span class="mn-l1-label">{link.label}</span>
+                </a>
+              )}
+            </li>
+          );
+        })
+      }
+    </ol>
+  </nav>
+
+  <footer class="mn-foot">
+    <a class="mn-foot-btn" href="/hledat/">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+        <circle cx="11" cy="11" r="8" />
+        <line x1="21" y1="21" x2="16.65" y2="16.65" />
+      </svg>
+      Hledat
+    </a>
+    <a class="mn-foot-btn" href="/newsletter/">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+        <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
+        <polyline points="22,6 12,13 2,6" />
+      </svg>
+      Newsletter
+    </a>
+    <a class="mn-foot-btn" href="/ucet/">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+        <circle cx="12" cy="7" r="4" />
+      </svg>
+      Účet
+    </a>
+  </footer>
+</aside>
+
+<style>
+  /* ============ Drawer + backdrop ============
+   * Drawer slides in from the right. Width: min(420px, 92vw).
+   * Backdrop dims the rest of the viewport, click closes.
+   */
+  .mn-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 19, 30, 0.5);
+    z-index: 9000;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.22s ease-out;
+  }
+
+  .mn-backdrop[data-mobile-nav-backdrop]:not([hidden]) {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .mn-backdrop[hidden] { display: block; }
+
+  .mn-drawer {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: min(420px, 92vw);
+    background: #fff;
+    color: var(--ink);
+    z-index: 9100;
+    transform: translateX(100%);
+    transition: transform 0.26s ease-out;
+    display: flex;
+    flex-direction: column;
+    box-shadow: -16px 0 40px -16px rgba(15, 19, 30, 0.35);
+  }
+
+  .mn-drawer[aria-hidden="false"] {
+    transform: translateX(0);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .mn-backdrop,
+    .mn-drawer { transition: none; }
+  }
+
+  /* Hide drawer + backdrop on desktop where the proper nav lives */
+  @media (min-width: 961px) {
+    .mn-drawer,
+    .mn-backdrop { display: none !important; }
+  }
+
+  /* ============ Drawer header ============ */
+  .mn-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.85rem 1.1rem;
+    background: var(--p-800);
+    color: #fff;
+    flex-shrink: 0;
+  }
+
+  .mn-head-title {
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+  }
+
+  .mn-close {
+    width: 38px;
+    height: 38px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.12);
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    color: #fff;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+  }
+
+  .mn-close:hover,
+  .mn-close:focus-visible {
+    background: rgba(255, 255, 255, 0.22);
+    outline: none;
+  }
+
+  .mn-close svg { width: 16px; height: 16px; }
+
+  /* ============ Nav body (scrollable) ============ */
+  .mn-nav {
+    flex: 1;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding-bottom: 0.5rem;
+  }
+
+  .mn-list,
+  .mn-sections,
+  .mn-leaves {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  /* ============ Level 1 — rubrika ============ */
+  .mn-l1 {
+    border-bottom: 1px solid var(--line);
+  }
+
+  .mn-l1 > summary,
+  .mn-l1.mn-l1-flat {
+    list-style: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    padding: 1.05rem 1.25rem;
+    font-size: 17px;
+    font-weight: 800;
+    color: var(--ink);
+    letter-spacing: -0.005em;
+    user-select: none;
+    text-decoration: none;
+    background: #fff;
+    transition: background 0.12s;
+  }
+
+  .mn-l1 > summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .mn-l1 > summary:hover,
+  .mn-l1[open] > summary,
+  .mn-l1.mn-l1-flat:hover {
+    background: var(--p-50);
+  }
+
+  .mn-l1[open] > summary .mn-chev {
+    transform: rotate(180deg);
+  }
+
+  .mn-l1-label { flex: 1; }
+
+  .mn-l1-flat { border-bottom: 1px solid var(--line); }
+
+  .mn-chev {
+    width: 16px;
+    height: 16px;
+    color: var(--p-700);
+    flex-shrink: 0;
+    transition: transform 0.18s ease-out;
+  }
+
+  /* ============ Level 1 body ============ */
+  .mn-l1-body {
+    background: var(--bg-warm);
+    padding: 0.6rem 0 0.75rem;
+  }
+
+  .mn-overview {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    margin: 0.25rem 1.25rem 0.65rem;
+    padding: 0.45rem 0.9rem;
+    background: #fff;
+    border: 1px solid var(--p-300);
+    border-radius: 999px;
+    color: var(--p-700);
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    text-decoration: none;
+  }
+
+  .mn-overview:hover,
+  .mn-overview:focus-visible {
+    background: var(--p-700);
+    color: #fff;
+    border-color: var(--p-700);
+    outline: none;
+  }
+
+  .mn-overview svg { width: 12px; height: 12px; }
+
+  /* ============ Level 2 — sekce ============ */
+  .mn-l2 {
+    margin: 0 1rem 0.35rem 1.25rem;
+    border-left: 3px solid var(--p-200);
+    background: #fff;
+    border-radius: 0 var(--r) var(--r) 0;
+    overflow: hidden;
+  }
+
+  .mn-l2 > summary {
+    list-style: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.65rem;
+    padding: 0.7rem 0.95rem;
+    font-size: 14.5px;
+    font-weight: 700;
+    color: var(--ink-soft);
+    user-select: none;
+    transition: color 0.12s, background 0.12s;
+  }
+
+  .mn-l2 > summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .mn-l2 > summary:hover {
+    color: var(--p-700);
+    background: var(--p-50);
+  }
+
+  .mn-l2[open] > summary {
+    color: var(--p-700);
+  }
+
+  .mn-l2[open] > summary .mn-chev {
+    transform: rotate(180deg);
+  }
+
+  .mn-l2-label { flex: 1; }
+
+  /* ============ Level 3 — listy ============ */
+  .mn-leaves {
+    padding: 0.1rem 0 0.55rem;
+    border-top: 1px dashed var(--line);
+  }
+
+  .mn-l3 {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    padding: 0.5rem 0.95rem 0.5rem 1.6rem;
+    font-size: 13.5px;
+    color: var(--muted);
+    text-decoration: none;
+    line-height: 1.45;
+    border-left: 2px solid transparent;
+    transition: color 0.12s, border-color 0.12s, background 0.12s;
+  }
+
+  .mn-l3:hover,
+  .mn-l3:focus-visible {
+    color: var(--p-700);
+    background: var(--p-50);
+    border-left-color: var(--p-500);
+    outline: none;
+  }
+
+  .mn-l3-more {
+    font-family: var(--mono);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    font-weight: 700;
+    color: var(--p-700);
+  }
+
+  .mn-l3-more svg { width: 12px; height: 12px; }
+
+  /* ============ Drawer footer (utility) ============ */
+  .mn-foot {
+    flex-shrink: 0;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.4rem;
+    padding: 0.85rem 1rem 1.05rem;
+    background: var(--bg-warm);
+    border-top: 1px solid var(--line);
+  }
+
+  .mn-foot-btn {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.3rem;
+    padding: 0.65rem 0.4rem;
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: var(--r);
+    color: var(--ink);
+    font-size: 12.5px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: border-color 0.12s, color 0.12s, background 0.12s;
+  }
+
+  .mn-foot-btn:hover,
+  .mn-foot-btn:focus-visible {
+    border-color: var(--p-400);
+    color: var(--p-700);
+    background: var(--p-50);
+    outline: none;
+  }
+
+  .mn-foot-btn svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  /* Body scroll lock applied via class on <body> when drawer open */
+  :global(body.mn-locked) {
+    overflow: hidden;
+  }
+</style>
+
+<script is:inline>
+  /*
+   * Mobile nav drawer — open/close + body scroll lock.
+   *
+   * Trigger: any [data-mobile-nav-trigger] click (the burger button
+   * lives in the Masthead). Close: dedicated close button, backdrop
+   * click, ESC key, or any link click inside the drawer (so tapping a
+   * leaf navigates and dismisses).
+   */
+  (function () {
+    const drawer   = document.querySelector("[data-mobile-nav-drawer]");
+    const backdrop = document.querySelector("[data-mobile-nav-backdrop]");
+    if (!drawer || !backdrop) return;
+
+    function open() {
+      drawer.setAttribute("aria-hidden", "false");
+      backdrop.hidden = false;
+      document.body.classList.add("mn-locked");
+      // Move focus into the drawer for a11y
+      const closeBtn = drawer.querySelector("[data-mobile-nav-close]");
+      if (closeBtn) closeBtn.focus({ preventScroll: true });
+      // Sync aria-expanded on any triggers
+      document.querySelectorAll("[data-mobile-nav-trigger]").forEach((t) => {
+        t.setAttribute("aria-expanded", "true");
+      });
+    }
+
+    function close() {
+      drawer.setAttribute("aria-hidden", "true");
+      backdrop.hidden = true;
+      document.body.classList.remove("mn-locked");
+      document.querySelectorAll("[data-mobile-nav-trigger]").forEach((t) => {
+        t.setAttribute("aria-expanded", "false");
+      });
+    }
+
+    // Triggers are rendered by Masthead — wire them up here.
+    document.querySelectorAll("[data-mobile-nav-trigger]").forEach((t) => {
+      t.addEventListener("click", (e) => {
+        e.preventDefault();
+        if (drawer.getAttribute("aria-hidden") === "true") open();
+        else close();
+      });
+    });
+
+    // Dedicated close button
+    drawer.querySelectorAll("[data-mobile-nav-close]").forEach((btn) => {
+      btn.addEventListener("click", close);
+    });
+
+    // Backdrop click closes
+    backdrop.addEventListener("click", close);
+
+    // Link inside drawer closes drawer (the new page handles the rest)
+    drawer.addEventListener("click", (e) => {
+      const link = e.target.closest && e.target.closest("a[href]");
+      if (link) close();
+    });
+
+    // ESC closes
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && drawer.getAttribute("aria-hidden") === "false") {
+        close();
+        const triggers = document.querySelectorAll("[data-mobile-nav-trigger]");
+        if (triggers.length) triggers[0].focus();
+      }
+    });
+  })();
+</script>
