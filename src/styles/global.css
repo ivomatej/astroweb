@@ -84,3 +84,124 @@ select {
 main {
   display: block;
 }
+
+/* ============================================================
+ * Print stylesheet
+ * ============================================================
+ *
+ * Reader hits "Tisk" in the sidebar share row → window.print().
+ * For the printout we keep ONLY the editorial body:
+ *
+ *   H1 + perex · TLDR · ByLine · hero image · article sections ·
+ *   methodology · history · garant bio
+ *
+ * Everything else — chrome, sidebar, interactive promos, accordions —
+ * is hidden. Backgrounds are flattened to white so ink usage stays
+ * reasonable and dark themed blocks (TLDR) remain legible on paper.
+ */
+@media print {
+  /* --- chrome & navigation ----------------------------------- */
+  .skip-link,
+  .masthead,
+  .masthead-sentinel,
+  footer.foot,
+  .cc-bar,
+  .cc-modal,
+  .page-breadcrumbs {
+    display: none !important;
+  }
+
+  /* --- article shell ----------------------------------------- */
+  .article-wrap {
+    display: block !important;
+    padding: 0 !important;
+    max-width: none !important;
+  }
+
+  .article-sidebar,
+  .toc-aside.toc-inline,
+  .toc-inline-details {
+    display: none !important;
+  }
+
+  /* --- collapse transparency accordion + product acquisition - */
+  .disclosure-accordion {
+    display: none !important;
+  }
+
+  /* --- drop interactive / promotional post-sections ---------- */
+  .next-cta,
+  .related-articles,
+  .rating-section,
+  .comments-section,
+  .report-error-section,
+  .making {
+    display: none !important;
+  }
+
+  /* --- KEEP substantive sections, just hint pagination -------- */
+  .methodology,
+  .history-section,
+  .credibility-stack {
+    page-break-inside: avoid;
+  }
+
+  /* --- flatten the dark TLDR block --------------------------- */
+  .tldr,
+  .tldr * {
+    background: #fff !important;
+    color: #15131e !important;
+    text-shadow: none !important;
+  }
+  .tldr {
+    border: 1px solid #15131e !important;
+    padding: 1rem 1.25rem !important;
+  }
+
+  /* --- typography baseline ----------------------------------- */
+  body {
+    background: #fff !important;
+    color: #000;
+    font-size: 11pt;
+    line-height: 1.55;
+  }
+
+  .article-main {
+    max-width: none !important;
+  }
+
+  /* Append href next to link text so the printed page is still
+     navigable. Skip anchors and protocol-only links. */
+  a[href^="http"]::after,
+  a[href^="/"]::after {
+    content: " (" attr(href) ")";
+    font-size: 0.85em;
+    color: #555;
+    word-break: break-all;
+  }
+  a[href^="#"]::after,
+  a[href^="mailto:"]::after,
+  a[href^="tel:"]::after {
+    content: "";
+  }
+
+  img {
+    max-width: 100% !important;
+    height: auto !important;
+    page-break-inside: avoid;
+  }
+
+  h1, h2, h3 {
+    page-break-after: avoid;
+  }
+
+  h2, h3 {
+    page-break-inside: avoid;
+  }
+
+  /* Remove soft shadows that print as dirty smudges */
+  * {
+    box-shadow: none !important;
+    text-shadow: none !important;
+  }
+}
