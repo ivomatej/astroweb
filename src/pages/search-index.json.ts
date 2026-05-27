@@ -12,8 +12,10 @@
  *     desc:   "...short text...",     // shown under result
  *     kind:   "Článek" | "Recenze" | "Slovník" | "Značka" | "Rubrika"
  *           | "Rozhovor" | "Magazín" | "Diskuze" | "Stránka" | "Autor",
- *     hint?:  "Elektronářadí · pillar"   // optional secondary line (category, year, etc.)
- *     tags?:  ["bruska","aku","makita"]  // extra keywords pumped into match score
+ *     hint?:  "Elektronářadí · pillar"   // optional secondary line
+ *     date?:  "2026-05-22"               // ISO; rendered as "22. 5. 2026"
+ *     author?:"Ivo Matěj"                // primary author / source / garant
+ *     tags?:  ["bruska","aku","makita"]  // extra keywords for match score
  *   }
  *
  * Kept thin on purpose — bigger search corpus would belong on a backend.
@@ -28,7 +30,7 @@ import { brands } from "../data/brands";
 import { magazineArticles } from "../data/magazine";
 import { interviews } from "../data/interviews";
 import { forumThreads } from "../data/forum";
-import { allPeople } from "../data/people";
+import { allPeople, getPersonBySlug } from "../data/people";
 
 interface SearchEntry {
   url: string;
@@ -36,6 +38,8 @@ interface SearchEntry {
   desc: string;
   kind: string;
   hint?: string;
+  date?: string;
+  author?: string;
   tags?: string[];
 }
 
@@ -60,6 +64,8 @@ for (const a of articles) {
     desc: clean(a.perex, 220),
     kind: a.kind === "pillar" ? "Článek (pillar)" : "Článek",
     hint: a.category,
+    date: a.dates.updatedAt ?? a.dates.publishedAt,
+    author: a.author.name,
     tags: [a.category.toLowerCase(), a.slug],
   });
 }
@@ -72,6 +78,8 @@ entries.push(
     desc: "Sedm pračet do 25 000 Kč podrobně testovaných 6 týdnů v laboratoři. Pořadí podle životnosti, spotřeby a hlučnosti.",
     kind: "Žebříček",
     hint: "Domácí spotřebiče · TOP",
+    date: "2026-05-12",
+    author: "Marie Müllerová",
     tags: ["pracky", "pračky", "bosch", "miele", "lg", "beko", "samsung"],
   },
   {
@@ -80,6 +88,8 @@ entries.push(
     desc: "Srovnání dvou nejprodávanějších německých značek. Cena, životnost, opravitelnost, dostupnost náhradních dílů.",
     kind: "Srovnání",
     hint: "Domácí spotřebiče · vs.",
+    date: "2026-04-08",
+    author: "Marie Müllerová",
     tags: ["bosch", "miele", "pracky", "srovnani"],
   },
 );
@@ -104,6 +114,8 @@ for (const t of glossaryTerms) {
     desc: t.shortDef,
     kind: "Slovník",
     hint: glossaryCategories.find((c) => c.slug === t.categorySlug)?.name,
+    date: t.updatedAt,
+    author: t.approvedBy,
     tags: t.aliases?.map((a) => a.toLowerCase()) ?? [],
   });
 }
@@ -147,6 +159,9 @@ for (const m of magazineArticles) {
     title: m.title,
     desc: clean(m.perex, 220),
     kind: "Magazín",
+    hint: m.category,
+    date: m.publishedAt,
+    author: getPersonBySlug(m.authorSlug)?.name,
   });
 }
 entries.push({
@@ -158,11 +173,15 @@ entries.push({
 
 // ─── Rozhovory ────────────────────────────────────────────────────────────
 for (const i of interviews) {
+  const interviewee = getPersonBySlug(i.intervieweeSlug);
   entries.push({
     url: `/rozhovory/${i.slug}/`,
     title: i.title,
     desc: clean(i.perex, 220),
     kind: "Rozhovor",
+    hint: i.category,
+    date: i.publishedAt,
+    author: interviewee?.name,
   });
 }
 entries.push({
@@ -179,7 +198,9 @@ for (const t of forumThreads) {
     title: t.title,
     desc: clean(t.originalPost.bodyHtml, 180),
     kind: "Diskuze",
-    hint: `${t.replyCount} odpovědí`,
+    hint: `${t.replyCount} odpovědí · ${t.viewCount} zobrazení`,
+    date: t.lastActivityAt,
+    author: t.authorName,
   });
 }
 entries.push({

@@ -204,13 +204,37 @@ import PageBreadcrumbs from "../components/page/PageBreadcrumbs.astro";
         return "k-page";
       }
 
-      // Build a breadcrumb-style URL display from "/clanek/aku-brusky/".
-      function urlCrumb(url) {
-        const parts = (url || "").split("/").filter(Boolean);
-        if (!parts.length) return "recenzer.cz";
-        return "recenzer.cz <span aria-hidden=\"true\">›</span> " +
-          parts.map(escapeHtml).join(" <span aria-hidden=\"true\">›</span> ");
+      // Czech date formatter: "2026-05-22" → "22. 5. 2026".
+      // Uses Intl with cs-CZ if available; falls back to a hand-built string.
+      const dateFormatter = (function () {
+        try {
+          return new Intl.DateTimeFormat("cs-CZ", {
+            day: "numeric",
+            month: "numeric",
+            year: "numeric",
+          });
+        } catch (e) { return null; }
+      })();
+
+      function formatDate(iso) {
+        if (!iso) return "";
+        const d = new Date(iso);
+        if (isNaN(d.getTime())) return iso;
+        if (dateFormatter) return dateFormatter.format(d);
+        return d.getDate() + ". " + (d.getMonth() + 1) + ". " + d.getFullYear();
       }
+
+      // Inline SVG icons used in the meta line and action button.
+      const ICON_CAL =
+        '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">' +
+          '<rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/>' +
+          '<line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>';
+      const ICON_USER =
+        '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">' +
+          '<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>';
+      const ICON_ARROW =
+        '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">' +
+          '<line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>';
 
       function renderResults(entries, qTokens) {
         list.innerHTML = entries
@@ -219,16 +243,27 @@ import PageBreadcrumbs from "../components/page/PageBreadcrumbs.astro";
             const desc  = highlight(entry.desc,  qTokens);
             const hint  = entry.hint ? escapeHtml(entry.hint) : "";
             const cls   = kindClass(entry.kind);
+            const dateStr   = formatDate(entry.date);
+            const authorStr = entry.author ? escapeHtml(entry.author) : "";
+
+            const metaParts = [];
+            if (dateStr)   metaParts.push('<span class="result-meta-item"><span class="result-meta-ic" aria-hidden="true">' + ICON_CAL + '</span><time datetime="' + escapeHtml(entry.date || "") + '">' + escapeHtml(dateStr) + '</time></span>');
+            if (authorStr) metaParts.push('<span class="result-meta-item"><span class="result-meta-ic" aria-hidden="true">' + ICON_USER + '</span><span>' + authorStr + '</span></span>');
+            const metaRow = metaParts.length
+              ? '<div class="result-meta">' + metaParts.join("") + '</div>'
+              : "";
+
             return (
               '<li class="search-result ' + cls + '">' +
-                '<a href="' + escapeHtml(entry.url) + '">' +
+                '<a class="result-link" href="' + escapeHtml(entry.url) + '" aria-label="Zobrazit: ' + escapeHtml(entry.title) + '">' +
                   '<div class="result-head">' +
                     '<span class="result-kind">' + escapeHtml(entry.kind) + '</span>' +
                     (hint ? '<span class="result-hint">' + hint + '</span>' : '') +
                   '</div>' +
                   '<h3 class="result-title">' + title + '</h3>' +
                   (desc ? '<p class="result-desc">' + desc + '</p>' : '') +
-                  '<span class="result-url">' + urlCrumb(entry.url) + '</span>' +
+                  metaRow +
+                  '<span class="result-cta" aria-hidden="true">Zobrazit ' + ICON_ARROW + '</span>' +
                 '</a>' +
               '</li>'
             );
@@ -486,9 +521,17 @@ import PageBreadcrumbs from "../components/page/PageBreadcrumbs.astro";
     .k-hub        { --kc-bg: #f3e8ff;        --kc-text: #6b21a8;       --kc-border: #a855f7; }
     .k-page       { --kc-bg: #f1f5f9;        --kc-text: #334155;       --kc-border: #64748b; }
 
-    .search-result a {
-      display: block;
-      padding: 1.1rem 1.3rem 1rem;
+    .search-result .result-link {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      grid-template-areas:
+        "head head"
+        "title title"
+        "desc desc"
+        "meta cta";
+      gap: 0.5rem 1rem;
+      align-items: end;
+      padding: 1.2rem 1.4rem 1.1rem;
       background: #fff;
       border: 1px solid var(--line);
       border-left: 4px solid var(--kc-border, var(--p-500));
@@ -498,20 +541,33 @@ import PageBreadcrumbs from "../components/page/PageBreadcrumbs.astro";
       transition: border-color 0.15s, transform 0.15s, box-shadow 0.15s;
     }
 
-    .search-result a:hover,
-    .search-result a:focus-visible {
+    @media (max-width: 540px) {
+      .search-result .result-link {
+        grid-template-areas:
+          "head"
+          "title"
+          "desc"
+          "meta"
+          "cta";
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .search-result .result-link:hover,
+    .search-result .result-link:focus-visible {
       border-color: var(--kc-border, var(--p-400));
       transform: translateY(-1px);
-      box-shadow: 0 12px 24px -16px rgba(46, 20, 102, 0.24);
+      box-shadow: 0 12px 28px -18px rgba(46, 20, 102, 0.28);
       outline: none;
     }
 
     .result-head {
+      grid-area: head;
       display: flex;
       gap: 0.6rem;
       align-items: center;
       flex-wrap: wrap;
-      margin-bottom: 0.5rem;
+      margin-bottom: 0;
     }
 
     .result-kind {
@@ -538,38 +594,90 @@ import PageBreadcrumbs from "../components/page/PageBreadcrumbs.astro";
     }
 
     .result-title {
-      font-size: 1.05rem;
+      grid-area: title;
+      font-size: 1.1rem;
       font-weight: 800;
       color: var(--ink);
       letter-spacing: -0.015em;
       line-height: 1.3;
-      margin: 0 0 0.35rem;
+      margin: 0;
     }
 
-    .search-result a:hover .result-title,
-    .search-result a:focus-visible .result-title {
+    .search-result .result-link:hover .result-title,
+    .search-result .result-link:focus-visible .result-title {
       color: var(--kc-text, var(--p-700));
     }
 
     .result-desc {
-      margin: 0 0 0.65rem;
+      grid-area: desc;
+      margin: 0;
       font-size: 13.5px;
       line-height: 1.55;
       color: var(--ink-soft);
     }
 
-    .result-url {
-      display: block;
-      font-family: var(--mono);
-      font-size: 11.5px;
-      color: var(--muted-2);
-      letter-spacing: 0.02em;
+    .result-meta {
+      grid-area: meta;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem 1rem;
+      font-size: 12.5px;
+      color: var(--muted);
+      margin-top: 0.25rem;
+    }
+
+    .result-meta-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
       line-height: 1.4;
     }
 
-    .result-url span {
-      color: var(--line);
-      padding: 0 0.25rem;
+    .result-meta-ic {
+      width: 14px;
+      height: 14px;
+      flex-shrink: 0;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--muted-2);
+    }
+
+    .result-meta-ic svg {
+      width: 100%;
+      height: 100%;
+    }
+
+    .result-meta time { font-variant-numeric: tabular-nums; }
+
+    .result-cta {
+      grid-area: cta;
+      justify-self: end;
+      align-self: end;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      padding: 0.5rem 0.95rem;
+      border-radius: 999px;
+      background: var(--kc-bg, var(--p-50));
+      color: var(--kc-text, var(--p-700));
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 700;
+      white-space: nowrap;
+      transition: background 0.15s, color 0.15s, transform 0.15s;
+    }
+
+    .search-result .result-link:hover .result-cta,
+    .search-result .result-link:focus-visible .result-cta {
+      background: var(--kc-border, var(--p-700));
+      color: #fff;
+      transform: translateX(2px);
+    }
+
+    .result-cta svg {
+      width: 14px;
+      height: 14px;
     }
 
     .search-result mark {
