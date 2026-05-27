@@ -27,6 +27,11 @@ const isActive = (href: string): boolean =>
     </nav>
 
     <div class="masthead-right">
+      {/*
+        Desktop: full search form with visible input.
+        Mobile: hidden in favor of the icon-only link below — keeps the
+        header compact so H1 stays above the fold.
+      */}
       <form
         class="search-pill"
         role="search"
@@ -51,6 +56,13 @@ const isActive = (href: string): boolean =>
           spellcheck="false"
         />
       </form>
+
+      <a class="search-icon-link" href="/hledat/" aria-label="Otevřít hledání">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+          <circle cx="11" cy="11" r="8" />
+          <line x1="21" y1="21" x2="16.65" y2="16.65" />
+        </svg>
+      </a>
 
       <a href="/newsletter/" class="masthead-account" aria-label="Odebírat newsletter">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
@@ -213,6 +225,37 @@ const isActive = (href: string): boolean =>
     border: 0;
   }
 
+  /*
+   * Icon-only fallback for mobile, hidden by default on desktop where
+   * the full input form is shown instead.
+   */
+  .search-icon-link {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    color: rgba(255, 255, 255, 0.85);
+    text-decoration: none;
+    transition: background 0.15s, border-color 0.15s, color 0.15s;
+  }
+
+  .search-icon-link:hover,
+  .search-icon-link:focus-visible {
+    background: rgba(255, 255, 255, 0.14);
+    border-color: rgba(255, 255, 255, 0.22);
+    color: #fff;
+    outline: none;
+  }
+
+  .search-icon-link svg {
+    width: 16px;
+    height: 16px;
+  }
+
   .masthead-account {
     display: inline-flex;
     align-items: center;
@@ -239,11 +282,17 @@ const isActive = (href: string): boolean =>
   @media (max-width: 960px) {
     .nav { display: none; }
     .search-pill { min-width: 0; }
-    .search-pill input[type="search"] { width: 140px; flex: 0 0 auto; }
+    .search-pill input[type="search"] { width: 160px; flex: 0 0 auto; }
   }
 
-  @media (max-width: 480px) {
-    .search-pill input[type="search"] { width: 100px; }
+  /*
+   * Phones — drop the full search form in favor of a compact icon link
+   * to /hledat/. Reclaims ~180 px of masthead width that was eaten by
+   * a feature only ~10 % of users touch from the header.
+   */
+  @media (max-width: 720px) {
+    .search-pill { display: none; }
+    .search-icon-link { display: inline-flex; }
   }
 
   @media (max-width: 560px) {

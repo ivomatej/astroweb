@@ -78,8 +78,13 @@ const { topBar } = site;
     color: #fff;
   }
 
-  @media (max-width: 720px) {
-    .top-bar-links {
+  /*
+   * Mobile: hide the whole utility ribbon — it pushed H1 below the fold
+   * and degraded LCP. Editorial-standards links (Metodika / Etický kodex
+   * / Zdroje) live in the footer too, so nothing is actually lost.
+   */
+  @media (max-width: 768px) {
+    .top-bar {
       display: none;
     }
   }
