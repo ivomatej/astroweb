@@ -103,7 +103,14 @@ const showAsUpdated = dates.significantUpdate === true && !!updatedHuman;
         <div class="bp-bio" set:html={author.bioHtml} />
         {author.credentials && author.credentials.length > 0 && (
           <ul class="bp-creds">
-            {author.credentials.slice(0, 3).map((cred) => <li>{cred}</li>)}
+            {author.credentials.slice(0, 3).map((cred) => (
+              <li>
+                <svg class="bp-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" aria-hidden="true">
+                  <polyline points="20 6 9 17 4 12" />
+                </svg>
+                <span>{cred}</span>
+              </li>
+            ))}
           </ul>
         )}
         <a class="bp-link" href={`/autor/${author.slug}/`}>
@@ -154,7 +161,14 @@ const showAsUpdated = dates.significantUpdate === true && !!updatedHuman;
             <div class="bp-bio" set:html={garant.bioHtml} />
             {garant.credentials && garant.credentials.length > 0 && (
               <ul class="bp-creds">
-                {garant.credentials.slice(0, 3).map((cred) => <li>{cred}</li>)}
+                {garant.credentials.slice(0, 3).map((cred) => (
+                  <li>
+                    <svg class="bp-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" aria-hidden="true">
+                      <polyline points="20 6 9 17 4 12" />
+                    </svg>
+                    <span>{cred}</span>
+                  </li>
+                ))}
               </ul>
             )}
             <a class="bp-link" href={`/autor/${garant.slug}/`}>
@@ -427,30 +441,40 @@ const showAsUpdated = dates.significantUpdate === true && !!updatedHuman;
   .bp-bio :global(p:last-child) { margin-bottom: 0; }
   .bp-bio :global(strong) { color: var(--ink); }
 
+  /*
+   * Credentials list — readable check-list style: small purple
+   * checkmark icon + plain sentence-case text. Per user feedback the
+   * earlier mono-caps pill chips were hard to scan; this reads like
+   * the bullet list on the author profile page.
+   */
   .bp-creds {
     list-style: none;
     padding: 0;
-    margin: 0.7rem 0 0;
+    margin: 0.85rem 0 0;
     display: flex;
-    flex-wrap: wrap;
-    gap: 0.3rem;
+    flex-direction: column;
+    gap: 0.4rem;
   }
 
   .bp-creds li {
-    font-family: var(--mono);
-    font-size: 10.5px;
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-    color: var(--p-700);
-    background: var(--p-50);
-    padding: 2px 8px;
-    border-radius: 999px;
-    font-weight: 700;
+    display: flex;
+    align-items: flex-start;
+    gap: 0.55rem;
+    font-size: 13.5px;
+    line-height: 1.45;
+    color: var(--ink-soft);
   }
 
-  .garant-popover .bp-creds li {
-    color: var(--amber-text);
-    background: var(--amber-bg);
+  .bp-check {
+    width: 16px;
+    height: 16px;
+    color: var(--p-600);
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  .garant-popover .bp-check {
+    color: var(--amber);
   }
 
   .bp-link {
