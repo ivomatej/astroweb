@@ -92,9 +92,15 @@ const isActive = (href: string): boolean =>
 
 <style>
   .masthead-sentinel {
-    /* Zero-height marker just above the header. */
+    /*
+     * 1 px marker above the header used by IntersectionObserver to
+     * detect "user is at top of page". Painted with the same purple
+     * as the masthead so it visually merges into the bar instead of
+     * showing a thin white seam against the body background.
+     */
     height: 1px;
     width: 100%;
+    background: var(--p-800);
   }
 
   /*
