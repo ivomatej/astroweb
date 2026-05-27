@@ -439,7 +439,13 @@ const showAsUpdated = dates.significantUpdate === true && !!updatedHuman;
 
   .bp-bio :global(p) { margin: 0 0 0.5rem; }
   .bp-bio :global(p:last-child) { margin-bottom: 0; }
-  .bp-bio :global(strong) { color: var(--ink); }
+  /* Per user preference — keep <strong> semantically present but
+     drop the visual bold inside the popover so the bio reads as one
+     even paragraph. */
+  .bp-bio :global(strong) {
+    color: var(--ink-soft);
+    font-weight: inherit;
+  }
 
   /*
    * Credentials list — readable check-list style: small purple
