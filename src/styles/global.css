@@ -89,7 +89,8 @@ main {
  * Print stylesheet
  * ============================================================
  *
- * Reader hits "Tisk" in the sidebar share row → window.print().
+ * Triggered by browser Ctrl/Cmd+P (the in-page "Tisk" button was
+ * removed from the sidebar — print is invoked natively now).
  * For the printout we keep ONLY the editorial body:
  *
  *   H1 + perex · TLDR · ByLine · hero image · article sections ·
