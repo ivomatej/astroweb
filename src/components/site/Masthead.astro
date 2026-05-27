@@ -6,7 +6,14 @@ const isActive = (href: string): boolean =>
   href === "/" ? pathname === "/" : pathname.startsWith(href);
 ---
 
-<header class="masthead">
+{/*
+  Sentinel above the masthead. Sits at the absolute top of the document
+  and is used by IntersectionObserver to detect scroll direction WITHOUT
+  attaching a scroll listener — the latter hurts INP on long pages.
+*/}
+<div class="masthead-sentinel" aria-hidden="true"></div>
+
+<header class="masthead" data-masthead>
   <div class="masthead-inner">
     <a href="/" class="brand" aria-label={`${site.brand.name} — domů`}>
       <span class="brand-name">{site.brand.name}</span>
@@ -63,15 +70,43 @@ const isActive = (href: string): boolean =>
           <line x1="21" y1="21" x2="16.65" y2="16.65" />
         </svg>
       </a>
+
+      <a class="newsletter-cta" href="/newsletter/">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+          <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
+          <polyline points="22,6 12,13 2,6" />
+        </svg>
+        <span>Newsletter</span>
+      </a>
     </div>
   </div>
 </header>
 
 <style>
+  .masthead-sentinel {
+    /* Zero-height marker just above the header. */
+    height: 1px;
+    width: 100%;
+  }
+
   .masthead {
     border-bottom: 1px solid rgba(255, 255, 255, 0.08);
     background: var(--p-800);
     color: #fff;
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    transition: transform 0.22s ease-out;
+    will-change: transform;
+  }
+
+  /* Hidden state — applied by JS when the user scrolls DOWN past the sentinel. */
+  .masthead.is-hidden {
+    transform: translateY(-100%);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .masthead { transition: none; }
   }
 
   .masthead-inner {
@@ -248,6 +283,39 @@ const isActive = (href: string): boolean =>
     height: 16px;
   }
 
+  /*
+   * Newsletter CTA — a single, deliberate signup destination in the
+   * header. Replaces the universal "subscribe everywhere" promo strip.
+   * Hidden on phones, where chrome real estate is precious.
+   */
+  .newsletter-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0.5rem 0.95rem;
+    border-radius: 999px;
+    background: #fff;
+    color: var(--p-800);
+    font-size: 13px;
+    font-weight: 700;
+    text-decoration: none;
+    border: 1px solid #fff;
+    transition: background 0.15s, color 0.15s, transform 0.15s;
+  }
+
+  .newsletter-cta:hover,
+  .newsletter-cta:focus-visible {
+    background: var(--p-100);
+    color: var(--p-900);
+    transform: translateY(-1px);
+    outline: none;
+  }
+
+  .newsletter-cta svg {
+    width: 13px;
+    height: 13px;
+  }
+
 @media (max-width: 960px) {
     .nav { display: none; }
     .search-pill { min-width: 0; }
@@ -262,6 +330,57 @@ const isActive = (href: string): boolean =>
   @media (max-width: 720px) {
     .search-pill { display: none; }
     .search-icon-link { display: inline-flex; }
+    .newsletter-cta { display: none; }
   }
-
 </style>
+
+<script is:inline>
+  /*
+   * Sticky-header hide-on-scroll.
+   *
+   * Goal: when the user scrolls DOWN past the top of the page, slide the
+   * masthead out of view. When they scroll UP, slide it back. While the
+   * sentinel at the very top of the document is visible (= user is at
+   * the top of the page) the header is always shown.
+   *
+   * IntersectionObserver does the cheap top-of-page detection (no
+   * per-frame work). Direction detection uses a passive scroll listener
+   * wrapped in requestAnimationFrame and a small delta threshold — that
+   * keeps the JS off the main thread between scrolls so INP stays clean.
+   */
+  (function () {
+    const header   = document.querySelector("[data-masthead]");
+    const sentinel = document.querySelector(".masthead-sentinel");
+    if (!header || !sentinel || !("IntersectionObserver" in window)) return;
+
+    let atTop  = true;
+    let lastY  = window.scrollY || 0;
+    let ticking = false;
+
+    new IntersectionObserver(
+      (entries) => {
+        for (const e of entries) atTop = e.isIntersecting;
+        if (atTop) header.classList.remove("is-hidden");
+      },
+      { threshold: 0 },
+    ).observe(sentinel);
+
+    document.addEventListener(
+      "scroll",
+      () => {
+        if (ticking) return;
+        ticking = true;
+        requestAnimationFrame(() => {
+          const y = window.scrollY || 0;
+          if (!atTop) {
+            if (y > lastY + 8 && y > 80) header.classList.add("is-hidden");
+            else if (y < lastY - 8)      header.classList.remove("is-hidden");
+          }
+          lastY = y;
+          ticking = false;
+        });
+      },
+      { passive: true },
+    );
+  })();
+</script>
