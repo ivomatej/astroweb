@@ -38,6 +38,48 @@ if (!article) {
 }
 
 /*
+ * JSON-LD for Article schema.org.
+ *
+ * Both datePublished and dateModified are emitted whenever the
+ * article has an updatedAt — regardless of the byline rule (which
+ * may hide Publikováno from the header after a significant update).
+ * Google / LLM crawlers still see the full date history here.
+ *
+ * See docs/editorial-rules.md for the byline visibility rule.
+ */
+const canonicalUrl = article.seo.canonical
+  ?? `https://www.recenzer.cz/clanek/${article.slug}/`;
+const articleJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "Article",
+  headline: article.title.replace(/<[^>]+>/g, ""),
+  description: article.seo.description,
+  url: canonicalUrl,
+  datePublished: article.dates.publishedAt,
+  ...(article.dates.updatedAt && { dateModified: article.dates.updatedAt }),
+  author: {
+    "@type": "Person",
+    name: article.author.name,
+    url: `https://www.recenzer.cz/autor/${article.author.slug}/`,
+  },
+  ...(article.garant && {
+    reviewedBy: {
+      "@type": "Person",
+      name: article.garant.name,
+      url: `https://www.recenzer.cz/autor/${article.garant.slug}/`,
+    },
+  }),
+  publisher: {
+    "@type": "Organization",
+    name: "Recenzer.cz",
+    url: "https://www.recenzer.cz/",
+  },
+  ...(article.cover.src && {
+    image: `https://www.recenzer.cz${article.cover.src}`,
+  }),
+};
+
+/*
  * Article page order.
  *
  * Main column:
@@ -71,6 +113,8 @@ if (!article) {
   noIndex={article.seo.noIndex}
   showNewsletterBand
 >
+  <script type="application/ld+json" set:html={JSON.stringify(articleJsonLd)} />
+
   <Breadcrumbs items={article.breadcrumbs} kicker={article.kicker} />
 
   <div class="article-wrap">

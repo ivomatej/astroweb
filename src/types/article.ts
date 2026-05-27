@@ -107,8 +107,31 @@ export interface Person {
 }
 
 export interface ByLineDates {
-  publishedAt: string; // ISO date
-  updatedAt?: string; // ISO date
+  /** ISO date of the original publication. */
+  publishedAt: string;
+  /** ISO date of the most recent edit, if any. */
+  updatedAt?: string;
+  /**
+   * Editorial flag — set true when the most recent update is
+   * significant enough that the article should present itself as
+   * "Aktualizováno: <updatedAt>" in the byline header INSTEAD of
+   * "Publikováno: <publishedAt>".
+   *
+   * Effect on the page:
+   *  - false / undefined (default):
+   *      ByLine meta shows  📅 Publikováno: <publishedAt> + Doba čtení.
+   *      The article is treated as still reflecting its publish date.
+   *  - true:
+   *      ByLine meta shows  🔄 Aktualizováno: <updatedAt> + Doba čtení.
+   *      The original publishedAt is hidden from the header but
+   *      remains visible in the History section and in the JSON-LD
+   *      structured data (datePublished + dateModified).
+   *
+   * What counts as "significant" — see docs/editorial-rules.md.
+   * (Threshold to be formalized later; for now the editor sets the
+   *  flag manually.)
+   */
+  significantUpdate?: boolean;
   readingTimeMin: number;
 }
 

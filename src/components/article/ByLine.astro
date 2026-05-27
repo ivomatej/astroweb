@@ -16,6 +16,19 @@ function formatCzechDate(iso: string): string {
 
 const publishedHuman = formatCzechDate(dates.publishedAt);
 const updatedHuman = dates.updatedAt ? formatCzechDate(dates.updatedAt) : undefined;
+
+/*
+ * Editorial rule (see docs/editorial-rules.md):
+ *
+ * Either Publikováno OR Aktualizováno is shown in the byline header,
+ * never both. Switch decided by dates.significantUpdate:
+ *   - false / undefined → show Publikováno (default for fresh articles)
+ *   - true              → show Aktualizováno (post-significant-edit)
+ *
+ * The original publishedAt is still emitted in the JSON-LD on the
+ * article page and stays visible in the History section.
+ */
+const showAsUpdated = dates.significantUpdate === true && !!updatedHuman;
 ---
 
 {/*
@@ -29,17 +42,8 @@ const updatedHuman = dates.updatedAt ? formatCzechDate(dates.updatedAt) : undefi
 */}
 <div class:list={["byline", { "has-garant": !!garant }]}>
   <div class="byline-col byline-meta">
-    <span class="byline-meta-row">
-      <svg class="byline-meta-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-        <rect x="3" y="4" width="18" height="18" rx="2" />
-        <line x1="16" y1="2" x2="16" y2="6" />
-        <line x1="8" y1="2" x2="8" y2="6" />
-      </svg>
-      Publikováno: <strong><time datetime={dates.publishedAt}>{publishedHuman}</time></strong>
-    </span>
-
     {
-      updatedHuman && (
+      showAsUpdated ? (
         <span class="byline-meta-row">
           <svg class="byline-meta-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
             <polyline points="23 4 23 10 17 10" />
@@ -49,6 +53,15 @@ const updatedHuman = dates.updatedAt ? formatCzechDate(dates.updatedAt) : undefi
           <span class="upd-tag">
             <time datetime={dates.updatedAt}>{updatedHuman}</time>
           </span>
+        </span>
+      ) : (
+        <span class="byline-meta-row">
+          <svg class="byline-meta-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <rect x="3" y="4" width="18" height="18" rx="2" />
+            <line x1="16" y1="2" x2="16" y2="6" />
+            <line x1="8" y1="2" x2="8" y2="6" />
+          </svg>
+          Publikováno: <strong><time datetime={dates.publishedAt}>{publishedHuman}</time></strong>
         </span>
       )
     }

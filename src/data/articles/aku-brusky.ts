@@ -192,6 +192,13 @@ export const akuBrusky: Article = {
   dates: {
     publishedAt: "2024-03-14",
     updatedAt: "2026-05-22",
+    // Switch ByLine to "Aktualizováno: 22. 5. 2026" instead of the
+    // original publish date. Methodology was substantially revised
+    // between 2024 and 2026 (refresh check, multi-test windows, new
+    // EPTA + ISO 5349 measurements) → reading the 2024 publish date
+    // would mislead the reader. publishedAt stays in JSON-LD +
+    // History section. See docs/editorial-rules.md.
+    significantUpdate: true,
     readingTimeMin: 18,
   },
 
