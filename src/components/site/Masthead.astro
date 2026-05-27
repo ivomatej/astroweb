@@ -1,5 +1,6 @@
 ---
 import { site } from "../../config/site";
+import MegaMenu from "./MegaMenu.astro";
 
 const pathname = Astro.url.pathname;
 const isActive = (href: string): boolean =>
@@ -20,17 +21,39 @@ const isActive = (href: string): boolean =>
     </a>
 
     <nav class="nav" aria-label="Hlavní">
-      {
-        site.primaryNav.map((link) => (
-          <a
-            href={link.href}
-            class:list={[{ active: isActive(link.href) }]}
-            aria-current={isActive(link.href) ? "page" : undefined}
-          >
-            {link.label}
-          </a>
-        ))
-      }
+      <ul class="nav-list" role="list">
+        {
+          site.primaryNav.map((link, i) => {
+            const triggerId = `mega-trigger-${i}`;
+            const hasMega = !!link.mega;
+            return (
+              <li
+                class:list={["nav-item", { "has-mega": hasMega }]}
+                data-nav-item
+              >
+                <a
+                  href={link.href}
+                  class:list={[{ active: isActive(link.href) }]}
+                  aria-current={isActive(link.href) ? "page" : undefined}
+                  aria-haspopup={hasMega ? "true" : undefined}
+                  aria-expanded={hasMega ? "false" : undefined}
+                  id={hasMega ? triggerId : undefined}
+                >
+                  {link.label}
+                  {hasMega && (
+                    <svg class="nav-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+                      <polyline points="6 9 12 15 18 9" />
+                    </svg>
+                  )}
+                </a>
+                {hasMega && link.mega && (
+                  <MegaMenu panel={link.mega} labelledBy={triggerId} />
+                )}
+              </li>
+            );
+          })
+        }
+      </ul>
     </nav>
 
     <div class="masthead-right">
@@ -118,11 +141,27 @@ const isActive = (href: string): boolean =>
 
   .nav {
     display: flex;
-    gap: 1.75rem;
     margin-left: 1.25rem;
   }
 
+  .nav-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    gap: 1.75rem;
+  }
+
+  .nav-item {
+    position: static;          /* mega-panel is positioned to .masthead */
+    display: inline-flex;
+    align-items: center;
+  }
+
   .nav a {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
     font-size: 14px;
     font-weight: 500;
     color: rgba(255, 255, 255, 0.78);
@@ -140,6 +179,35 @@ const isActive = (href: string): boolean =>
   .nav a.active {
     color: #fff;
     border-bottom-color: var(--p-300);
+  }
+
+  .nav-chev {
+    width: 11px;
+    height: 11px;
+    color: rgba(255, 255, 255, 0.55);
+    transition: transform 0.18s, color 0.15s;
+  }
+
+  .nav-item:hover .nav-chev,
+  .nav-item.is-open .nav-chev,
+  .nav-item:focus-within .nav-chev {
+    color: #fff;
+    transform: rotate(180deg);
+  }
+
+  /*
+   * Mega-panel show / hide.
+   * The .mega-panel element belongs to the MegaMenu component (its own
+   * Astro scope), so we have to bypass scoping with :global() — otherwise
+   * Masthead's data-astro-cid won't match the panel's.
+   * Pure-CSS open on :hover / :focus-within ensures it works without JS.
+   * JS additionally toggles .is-open for keyboard users (ESC to close,
+   * Tab navigation in/out).
+   */
+  .nav-item.has-mega:hover > :global(.mega-panel),
+  .nav-item.has-mega:focus-within > :global(.mega-panel),
+  .nav-item.has-mega.is-open > :global(.mega-panel) {
+    display: block;
   }
 
   .masthead-right {
@@ -323,5 +391,81 @@ const isActive = (href: string): boolean =>
       },
       { passive: true },
     );
+  })();
+
+  /*
+   * Mega-menu keyboard / outside-click handling.
+   *
+   * Mouse hover is pure CSS (.has-mega:hover > .mega-panel { display: block }).
+   * Keyboard users get :focus-within for free when Tab lands on the trigger.
+   * What we wire here manually:
+   *
+   *   - aria-expanded mirror on the trigger anchor while the parent
+   *     li.has-mega is open (hover OR is-open class).
+   *   - ESC closes a panel that was opened via .is-open (keyboard
+   *     scenario) and returns focus to the trigger.
+   *   - Clicking outside the nav while a panel is is-open closes it.
+   *
+   * No click-to-toggle handler — clicking the trigger should follow
+   * the link to the category page like a normal nav anchor.
+   */
+  (function () {
+    const items = document.querySelectorAll(".nav-item.has-mega");
+    if (!items.length) return;
+
+    function closeAll() {
+      items.forEach((it) => {
+        it.classList.remove("is-open");
+        const trigger = it.querySelector("a[aria-haspopup]");
+        if (trigger) trigger.setAttribute("aria-expanded", "false");
+      });
+    }
+
+    // Reflect open state in aria-expanded via focusin/focusout.
+    items.forEach((it) => {
+      const trigger = it.querySelector("a[aria-haspopup]");
+      if (!trigger) return;
+
+      it.addEventListener("focusin", () => {
+        trigger.setAttribute("aria-expanded", "true");
+      });
+      it.addEventListener("focusout", (e) => {
+        // If focus is moving to another element still inside this li,
+        // keep the panel open. If it left the li, collapse.
+        if (!it.contains(e.relatedTarget)) {
+          trigger.setAttribute("aria-expanded", "false");
+          it.classList.remove("is-open");
+        }
+      });
+
+      // Mouse enter also reflects expanded state for AT users with mouse.
+      it.addEventListener("mouseenter", () => {
+        trigger.setAttribute("aria-expanded", "true");
+      });
+      it.addEventListener("mouseleave", () => {
+        if (!it.classList.contains("is-open") && !it.matches(":focus-within")) {
+          trigger.setAttribute("aria-expanded", "false");
+        }
+      });
+    });
+
+    // ESC closes any open panel.
+    document.addEventListener("keydown", (e) => {
+      if (e.key !== "Escape") return;
+      const open = document.querySelector(".nav-item.has-mega.is-open");
+      const focused = document.activeElement && document.activeElement.closest(".nav-item.has-mega");
+      if (!open && !focused) return;
+      closeAll();
+      if (focused) {
+        const trigger = focused.querySelector("a[aria-haspopup]");
+        if (trigger) trigger.focus();
+      }
+    });
+
+    // Outside-click closes panels that were opened via .is-open.
+    document.addEventListener("click", (e) => {
+      const insideNav = e.target.closest && e.target.closest(".nav-item.has-mega");
+      if (!insideNav) closeAll();
+    });
   })();
 </script>

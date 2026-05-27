@@ -1,4 +1,5 @@
 import type { SiteConfig } from "../types/site";
+import { megaMenuByHref } from "./mega-menu";
 
 export const site: SiteConfig = {
   brand: {
@@ -20,13 +21,13 @@ export const site: SiteConfig = {
   },
 
   primaryNav: [
-    { href: "/domaci-spotrebice/", label: "Spotřebiče" },
-    { href: "/elektronarad/", label: "Elektronářadí" },
-    { href: "/zahrada/", label: "Zahrada" },
-    { href: "/auto/", label: "Auto" },
-    { href: "/sluzby/", label: "Služby" },
-    { href: "/navody/", label: "Návody" },
-    { href: "/magazin/", label: "Novinky" },
+    { href: "/domaci-spotrebice/", label: "Spotřebiče",    mega: megaMenuByHref["/domaci-spotrebice/"] },
+    { href: "/elektronarad/",      label: "Elektronářadí", mega: megaMenuByHref["/elektronarad/"] },
+    { href: "/zahrada/",           label: "Zahrada",       mega: megaMenuByHref["/zahrada/"] },
+    { href: "/auto/",              label: "Auto",          mega: megaMenuByHref["/auto/"] },
+    { href: "/sluzby/",            label: "Služby",        mega: megaMenuByHref["/sluzby/"] },
+    { href: "/navody/",            label: "Návody",        mega: megaMenuByHref["/navody/"] },
+    { href: "/magazin/",           label: "Novinky",       mega: megaMenuByHref["/magazin/"] },
   ],
 
   newsletter: {
