@@ -22,22 +22,22 @@ const formattedAvg = rating.average.toFixed(1).replace(".", ",");
         Vaše hodnocení nám pomáhá poznat, které průvodce se daří a které
         potřebují aktualizaci.
       </p>
-      <div class="rating-actions">
-        <button class="rating-thumb" type="button">
+      <div class="rating-actions" data-rating-actions>
+        <button class="rating-thumb" type="button" data-rating-vote="up" aria-pressed="false">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
             <path d="M7 10v12" />
             <path d="M15 5.88 14 10h5.83a2 2 0 0 1 1.92 2.56l-2.33 8A2 2 0 0 1 17.5 22H7" />
           </svg>
-          Užitečné
+          <span class="rating-thumb-label">Užitečné</span>
         </button>
-        <button class="rating-thumb down" type="button">
+        <button class="rating-thumb down" type="button" data-rating-vote="down" aria-pressed="false">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
             <path d="M17 14V2" />
             <path d="M9 18.12 10 14H4.17a2 2 0 0 1-1.92-2.56l2.33-8A2 2 0 0 1 6.5 2H17" />
           </svg>
-          Mohlo být lepší
+          <span class="rating-thumb-label">Mohlo být lepší</span>
         </button>
-        <button class="rating-share" type="button">
+        <button class="rating-share" type="button" data-rating-share>
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
             <circle cx="18" cy="5" r="3" />
             <circle cx="6" cy="12" r="3" />
@@ -48,6 +48,7 @@ const formattedAvg = rating.average.toFixed(1).replace(".", ",");
           Sdílet
         </button>
       </div>
+      <p class="rating-toast" data-rating-toast hidden></p>
     </div>
 
     <div class="rating-card-right">
@@ -170,11 +171,37 @@ const formattedAvg = rating.average.toFixed(1).replace(".", ",");
     color: var(--p-700);
   }
 
-  .rating-thumb.on {
+  .rating-thumb.on,
+  .rating-share.on {
     border-color: var(--p-600);
     color: var(--p-700);
     background: var(--p-50);
   }
+
+  .rating-thumb[disabled],
+  .rating-share[disabled] {
+    cursor: default;
+  }
+
+  .rating-thumb[disabled]:not(.on),
+  .rating-share[disabled]:not(.on) {
+    opacity: 0.55;
+  }
+
+  .rating-toast {
+    margin: 0.8rem 0 0;
+    padding: 0.5rem 0.85rem;
+    background: var(--green-bg);
+    color: var(--green-text);
+    border-left: 3px solid var(--green);
+    border-radius: var(--r-sm);
+    font-size: 13px;
+    font-weight: 600;
+    line-height: 1.4;
+    max-width: 38ch;
+  }
+
+  .rating-toast[hidden] { display: none; }
 
   .rating-thumb svg,
   .rating-share svg {
@@ -265,3 +292,109 @@ const formattedAvg = rating.average.toFixed(1).replace(".", ",");
     }
   }
 </style>
+
+<script is:inline>
+  /*
+   * Article rating + share — frontend-only, no backend yet.
+   *
+   * Thumbs:
+   *   - "up" / "down" vote stored in localStorage keyed by URL path,
+   *     so the user sees their previous choice highlighted on return
+   *     and we don't keep harvesting duplicate votes from one device.
+   *   - Once a vote is cast, both buttons go disabled (visual: only the
+   *     chosen one stays highlighted). User can clear via DevTools, the
+   *     UI doesn't bother with an "undo" — vote is supposed to feel
+   *     committal.
+   *
+   * Share:
+   *   - navigator.share() is used when available (mobile mostly) — pops
+   *     the OS share sheet (AirDrop, Messages, X, …).
+   *   - Desktop fallback: copy the URL to clipboard via Clipboard API,
+   *     with the textarea trick as last resort.
+   *
+   * No tracking pixels, no third-party SDKs.
+   */
+  (function () {
+    const root = document.querySelector("[data-rating-actions]");
+    if (!root) return;
+    const toast = document.querySelector("[data-rating-toast]");
+    const path  = window.location.pathname;
+    const key   = "recenzer:rating:" + path;
+
+    function showToast(msg) {
+      if (!toast) return;
+      toast.textContent = msg;
+      toast.hidden = false;
+      clearTimeout(showToast._t);
+      showToast._t = setTimeout(() => { toast.hidden = true; }, 3500);
+    }
+
+    function applyVote(vote) {
+      root.querySelectorAll("[data-rating-vote]").forEach((btn) => {
+        const v = btn.getAttribute("data-rating-vote");
+        const on = v === vote;
+        btn.classList.toggle("on", on);
+        btn.setAttribute("aria-pressed", on ? "true" : "false");
+        btn.disabled = true;
+      });
+    }
+
+    // Restore previous vote on page load
+    let stored = null;
+    try { stored = window.localStorage.getItem(key); } catch (e) {}
+    if (stored === "up" || stored === "down") applyVote(stored);
+
+    root.querySelectorAll("[data-rating-vote]").forEach((btn) => {
+      btn.addEventListener("click", function () {
+        if (this.disabled) return;
+        const vote = this.getAttribute("data-rating-vote");
+        try { window.localStorage.setItem(key, vote); } catch (e) {}
+        applyVote(vote);
+        showToast(
+          vote === "up"
+            ? "Děkujeme za hlas! Pomáhá nám poznat, co se daří."
+            : "Díky za upřímnost. Co bychom mohli zlepšit? Napište nám na redakce@recenzer.cz",
+        );
+      });
+    });
+
+    const shareBtn = root.querySelector("[data-rating-share]");
+    if (shareBtn) {
+      shareBtn.addEventListener("click", async function () {
+        const url   = window.location.href;
+        const title = document.title;
+
+        if (navigator.share) {
+          try {
+            await navigator.share({ title, url });
+            showToast("Sdílení proběhlo. Díky!");
+            return;
+          } catch (e) {
+            if (e && e.name === "AbortError") return; // user dismissed
+            // otherwise fall through to clipboard fallback
+          }
+        }
+
+        // Clipboard fallback
+        const ok = await (async () => {
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            try { await navigator.clipboard.writeText(url); return true; }
+            catch (e) {}
+          }
+          try {
+            const ta = document.createElement("textarea");
+            ta.value = url;
+            ta.style.position = "fixed";
+            ta.style.opacity = "0";
+            document.body.appendChild(ta);
+            ta.select();
+            document.execCommand("copy");
+            document.body.removeChild(ta);
+            return true;
+          } catch (e) { return false; }
+        })();
+        showToast(ok ? "Odkaz na článek zkopírován do schránky." : "Sdílení se nezdařilo.");
+      });
+    }
+  })();
+</script>
