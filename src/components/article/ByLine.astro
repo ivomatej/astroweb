@@ -30,6 +30,11 @@ const updatedHuman = dates.updatedAt ? formatCzechDate(dates.updatedAt) : undefi
 <div class:list={["byline", { "has-garant": !!garant }]}>
   <div class="byline-col byline-meta">
     <div class="byline-meta-row">
+      <svg class="byline-meta-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+        <rect x="3" y="4" width="18" height="18" rx="2" />
+        <line x1="16" y1="2" x2="16" y2="6" />
+        <line x1="8" y1="2" x2="8" y2="6" />
+      </svg>
       <span class="byline-meta-label">Publikováno</span>
       <strong class="byline-meta-value">
         <time datetime={dates.publishedAt}>{publishedHuman}</time>
@@ -39,6 +44,10 @@ const updatedHuman = dates.updatedAt ? formatCzechDate(dates.updatedAt) : undefi
     {
       updatedHuman && (
         <div class="byline-meta-row">
+          <svg class="byline-meta-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <polyline points="23 4 23 10 17 10" />
+            <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10" />
+          </svg>
           <span class="byline-meta-label">Aktualizováno</span>
           <strong class="byline-meta-value">
             <time datetime={dates.updatedAt}>{updatedHuman}</time>
@@ -48,6 +57,10 @@ const updatedHuman = dates.updatedAt ? formatCzechDate(dates.updatedAt) : undefi
     }
 
     <div class="byline-meta-row">
+      <svg class="byline-meta-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+        <circle cx="12" cy="12" r="10" />
+        <polyline points="12 6 12 12 16 14" />
+      </svg>
       <span class="byline-meta-label">Doba čtení</span>
       <strong class="byline-meta-value">{dates.readingTimeMin} min</strong>
     </div>
@@ -97,19 +110,25 @@ const updatedHuman = dates.updatedAt ? formatCzechDate(dates.updatedAt) : undefi
 </div>
 
 <style>
+  /*
+   * Meta column is narrower than the person columns (≈ 0.85 fr vs
+   * 1.15 fr each). Author / Garant get a bit more room because their
+   * content — full name + role + photo — is wider than three short
+   * "label · value" rows.
+   */
   .byline {
     margin: 1.5rem 0;
     padding: 1.1rem 0;
     border-top: 1px solid var(--line);
     border-bottom: 1px solid var(--line);
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 0.85fr 1.15fr;
     gap: 1.25rem 2rem;
     align-items: center;
   }
 
   .byline.has-garant {
-    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-columns: 0.85fr 1.15fr 1.15fr;
   }
 
   @media (max-width: 720px) {
@@ -125,24 +144,31 @@ const updatedHuman = dates.updatedAt ? formatCzechDate(dates.updatedAt) : undefi
   }
 
   /* ============ Meta column ============
-   * One row per meta item: label on the left, value bold on the right.
-   * No icons / no uppercase eyebrows — keeps the strip visually quiet
-   * so the people columns get the focus.
+   * Row layout: [icon] Label  …  Value
+   * The label hugs the icon on the left; the value floats to the right
+   * via auto-margin so dates align in a column visually. Tabular-nums
+   * keeps digits same-width across all rows.
    */
   .byline-meta {
     display: flex;
     flex-direction: column;
-    gap: 0.45rem;
+    gap: 0.5rem;
     font-size: 13.5px;
     color: var(--muted);
   }
 
   .byline-meta-row {
     display: flex;
-    justify-content: space-between;
-    align-items: baseline;
-    gap: 0.75rem;
+    align-items: center;
+    gap: 0.55rem;
     line-height: 1.35;
+  }
+
+  .byline-meta-ic {
+    width: 14px;
+    height: 14px;
+    color: var(--muted-2);
+    flex-shrink: 0;
   }
 
   .byline-meta-label {
@@ -150,9 +176,11 @@ const updatedHuman = dates.updatedAt ? formatCzechDate(dates.updatedAt) : undefi
   }
 
   .byline-meta-value {
+    margin-left: auto;
     color: var(--ink);
     font-weight: 700;
     font-variant-numeric: tabular-nums;
+    text-align: right;
   }
 
   /* ============ Person column (autor / garant) ============ */
