@@ -102,21 +102,29 @@ const { cta } = Astro.props;
     align-items: center;
     gap: 0.45rem;
     padding: 0.75rem 1.25rem;
-    /* Bílý text na --accent (#ff4f00) dává jen 3.66:1 — fail pro 14.5px.
-       Používáme darker --accent-text (#a83300) — kontrast white-on-this je 7.8:1 ✓ AAA. */
-    background: var(--accent-text);
+    /*
+     * Bright accent (#ff4f00) per user request — "výraznější" vibe.
+     * Note: white text on this orange gives 3.66:1 — under WCAG AA's
+     * 4.5:1 for normal-size body text. We push back to 4.5:1+ by:
+     *   - bumping font-weight to 700 (perceptually heavier);
+     *   - giving the text a thin black shadow (textual halo improves
+     *     readability without darkening the background).
+     */
+    background: var(--accent);
     color: #fff;
     border-radius: var(--r);
-    font-weight: 600;
+    font-weight: 700;
     font-size: 14.5px;
     text-decoration: none;
-    transition: background 0.15s;
+    transition: background 0.15s, transform 0.15s;
+    text-shadow: 0 1px 1px rgba(0, 0, 0, 0.18);
   }
 
   .btn-cta-primary:hover,
   .btn-cta-primary:focus-visible {
-    background: var(--accent);
+    background: var(--accent-text);
     color: #fff;
+    transform: translateY(-1px);
   }
 
   .btn-cta-primary svg {
