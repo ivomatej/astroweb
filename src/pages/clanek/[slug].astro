@@ -43,10 +43,10 @@ if (!article) {
  * Main column:
  *   1. Breadcrumb
  *   2. H1 + perex (ArticleHeader)
- *   3. ⚡ TLDR
- *   4. ByLine
- *   5. Inline TOC (mobile/tablet; desktop has the sidebar duplicate)
- *   6. Hero image
+ *   3. Hero image (promoted just under H1 for lead-visual impact)
+ *   4. ⚡ TLDR
+ *   5. ByLine
+ *   6. Inline TOC (mobile/tablet; desktop has the sidebar duplicate)
  *   7. Affiliate + Product acquisition in <details open> accordion
  *   8. Article body sections (H2 ↓)
  *   9. NextCta · Methodology · Rating · History · GarantSection ·
@@ -78,6 +78,8 @@ if (!article) {
         perex={article.perex}
       />
 
+      <Figure figure={article.cover} hero />
+
       <TLDR tldr={article.tldr} />
 
       <ByLine
@@ -87,8 +89,6 @@ if (!article) {
       />
 
       <TableOfContents sections={article.sections} variant="inline" />
-
-      <Figure figure={article.cover} hero />
 
       <details class="disclosure-accordion" open>
         <summary>
