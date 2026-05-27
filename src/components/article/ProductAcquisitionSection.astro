@@ -79,13 +79,6 @@ const answerTone = {
   data.enabled && (
     <aside class="acquisition-block" aria-label="Jak jsme produkt získali k testu">
       <header class="acquisition-head">
-        <div class="acquisition-eyebrow">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
-            <path d="M9 11l3 3L22 4" />
-            <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" />
-          </svg>
-          <span>Transparentní disclosure · povinný blok</span>
-        </div>
         <h2>Jak jsme produkt získali k testu</h2>
         <p class="acquisition-lede">
           Podle <a href="/eticky-kodex/">Etického kodexu</a> a EU Směrnice o nekalých obchodních praktikách musíme uvést, jakou cestou se produkt dostal do
@@ -192,9 +185,14 @@ const answerTone = {
 }
 
 <style>
+  /*
+   * Fills the parent width (matches .affiliate-disclosure which sits
+   * directly above inside the disclosure-accordion body). Previously
+   * had max-width: var(--max-w-text) which made it visibly narrower
+   * than the affiliate box above and pulled it left of column.
+   */
   .acquisition-block {
-    max-width: var(--max-w-text);
-    margin: 2.25rem auto;
+    margin: 1.5rem 0 0;
     padding: 1.75rem;
     background: var(--bg);
     border: 1px solid var(--line);
@@ -207,20 +205,6 @@ const answerTone = {
     padding-bottom: 1.25rem;
     border-bottom: 1px dashed var(--line);
   }
-
-  .acquisition-eyebrow {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.45rem;
-    font-family: var(--mono);
-    font-size: 0.72rem;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    color: var(--p-700);
-    font-weight: 700;
-    margin-bottom: 0.6rem;
-  }
-  .acquisition-eyebrow svg { width: 13px; height: 13px; }
 
   .acquisition-head h2 {
     font-family: var(--sans);
