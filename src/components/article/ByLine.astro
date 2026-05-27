@@ -29,41 +29,37 @@ const updatedHuman = dates.updatedAt ? formatCzechDate(dates.updatedAt) : undefi
 */}
 <div class:list={["byline", { "has-garant": !!garant }]}>
   <div class="byline-col byline-meta">
-    <div class="byline-meta-row">
+    <span class="byline-meta-row">
       <svg class="byline-meta-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
         <rect x="3" y="4" width="18" height="18" rx="2" />
         <line x1="16" y1="2" x2="16" y2="6" />
         <line x1="8" y1="2" x2="8" y2="6" />
       </svg>
-      <span class="byline-meta-label">Publikováno</span>
-      <strong class="byline-meta-value">
-        <time datetime={dates.publishedAt}>{publishedHuman}</time>
-      </strong>
-    </div>
+      Publikováno: <strong><time datetime={dates.publishedAt}>{publishedHuman}</time></strong>
+    </span>
 
     {
       updatedHuman && (
-        <div class="byline-meta-row">
+        <span class="byline-meta-row">
           <svg class="byline-meta-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
             <polyline points="23 4 23 10 17 10" />
             <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10" />
           </svg>
-          <span class="byline-meta-label">Aktualizováno</span>
-          <strong class="byline-meta-value">
+          Aktualizováno:
+          <span class="upd-tag">
             <time datetime={dates.updatedAt}>{updatedHuman}</time>
-          </strong>
-        </div>
+          </span>
+        </span>
       )
     }
 
-    <div class="byline-meta-row">
+    <span class="byline-meta-row">
       <svg class="byline-meta-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
         <circle cx="12" cy="12" r="10" />
         <polyline points="12 6 12 12 16 14" />
       </svg>
-      <span class="byline-meta-label">Doba čtení</span>
-      <strong class="byline-meta-value">{dates.readingTimeMin} min</strong>
-    </div>
+      Doba čtení: <strong>{dates.readingTimeMin} min</strong>
+    </span>
   </div>
 
   <div class="byline-col byline-person">
@@ -144,23 +140,22 @@ const updatedHuman = dates.updatedAt ? formatCzechDate(dates.updatedAt) : undefi
   }
 
   /* ============ Meta column ============
-   * Row layout: [icon] Label  …  Value
-   * The label hugs the icon on the left; the value floats to the right
-   * via auto-margin so dates align in a column visually. Tabular-nums
-   * keeps digits same-width across all rows.
+   * Inline row: [icon] Label: <bold value>  — matches the original
+   * compact style. The Aktualizováno value is wrapped in a green pill
+   * (.upd-tag) so the most volatile date pops visually.
    */
   .byline-meta {
     display: flex;
     flex-direction: column;
-    gap: 0.5rem;
+    gap: 0.55rem;
     font-size: 13.5px;
     color: var(--muted);
   }
 
   .byline-meta-row {
-    display: flex;
+    display: inline-flex;
     align-items: center;
-    gap: 0.55rem;
+    gap: 0.45rem;
     line-height: 1.35;
   }
 
@@ -171,16 +166,20 @@ const updatedHuman = dates.updatedAt ? formatCzechDate(dates.updatedAt) : undefi
     flex-shrink: 0;
   }
 
-  .byline-meta-label {
-    color: var(--muted);
-  }
-
-  .byline-meta-value {
-    margin-left: auto;
+  .byline-meta-row strong {
     color: var(--ink);
     font-weight: 700;
     font-variant-numeric: tabular-nums;
-    text-align: right;
+  }
+
+  .upd-tag {
+    padding: 1px 8px;
+    background: var(--green-bg);
+    color: var(--green-text);
+    border-radius: 999px;
+    font-size: 12.5px;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
   }
 
   /* ============ Person column (autor / garant) ============ */
