@@ -84,6 +84,36 @@ const showAsUpdated = dates.significantUpdate === true && !!updatedHuman;
           <span>{author.initials ?? author.name.slice(0, 2)}</span>
         )
       }
+      <div class="byline-popover author-popover" role="tooltip" aria-hidden="true">
+        <div class="bp-head">
+          <div class:list={["bp-avatar", "author", { "has-photo": !!author.photoUrl }]}>
+            {
+              author.photoUrl ? (
+                <img src={author.photoUrl} alt={author.name} />
+              ) : (
+                <span>{author.initials ?? author.name.slice(0, 2)}</span>
+              )
+            }
+          </div>
+          <div class="bp-head-text">
+            <div class="bp-name">{author.name}</div>
+            <div class="bp-role">{author.role}</div>
+          </div>
+        </div>
+        <div class="bp-bio" set:html={author.bioHtml} />
+        {author.credentials && author.credentials.length > 0 && (
+          <ul class="bp-creds">
+            {author.credentials.slice(0, 3).map((cred) => <li>{cred}</li>)}
+          </ul>
+        )}
+        <a class="bp-link" href={`/autor/${author.slug}/`}>
+          Otevřít profil autora
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+            <line x1="5" y1="12" x2="19" y2="12" />
+            <polyline points="12 5 19 12 12 19" />
+          </svg>
+        </a>
+      </div>
     </div>
     <div class="byline-text">
       <div class="byline-label">Autor</div>
@@ -105,6 +135,36 @@ const showAsUpdated = dates.significantUpdate === true && !!updatedHuman;
               <span>{garant.initials ?? garant.name.slice(0, 2)}</span>
             )
           }
+          <div class="byline-popover garant-popover" role="tooltip" aria-hidden="true">
+            <div class="bp-head">
+              <div class:list={["bp-avatar", "garant", { "has-photo": !!garant.photoUrl }]}>
+                {
+                  garant.photoUrl ? (
+                    <img src={garant.photoUrl} alt={garant.name} />
+                  ) : (
+                    <span>{garant.initials ?? garant.name.slice(0, 2)}</span>
+                  )
+                }
+              </div>
+              <div class="bp-head-text">
+                <div class="bp-name">{garant.name}</div>
+                <div class="bp-role">{garant.role}</div>
+              </div>
+            </div>
+            <div class="bp-bio" set:html={garant.bioHtml} />
+            {garant.credentials && garant.credentials.length > 0 && (
+              <ul class="bp-creds">
+                {garant.credentials.slice(0, 3).map((cred) => <li>{cred}</li>)}
+              </ul>
+            )}
+            <a class="bp-link" href={`/autor/${garant.slug}/`}>
+              Otevřít profil garanta
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+                <line x1="5" y1="12" x2="19" y2="12" />
+                <polyline points="12 5 19 12 12 19" />
+              </svg>
+            </a>
+          </div>
         </div>
         <div class="byline-text">
           <div class="byline-label">Odborný garant</div>
@@ -212,7 +272,24 @@ const showAsUpdated = dates.significantUpdate === true && !!updatedHuman;
     font-weight: 700;
     font-size: 14px;
     flex-shrink: 0;
+    overflow: visible;        /* let popover escape avatar bounds */
+    position: relative;        /* popover positions to this */
+    cursor: help;              /* signals "hover for more" */
+  }
+
+  .byline-avatar > img,
+  .byline-avatar > span {
+    border-radius: 50%;
     overflow: hidden;
+    width: 100%;
+    height: 100%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .byline-avatar > img {
+    object-fit: cover;
   }
 
   .byline-avatar.author {
@@ -229,10 +306,181 @@ const showAsUpdated = dates.significantUpdate === true && !!updatedHuman;
     background: transparent;
   }
 
-  .byline-avatar img {
+  /* ============ Hover popover ============
+   * Visible only on hover / focus of the avatar. Distinct visual from
+   * the reference screenshot: card hugs the avatar's left edge, uses a
+   * thick left border tinted in the role color (purple for author,
+   * amber for garant), and the inline head puts avatar + name + role
+   * on one row instead of stacked.
+   */
+  .byline-popover {
+    position: absolute;
+    top: calc(100% + 10px);
+    left: 0;
+    z-index: 50;
+    width: min(360px, 90vw);
+    padding: 1rem 1.1rem;
+    background: #fff;
+    border: 1px solid var(--line);
+    border-left: 4px solid var(--p-500);
+    border-radius: var(--r-lg);
+    box-shadow: 0 18px 44px -16px rgba(15, 19, 30, 0.28);
+    opacity: 0;
+    transform: translateY(-4px);
+    pointer-events: none;
+    transition: opacity 0.15s ease-out, transform 0.15s ease-out;
+    cursor: default;
+  }
+
+  .garant-popover {
+    border-left-color: var(--amber);
+  }
+
+  .byline-avatar:hover .byline-popover,
+  .byline-avatar:focus-within .byline-popover {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+  }
+
+  /* Tiny invisible bridge between avatar and popover so the cursor
+     doesn't fall off the avatar while moving down to the card. */
+  .byline-avatar::after {
+    content: "";
+    position: absolute;
+    top: 100%;
+    left: 0;
     width: 100%;
-    height: 100%;
-    object-fit: cover;
+    height: 12px;
+    pointer-events: none;
+  }
+  .byline-avatar:hover::after,
+  .byline-avatar:focus-within::after {
+    pointer-events: auto;
+  }
+
+  /* Hover popover hidden on touch / mobile — tap would show it and
+     then nothing closes it cleanly. Keyboard focus on small screens
+     would also be ambiguous. */
+  @media (hover: none), (max-width: 720px) {
+    .byline-popover { display: none; }
+  }
+
+  .bp-head {
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    padding-bottom: 0.7rem;
+    border-bottom: 1px dashed var(--line);
+    margin-bottom: 0.7rem;
+  }
+
+  .bp-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    overflow: hidden;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: 700;
+  }
+  .bp-avatar.author  { background: var(--p-100);   color: var(--p-700); }
+  .bp-avatar.garant  { background: var(--amber-bg); color: var(--amber); }
+  .bp-avatar.has-photo { background: transparent; }
+  .bp-avatar img { width: 100%; height: 100%; object-fit: cover; }
+
+  .bp-name {
+    font-size: 15px;
+    font-weight: 800;
+    color: var(--ink);
+    line-height: 1.2;
+  }
+
+  .bp-role {
+    font-size: 12.5px;
+    color: var(--muted);
+    margin-top: 1px;
+  }
+
+  .bp-bio {
+    font-size: 13.5px;
+    line-height: 1.55;
+    color: var(--ink-soft);
+    margin: 0;
+  }
+
+  .bp-bio :global(p) { margin: 0 0 0.5rem; }
+  .bp-bio :global(p:last-child) { margin-bottom: 0; }
+  .bp-bio :global(strong) { color: var(--ink); }
+
+  .bp-creds {
+    list-style: none;
+    padding: 0;
+    margin: 0.7rem 0 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.3rem;
+  }
+
+  .bp-creds li {
+    font-family: var(--mono);
+    font-size: 10.5px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--p-700);
+    background: var(--p-50);
+    padding: 2px 8px;
+    border-radius: 999px;
+    font-weight: 700;
+  }
+
+  .garant-popover .bp-creds li {
+    color: var(--amber-text);
+    background: var(--amber-bg);
+  }
+
+  .bp-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    margin-top: 0.8rem;
+    padding-top: 0.7rem;
+    border-top: 1px dashed var(--line);
+    width: 100%;
+    font-family: var(--mono);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-weight: 700;
+    color: var(--p-700);
+    text-decoration: none;
+  }
+
+  .garant-popover .bp-link {
+    color: var(--amber-text);
+  }
+
+  .bp-link:hover,
+  .bp-link:focus-visible {
+    color: var(--p-900);
+    outline: none;
+  }
+
+  .garant-popover .bp-link:hover,
+  .garant-popover .bp-link:focus-visible {
+    color: var(--amber);
+  }
+
+  .bp-link svg {
+    width: 12px;
+    height: 12px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .byline-popover { transition: none; }
   }
 
   .byline-text {
