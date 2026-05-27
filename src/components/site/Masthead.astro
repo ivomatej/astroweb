@@ -122,8 +122,7 @@ const isActive = (href: string): boolean =>
     transition: opacity 0.18s ease-out;
   }
 
-  body:has(.nav-item.has-mega.is-open) .page-backdrop,
-  body:has(.nav-item.has-mega:focus-within) .page-backdrop {
+  body:has(.nav-item.has-mega.is-open) .page-backdrop {
     opacity: 1;
     pointer-events: auto;
   }
@@ -250,32 +249,24 @@ const isActive = (href: string): boolean =>
     transition: transform 0.18s, color 0.15s;
   }
 
-  .nav-item.is-open .nav-chev,
-  .nav-item:focus-within .nav-chev {
+  .nav-item.is-open .nav-chev {
     color: #fff;
     transform: rotate(180deg);
   }
 
   /*
-   * Mega-panel show / hide.
+   * Mega-panel show / hide — JS is the SOLE source of truth.
    *
-   * Previously a CSS :hover rule opened the panel. In Astro dev mode
-   * the :hover state was getting stuck (likely the dev toolbar's
-   * shadow-root pointer events plus HMR re-rendering the masthead
-   * without releasing the prior hover). Result: panel wouldn't close
-   * locally, even though production was fine.
-   *
-   * Switched to JS-driven .is-open class. Mouseenter / focusin add it,
-   * mouseleave / focusout-outside remove it after a small 180 ms delay
-   * so quick cross-element traversal doesn't flicker. :focus-within is
-   * kept as a belt-and-braces for screen-reader Tab navigation in case
-   * the JS handler misses.
+   * Earlier versions tried CSS :hover (got stuck in Astro dev mode
+   * due to dev-toolbar shadow DOM pointer events) and then mixed
+   * :focus-within (still got stuck because focus inside the panel
+   * kept the rule matching). The deterministic answer is: only
+   * .is-open controls visibility. JS owns the state.
    *
    * :global() bypasses Astro scoping since the panel element lives in
    * MegaMenu's scope, not Masthead's.
    */
-  .nav-item.has-mega.is-open > :global(.mega-panel),
-  .nav-item.has-mega:focus-within > :global(.mega-panel) {
+  .nav-item.has-mega.is-open > :global(.mega-panel) {
     display: block;
   }
 
@@ -497,6 +488,7 @@ const isActive = (href: string): boolean =>
 
     items.forEach((it) => {
       const trigger = it.querySelector("a[aria-haspopup]");
+      const panel   = it.querySelector(".mega-panel");
       if (!trigger) return;
 
       let closeTimer = 0;
@@ -511,26 +503,39 @@ const isActive = (href: string): boolean =>
         trigger.setAttribute("aria-expanded", "true");
       }
 
-      function scheduleClose() {
+      function closeNow() {
         clearTimeout(closeTimer);
-        closeTimer = window.setTimeout(() => {
-          // Don't close if focus is currently inside this item
-          // (keyboard user Tabbed into the panel).
-          if (it.matches(":focus-within")) return;
-          it.classList.remove("is-open");
-          trigger.setAttribute("aria-expanded", "false");
-        }, CLOSE_DELAY);
+        it.classList.remove("is-open");
+        trigger.setAttribute("aria-expanded", "false");
       }
 
+      function scheduleClose() {
+        clearTimeout(closeTimer);
+        closeTimer = window.setTimeout(closeNow, CLOSE_DELAY);
+      }
+
+      function cancelClose() {
+        clearTimeout(closeTimer);
+      }
+
+      // Mouseenter / mouseleave fire when the cursor crosses the
+      // GEOMETRIC box of the element. The mega-panel sits below the
+      // masthead in absolute position so it's geometrically separate
+      // from .nav-item — we have to listen on both. Quick traversal
+      // (nav-item → panel or panel → nav-item) cancels the close.
       it.addEventListener("mouseenter", open);
       it.addEventListener("mouseleave", scheduleClose);
+
+      if (panel) {
+        panel.addEventListener("mouseenter", cancelClose);
+        panel.addEventListener("mouseleave", scheduleClose);
+      }
+
+      // Keyboard path — focus moves into trigger or any descendant
+      // (panel link). Closing on focusout-outside is immediate.
       it.addEventListener("focusin", open);
       it.addEventListener("focusout", (e) => {
-        if (!it.contains(e.relatedTarget)) {
-          clearTimeout(closeTimer);
-          it.classList.remove("is-open");
-          trigger.setAttribute("aria-expanded", "false");
-        }
+        if (!it.contains(e.relatedTarget)) closeNow();
       });
     });
 
