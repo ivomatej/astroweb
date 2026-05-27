@@ -85,13 +85,11 @@ if (!article) {
 
       <TLDR tldr={article.tldr} />
 
-      <div class="byline-sticky">
-        <ByLine
-          author={article.author}
-          garant={article.garant}
-          dates={article.dates}
-        />
-      </div>
+      <ByLine
+        author={article.author}
+        garant={article.garant}
+        dates={article.dates}
+      />
 
       <TableOfContents sections={article.sections} variant="inline" />
 
@@ -151,36 +149,6 @@ if (!article) {
     <aside class="article-sidebar">
       <TableOfContents sections={article.sections} variant="sidebar" />
 
-      <div class="side-card side-author">
-        <div class="side-card-head">
-          <span class="side-card-title">Autor článku</span>
-        </div>
-        <a class="side-author-row" href={`/autor/${article.author.slug}/`}>
-          <span class="side-author-avatar">
-            {article.author.photoUrl
-              ? <img src={article.author.photoUrl} alt={article.author.name} />
-              : <span>{article.author.initials ?? article.author.name.slice(0, 2)}</span>}
-          </span>
-          <span class="side-author-text">
-            <strong>{article.author.name}</strong>
-            <span>{article.author.role}</span>
-          </span>
-        </a>
-        {article.garant && (
-          <a class="side-author-row side-author-garant" href={`/autor/${article.garant.slug}/`}>
-            <span class="side-author-avatar garant">
-              {article.garant.photoUrl
-                ? <img src={article.garant.photoUrl} alt={article.garant.name} />
-                : <span>{article.garant.initials ?? article.garant.name.slice(0, 2)}</span>}
-            </span>
-            <span class="side-author-text">
-              <em>Odborný garant</em>
-              <strong>{article.garant.name}</strong>
-            </span>
-          </a>
-        )}
-      </div>
-
       <div class="side-card side-share">
         <div class="side-card-head">
           <span class="side-card-title">Sdílet článek</span>
@@ -232,20 +200,11 @@ if (!article) {
   .article-body { margin-top: 0; }
 
   /*
-   * Sticky ByLine — autor + garant + datum + share zůstávají
-   * viditelné při scrollování delším článkem. Top offset musí
-   * counter-balance the sticky masthead height.
+   * Sidebar — TOC + share row, anchored at the TOP of the grid cell
+   * and STAY there (align-self: start). No position: sticky — the user
+   * doesn't want it following them down the page. Once the article body
+   * scrolls past, the sidebar naturally falls off the viewport.
    */
-  .byline-sticky {
-    position: sticky;
-    top: 60px;
-    z-index: 5;
-    background: var(--bg);
-    margin: 0 -0.25rem 1rem;
-    padding: 0 0.25rem;
-  }
-
-  /* Sidebar — sticky TOC on desktop only. Inline TOC handles mobile. */
   .article-sidebar {
     display: none;
   }
@@ -253,11 +212,7 @@ if (!article) {
   @media (min-width: 1024px) {
     .article-sidebar {
       display: block;
-      position: sticky;
-      top: 80px;
       align-self: start;
-      max-height: calc(100vh - 100px);
-      overflow-y: auto;
     }
   }
 
@@ -265,7 +220,6 @@ if (!article) {
     .article-wrap {
       grid-template-columns: 1fr;
     }
-    .byline-sticky { position: static; }
   }
 
   /* ============ Disclosure accordion ============ */
@@ -364,83 +318,6 @@ if (!article) {
     text-transform: uppercase;
     letter-spacing: 0.1em;
     color: var(--ink);
-    font-weight: 700;
-  }
-
-  .side-author-row {
-    display: flex;
-    align-items: center;
-    gap: 0.7rem;
-    padding: 0.55rem 0;
-    text-decoration: none;
-    color: var(--ink);
-    border-radius: var(--r);
-  }
-
-  .side-author-row + .side-author-row {
-    border-top: 1px dashed var(--line);
-    margin-top: 0.5rem;
-    padding-top: 0.85rem;
-  }
-
-  .side-author-row:hover strong,
-  .side-author-row:focus-visible strong {
-    color: var(--p-700);
-  }
-
-  .side-author-avatar {
-    width: 38px;
-    height: 38px;
-    border-radius: 50%;
-    background: var(--p-100);
-    color: var(--p-700);
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: 800;
-    font-size: 13px;
-    flex-shrink: 0;
-    overflow: hidden;
-  }
-
-  .side-author-avatar.garant {
-    background: var(--amber-bg);
-    color: var(--amber-text);
-  }
-
-  .side-author-avatar img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
-
-  .side-author-text {
-    display: flex;
-    flex-direction: column;
-    gap: 1px;
-    line-height: 1.35;
-    min-width: 0;
-  }
-
-  .side-author-text strong {
-    font-size: 14px;
-    color: var(--ink);
-    font-weight: 700;
-  }
-
-  .side-author-text span,
-  .side-author-text em {
-    font-size: 12px;
-    color: var(--muted);
-    font-style: normal;
-  }
-
-  .side-author-text em {
-    font-family: var(--mono);
-    font-size: 10.5px;
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-    color: var(--amber-text);
     font-weight: 700;
   }
 
