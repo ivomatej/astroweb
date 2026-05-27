@@ -43,9 +43,10 @@ if (!article) {
  * Main column:
  *   1. Breadcrumb
  *   2. H1 + perex (ArticleHeader)
- *   3. Hero image (promoted just under H1 for lead-visual impact)
- *   4. ⚡ TLDR
- *   5. ByLine
+ *   3. ByLine (autor + garant + dates — immediately under headline
+ *      so credentials are visible before the visual)
+ *   4. Hero image
+ *   5. ⚡ TLDR
  *   6. Inline TOC (mobile/tablet; desktop has the sidebar duplicate)
  *   7. Affiliate + Product acquisition in <details open> accordion
  *   8. Article body sections (H2 ↓)
@@ -78,15 +79,15 @@ if (!article) {
         perex={article.perex}
       />
 
-      <Figure figure={article.cover} hero />
-
-      <TLDR tldr={article.tldr} />
-
       <ByLine
         author={article.author}
         garant={article.garant}
         dates={article.dates}
       />
+
+      <Figure figure={article.cover} hero />
+
+      <TLDR tldr={article.tldr} />
 
       <TableOfContents sections={article.sections} variant="inline" />
 
