@@ -14,6 +14,13 @@ const isActive = (href: string): boolean =>
 */}
 <div class="masthead-sentinel" aria-hidden="true"></div>
 
+{/*
+  Backdrop shown while any mega panel is open. Pure-CSS visibility
+  driven by body:has(.nav-item.has-mega:hover|focus-within|.is-open).
+  Sits below the masthead/panel z-index so they stay crisp on top.
+*/}
+<div class="page-backdrop" aria-hidden="true"></div>
+
 <header class="masthead" data-masthead>
   <div class="masthead-inner">
     <a href="/" class="brand" aria-label={`${site.brand.name} — domů`}>
@@ -90,6 +97,36 @@ const isActive = (href: string): boolean =>
     width: 100%;
   }
 
+  /*
+   * Backdrop shown when ANY mega panel is open (hover, focus-within
+   * or .is-open). Sits at z 30 — above page content, below the panel
+   * (z 40) and the masthead (z 50). Uses :has() so it's pure CSS.
+   * backdrop-filter blurs the page behind, regardless of dark/light
+   * theme of the underlying content.
+   */
+  .page-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 19, 30, 0.32);
+    backdrop-filter: blur(3px);
+    -webkit-backdrop-filter: blur(3px);
+    z-index: 30;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.18s ease-out;
+  }
+
+  body:has(.nav-item.has-mega:hover) .page-backdrop,
+  body:has(.nav-item.has-mega:focus-within) .page-backdrop,
+  body:has(.nav-item.has-mega.is-open) .page-backdrop {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .page-backdrop { transition: none; }
+  }
+
   .masthead {
     border-bottom: 1px solid rgba(255, 255, 255, 0.08);
     background: var(--p-800);
@@ -113,10 +150,17 @@ const isActive = (href: string): boolean =>
   .masthead-inner {
     max-width: var(--max-w);
     margin: 0 auto;
-    padding: 0.85rem var(--gutter);
+    padding: 0 var(--gutter);
     display: flex;
-    align-items: center;
+    align-items: stretch;       /* let nav stretch to full height */
     gap: 2rem;
+    min-height: 56px;           /* baseline masthead height */
+  }
+
+  /* Items that aren't the nav still need to be vertically centered. */
+  .brand,
+  .masthead-right {
+    align-self: center;
   }
 
   .brand {
@@ -141,6 +185,7 @@ const isActive = (href: string): boolean =>
 
   .nav {
     display: flex;
+    align-items: stretch;
     margin-left: 1.25rem;
   }
 
@@ -149,12 +194,24 @@ const isActive = (href: string): boolean =>
     padding: 0;
     margin: 0;
     display: flex;
+    align-items: stretch;
     gap: 1.75rem;
   }
 
+  /*
+   * .nav-item stretches to the FULL masthead height so the geometric
+   * hover area covers the gap between the link text and the bottom of
+   * the masthead. Previous version was inline-flex sized to content
+   * → mouse moving down to the panel left the .nav-item box mid-way
+   * and the panel closed. This fixes that.
+   *
+   * position: static keeps the absolutely-positioned .mega-panel
+   * anchored to the .masthead (the sticky positioned ancestor), not
+   * to each individual .nav-item.
+   */
   .nav-item {
-    position: static;          /* mega-panel is positioned to .masthead */
-    display: inline-flex;
+    position: static;
+    display: flex;
     align-items: center;
   }
 
@@ -166,7 +223,7 @@ const isActive = (href: string): boolean =>
     font-weight: 500;
     color: rgba(255, 255, 255, 0.78);
     text-decoration: none;
-    padding: 5px 0;
+    padding: 1rem 0;
     border-bottom: 2px solid transparent;
     transition: color 0.15s, border-color 0.15s;
   }
