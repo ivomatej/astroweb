@@ -306,6 +306,17 @@ const showAsUpdated = dates.significantUpdate === true && !!updatedHuman;
     background: transparent;
   }
 
+  /*
+   * On hover/focus, elevate the avatar above the masthead's
+   * .page-backdrop (z-index 30). Avatar stays crisp while the rest
+   * of the page dims behind the backdrop. Popover is positioned
+   * inside the avatar so it rides up with the same z-index.
+   */
+  .byline-avatar:hover,
+  .byline-avatar:focus-within {
+    z-index: 35;
+  }
+
   /* ============ Hover popover ============
    * Visible only on hover / focus of the avatar. Distinct visual from
    * the reference screenshot: card hugs the avatar's left edge, uses a
