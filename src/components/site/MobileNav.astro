@@ -208,12 +208,17 @@ import { site } from "../../config/site";
     .mn-backdrop { display: none !important; }
   }
 
-  /* ============ Drawer header ============ */
+  /* ============ Drawer header ============
+   * min-height matches the masthead's 56px so the purple band aligns
+   * visually with the page header when the drawer slides in. Padding
+   * is now vertical-flexible (auto), the min-height does the work.
+   */
   .mn-head {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 0.85rem 1.1rem;
+    padding: 0 1.1rem;
+    min-height: 56px;
     background: var(--p-800);
     color: #fff;
     flex-shrink: 0;
@@ -346,9 +351,12 @@ import { site } from "../../config/site";
 
   .mn-overview svg { width: 12px; height: 12px; }
 
-  /* ============ Level 2 — sekce ============ */
+  /* ============ Level 2 — sekce ============
+   * Bumped to 16 px / 1rem vertical padding so each row hits the
+   * 44 px touch-target floor recommended for thumbs.
+   */
   .mn-l2 {
-    margin: 0 1rem 0.35rem 1.25rem;
+    margin: 0 0.85rem 0.4rem 1rem;
     border-left: 3px solid var(--p-200);
     background: #fff;
     border-radius: 0 var(--r) var(--r) 0;
@@ -361,9 +369,9 @@ import { site } from "../../config/site";
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 0.65rem;
-    padding: 0.7rem 0.95rem;
-    font-size: 14.5px;
+    gap: 0.7rem;
+    padding: 1rem 1.05rem;
+    font-size: 16px;
     font-weight: 700;
     color: var(--ink-soft);
     user-select: none;
@@ -389,9 +397,13 @@ import { site } from "../../config/site";
 
   .mn-l2-label { flex: 1; }
 
-  /* ============ Level 3 — listy ============ */
+  /* ============ Level 3 — listy ============
+   * Bumped to 15 px / 0.85rem vertical padding (~46 px row), comfortable
+   * tap target on phones. Items separated by a 1 px hairline so the
+   * list reads as discrete rows instead of a wall of links.
+   */
   .mn-leaves {
-    padding: 0.1rem 0 0.55rem;
+    padding: 0.25rem 0 0.55rem;
     border-top: 1px dashed var(--line);
   }
 
@@ -399,14 +411,19 @@ import { site } from "../../config/site";
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 0.5rem;
-    padding: 0.5rem 0.95rem 0.5rem 1.6rem;
-    font-size: 13.5px;
+    gap: 0.55rem;
+    padding: 0.85rem 1.05rem 0.85rem 1.5rem;
+    font-size: 15px;
     color: var(--muted);
     text-decoration: none;
-    line-height: 1.45;
+    line-height: 1.4;
     border-left: 2px solid transparent;
+    border-bottom: 1px solid var(--line-soft);
     transition: color 0.12s, border-color 0.12s, background 0.12s;
+  }
+
+  .mn-leaves li:last-child .mn-l3 {
+    border-bottom: 0;
   }
 
   .mn-l3:hover,
@@ -419,14 +436,14 @@ import { site } from "../../config/site";
 
   .mn-l3-more {
     font-family: var(--mono);
-    font-size: 11px;
+    font-size: 12px;
     text-transform: uppercase;
     letter-spacing: 0.06em;
     font-weight: 700;
     color: var(--p-700);
   }
 
-  .mn-l3-more svg { width: 12px; height: 12px; }
+  .mn-l3-more svg { width: 13px; height: 13px; }
 
   /* ============ Drawer footer (utility) ============ */
   .mn-foot {
