@@ -34,36 +34,6 @@ const isActive = (href: string): boolean =>
     </nav>
 
     <div class="masthead-right">
-      {/*
-        Desktop: full search form with visible input.
-        Mobile: hidden in favor of the icon-only link below — keeps the
-        header compact so H1 stays above the fold.
-      */}
-      <form
-        class="search-pill"
-        role="search"
-        action="/hledat/"
-        method="get"
-        aria-label="Vyhledávání na webu"
-      >
-        <button type="submit" class="search-pill-btn" aria-label="Hledat">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-            <circle cx="11" cy="11" r="8" />
-            <line x1="21" y1="21" x2="16.65" y2="16.65" />
-          </svg>
-        </button>
-        <label for="masthead-search-q" class="visually-hidden">Hledaný výraz</label>
-        <input
-          id="masthead-search-q"
-          type="search"
-          name="q"
-          placeholder="Hledat recenzi…"
-          autocomplete="off"
-          autocapitalize="off"
-          spellcheck="false"
-        />
-      </form>
-
       <a class="search-icon-link" href="/hledat/" aria-label="Otevřít hledání">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
           <circle cx="11" cy="11" r="8" />
@@ -77,6 +47,14 @@ const isActive = (href: string): boolean =>
           <polyline points="22,6 12,13 2,6" />
         </svg>
         <span>Newsletter</span>
+      </a>
+
+      <a class="account-cta" href="/ucet/" aria-label="Přihlásit se / Můj účet">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+          <circle cx="12" cy="7" r="4" />
+        </svg>
+        <span>Účet</span>
       </a>
     </div>
   </div>
@@ -171,93 +149,12 @@ const isActive = (href: string): boolean =>
     gap: 0.75rem;
   }
 
-  .search-pill {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.25rem;
-    padding: 0.3rem 0.4rem 0.3rem 0.5rem;
-    border-radius: 999px;
-    background: rgba(255, 255, 255, 0.08);
-    color: rgba(255, 255, 255, 0.85);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    transition: background 0.15s, border-color 0.15s;
-    min-width: 220px;
-  }
-
-  .search-pill:hover,
-  .search-pill:focus-within {
-    background: rgba(255, 255, 255, 0.14);
-    border-color: rgba(255, 255, 255, 0.22);
-  }
-
-  .search-pill-btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 26px;
-    height: 26px;
-    padding: 0;
-    background: transparent;
-    border: 0;
-    border-radius: 50%;
-    color: rgba(255, 255, 255, 0.78);
-    cursor: pointer;
-  }
-
-  .search-pill-btn:hover,
-  .search-pill-btn:focus-visible {
-    color: #fff;
-    background: rgba(255, 255, 255, 0.14);
-    outline: none;
-  }
-
-  .search-pill-btn svg {
-    width: 14px;
-    height: 14px;
-  }
-
-  .search-pill input[type="search"] {
-    flex: 1;
-    min-width: 0;
-    padding: 0.3rem 0.4rem;
-    background: transparent;
-    border: 0;
-    color: #fff;
-    font-size: 13px;
-    font-family: inherit;
-  }
-
-  .search-pill input[type="search"]::placeholder {
-    color: rgba(255, 255, 255, 0.55);
-  }
-
-  .search-pill input[type="search"]:focus {
-    outline: none;
-  }
-
-  .search-pill input[type="search"]::-webkit-search-cancel-button {
-    -webkit-appearance: none;
-    appearance: none;
-  }
-
-  .visually-hidden {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    padding: 0;
-    margin: -1px;
-    overflow: hidden;
-    clip: rect(0, 0, 0, 0);
-    white-space: nowrap;
-    border: 0;
-  }
-
   /*
-   * Icon-only fallback for mobile, hidden by default on desktop where
-   * the full input form is shown instead.
+   * Search trigger — icon-only link to /hledat/. No inline input in the
+   * masthead; user types the query on the search page itself.
    */
   .search-icon-link {
-    display: none;
+    display: inline-flex;
     align-items: center;
     justify-content: center;
     width: 36px;
@@ -284,9 +181,7 @@ const isActive = (href: string): boolean =>
   }
 
   /*
-   * Newsletter CTA — a single, deliberate signup destination in the
-   * header. Replaces the universal "subscribe everywhere" promo strip.
-   * Hidden on phones, where chrome real estate is precious.
+   * Newsletter CTA — primary pill (filled white).
    */
   .newsletter-cta {
     display: inline-flex;
@@ -316,21 +211,67 @@ const isActive = (href: string): boolean =>
     height: 13px;
   }
 
-@media (max-width: 960px) {
+  /*
+   * Account CTA — secondary pill (outlined). Leads to /ucet/ which
+   * will host the login form for non-authenticated visitors and the
+   * account dashboard for signed-in users.
+   */
+  .account-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0.5rem 0.95rem;
+    border-radius: 999px;
+    background: transparent;
+    color: #fff;
+    font-size: 13px;
+    font-weight: 600;
+    text-decoration: none;
+    border: 1px solid rgba(255, 255, 255, 0.35);
+    transition: background 0.15s, border-color 0.15s, transform 0.15s;
+  }
+
+  .account-cta:hover,
+  .account-cta:focus-visible {
+    background: rgba(255, 255, 255, 0.12);
+    border-color: rgba(255, 255, 255, 0.55);
+    color: #fff;
+    transform: translateY(-1px);
+    outline: none;
+  }
+
+  .account-cta svg {
+    width: 14px;
+    height: 14px;
+  }
+
+  @media (max-width: 960px) {
     .nav { display: none; }
-    .search-pill { min-width: 0; }
-    .search-pill input[type="search"] { width: 160px; flex: 0 0 auto; }
   }
 
   /*
-   * Phones — drop the full search form in favor of a compact icon link
-   * to /hledat/. Reclaims ~180 px of masthead width that was eaten by
-   * a feature only ~10 % of users touch from the header.
+   * Phones — labels in Newsletter/Account would push the masthead over
+   * one row. Collapse both to icon-only circular buttons matching the
+   * search icon.
    */
   @media (max-width: 720px) {
-    .search-pill { display: none; }
-    .search-icon-link { display: inline-flex; }
-    .newsletter-cta { display: none; }
+    .newsletter-cta,
+    .account-cta {
+      gap: 0;
+      padding: 0;
+      width: 36px;
+      height: 36px;
+      justify-content: center;
+    }
+    .newsletter-cta span,
+    .account-cta span {
+      display: none;
+    }
+    .newsletter-cta svg,
+    .account-cta svg {
+      width: 15px;
+      height: 15px;
+    }
   }
 </style>
 
