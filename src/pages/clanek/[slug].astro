@@ -69,12 +69,11 @@ if (!article) {
   noIndex={article.seo.noIndex}
   showNewsletterBand
 >
-  <Breadcrumbs items={article.breadcrumbs} />
+  <Breadcrumbs items={article.breadcrumbs} kicker={article.kicker} />
 
   <div class="article-wrap">
     <div class="article-main">
       <ArticleHeader
-        kicker={article.kicker}
         title={article.title}
         perex={article.perex}
       />

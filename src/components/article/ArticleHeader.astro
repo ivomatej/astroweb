@@ -1,6 +1,11 @@
 ---
 interface Props {
-  kicker: string;
+  /**
+   * Optional eyebrow kicker — usually now passed to <Breadcrumbs />
+   * so it shares the breadcrumb row (saves vertical space above H1).
+   * Kept here for legacy callers that still want it inline.
+   */
+  kicker?: string;
   /** HTML allowed for inline <em>, <strong> */
   title: string;
   /** HTML allowed for inline <strong> */
@@ -11,14 +16,14 @@ const { kicker, title, perex } = Astro.props;
 ---
 
 <header class="article-header">
-  <div class="kicker">{kicker}</div>
+  {kicker && <div class="kicker">{kicker}</div>}
   <h1 class="article-title" set:html={title}></h1>
   <p class="article-perex" set:html={perex}></p>
 </header>
 
 <style>
   .article-header {
-    padding-top: 1.5rem;
+    padding-top: 1rem;
   }
 
   .kicker {

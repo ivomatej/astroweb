@@ -3,9 +3,16 @@ import type { BreadcrumbItem } from "../../types/article";
 
 interface Props {
   items: BreadcrumbItem[];
+  /**
+   * Optional context kicker (e.g. "Hloubková analýza · Elektronářadí")
+   * rendered on the right side of the breadcrumb row. Audit point:
+   * the kicker used to sit on its own line above the H1 — wasted
+   * vertical space when the breadcrumb row had empty right gutter.
+   */
+  kicker?: string;
 }
 
-const { items } = Astro.props;
+const { items, kicker } = Astro.props;
 ---
 
 <nav class="breadcrumbs" aria-label="Drobečková navigace">
@@ -19,6 +26,7 @@ const { items } = Astro.props;
       ))
     }
   </ol>
+  {kicker && <span class="breadcrumbs-kicker">{kicker}</span>}
 </nav>
 
 <style>
@@ -28,6 +36,11 @@ const { items } = Astro.props;
     padding: 1rem var(--gutter) 0;
     font-size: 13px;
     color: var(--muted);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 0.5rem 1rem;
   }
 
   .breadcrumbs ol {
@@ -38,6 +51,20 @@ const { items } = Astro.props;
     flex-wrap: wrap;
     align-items: center;
     gap: 0.4rem;
+    min-width: 0;
+  }
+
+  .breadcrumbs-kicker {
+    font-family: var(--mono);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--p-700);
+    font-weight: 700;
+    background: var(--p-50);
+    padding: 3px 10px;
+    border-radius: 999px;
+    white-space: nowrap;
   }
 
   .breadcrumbs li {
