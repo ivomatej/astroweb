@@ -116,16 +116,16 @@ const currentYear = new Date().getFullYear();
           <a href={link.href}>{link.label}</a>
         ))
       }
-      <button type="button" class="foot-cookie-btn" data-open-cookie-settings>
-        Nastavení cookies
-      </button>
     </div>
   </div>
 
   <div class="foot-bottom">
-    <span>
+    <span class="foot-copyright">
       © {site.brand.foundedYear}–{currentYear} {site.brand.name}
     </span>
+    <button type="button" class="foot-cookie-btn" data-open-cookie-settings>
+      Nastavení cookies
+    </button>
   </div>
 </footer>
 
@@ -275,7 +275,9 @@ const currentYear = new Date().getFullYear();
     background: transparent;
     border: 0;
     padding: 0;
-    color: rgba(255, 255, 255, 0.6);
+    /* Same opacity as the copyright span next to it (.foot-bottom inherits
+       rgba(255,255,255,0.65) — both pass WCAG AA on the --ink footer bg). */
+    color: rgba(255, 255, 255, 0.65);
     font: inherit;
     font-size: 12.5px;
     font-weight: 500;
