@@ -313,7 +313,7 @@ export async function fetchUpdates(): Promise<unknown[]> {
 // Full Article (detail page)
 // ===========================================================================
 
-interface BackendArticle {
+export interface BackendArticle {
   slug: string;
   kind: string;
   status: string;
@@ -381,8 +381,16 @@ function mapRelatedTag(raw: string): 'navod' | 'srovnani' | 'tema' | 'top' | 'te
 import type { Article, ArticleKind, ArticleStatus, RelatedArticle } from '../types/article';
 
 export async function fetchArticleAsFrontendShape(slug: string): Promise<Article> {
-  const a = await fetchArticle(slug);
+  return mapBackendArticle(await fetchArticle(slug));
+}
 
+/**
+ * Pure mapper: backend article payload → frontend `Article` shape. Shared by
+ * the build-time public path (`fetchArticleAsFrontendShape`) and the runtime
+ * admin-preview path (`src/lib/preview-api.ts`), so a draft renders through the
+ * exact same component tree as a published article.
+ */
+export function mapBackendArticle(a: BackendArticle): Article {
   const related: RelatedArticle[] = a.relatedArticles.map((r) => ({
     href: r.href,
     title: r.title,

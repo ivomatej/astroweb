@@ -1,0 +1,272 @@
+---
+/**
+ * Shared article composition — the full visual body of an article page,
+ * from breadcrumbs to the making-of footer. Rendered identically by the
+ * production page (`pages/clanek/[slug].astro`, SSG) and the admin preview
+ * route (`preview-route/clanek.astro`, SSR). Single source of truth so a
+ * draft preview always matches production pixel-for-pixel.
+ *
+ * Page-level concerns (BaseLayout, <title>/SEO, JSON-LD) stay in the page.
+ */
+import "../../styles/article-content.css";
+
+import type { Article } from "../../types/article";
+
+import Breadcrumbs from "./Breadcrumbs.astro";
+import ArticleHeader from "./ArticleHeader.astro";
+import ByLine from "./ByLine.astro";
+import TrustRow from "./TrustRow.astro";
+import AffiliateDisclosure from "./AffiliateDisclosure.astro";
+import ProductAcquisitionSection from "./ProductAcquisitionSection.astro";
+import TLDR from "./TLDR.astro";
+import Figure from "./Figure.astro";
+import ArticleSection from "./ArticleSection.astro";
+import TableOfContents from "./TableOfContents.astro";
+import NextCta from "./NextCta.astro";
+import RelatedArticles from "./RelatedArticles.astro";
+import MethodologySection from "./MethodologySection.astro";
+import RatingSection from "./RatingSection.astro";
+import HistorySection from "./HistorySection.astro";
+import GarantSection from "./GarantSection.astro";
+import CommentsSection from "./CommentsSection.astro";
+import ReportErrorSection from "./ReportErrorSection.astro";
+import MakingSection from "./MakingSection.astro";
+
+interface Props {
+  article: Article;
+}
+
+const { article } = Astro.props;
+---
+
+<Breadcrumbs items={article.breadcrumbs} kicker={article.kicker} />
+
+<div class="article-wrap">
+  <div class="article-main">
+    <ArticleHeader title={article.title} perex={article.perex} />
+
+    <ByLine author={article.author} garant={article.garant} dates={article.dates} />
+
+    <Figure figure={article.cover} hero />
+
+    <TLDR tldr={article.tldr} />
+
+    <TableOfContents sections={article.sections} variant="inline" />
+
+    <details class="disclosure-accordion" open>
+      <summary>
+        <span class="acc-eyebrow">Transparentnost</span>
+        <span class="acc-title">Jak jsme produkt získali a co jsou affiliate odkazy</span>
+        <span class="acc-chev" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <polyline points="6 9 12 15 18 9" />
+          </svg>
+        </span>
+      </summary>
+      <div class="acc-body">
+        <AffiliateDisclosure disclosure={article.affiliateDisclosure} />
+        {article.productAcquisition && (
+          <ProductAcquisitionSection data={article.productAcquisition} />
+        )}
+      </div>
+    </details>
+
+    <article class="article-body">
+      {article.sections.map((section) => <ArticleSection section={section} />)}
+    </article>
+
+    {article.nextCta && <NextCta cta={article.nextCta} />}
+
+    {article.methodology && <MethodologySection methodology={article.methodology} />}
+
+    {article.rating && <RatingSection rating={article.rating} />}
+
+    {article.history.length > 0 && <HistorySection history={article.history} />}
+
+    <GarantSection author={article.author} garant={article.garant} />
+
+    {article.relatedArticles.length > 0 && (
+      <RelatedArticles items={article.relatedArticles} />
+    )}
+
+    {article.comments.enabled && <CommentsSection comments={article.comments} />}
+
+    {article.reportErrorHref && <ReportErrorSection href={article.reportErrorHref} />}
+  </div>
+
+  <aside class="article-sidebar">
+    <TableOfContents sections={article.sections} variant="sidebar" />
+
+    <div class="side-card side-trust">
+      <div class="side-card-head">
+        <span class="side-card-title">Záruky článku</span>
+      </div>
+      <TrustRow pills={article.trustPills} />
+    </div>
+  </aside>
+</div>
+
+<MakingSection stats={article.credibilityStats} />
+
+<style>
+  .article-wrap {
+    max-width: var(--max-w);
+    margin: 0 auto;
+    padding: 0 var(--gutter) 2rem;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 280px;
+    gap: 2.5rem;
+  }
+
+  .article-main { min-width: 0; }
+
+  .article-body { margin-top: 0; }
+
+  /*
+   * Sidebar — TOC + share row, anchored at the TOP of the grid cell
+   * and STAY there (align-self: start). No position: sticky — the user
+   * doesn't want it following them down the page. Once the article body
+   * scrolls past, the sidebar naturally falls off the viewport.
+   */
+  .article-sidebar {
+    display: none;
+  }
+
+  @media (min-width: 1024px) {
+    .article-sidebar {
+      display: block;
+      align-self: start;
+    }
+  }
+
+  @media (max-width: 1080px) {
+    .article-wrap {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  /* ============ Disclosure accordion ============ */
+  .disclosure-accordion {
+    margin: 1.5rem 0 2rem;
+    background: var(--bg-warm);
+    border: 1px solid var(--line);
+    border-radius: var(--r-lg);
+    overflow: hidden;
+  }
+
+  .disclosure-accordion[open] {
+    border-color: var(--p-200);
+  }
+
+  .disclosure-accordion summary {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: 0.75rem;
+    align-items: center;
+    padding: 0.85rem 1.1rem;
+    cursor: pointer;
+    list-style: none;
+    user-select: none;
+  }
+
+  .disclosure-accordion summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .acc-eyebrow {
+    font-family: var(--mono);
+    font-size: 10.5px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--p-700);
+    font-weight: 700;
+    padding: 3px 9px;
+    background: var(--p-50);
+    border-radius: 999px;
+  }
+
+  .acc-title {
+    font-weight: 700;
+    font-size: 14.5px;
+    color: var(--ink);
+    line-height: 1.4;
+  }
+
+  .acc-chev {
+    display: inline-flex;
+    width: 22px;
+    height: 22px;
+    align-items: center;
+    justify-content: center;
+    color: var(--p-700);
+    transition: transform 0.18s ease-out;
+  }
+
+  .disclosure-accordion[open] .acc-chev {
+    transform: rotate(180deg);
+  }
+
+  .acc-chev svg { width: 16px; height: 16px; }
+
+  .acc-body {
+    padding: 0.4rem 1.1rem 1.1rem;
+    border-top: 1px solid var(--line);
+    background: #fff;
+  }
+
+  /* Reset any vertical margin coming from child block components. */
+  .acc-body > :first-child { margin-top: 0.85rem; }
+  .acc-body > :last-child  { margin-bottom: 0; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .acc-chev { transition: none; }
+  }
+
+  /* ============ Sidebar mini author card ============ */
+  .side-card {
+    background: var(--bg-warm);
+    border: 1px solid var(--line);
+    border-radius: var(--r-lg);
+    padding: 1.1rem 1.15rem;
+    margin-top: 1rem;
+  }
+
+  .side-card-head {
+    margin-bottom: 0.75rem;
+  }
+
+  .side-card-title {
+    font-family: var(--mono);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--ink);
+    font-weight: 700;
+  }
+
+  /*
+   * Inside the sidebar, TrustRow's row layout breaks down — the 4 pills
+   * wrap awkwardly in the narrow column. Override to stack vertically
+   * and tighten visual weight so they read as a list rather than tags.
+   */
+  .side-trust :global(.trust-row) {
+    flex-direction: column;
+    gap: 0.55rem;
+    margin: 0;
+  }
+
+  .side-trust :global(.trust-pill) {
+    font-size: 12.5px;
+    line-height: 1.35;
+    color: var(--ink-soft);
+    align-items: flex-start;
+  }
+
+  .side-trust :global(.trust-pill svg) {
+    width: 14px;
+    height: 14px;
+    color: var(--green);
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+</style>

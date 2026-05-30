@@ -7,11 +7,15 @@
   },
   "scripts": {
     "dev": "astro dev --host 0.0.0.0",
+    "dev:preview": "astro dev --host 0.0.0.0 --config astro.config.preview.mjs",
     "build": "astro build",
+    "build:preview": "astro build --config astro.config.preview.mjs",
+    "start:preview": "node ./dist/server/entry.mjs",
     "preview": "astro preview",
     "astro": "astro"
   },
   "dependencies": {
-    "astro": "^6.3.7"
+    "@astrojs/node": "^10.1.2",
+    "astro": "^6.4.2"
   }
 }
