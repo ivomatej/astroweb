@@ -1,0 +1,33 @@
+---
+/**
+ * Admin draft preview for a magazine article — SSR, on-demand. Lives outside
+ * src/pages; injected only by astro.config.preview.mjs at /preview/magazin/[slug].
+ * Renders through the same <MagazineArticleView> as the public page.
+ *
+ * The "Další v magazínu" list depends on the build-time published list, which
+ * is empty in the preview deployment — that section hides itself. The article
+ * itself (the thing being edited) and its author come live via the token.
+ */
+export const prerender = false;
+
+import PreviewShell from "../components/preview/PreviewShell.astro";
+import MagazineArticleView from "../components/magazine/MagazineArticleView.astro";
+import { fetchPreview } from "../lib/preview-api";
+import { backendToMagazine, type BackendMagazine } from "../data/magazine";
+
+const slug = Astro.params.slug ?? "";
+const token = Astro.url.searchParams.get("token") ?? "";
+
+const result =
+  !slug || !token
+    ? ({ ok: false, status: 400, message: "Chybí parametr slug nebo token." } as const)
+    : await fetchPreview<BackendMagazine>("magazine", slug, token);
+
+const article = result.ok ? backendToMagazine(result.data) : null;
+const author = result.ok ? result.data.author : undefined;
+const pageTitle = article ? `Náhled: ${article.title}` : "Náhled článku";
+---
+
+<PreviewShell pageTitle={pageTitle} error={result.ok ? undefined : result}>
+  {article && <MagazineArticleView article={article} author={author} />}
+</PreviewShell>

@@ -1,0 +1,38 @@
+---
+/**
+ * Admin draft preview for a glossary term — SSR, on-demand. Lives outside
+ * src/pages; injected only by astro.config.preview.mjs at /preview/slovnik/pojem/[slug].
+ * Renders through the same <GlossaryTermView> as the public page.
+ *
+ * Related/same-category aside data depends on the build-time published list,
+ * which is empty in the preview deployment — that's fine, the term itself (the
+ * thing being edited) comes live via the token. The category badge is rebuilt
+ * from the term's own backend payload so it still shows.
+ */
+export const prerender = false;
+
+import PreviewShell from "../components/preview/PreviewShell.astro";
+import GlossaryTermView from "../components/glossary/GlossaryTermView.astro";
+import { fetchPreview } from "../lib/preview-api";
+import {
+  backendToTerm,
+  glossaryCategoryFromBackend,
+} from "../data/glossary";
+import type { BackendGlossaryTerm } from "../lib/contenta-api";
+
+const slug = Astro.params.slug ?? "";
+const token = Astro.url.searchParams.get("token") ?? "";
+
+const result =
+  !slug || !token
+    ? ({ ok: false, status: 400, message: "Chybí parametr slug nebo token." } as const)
+    : await fetchPreview<BackendGlossaryTerm>("glossary", slug, token);
+
+const term = result.ok ? backendToTerm(result.data) : null;
+const category = result.ok ? glossaryCategoryFromBackend(result.data.category) : undefined;
+const pageTitle = term ? `Náhled: ${term.term}` : "Náhled pojmu";
+---
+
+<PreviewShell pageTitle={pageTitle} error={result.ok ? undefined : result}>
+  {term && <GlossaryTermView term={term} category={category} />}
+</PreviewShell>

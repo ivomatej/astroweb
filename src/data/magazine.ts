@@ -21,7 +21,12 @@ export interface MagazineArticle {
   sources?: { label: string; href: string }[];
 }
 
-interface BackendMagazine {
+/**
+ * Backend magazine detail payload. The list endpoint (`fetchMagazine`) returns
+ * the same shape; `bodyHtml`/`sources`/`related` are only fully populated on the
+ * single-item detail (used by the admin draft-preview route).
+ */
+export interface BackendMagazine {
   slug: string;
   kind: string;
   href: string;
@@ -38,7 +43,7 @@ interface BackendMagazine {
   seo?: unknown;
 }
 
-function backendToMagazine(m: BackendMagazine): MagazineArticle {
+export function backendToMagazine(m: BackendMagazine): MagazineArticle {
   return {
     slug: m.slug,
     title: m.title,

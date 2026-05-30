@@ -1,0 +1,33 @@
+---
+/**
+ * Admin draft preview for an author profile — SSR, on-demand. Lives outside
+ * src/pages; injected only by astro.config.preview.mjs at /preview/autor/[slug].
+ * Renders through the same <AuthorView> as the public page.
+ *
+ * The author being edited comes live via the token. The `articles` strip
+ * (articles authored/reviewed by this author) is NOT part of the backend
+ * author payload, so the preview omits it — it's an optional view prop.
+ */
+export const prerender = false;
+
+import PreviewShell from "../components/preview/PreviewShell.astro";
+import AuthorView from "../components/author/AuthorView.astro";
+import { fetchPreview } from "../lib/preview-api";
+import { backendToAuthor } from "../data/people";
+import type { BackendAuthor } from "../lib/contenta-api";
+
+const slug = Astro.params.slug ?? "";
+const token = Astro.url.searchParams.get("token") ?? "";
+
+const result =
+  !slug || !token
+    ? ({ ok: false, status: 400, message: "Chybí parametr slug nebo token." } as const)
+    : await fetchPreview<BackendAuthor>("authors", slug, token);
+
+const person = result.ok ? backendToAuthor(result.data) : null;
+const pageTitle = person ? `Náhled: ${person.name}` : "Náhled autora";
+---
+
+<PreviewShell pageTitle={pageTitle} error={result.ok ? undefined : result}>
+  {person && <AuthorView person={person} />}
+</PreviewShell>

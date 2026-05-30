@@ -48,15 +48,17 @@ export interface Brand {
   kodexScore: number;
   category: "Doporučená" | "Solidní" | "Sledovaná" | "Nedoporučovaná";
   tone: "green" | "amber" | "red";
-  founded: string;
-  country: string;
-  headquarters: string;
-  ownership: string;
+  // Rich fixture fields the backend doesn't yet store — optional so a sparse
+  // backend payload (admin preview) maps cleanly and the view can guard them.
+  founded?: string;
+  country?: string;
+  headquarters?: string;
+  ownership?: string;
   revenue?: string;
   employees?: string;
-  website: string;
-  historyHtml: string;
-  philosophy: string;
+  website?: string;
+  historyHtml?: string;
+  philosophy?: string;
   productLines: BrandProductLine[];
   service: BrandServiceInfo;
   recommendedProducts: { name: string; href?: string; note?: string }[];
@@ -85,7 +87,14 @@ function toneFromScore(score: number): Brand["tone"] {
   return "red";
 }
 
-function backendToBrand(b: BackendBrand): Brand {
+/**
+ * Maps a backend brand payload into the frontend `Brand` shape. The backend
+ * stores only a subset of the rich fixture fields; the rest (founded, country,
+ * headquarters, ownership, revenue, employees, website, philosophy,
+ * recommendedProducts) are left undefined rather than fabricated, and the
+ * BrandView guards them. Used both at build time and by the admin preview route.
+ */
+export function backendToBrand(b: BackendBrand): Brand {
   const score = b.kodexScore ?? 0;
   const tierUpper = (b.tier ?? "SOLID").toUpperCase();
   return {
@@ -96,13 +105,13 @@ function backendToBrand(b: BackendBrand): Brand {
     kodexScore: score,
     category: CATEGORY_MAP[tierUpper] ?? "Solidní",
     tone: toneFromScore(score),
-    founded: "",
-    country: "",
-    headquarters: "",
-    ownership: "",
-    website: "",
-    historyHtml: b.descriptionHtml ?? "",
-    philosophy: "",
+    founded: undefined,
+    country: undefined,
+    headquarters: undefined,
+    ownership: undefined,
+    website: undefined,
+    historyHtml: b.descriptionHtml ?? undefined,
+    philosophy: undefined,
     productLines: (b.productLines as BrandProductLine[]) ?? [],
     service: (b.serviceInfo as BrandServiceInfo) ?? {
       rating: 0,

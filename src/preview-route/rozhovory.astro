@@ -1,0 +1,35 @@
+---
+/**
+ * Admin draft preview for an interview — SSR, on-demand. Lives outside
+ * src/pages; injected only by astro.config.preview.mjs at /preview/rozhovory/[slug].
+ * Renders through the same <InterviewView> as the public page.
+ *
+ * The public page resolves interviewee/interviewer from the build-time people
+ * list, which is empty in the preview deployment. Instead we pass the person
+ * refs straight off the interview's own backend payload, so the hero cards
+ * still render. Related content depends on the published list and is omitted.
+ */
+export const prerender = false;
+
+import PreviewShell from "../components/preview/PreviewShell.astro";
+import InterviewView from "../components/interview/InterviewView.astro";
+import { fetchPreview } from "../lib/preview-api";
+import { backendToInterview, type BackendInterview } from "../data/interviews";
+
+const slug = Astro.params.slug ?? "";
+const token = Astro.url.searchParams.get("token") ?? "";
+
+const result =
+  !slug || !token
+    ? ({ ok: false, status: 400, message: "Chybí parametr slug nebo token." } as const)
+    : await fetchPreview<BackendInterview>("interviews", slug, token);
+
+const interview = result.ok ? backendToInterview(result.data) : null;
+const expert = result.ok ? result.data.interviewee : undefined;
+const interviewer = result.ok ? result.data.interviewer : undefined;
+const pageTitle = interview ? `Náhled: ${interview.title}` : "Náhled rozhovoru";
+---
+
+<PreviewShell pageTitle={pageTitle} error={result.ok ? undefined : result}>
+  {interview && <InterviewView interview={interview} expert={expert} interviewer={interviewer} />}
+</PreviewShell>

@@ -1,0 +1,776 @@
+---
+/**
+ * Shared visual composition for a brand profile detail. Extracted from
+ * `src/pages/znacky/[slug].astro` so the public page and the admin
+ * draft-preview route render the brand identically.
+ *
+ * The backend stores only a subset of the rich Brand shape, so the optional
+ * fields (founded, country, headquarters, ownership, revenue, employees,
+ * website, philosophy, recommendedProducts) are guarded below — a sparse
+ * preview brand renders without crashing.
+ */
+import { tierMeta, type Brand } from "../../data/brands";
+
+interface Props {
+  brand: Brand;
+  relatedBrands?: Brand[];
+}
+
+const { brand, relatedBrands = [] } = Astro.props;
+
+function formatCzechDate(iso: string): string {
+  const d = new Date(iso);
+  return `${d.getDate()}. ${d.getMonth() + 1}. ${d.getFullYear()}`;
+}
+
+const severityLabel = {
+  low: "Drobný",
+  medium: "Střední",
+  high: "Závažný",
+};
+
+const sourceTypeLabel = {
+  official: "Oficiální",
+  wiki: "Wikipedia",
+  test: "Test",
+  regulator: "Regulátor",
+};
+---
+
+<!-- ============ HERO ============ -->
+<header class={`brand-hero brand-tone-${brand.tone}`}>
+  <div class="inner brand-hero-grid">
+    <div class="brand-logo-block">
+      <div class="brand-logo-large" aria-hidden="true">
+        <span>{brand.name.slice(0, 2).toUpperCase()}</span>
+      </div>
+      <div class={`brand-score-card brand-score-${brand.tone}`}>
+        <span class="score-label">Skóre Kodexu</span>
+        <strong class="score-value">{brand.kodexScore}</strong>
+        <span class="score-max">/ 100</span>
+        <span class={`score-category score-cat-${brand.tone}`}>{brand.category}</span>
+      </div>
+    </div>
+    <div class="brand-info">
+      <span class={`brand-tier-badge brand-tier-${brand.tone}`}>{tierMeta[brand.tier].label}</span>
+      <h1 class="brand-name">{brand.name}</h1>
+      <p class="brand-tagline">{brand.tagline}</p>
+
+      <dl class="brand-quick-facts">
+        {
+          brand.founded && (
+            <div>
+              <dt>Založeno</dt>
+              <dd>{brand.founded}</dd>
+            </div>
+          )
+        }
+        {
+          brand.country && (
+            <div>
+              <dt>Země</dt>
+              <dd>{brand.country}</dd>
+            </div>
+          )
+        }
+        {
+          brand.headquarters && (
+            <div>
+              <dt>Sídlo</dt>
+              <dd>{brand.headquarters}</dd>
+            </div>
+          )
+        }
+        {
+          brand.revenue && (
+            <div>
+              <dt>Obrat</dt>
+              <dd>{brand.revenue}</dd>
+            </div>
+          )
+        }
+        {
+          brand.employees && (
+            <div>
+              <dt>Zaměstnanců</dt>
+              <dd>{brand.employees}</dd>
+            </div>
+          )
+        }
+        {
+          brand.ownership && (
+            <div>
+              <dt>Vlastnictví</dt>
+              <dd>{brand.ownership}</dd>
+            </div>
+          )
+        }
+      </dl>
+
+      <div class="brand-cta-row">
+        {
+          brand.website && (
+            <a href={brand.website} rel="noopener" target="_blank" class="btn-official">
+              Oficiální web
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+                <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+                <polyline points="15 3 21 3 21 9" />
+                <line x1="10" y1="14" x2="21" y2="3" />
+              </svg>
+            </a>
+          )
+        }
+        <a href="/kodex-ferove-firmy/" class="btn-kodex">Co znamená skóre?</a>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- ============ HISTORY ============ -->
+{
+  (brand.historyHtml || brand.philosophy) && (
+    <section class="brand-history">
+      <div class="inner">
+        <header class="section-head">
+          <p class="eyebrow">Historie a profil</p>
+          <h2>O značce {brand.name}</h2>
+        </header>
+        {brand.historyHtml && <div class="history-prose" set:html={brand.historyHtml} />}
+        {
+          brand.philosophy && (
+            <aside class="philosophy-card">
+              <span class="philosophy-label">Filozofie značky</span>
+              <p>{brand.philosophy}</p>
+            </aside>
+          )
+        }
+      </div>
+    </section>
+  )
+}
+
+<!-- ============ PRODUCT LINES ============ -->
+{
+  brand.productLines.length > 0 && (
+    <section class="brand-lines">
+      <div class="inner">
+        <header class="section-head">
+          <p class="eyebrow">Produktové portfolio</p>
+          <h2>{brand.productLines.length} hlavních produktových řad</h2>
+          <p class="lead">Přehled klíčových řad značky {brand.name} s cenovými segmenty a příkladovými modely.</p>
+        </header>
+        <ul class="lines-grid">
+          {brand.productLines.map((line) => (
+            <li class="line-card">
+              <h3>{line.name}</h3>
+              <p>{line.description}</p>
+              <div class="line-meta">
+                <div>
+                  <span class="line-label">Cenová kategorie</span>
+                  <strong>{line.priceRange}</strong>
+                </div>
+                {line.exampleModel && (
+                  <div>
+                    <span class="line-label">Příklad modelu</span>
+                    <strong>{line.exampleModel}</strong>
+                  </div>
+                )}
+              </div>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </section>
+  )
+}
+
+<!-- ============ SERVICE IN CZ ============ -->
+<section class="brand-service">
+  <div class="inner">
+    <header class="section-head">
+      <p class="eyebrow">Servis v ČR</p>
+      <h2>Jak {brand.name} obslouží český trh</h2>
+      <p class="lead">
+        Kvalita servisu je jeden ze sedmi pilířů našeho Kodexu férové firmy. Tady jsou konkrétní čísla pro {brand.name}.
+      </p>
+    </header>
+    <div class="service-grid">
+      <div class="service-rating">
+        <span class="service-label">Hodnocení servisu</span>
+        <div class="service-stars">
+          {
+            [1, 2, 3, 4, 5].map((star) => (
+              <svg
+                viewBox="0 0 24 24"
+                fill={star <= Math.round(brand.service.rating) ? "currentColor" : "none"}
+                stroke="currentColor"
+                stroke-width="2"
+                class={star <= Math.round(brand.service.rating) ? "filled" : "empty"}
+              >
+                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+              </svg>
+            ))
+          }
+        </div>
+        <strong class="service-score">{brand.service.rating.toFixed(1)} / 5</strong>
+      </div>
+
+      <div class="service-numbers">
+        {
+          brand.service.ownCenters !== undefined && (
+            <div class="service-number">
+              <strong>{brand.service.ownCenters}</strong>
+              <span>Vlastních center</span>
+            </div>
+          )
+        }
+        {
+          brand.service.partnerCenters !== undefined && (
+            <div class="service-number">
+              <strong>{brand.service.partnerCenters}</strong>
+              <span>Partnerských</span>
+            </div>
+          )
+        }
+        {
+          brand.service.avgRepairDays !== undefined && (
+            <div class="service-number">
+              <strong>{brand.service.avgRepairDays} dní</strong>
+              <span>Průměrná reklamace</span>
+            </div>
+          )
+        }
+      </div>
+
+      <div class="service-description">
+        <p>{brand.service.description}</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ RECOMMENDED PRODUCTS ============ -->
+{
+  brand.recommendedProducts.length > 0 && (
+    <section class="brand-recommended">
+      <div class="inner">
+        <header class="section-head">
+          <p class="eyebrow">Doporučujeme</p>
+          <h2>Konkrétní produkty {brand.name}, které jsme otestovali</h2>
+          <p class="lead">
+            Modely, které prošly naší laboratoří a získaly dobré hodnocení. Kliknutím se dostanete na detailní recenzi.
+          </p>
+        </header>
+        <ul class="rec-list">
+          {brand.recommendedProducts.map((p) => (
+            <li class="rec-card">
+              <div class="rec-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="20 6 9 17 4 12" />
+                </svg>
+              </div>
+              <div class="rec-body">
+                <strong>{p.name}</strong>
+                {p.note && <span class="rec-note">{p.note}</span>}
+              </div>
+              {p.href && (
+                <a href={p.href} class="rec-link">
+                  Recenze
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+                    <line x1="5" y1="12" x2="19" y2="12" />
+                    <polyline points="12 5 19 12 12 19" />
+                  </svg>
+                </a>
+              )}
+            </li>
+          ))}
+        </ul>
+      </div>
+    </section>
+  )
+}
+
+<!-- ============ WEAKNESSES ============ -->
+{
+  brand.weaknesses.length > 0 && (
+    <section class="brand-weaknesses">
+      <div class="inner">
+        <header class="section-head">
+          <p class="eyebrow">Buďte upřímní</p>
+          <h2>Slabiny a opakované problémy {brand.name}</h2>
+          <p class="lead">
+            Žádná značka není perfektní. Zde jsou problémy, které jsme u {brand.name} opakovaně zaznamenali.
+          </p>
+        </header>
+        <ul class="weak-list">
+          {brand.weaknesses.map((w) => (
+            <li class={`weak-card weak-severity-${w.severity}`}>
+              <header class="weak-head">
+                <span class={`weak-severity weak-severity-${w.severity}`}>{severityLabel[w.severity]}</span>
+                <h3>{w.title}</h3>
+              </header>
+              <p set:html={w.description} />
+            </li>
+          ))}
+        </ul>
+      </div>
+    </section>
+  )
+}
+
+<!-- ============ SOURCES ============ -->
+<section class="brand-sources">
+  <div class="inner">
+    <header class="section-head">
+      <p class="eyebrow">Externí zdroje</p>
+      <h2>Kde si můžete fakta o {brand.name} ověřit</h2>
+      <p class="lead">
+        Veškerá tvrzení na této stránce jsou ověřitelná z primárních zdrojů. Tady jsou.
+      </p>
+    </header>
+    <ul class="sources-list">
+      {
+        brand.sources.map((s) => (
+          <li class={`source-card source-${s.type}`}>
+            <span class="source-type">{sourceTypeLabel[s.type]}</span>
+            <a href={s.href} rel="noopener" target="_blank" class="source-link">
+              {s.label}
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+                <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+                <polyline points="15 3 21 3 21 9" />
+                <line x1="10" y1="14" x2="21" y2="3" />
+              </svg>
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+    <p class="sources-meta">
+      Profil aktualizovaný <time datetime={brand.updatedAt}>{formatCzechDate(brand.updatedAt)}</time>.
+    </p>
+  </div>
+</section>
+
+<!-- ============ RELATED BRANDS ============ -->
+{
+  relatedBrands.length > 0 && (
+    <section class="brand-related">
+      <div class="inner">
+        <header class="section-head">
+          <h2>Další značky</h2>
+        </header>
+        <ul class="related-grid">
+          {relatedBrands.map((b) => (
+            <li>
+              <a href={`/znacky/${b.slug}/`} class={`related-card related-${b.tone}`}>
+                <div class="related-logo" aria-hidden="true">
+                  <span>{b.name.slice(0, 2).toUpperCase()}</span>
+                </div>
+                <div>
+                  <strong>{b.name}</strong>
+                  <span>{b.kodexScore} / 100</span>
+                </div>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+                  <line x1="5" y1="12" x2="19" y2="12" />
+                  <polyline points="12 5 19 12 12 19" />
+                </svg>
+              </a>
+            </li>
+          ))}
+        </ul>
+        <p class="related-all">
+          <a href="/znacky/">Všechny značky v databázi</a>
+        </p>
+      </div>
+    </section>
+  )
+}
+
+<style>
+  .inner { max-width: var(--max-w); margin: 0 auto; padding: clamp(2.5rem, 5vw, 4rem) var(--gutter); }
+  .section-head { max-width: 65ch; margin: 0 0 2rem; }
+  .eyebrow {
+    font-family: var(--mono); font-size: 11.5px; text-transform: uppercase;
+    letter-spacing: 0.1em; color: var(--p-700); font-weight: 700; margin: 0 0 0.5rem;
+  }
+  .section-head h2 {
+    font-size: clamp(1.4rem, 2.7vw, 1.85rem); font-weight: 800; letter-spacing: -0.025em;
+    color: var(--ink); line-height: 1.2; margin-bottom: 0.6rem;
+  }
+  .section-head .lead { font-size: 15px; line-height: 1.6; color: var(--muted); margin: 0; }
+
+  /* HERO */
+  .brand-hero {
+    background:
+      radial-gradient(900px circle at 90% 0%, rgba(149, 114, 240, 0.14), transparent 55%),
+      var(--bg);
+    border-bottom: 1px solid var(--line);
+  }
+  .brand-tone-green {
+    background:
+      radial-gradient(900px circle at 90% 0%, rgba(21, 128, 61, 0.12), transparent 55%),
+      var(--bg);
+  }
+  .brand-tone-amber {
+    background:
+      radial-gradient(900px circle at 90% 0%, rgba(180, 83, 9, 0.12), transparent 55%),
+      var(--bg);
+  }
+  .brand-tone-red {
+    background:
+      radial-gradient(900px circle at 90% 0%, rgba(185, 28, 28, 0.12), transparent 55%),
+      var(--bg);
+  }
+  .brand-hero .inner { padding: clamp(2.5rem, 5vw, 4rem) var(--gutter); }
+  .brand-hero-grid {
+    display: grid; grid-template-columns: 240px 1fr; gap: 2.5rem;
+    align-items: start;
+  }
+  @media (max-width: 800px) { .brand-hero-grid { grid-template-columns: 1fr; gap: 1.5rem; } }
+
+  .brand-logo-large {
+    width: 240px; height: 240px; border-radius: 32px;
+    background: linear-gradient(135deg, var(--p-100), var(--p-200)); color: var(--p-700);
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--sans); font-weight: 800; font-size: 4rem;
+    letter-spacing: -0.04em;
+    margin-bottom: 1rem;
+  }
+  @media (max-width: 800px) { .brand-logo-large { width: 160px; height: 160px; font-size: 3rem; } }
+
+  .brand-score-card {
+    padding: 1.25rem; background: var(--bg);
+    border: 1px solid var(--line); border-radius: var(--r-lg);
+    text-align: center;
+    display: flex; flex-direction: column; gap: 0.3rem; align-items: center;
+  }
+  .brand-score-green { border-color: var(--green); }
+  .brand-score-amber { border-color: var(--amber); }
+  .brand-score-red { border-color: var(--red); }
+  .score-label {
+    font-family: var(--mono); font-size: 0.7rem;
+    text-transform: uppercase; letter-spacing: 0.08em;
+    color: var(--muted); font-weight: 700;
+  }
+  .score-value {
+    font-family: var(--sans); font-size: 3rem; font-weight: 800;
+    color: var(--p-700); letter-spacing: -0.025em; line-height: 1;
+  }
+  .brand-score-green .score-value { color: var(--green); }
+  .brand-score-amber .score-value { color: var(--amber); }
+  .brand-score-red .score-value { color: var(--red); }
+  .score-max {
+    font-family: var(--mono); font-size: 0.85rem; color: var(--muted);
+  }
+  .score-category {
+    margin-top: 0.5rem;
+    font-family: var(--mono); font-size: 0.7rem; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.06em;
+    padding: 0.2rem 0.55rem; border-radius: 99px;
+    background: var(--p-50); color: var(--p-700);
+  }
+  .score-cat-green { background: var(--green-bg); color: var(--green); }
+  .score-cat-amber { background: var(--amber-bg); color: var(--amber); }
+  .score-cat-red { background: var(--red-bg); color: var(--red); }
+
+  .brand-tier-badge {
+    display: inline-block; font-family: var(--mono);
+    font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.1em;
+    font-weight: 700; padding: 0.25rem 0.6rem; border-radius: 99px;
+    background: var(--p-50); color: var(--p-700); margin-bottom: 1rem;
+  }
+  .brand-tier-green { background: var(--green-bg); color: var(--green); }
+  .brand-tier-amber { background: var(--amber-bg); color: var(--amber); }
+  .brand-tier-red { background: var(--red-bg); color: var(--red); }
+
+  .brand-name {
+    font-family: var(--sans); font-size: clamp(2rem, 5vw, 3.4rem);
+    font-weight: 800; letter-spacing: -0.025em; color: var(--ink);
+    line-height: 1; margin: 0 0 0.85rem;
+  }
+  .brand-tagline {
+    font-size: 1.15rem; line-height: 1.5; color: var(--ink-soft);
+    margin: 0 0 1.5rem; max-width: 60ch;
+  }
+
+  .brand-quick-facts {
+    margin: 0 0 1.5rem;
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 0.6rem;
+  }
+  .brand-quick-facts > div {
+    padding: 0.7rem 0.9rem; background: var(--bg);
+    border: 1px solid var(--line); border-radius: var(--r-sm);
+  }
+  .brand-quick-facts dt {
+    font-family: var(--mono); font-size: 0.66rem;
+    text-transform: uppercase; letter-spacing: 0.08em;
+    color: var(--muted); font-weight: 700; margin-bottom: 0.2rem;
+  }
+  .brand-quick-facts dd {
+    margin: 0; font-size: 0.9rem; font-weight: 600; color: var(--ink); line-height: 1.4;
+  }
+
+  .brand-cta-row { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+  .btn-official, .btn-kodex {
+    display: inline-flex; align-items: center; gap: 0.45rem;
+    padding: 0.8rem 1.3rem; border-radius: var(--r);
+    font-size: 0.92rem; font-weight: 700; text-decoration: none;
+    transition: background 0.15s ease;
+  }
+  .btn-official {
+    background: var(--p-700); color: #fff; border: 1px solid var(--p-700);
+  }
+  .btn-official:hover { background: var(--p-800); color: #fff; }
+  .btn-official svg { width: 13px; height: 13px; }
+  .btn-kodex {
+    background: var(--bg); color: var(--ink); border: 1px solid var(--line);
+  }
+  .btn-kodex:hover { border-color: var(--p-400); color: var(--p-700); }
+
+  /* HISTORY */
+  .brand-history { background: var(--bg-warm); border-bottom: 1px solid var(--line); }
+  .history-prose {
+    max-width: var(--max-w-text); margin-bottom: 1.5rem;
+  }
+  .history-prose :global(p) {
+    margin: 0 0 1rem; line-height: 1.75; color: var(--text); font-size: 1rem;
+  }
+  .history-prose :global(p:last-child) { margin-bottom: 0; }
+  .history-prose :global(strong) { color: var(--ink); font-weight: 700; }
+  .philosophy-card {
+    max-width: var(--max-w-text); padding: 1.5rem 1.75rem;
+    background: var(--bg); border: 1px solid var(--line);
+    border-left: 4px solid var(--p-500); border-radius: var(--r);
+  }
+  .philosophy-label {
+    display: block; font-family: var(--mono);
+    font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.08em;
+    color: var(--p-700); font-weight: 700; margin-bottom: 0.55rem;
+  }
+  .philosophy-card p {
+    margin: 0; font-size: 1.05rem; line-height: 1.65;
+    color: var(--text); font-style: italic;
+  }
+
+  /* LINES */
+  .brand-lines { background: var(--bg); border-bottom: 1px solid var(--line); }
+  .lines-grid {
+    list-style: none; padding: 0; margin: 0;
+    display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.85rem;
+  }
+  @media (max-width: 800px) { .lines-grid { grid-template-columns: 1fr; } }
+  .line-card {
+    padding: 1.5rem; background: var(--bg-warm);
+    border: 1px solid var(--line); border-top: 3px solid var(--p-500);
+    border-radius: var(--r);
+  }
+  .line-card h3 {
+    margin: 0 0 0.55rem; font-size: 1.05rem;
+    font-weight: 800; color: var(--ink); letter-spacing: -0.015em;
+  }
+  .line-card > p {
+    margin: 0 0 1rem; font-size: 0.9rem; line-height: 1.6; color: var(--text);
+  }
+  .line-meta {
+    display: grid; gap: 0.55rem;
+    padding-top: 0.85rem; border-top: 1px dashed var(--line);
+  }
+  .line-label {
+    display: block; font-family: var(--mono);
+    font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.08em;
+    color: var(--p-700); font-weight: 700; margin-bottom: 0.15rem;
+  }
+  .line-meta strong { font-size: 0.88rem; color: var(--ink); font-weight: 700; }
+
+  /* SERVICE */
+  .brand-service { background: var(--bg-alt); border-bottom: 1px solid var(--line); }
+  .service-grid {
+    display: grid; grid-template-columns: 220px 1fr; gap: 1.5rem;
+    align-items: start;
+  }
+  @media (max-width: 700px) { .service-grid { grid-template-columns: 1fr; } }
+  .service-rating {
+    padding: 1.5rem; background: var(--bg);
+    border: 1px solid var(--line); border-radius: var(--r-lg);
+    text-align: center;
+    display: flex; flex-direction: column; gap: 0.5rem; align-items: center;
+  }
+  .service-label {
+    font-family: var(--mono); font-size: 0.7rem;
+    text-transform: uppercase; letter-spacing: 0.08em;
+    color: var(--muted); font-weight: 700;
+  }
+  .service-stars {
+    display: inline-flex; gap: 0.2rem; color: var(--amber);
+  }
+  .service-stars svg { width: 22px; height: 22px; }
+  .service-stars .empty { color: var(--line); }
+  .service-score {
+    font-family: var(--sans); font-size: 1.4rem; font-weight: 800;
+    color: var(--ink); letter-spacing: -0.015em;
+  }
+
+  .service-numbers {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.6rem;
+  }
+  @media (max-width: 500px) { .service-numbers { grid-template-columns: 1fr; } }
+  .service-number {
+    padding: 1rem; background: var(--bg);
+    border: 1px solid var(--line); border-radius: var(--r-sm); text-align: center;
+  }
+  .service-number strong {
+    display: block; font-family: var(--sans);
+    font-size: 1.4rem; font-weight: 800; color: var(--ink); letter-spacing: -0.02em;
+    margin-bottom: 0.15rem;
+  }
+  .service-number span { font-size: 0.75rem; color: var(--muted); }
+
+  .service-description {
+    grid-column: 1 / -1;
+    padding: 1.25rem 1.5rem; background: var(--bg);
+    border: 1px solid var(--line); border-radius: var(--r);
+  }
+  .service-description p {
+    margin: 0; font-size: 0.95rem; line-height: 1.65; color: var(--text);
+  }
+
+  /* RECOMMENDED */
+  .brand-recommended { background: var(--bg); border-bottom: 1px solid var(--line); }
+  .rec-list {
+    list-style: none; padding: 0; margin: 0;
+    display: flex; flex-direction: column; gap: 0.65rem;
+  }
+  .rec-card {
+    display: grid; grid-template-columns: 36px 1fr auto; gap: 1rem;
+    align-items: center; padding: 1rem 1.25rem;
+    background: var(--green-bg); border: 1px solid rgba(21, 128, 61, 0.2);
+    border-radius: var(--r);
+  }
+  @media (max-width: 600px) { .rec-card { grid-template-columns: 36px 1fr; } }
+  .rec-icon {
+    width: 36px; height: 36px; border-radius: 50%;
+    background: var(--green); color: #fff;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .rec-icon svg { width: 18px; height: 18px; }
+  .rec-body { display: flex; flex-direction: column; gap: 0.2rem; }
+  .rec-body strong { color: var(--ink); font-weight: 700; font-size: 0.98rem; }
+  .rec-note { font-size: 0.85rem; color: var(--muted); }
+  .rec-link {
+    display: inline-flex; align-items: center; gap: 0.35rem;
+    padding: 0.45rem 0.85rem; background: var(--green); color: #fff;
+    border-radius: var(--r-sm); font-size: 0.85rem; font-weight: 700;
+    text-decoration: none;
+  }
+  .rec-link svg { width: 12px; height: 12px; }
+  .rec-link:hover { background: #0e6e36; color: #fff; }
+
+  /* WEAKNESSES */
+  .brand-weaknesses { background: var(--amber-bg); border-bottom: 1px solid var(--line); }
+  .brand-weaknesses .eyebrow { color: var(--amber); }
+  .weak-list {
+    list-style: none; padding: 0; margin: 0;
+    display: flex; flex-direction: column; gap: 0.75rem;
+  }
+  .weak-card {
+    padding: 1.25rem 1.5rem; background: var(--bg);
+    border: 1px solid var(--line); border-radius: var(--r);
+  }
+  .weak-card.weak-severity-low { border-left: 3px solid var(--muted-2); }
+  .weak-card.weak-severity-medium { border-left: 3px solid var(--amber); }
+  .weak-card.weak-severity-high { border-left: 3px solid var(--red); }
+  .weak-head {
+    display: flex; align-items: center; gap: 0.85rem;
+    margin-bottom: 0.65rem;
+  }
+  .weak-severity {
+    font-family: var(--mono); font-size: 0.65rem;
+    text-transform: uppercase; letter-spacing: 0.08em;
+    font-weight: 700; padding: 0.2rem 0.55rem; border-radius: 99px;
+  }
+  .weak-severity.weak-severity-low { background: var(--bg-warm); color: var(--muted); }
+  .weak-severity.weak-severity-medium { background: var(--amber-bg); color: var(--amber); }
+  .weak-severity.weak-severity-high { background: var(--red-bg); color: var(--red); }
+  .weak-head h3 {
+    margin: 0; font-size: 1.05rem; font-weight: 700; color: var(--ink);
+  }
+  .weak-card p {
+    margin: 0; font-size: 0.93rem; line-height: 1.6; color: var(--text);
+  }
+  .weak-card p :global(strong) { color: var(--ink); font-weight: 600; }
+  .weak-card p :global(a) {
+    color: var(--p-700); text-decoration: none;
+    border-bottom: 1px dashed var(--p-300);
+  }
+
+  /* SOURCES */
+  .brand-sources { background: var(--bg); border-bottom: 1px solid var(--line); }
+  .sources-list {
+    list-style: none; padding: 0; margin: 0 0 1.25rem;
+    display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.55rem;
+  }
+  @media (max-width: 700px) { .sources-list { grid-template-columns: 1fr; } }
+  .source-card {
+    display: grid; grid-template-columns: auto 1fr; gap: 0.85rem;
+    align-items: center; padding: 0.85rem 1.1rem;
+    background: var(--bg-warm); border: 1px solid var(--line);
+    border-radius: var(--r-sm);
+  }
+  .source-type {
+    font-family: var(--mono); font-size: 0.65rem;
+    text-transform: uppercase; letter-spacing: 0.08em;
+    padding: 0.2rem 0.55rem; border-radius: 99px; font-weight: 700;
+    background: var(--p-50); color: var(--p-700);
+  }
+  .source-official .source-type { background: var(--green-bg); color: var(--green); }
+  .source-wiki .source-type { background: var(--p-50); color: var(--p-700); }
+  .source-test .source-type { background: var(--amber-bg); color: var(--amber); }
+  .source-regulator .source-type { background: #e8f0fa; color: #0a4fa3; }
+  .source-link {
+    display: inline-flex; align-items: center; gap: 0.4rem;
+    color: var(--ink); font-size: 0.88rem; font-weight: 600;
+    text-decoration: none; border-bottom: 1px dashed var(--p-300);
+    word-break: break-word;
+  }
+  .source-link:hover { color: var(--p-700); }
+  .source-link svg { width: 12px; height: 12px; flex-shrink: 0; }
+  .sources-meta { font-size: 0.82rem; color: var(--muted); text-align: center; margin: 0; }
+
+  /* RELATED */
+  .brand-related { background: var(--bg); }
+  .related-grid {
+    list-style: none; padding: 0; margin: 0 0 1.25rem;
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.65rem;
+  }
+  @media (max-width: 700px) { .related-grid { grid-template-columns: 1fr; } }
+  .related-card {
+    display: grid; grid-template-columns: 48px 1fr auto; gap: 0.85rem;
+    padding: 1rem 1.25rem; background: var(--bg-warm);
+    border: 1px solid var(--line); border-radius: var(--r);
+    text-decoration: none; color: inherit; align-items: center;
+    transition: border-color 0.15s ease;
+  }
+  .related-card:hover { border-color: var(--p-300); }
+  .related-green { border-left: 3px solid var(--green); }
+  .related-amber { border-left: 3px solid var(--amber); }
+  .related-red { border-left: 3px solid var(--red); }
+  .related-logo {
+    width: 48px; height: 48px; border-radius: 12px;
+    background: linear-gradient(135deg, var(--p-100), var(--p-200));
+    color: var(--p-700);
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--sans); font-weight: 800; font-size: 1rem; letter-spacing: -0.02em;
+  }
+  .related-card > div { display: flex; flex-direction: column; gap: 0.15rem; }
+  .related-card strong { color: var(--ink); font-weight: 700; font-size: 0.98rem; }
+  .related-card span:not(strong) {
+    font-family: var(--mono); font-size: 0.72rem; color: var(--p-700);
+  }
+  .related-card svg { width: 14px; height: 14px; color: var(--p-500); }
+  .related-all { text-align: center; margin: 0; }
+  .related-all a {
+    color: var(--p-700); text-decoration: none;
+    border-bottom: 1px dashed var(--p-300); font-weight: 600;
+  }
+</style>

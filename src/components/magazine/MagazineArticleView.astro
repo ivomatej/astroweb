@@ -1,0 +1,293 @@
+---
+/**
+ * Shared visual composition for a magazine article detail. Extracted from
+ * `src/pages/magazin/[slug].astro` so the public page and the admin
+ * draft-preview route render the article identically.
+ *
+ * `otherArticles` ("Další v magazínu") depends on the build-time published
+ * list, which is empty in the preview deployment — the section simply hides
+ * when the list is empty. The article itself (the thing being edited) and its
+ * author come live via the token in the preview route.
+ */
+import type { MagazineArticle } from "../../data/magazine";
+import { magazineKindMeta } from "../../data/magazine";
+
+/**
+ * Only the byline fields the author card renders. `AuthorProfile` (public page)
+ * and the backend `author` payload (preview route) are both structurally
+ * assignable, so neither caller needs to coerce.
+ */
+interface MagazineByline {
+  slug: string;
+  name: string;
+  role?: string;
+  initials?: string;
+}
+
+interface Props {
+  article: MagazineArticle;
+  author?: MagazineByline;
+  otherArticles?: MagazineArticle[];
+}
+
+const { article, author, otherArticles = [] } = Astro.props;
+const kindMeta = magazineKindMeta[article.kind];
+
+function formatCzechDate(iso: string): string {
+  const d = new Date(iso);
+  return `${d.getDate()}. ${d.getMonth() + 1}. ${d.getFullYear()}`;
+}
+---
+
+<article class={`mag-detail mag-tone-${kindMeta.tone}`}>
+  <header class="mag-hero">
+    <div class="inner">
+      <div class="hero-meta">
+        <span class={`mag-kind mag-kind-${kindMeta.tone}`}>{kindMeta.label}</span>
+        {article.category && <span class="mag-category">{article.category}</span>}
+        <time datetime={article.publishedAt}>{formatCzechDate(article.publishedAt)}</time>
+      </div>
+      <h1 class="mag-title">{article.title}</h1>
+      <p class="mag-perex">{article.perex}</p>
+      {author && (
+        <div class="hero-author">
+          <a href={`/autor/${author.slug}/`} class="author-card">
+            <div class="author-avatar">{author.initials ?? author.name.slice(0, 2)}</div>
+            <div>
+              <strong>{author.name}</strong>
+              <span>{author.role}</span>
+            </div>
+          </a>
+          <span class="reading-time">{article.readingTimeMin} min čtení</span>
+        </div>
+      )}
+    </div>
+  </header>
+
+  <section class="mag-body">
+    <div class="inner mag-body-inner">
+      <div class="prose" set:html={article.bodyHtml} />
+
+      {
+        article.sources && article.sources.length > 0 && (
+          <aside class="sources-block">
+            <h3>Zdroje</h3>
+            <ul>
+              {article.sources.map((s) => (
+                <li>
+                  <a href={s.href} rel="noopener" target="_blank">
+                    {s.label}
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+                      <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+                      <polyline points="15 3 21 3 21 9" />
+                      <line x1="10" y1="14" x2="21" y2="3" />
+                    </svg>
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </aside>
+        )
+      }
+
+      {
+        article.relatedHrefs && article.relatedHrefs.length > 0 && (
+          <aside class="related-block">
+            <h3>Související</h3>
+            <ul>
+              {article.relatedHrefs.map((r) => (
+                <li>
+                  <a href={r.href}>{r.title}</a>
+                </li>
+              ))}
+            </ul>
+          </aside>
+        )
+      }
+    </div>
+  </section>
+
+  {
+    otherArticles.length > 0 && (
+      <section class="mag-other">
+        <div class="inner">
+          <h2>Další v magazínu</h2>
+          <ul class="other-list">
+            {otherArticles.map((a) => (
+              <li>
+                <a href={`/magazin/${a.slug}/`}>
+                  <span class={`mag-kind mag-kind-${magazineKindMeta[a.kind].tone}`}>{magazineKindMeta[a.kind].label}</span>
+                  <strong>{a.title}</strong>
+                  <time datetime={a.publishedAt}>{formatCzechDate(a.publishedAt)}</time>
+                </a>
+              </li>
+            ))}
+          </ul>
+          <p class="other-all">
+            <a href="/magazin/">Všechny články v magazínu</a>
+          </p>
+        </div>
+      </section>
+    )
+  }
+</article>
+
+<style>
+  .inner { max-width: var(--max-w); margin: 0 auto; padding: clamp(2.5rem, 5vw, 4rem) var(--gutter); }
+
+  /* HERO */
+  .mag-hero {
+    background:
+      radial-gradient(900px circle at 90% 0%, rgba(149, 114, 240, 0.14), transparent 55%),
+      var(--bg);
+    border-bottom: 1px solid var(--line);
+  }
+  .mag-tone-red .mag-hero {
+    background:
+      radial-gradient(900px circle at 90% 0%, rgba(185, 28, 28, 0.12), transparent 55%),
+      var(--bg);
+  }
+  .mag-tone-amber .mag-hero {
+    background:
+      radial-gradient(900px circle at 90% 0%, rgba(180, 83, 9, 0.12), transparent 55%),
+      var(--bg);
+  }
+  .mag-tone-green .mag-hero {
+    background:
+      radial-gradient(900px circle at 90% 0%, rgba(21, 128, 61, 0.12), transparent 55%),
+      var(--bg);
+  }
+
+  .hero-meta {
+    display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem;
+    margin-bottom: 1.25rem;
+  }
+  .mag-kind {
+    font-family: var(--mono); font-size: 0.72rem;
+    text-transform: uppercase; letter-spacing: 0.08em;
+    padding: 0.25rem 0.6rem; border-radius: 99px; font-weight: 700;
+  }
+  .mag-kind-green { background: var(--green-bg); color: var(--green); }
+  .mag-kind-amber { background: var(--amber-bg); color: var(--amber); }
+  .mag-kind-red { background: var(--red-bg); color: var(--red); }
+  .mag-kind-purple { background: var(--p-50); color: var(--p-700); }
+  .mag-category {
+    font-family: var(--mono); font-size: 0.72rem;
+    color: var(--muted); padding: 0.15rem 0.55rem;
+    background: var(--bg-warm); border-radius: 4px;
+  }
+  .hero-meta time { font-family: var(--mono); font-size: 0.85rem; color: var(--muted); }
+
+  .mag-title {
+    font-family: var(--sans); font-size: clamp(1.8rem, 4vw, 2.6rem);
+    font-weight: 800; letter-spacing: -0.025em;
+    color: var(--ink); line-height: 1.15; margin: 0 0 1rem; max-width: 22ch;
+  }
+  .mag-perex {
+    font-size: 1.15rem; line-height: 1.55; color: var(--ink-soft);
+    margin: 0 0 1.5rem; max-width: 60ch;
+  }
+  .hero-author {
+    display: flex; flex-wrap: wrap; align-items: center; gap: 1rem;
+  }
+  .author-card {
+    display: inline-flex; align-items: center; gap: 0.75rem;
+    padding: 0.6rem 0.85rem; background: var(--bg);
+    border: 1px solid var(--line); border-radius: var(--r);
+    text-decoration: none; color: inherit;
+    transition: border-color 0.15s ease;
+  }
+  .author-card:hover { border-color: var(--p-300); }
+  .author-avatar {
+    width: 36px; height: 36px; border-radius: 50%;
+    background: var(--p-100); color: var(--p-700);
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--mono); font-weight: 700; font-size: 0.75rem;
+  }
+  .author-card strong { display: block; font-size: 0.9rem; color: var(--ink); }
+  .author-card span { font-size: 0.78rem; color: var(--muted); }
+  .reading-time {
+    font-family: var(--mono); font-size: 0.78rem; color: var(--muted);
+  }
+
+  /* BODY */
+  .mag-body { background: var(--bg); border-bottom: 1px solid var(--line); }
+  .mag-body-inner { max-width: var(--max-w-text); }
+  .prose :global(h2) {
+    font-family: var(--sans); font-size: clamp(1.25rem, 2.5vw, 1.6rem);
+    font-weight: 800; color: var(--ink); letter-spacing: -0.015em;
+    margin: 2rem 0 1rem; padding-bottom: 0.5rem;
+    border-bottom: 2px solid var(--p-200);
+  }
+  .prose :global(p) {
+    margin: 0 0 1rem; line-height: 1.75; color: var(--text); font-size: 1.02rem;
+  }
+  .prose :global(ul), .prose :global(ol) {
+    margin: 0 0 1.25rem; padding: 0 0 0 1.5rem;
+  }
+  .prose :global(li) {
+    margin: 0 0 0.45rem; line-height: 1.65; color: var(--text);
+  }
+  .prose :global(strong) { color: var(--ink); font-weight: 700; }
+  .prose :global(a) {
+    color: var(--p-700); text-decoration: none;
+    border-bottom: 1px dashed var(--p-300);
+  }
+  .prose :global(.callout) {
+    padding: 1.1rem 1.4rem; background: var(--amber-bg);
+    border: 1px solid rgba(180, 83, 9, 0.2);
+    border-left: 4px solid var(--amber); border-radius: var(--r);
+    margin: 1.25rem 0; font-size: 0.95rem; line-height: 1.65;
+  }
+  .prose :global(.callout.warning) {
+    background: var(--red-bg); border-color: rgba(185, 28, 28, 0.2);
+    border-left-color: var(--red);
+  }
+
+  .sources-block, .related-block {
+    margin-top: 2rem; padding: 1.25rem 1.5rem;
+    background: var(--bg-warm); border: 1px solid var(--line);
+    border-left: 3px solid var(--p-500); border-radius: var(--r);
+  }
+  .sources-block h3, .related-block h3 {
+    margin: 0 0 0.75rem; font-size: 1rem; font-weight: 700; color: var(--ink);
+  }
+  .sources-block ul, .related-block ul {
+    list-style: none; padding: 0; margin: 0;
+    display: flex; flex-direction: column; gap: 0.4rem;
+  }
+  .sources-block li a, .related-block li a {
+    display: inline-flex; align-items: center; gap: 0.4rem;
+    color: var(--p-700); text-decoration: none;
+    font-size: 0.92rem; font-weight: 600;
+    border-bottom: 1px dashed var(--p-300);
+  }
+  .sources-block svg, .related-block svg { width: 12px; height: 12px; }
+
+  /* OTHER */
+  .mag-other { background: var(--bg-warm); }
+  .mag-other h2 {
+    font-family: var(--sans); font-size: clamp(1.3rem, 2.5vw, 1.7rem);
+    font-weight: 800; color: var(--ink); margin: 0 0 1.5rem; letter-spacing: -0.02em;
+  }
+  .other-list {
+    list-style: none; padding: 0; margin: 0 0 1.25rem;
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.75rem;
+  }
+  @media (max-width: 800px) { .other-list { grid-template-columns: 1fr; } }
+  .other-list li a {
+    display: flex; flex-direction: column; gap: 0.5rem;
+    padding: 1.1rem 1.25rem; background: var(--bg);
+    border: 1px solid var(--line); border-radius: var(--r);
+    text-decoration: none; color: inherit;
+    transition: transform 0.15s ease, border-color 0.15s ease;
+  }
+  .other-list li a:hover { transform: translateY(-2px); border-color: var(--p-300); }
+  .other-list strong { color: var(--ink); font-weight: 700; font-size: 0.95rem; line-height: 1.4; }
+  .other-list time { font-family: var(--mono); font-size: 0.75rem; color: var(--muted); }
+  .other-all { text-align: center; margin: 0; }
+  .other-all a {
+    color: var(--p-700); text-decoration: none;
+    border-bottom: 1px dashed var(--p-300); font-weight: 600;
+  }
+</style>

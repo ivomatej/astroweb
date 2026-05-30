@@ -58,7 +58,13 @@ function backendToCategory(c: BackendGlossaryCategory): GlossaryCategory {
   };
 }
 
-function backendToTerm(t: BackendGlossaryTerm): GlossaryTerm {
+/** Build a frontend GlossaryCategory from the backend `{slug,name}` + UI heuristic. */
+export function glossaryCategoryFromBackend(c: { slug: string; name: string }): GlossaryCategory {
+  const ui = CATEGORY_UI[c.slug] ?? { tone: "purple" as const, icon: "lab" as const };
+  return { slug: c.slug, name: c.name, description: "", tone: ui.tone, icon: ui.icon };
+}
+
+export function backendToTerm(t: BackendGlossaryTerm): GlossaryTerm {
   return {
     slug: t.slug,
     term: t.term,

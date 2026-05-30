@@ -20,16 +20,22 @@ function apiBase(): string {
   );
 }
 
-export type PreviewResult =
-  | { ok: true; article: Article }
-  | { ok: false; status: number; message: string };
+export type PreviewError = { ok: false; status: number; message: string };
+export type PreviewResult = { ok: true; article: Article } | PreviewError;
+export type PreviewRaw<T> = { ok: true; data: T } | PreviewError;
 
 /**
- * Fetches an unpublished article through the token-gated preview endpoint and
- * maps it into the frontend `Article` shape (same component tree as published).
+ * Fetches one unpublished item of any kind through the token-gated preview
+ * endpoint (`/preview/<kind>/<slug>`). Returns the raw backend payload; each
+ * preview route maps it into its own frontend shape. The `kind` here is the
+ * API kind (articles, glossary, interviews, …), NOT the Astro route prefix.
  */
-export async function fetchPreviewArticle(slug: string, token: string): Promise<PreviewResult> {
-  const url = `${apiBase()}/preview/articles/${encodeURIComponent(slug)}?token=${encodeURIComponent(token)}`;
+export async function fetchPreview<T = unknown>(
+  kind: string,
+  slug: string,
+  token: string,
+): Promise<PreviewRaw<T>> {
+  const url = `${apiBase()}/preview/${kind}/${encodeURIComponent(slug)}?token=${encodeURIComponent(token)}`;
 
   let res: Response;
   try {
@@ -49,11 +55,20 @@ export async function fetchPreviewArticle(slug: string, token: string): Promise<
       res.status === 401
         ? 'Náhledový odkaz vypršel nebo je neplatný. Otevři náhled znovu z administrace.'
         : res.status === 404
-          ? 'Článek nebyl nalezen.'
+          ? 'Položka nebyla nalezena.'
           : `Chyba backendu (${res.status}). ${detail.slice(0, 160)}`;
     return { ok: false, status: res.status, message };
   }
 
-  const { data } = (await res.json()) as { data: BackendArticle };
-  return { ok: true, article: mapBackendArticle(data) };
+  const { data } = (await res.json()) as { data: T };
+  return { ok: true, data };
+}
+
+/**
+ * Article-specific wrapper kept for the /preview/clanek route: fetches + maps
+ * into the frontend `Article` shape (same component tree as published).
+ */
+export async function fetchPreviewArticle(slug: string, token: string): Promise<PreviewResult> {
+  const r = await fetchPreview<BackendArticle>('articles', slug, token);
+  return r.ok ? { ok: true, article: mapBackendArticle(r.data) } : r;
 }

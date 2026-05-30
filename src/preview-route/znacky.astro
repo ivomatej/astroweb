@@ -1,0 +1,35 @@
+---
+/**
+ * Admin draft preview for a brand profile — SSR, on-demand. Lives outside
+ * src/pages; injected only by astro.config.preview.mjs at /preview/znacky/[slug].
+ * Renders through the same <BrandView> as the public page.
+ *
+ * Related brands depend on the build-time published list, which is empty in the
+ * preview deployment — that's fine, the brand itself (the thing being edited)
+ * comes live via the token, so relatedBrands defaults to []. The backend stores
+ * only a subset of the rich Brand shape; backendToBrand leaves the rest
+ * undefined and BrandView guards them.
+ */
+export const prerender = false;
+
+import PreviewShell from "../components/preview/PreviewShell.astro";
+import BrandView from "../components/brand/BrandView.astro";
+import { fetchPreview } from "../lib/preview-api";
+import { backendToBrand } from "../data/brands";
+import type { BackendBrand } from "../lib/contenta-api";
+
+const slug = Astro.params.slug ?? "";
+const token = Astro.url.searchParams.get("token") ?? "";
+
+const result =
+  !slug || !token
+    ? ({ ok: false, status: 400, message: "Chybí parametr slug nebo token." } as const)
+    : await fetchPreview<BackendBrand>("brands", slug, token);
+
+const brand = result.ok ? backendToBrand(result.data) : null;
+const pageTitle = brand ? `Náhled: ${brand.name}` : "Náhled značky";
+---
+
+<PreviewShell pageTitle={pageTitle} error={result.ok ? undefined : result}>
+  {brand && <BrandView brand={brand} />}
+</PreviewShell>

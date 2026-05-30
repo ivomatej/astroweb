@@ -1,0 +1,53 @@
+---
+/**
+ * Admin draft preview for a category — SSR, on-demand. Injected at
+ * /preview/kategorie/[slug] by astro.config.preview.mjs.
+ *
+ * A category page is a LISTING (header + article cards). Only the category's
+ * own editable fields (name, tagline, description, hero image, editorial note)
+ * are previewable here — the article list depends on the build-time published
+ * feed (empty in the preview deployment), so we render just the header plus a
+ * note. Editors see exactly how the category header will look on the web.
+ */
+export const prerender = false;
+
+import PreviewShell from "../components/preview/PreviewShell.astro";
+import CategoryHeader from "../components/category/CategoryHeader.astro";
+import { backendToCategory } from "../data/categories";
+import { fetchPreview } from "../lib/preview-api";
+import type { BackendCategory } from "../lib/contenta-api";
+
+const slug = Astro.params.slug ?? "";
+const token = Astro.url.searchParams.get("token") ?? "";
+
+const result =
+  !slug || !token
+    ? ({ ok: false, status: 400, message: "Chybí parametr slug nebo token." } as const)
+    : await fetchPreview<BackendCategory>("categories", slug, token);
+
+const category = result.ok ? backendToCategory(result.data) : null;
+const pageTitle = category ? `Náhled: ${category.name}` : "Náhled kategorie";
+---
+
+<PreviewShell pageTitle={pageTitle} error={result.ok ? undefined : result}>
+  {category && (
+    <>
+      <CategoryHeader category={category} articleCount={category.articleCount} />
+      <p class="cat-preview-note">
+        Výpis článků se zobrazuje jen na živém webu — zde vidíš podobu hlavičky
+        kategorie (název, popis, obrázek, redakční poznámka).
+      </p>
+    </>
+  )}
+</PreviewShell>
+
+<style>
+  .cat-preview-note {
+    max-width: var(--max-w, 1100px);
+    margin: 1.5rem auto;
+    padding: 0 var(--gutter, 1.25rem);
+    font-size: 0.9rem;
+    color: var(--muted, #64748b);
+    font-style: italic;
+  }
+</style>

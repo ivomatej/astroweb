@@ -21,10 +21,20 @@ function previewRoutes() {
     name: 'contenta-preview-routes',
     hooks: {
       'astro:config:setup': ({ injectRoute }) => {
-        injectRoute({
-          pattern: '/preview/clanek/[slug]',
-          entrypoint: './src/preview-route/clanek.astro',
-        });
+        const routes = [
+          ['/preview/clanek/[slug]', './src/preview-route/clanek.astro'],
+          ['/preview/slovnik/pojem/[slug]', './src/preview-route/slovnik-pojem.astro'],
+          ['/preview/rozhovory/[slug]', './src/preview-route/rozhovory.astro'],
+          ['/preview/recenze-eshopu/[slug]', './src/preview-route/recenze-eshopu.astro'],
+          ['/preview/kariera/[slug]', './src/preview-route/kariera.astro'],
+          ['/preview/magazin/[slug]', './src/preview-route/magazin.astro'],
+          ['/preview/autor/[slug]', './src/preview-route/autor.astro'],
+          ['/preview/znacky/[slug]', './src/preview-route/znacky.astro'],
+          ['/preview/kategorie/[slug]', './src/preview-route/kategorie.astro'],
+        ];
+        for (const [pattern, entrypoint] of routes) {
+          injectRoute({ pattern, entrypoint });
+        }
       },
     },
   };

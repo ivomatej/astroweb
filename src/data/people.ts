@@ -11,7 +11,7 @@
 import type { AuthorProfile } from "../types/author";
 import { fetchAuthors, type BackendAuthor } from "../lib/contenta-api";
 
-function backendToAuthor(a: BackendAuthor): AuthorProfile {
+export function backendToAuthor(a: BackendAuthor): AuthorProfile {
   return {
     slug: a.slug,
     name: a.name,

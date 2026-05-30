@@ -1,0 +1,32 @@
+---
+/**
+ * Admin draft preview for an eshop review — SSR, on-demand. Lives outside
+ * src/pages; injected only by astro.config.preview.mjs at /preview/recenze-eshopu/[slug].
+ * Renders through the same <EshopReviewView> as the public page.
+ *
+ * The "other reviews" aside depends on the build-time published list, which is
+ * empty in the preview deployment — that's fine, the section hides itself. The
+ * review being edited comes live via the token.
+ */
+export const prerender = false;
+
+import PreviewShell from "../components/preview/PreviewShell.astro";
+import EshopReviewView from "../components/eshop/EshopReviewView.astro";
+import { fetchPreview } from "../lib/preview-api";
+import { backendToEshop, type BackendEshop } from "../data/eshops";
+
+const slug = Astro.params.slug ?? "";
+const token = Astro.url.searchParams.get("token") ?? "";
+
+const result =
+  !slug || !token
+    ? ({ ok: false, status: 400, message: "Chybí parametr slug nebo token." } as const)
+    : await fetchPreview<BackendEshop>("eshops", slug, token);
+
+const eshop = result.ok ? backendToEshop(result.data) : null;
+const pageTitle = eshop ? `Náhled: ${eshop.name}` : "Náhled recenze e-shopu";
+---
+
+<PreviewShell pageTitle={pageTitle} error={result.ok ? undefined : result}>
+  {eshop && <EshopReviewView eshop={eshop} />}
+</PreviewShell>

@@ -1,0 +1,94 @@
+---
+/**
+ * Shared chrome for every admin draft-preview route: the BaseLayout (noindex),
+ * the "Náhled konceptu" banner, and the error state. Each route renders its own
+ * <XView> into the default slot when the fetch succeeded.
+ *
+ * Usage:
+ *   <PreviewShell pageTitle={title} error={result.ok ? undefined : result}>
+ *     {result.ok && <GlossaryTermView ... />}
+ *   </PreviewShell>
+ */
+import BaseLayout from "../../layouts/BaseLayout.astro";
+
+interface Props {
+  pageTitle: string;
+  error?: { status: number; message: string };
+}
+
+const { pageTitle, error } = Astro.props;
+---
+
+<BaseLayout title={pageTitle} noIndex>
+  <div class="preview-banner" role="status">
+    <span class="preview-dot" aria-hidden="true"></span>
+    <span class="preview-label">Náhled konceptu</span>
+    <span class="preview-sub">Takto bude položka vypadat na webu. Stránka není veřejná ani indexovaná.</span>
+  </div>
+
+  {error ? (
+    <div class="preview-error">
+      <h1>Náhled se nepodařilo načíst</h1>
+      <p>{error.message}</p>
+      <p class="preview-error-code">Kód: {error.status}</p>
+    </div>
+  ) : (
+    <slot />
+  )}
+</BaseLayout>
+
+<style>
+  .preview-banner {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.55rem 1rem;
+    background: #1f2937;
+    color: #fff;
+    font-family: var(--mono, ui-monospace, monospace);
+    font-size: 12.5px;
+    position: sticky;
+    top: 0;
+    z-index: 50;
+  }
+
+  .preview-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 999px;
+    background: #f59e0b;
+    box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.25);
+    flex-shrink: 0;
+  }
+
+  .preview-label {
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+
+  .preview-sub {
+    color: #cbd5e1;
+    font-size: 11.5px;
+  }
+
+  .preview-error {
+    max-width: 640px;
+    margin: 4rem auto;
+    padding: 2rem 1.25rem;
+    text-align: center;
+  }
+
+  .preview-error h1 {
+    font-size: 1.4rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .preview-error-code {
+    margin-top: 1rem;
+    font-family: var(--mono, ui-monospace, monospace);
+    font-size: 12px;
+    color: #64748b;
+  }
+</style>

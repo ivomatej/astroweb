@@ -1,0 +1,362 @@
+---
+/**
+ * Shared visual composition for a glossary term detail. Extracted from
+ * `src/pages/slovnik/pojem/[slug].astro` so the public page and the admin
+ * draft-preview route render the term identically.
+ */
+import type { GlossaryCategory, GlossaryTerm } from "../../data/glossary";
+
+interface Props {
+  term: GlossaryTerm;
+  category?: GlossaryCategory;
+  relatedTerms?: GlossaryTerm[];
+  sameCatTerms?: GlossaryTerm[];
+}
+
+const { term, category, relatedTerms = [], sameCatTerms = [] } = Astro.props;
+
+function formatCzechDate(iso: string): string {
+  const d = new Date(iso);
+  return `${d.getDate()}. ${d.getMonth() + 1}. ${d.getFullYear()}`;
+}
+---
+
+<!-- ============ HERO ============ -->
+<header class={`term-hero term-tone-${category?.tone ?? "purple"}`}>
+  <div class="inner">
+    {category && (
+      <a href={`/slovnik/${category.slug}/`} class={`term-cat-link term-cat-${category.tone}`}>
+        {category.name}
+      </a>
+    )}
+    <h1 class="term-title">{term.term}</h1>
+    <p class="term-short">{term.shortDef}</p>
+    {
+      term.aliases && term.aliases.length > 0 && (
+        <div class="term-aliases">
+          <span class="aliases-label">Také známé jako:</span>
+          <ul>
+            {term.aliases.map((a) => (
+              <li>{a}</li>
+            ))}
+          </ul>
+        </div>
+      )
+    }
+    <div class="term-meta">
+      <span>
+        <strong>Aktualizováno:</strong> <time datetime={term.updatedAt}>{formatCzechDate(term.updatedAt)}</time>
+      </span>
+      {term.approvedBy && (
+        <span>
+          <strong>Schválil:</strong> {term.approvedBy}
+        </span>
+      )}
+    </div>
+  </div>
+</header>
+
+<!-- ============ MAIN CONTENT ============ -->
+<section class="term-section">
+  <div class="inner term-grid">
+    <article class="term-body">
+      <div class="term-prose" set:html={term.longDefHtml} />
+
+      {
+        term.sourceUrl && (
+          <div class="source-box">
+            <span class="source-label">Primární zdroj</span>
+            <a href={term.sourceUrl} rel="noopener" target="_blank" class="source-link">
+              {term.sourceUrl.replace(/^https?:\/\//, "").slice(0, 70)}
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+                <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+                <polyline points="15 3 21 3 21 9" />
+                <line x1="10" y1="14" x2="21" y2="3" />
+              </svg>
+            </a>
+          </div>
+        )
+      }
+
+      {
+        term.relatedArticles && term.relatedArticles.length > 0 && (
+          <div class="related-block">
+            <h2>Související články</h2>
+            <ul>
+              {term.relatedArticles.map((a) => (
+                <li>
+                  <a href={a.href}>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                      <polyline points="14 2 14 8 20 8" />
+                    </svg>
+                    {a.title}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )
+      }
+    </article>
+
+    <aside class="term-aside">
+      {
+        relatedTerms.length > 0 && (
+          <div class="aside-card">
+            <span class="aside-eyebrow">Související termíny</span>
+            <ul class="aside-related">
+              {relatedTerms.map((rt) => (
+                <li>
+                  <a href={`/slovnik/pojem/${rt.slug}/`}>
+                    <strong>{rt.term}</strong>
+                    <span>{rt.shortDef.slice(0, 80)}…</span>
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )
+      }
+
+      {
+        category && sameCatTerms.length > 0 && (
+          <div class="aside-card">
+            <span class="aside-eyebrow">Další z kategorie {category.name}</span>
+            <ul class="aside-list">
+              {sameCatTerms.map((t) => (
+                <li>
+                  <a href={`/slovnik/pojem/${t.slug}/`}>{t.term}</a>
+                </li>
+              ))}
+            </ul>
+            <a href={`/slovnik/${category.slug}/`} class="aside-cta">
+              Všechny v kategorii
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+                <line x1="5" y1="12" x2="19" y2="12" />
+                <polyline points="12 5 19 12 12 19" />
+              </svg>
+            </a>
+          </div>
+        )
+      }
+
+      <div class="aside-card aside-help">
+        <span class="aside-eyebrow">Něco chybí?</span>
+        <p>
+          Pokud vám v definici chybí důležitá informace nebo máte k termínu otázku, napište na <a href="mailto:redakce@recenzer.cz">redakce@recenzer.cz</a>.
+        </p>
+      </div>
+    </aside>
+  </div>
+</section>
+
+<style>
+  .inner { max-width: var(--max-w); margin: 0 auto; padding: clamp(2rem, 4vw, 3rem) var(--gutter); }
+
+  /* HERO */
+  .term-hero {
+    background:
+      radial-gradient(900px circle at 90% 0%, rgba(149, 114, 240, 0.14), transparent 55%),
+      var(--bg);
+    border-bottom: 1px solid var(--line);
+  }
+  .term-tone-amber {
+    background:
+      radial-gradient(900px circle at 90% 0%, rgba(180, 83, 9, 0.12), transparent 55%),
+      var(--bg);
+  }
+  .term-tone-green {
+    background:
+      radial-gradient(900px circle at 90% 0%, rgba(21, 128, 61, 0.12), transparent 55%),
+      var(--bg);
+  }
+  .term-tone-red {
+    background:
+      radial-gradient(900px circle at 90% 0%, rgba(185, 28, 28, 0.12), transparent 55%),
+      var(--bg);
+  }
+  .term-tone-blue {
+    background:
+      radial-gradient(900px circle at 90% 0%, rgba(10, 79, 163, 0.12), transparent 55%),
+      var(--bg);
+  }
+  .term-hero .inner { padding: clamp(2.5rem, 4vw, 3.5rem) var(--gutter); }
+
+  .term-cat-link {
+    display: inline-block; font-family: var(--mono);
+    font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.1em;
+    font-weight: 700; padding: 0.25rem 0.6rem; border-radius: 99px;
+    background: var(--p-50); color: var(--p-700);
+    text-decoration: none; margin-bottom: 1rem;
+  }
+  .term-cat-link:hover { background: var(--p-100); }
+  .term-cat-amber { background: var(--amber-bg); color: var(--amber); }
+  .term-cat-green { background: var(--green-bg); color: var(--green); }
+  .term-cat-red { background: var(--red-bg); color: var(--red); }
+  .term-cat-blue { background: #e8f0fa; color: #0a4fa3; }
+
+  .term-title {
+    font-family: var(--sans); font-size: clamp(1.8rem, 4.2vw, 2.8rem);
+    font-weight: 800; letter-spacing: -0.025em; color: var(--ink);
+    line-height: 1.1; margin: 0 0 1rem;
+  }
+  .term-short {
+    font-size: 1.15rem; line-height: 1.5; color: var(--ink-soft);
+    margin: 0 0 1.25rem; max-width: 60ch;
+  }
+  .term-aliases {
+    padding: 0.85rem 1.1rem; background: var(--bg);
+    border: 1px solid var(--line); border-radius: var(--r);
+    margin-bottom: 1rem; max-width: 60ch;
+  }
+  .aliases-label {
+    font-family: var(--mono); font-size: 0.7rem;
+    text-transform: uppercase; letter-spacing: 0.08em;
+    color: var(--p-700); font-weight: 700; margin-right: 0.6rem;
+  }
+  .term-aliases ul {
+    list-style: none; padding: 0; margin: 0;
+    display: inline-flex; flex-wrap: wrap; gap: 0.4rem;
+  }
+  .term-aliases li {
+    font-family: var(--mono); font-size: 0.82rem;
+    color: var(--ink); padding: 0.15rem 0.5rem;
+    background: var(--bg-warm); border-radius: 4px;
+  }
+  .term-meta {
+    display: flex; flex-wrap: wrap; gap: 0.5rem 1.5rem;
+    font-size: 0.85rem; color: var(--muted);
+  }
+  .term-meta strong { color: var(--ink); font-weight: 600; }
+
+  /* MAIN */
+  .term-section { background: var(--bg-warm); border-bottom: 1px solid var(--line); }
+  .term-grid {
+    display: grid; grid-template-columns: 1fr 320px; gap: 2rem;
+    align-items: start;
+  }
+  @media (max-width: 900px) { .term-grid { grid-template-columns: 1fr; } }
+
+  .term-body {
+    padding: 2rem; background: var(--bg);
+    border: 1px solid var(--line); border-radius: var(--r-lg);
+  }
+  .term-prose :global(p) {
+    margin: 0 0 1rem; line-height: 1.75; color: var(--text); font-size: 1rem;
+  }
+  .term-prose :global(p:last-child) { margin-bottom: 0; }
+  .term-prose :global(ul) {
+    margin: 0.85rem 0 1.25rem; padding: 0;
+    list-style: none; display: flex; flex-direction: column; gap: 0.5rem;
+  }
+  .term-prose :global(li) {
+    position: relative; padding-left: 1.5rem;
+    font-size: 0.95rem; line-height: 1.65; color: var(--text);
+  }
+  .term-prose :global(li)::before {
+    content: "›"; position: absolute; left: 0;
+    color: var(--p-700); font-weight: 800; font-size: 1.05rem;
+  }
+  .term-prose :global(strong) { color: var(--ink); font-weight: 700; }
+  .term-prose :global(em) { font-style: italic; color: var(--p-700); }
+
+  .source-box {
+    margin-top: 1.5rem; padding: 1rem 1.25rem;
+    background: var(--green-bg); border-left: 3px solid var(--green);
+    border-radius: var(--r-sm);
+  }
+  .source-label {
+    display: block; font-family: var(--mono);
+    font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.08em;
+    color: var(--green); font-weight: 700; margin-bottom: 0.35rem;
+  }
+  .source-link {
+    display: inline-flex; align-items: center; gap: 0.35rem;
+    font-family: var(--mono); font-size: 0.85rem;
+    color: var(--green); text-decoration: none;
+    border-bottom: 1px dashed rgba(21, 128, 61, 0.4); font-weight: 600;
+    word-break: break-all;
+  }
+  .source-link svg { width: 12px; height: 12px; flex-shrink: 0; }
+
+  .related-block {
+    margin-top: 1.75rem; padding-top: 1.5rem;
+    border-top: 1px dashed var(--line);
+  }
+  .related-block h2 {
+    margin: 0 0 0.85rem; font-size: 1.15rem;
+    font-weight: 700; color: var(--ink);
+  }
+  .related-block ul {
+    list-style: none; padding: 0; margin: 0;
+    display: flex; flex-direction: column; gap: 0.5rem;
+  }
+  .related-block li a {
+    display: inline-flex; align-items: center; gap: 0.5rem;
+    padding: 0.6rem 0.85rem; background: var(--bg-warm);
+    border-radius: var(--r-sm); color: var(--p-700);
+    font-weight: 600; font-size: 0.92rem;
+    text-decoration: none; border-left: 3px solid var(--p-500);
+    transition: background 0.15s ease;
+  }
+  .related-block li a:hover { background: var(--p-50); }
+  .related-block svg { width: 14px; height: 14px; }
+
+  /* ASIDE */
+  .term-aside {
+    display: flex; flex-direction: column; gap: 1rem;
+    position: sticky; top: 1rem;
+  }
+  @media (max-width: 900px) { .term-aside { position: static; } }
+  .aside-card {
+    padding: 1.25rem; background: var(--bg);
+    border: 1px solid var(--line); border-radius: var(--r-lg);
+  }
+  .aside-eyebrow {
+    display: block; font-family: var(--mono);
+    font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.08em;
+    color: var(--p-700); font-weight: 700; margin-bottom: 0.85rem;
+  }
+  .aside-related {
+    list-style: none; padding: 0; margin: 0;
+    display: flex; flex-direction: column; gap: 0.55rem;
+  }
+  .aside-related li a {
+    display: flex; flex-direction: column; gap: 0.15rem;
+    padding: 0.7rem 0.85rem; background: var(--bg-warm);
+    border-radius: var(--r-sm); color: var(--ink);
+    text-decoration: none; border-left: 2px solid var(--p-500);
+    transition: background 0.15s ease;
+  }
+  .aside-related li a:hover { background: var(--p-50); }
+  .aside-related strong { font-size: 0.92rem; font-weight: 700; color: var(--ink); }
+  .aside-related span { font-size: 0.78rem; color: var(--muted); line-height: 1.45; }
+
+  .aside-list {
+    list-style: none; padding: 0; margin: 0 0 0.85rem;
+    display: flex; flex-direction: column; gap: 0.35rem;
+  }
+  .aside-list li a {
+    display: block; padding: 0.5rem 0.75rem;
+    color: var(--ink); text-decoration: none; font-size: 0.88rem;
+    border-radius: var(--r-sm); transition: background 0.15s ease;
+  }
+  .aside-list li a:hover { background: var(--bg-warm); color: var(--p-700); }
+  .aside-cta {
+    display: inline-flex; align-items: center; gap: 0.4rem;
+    font-size: 0.82rem; color: var(--p-700);
+    text-decoration: none; font-weight: 600;
+    border-bottom: 1px dashed var(--p-300);
+  }
+  .aside-cta svg { width: 11px; height: 11px; }
+
+  .aside-help { background: var(--bg-warm); border-color: var(--p-200); }
+  .aside-help p {
+    margin: 0; font-size: 0.85rem; line-height: 1.55; color: var(--text);
+  }
+  .aside-help a {
+    color: var(--p-700); text-decoration: none;
+    border-bottom: 1px dashed var(--p-300);
+  }
+</style>

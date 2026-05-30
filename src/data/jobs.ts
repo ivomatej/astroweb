@@ -33,7 +33,7 @@ export interface JobOffer {
   hiringManager: string;
 }
 
-interface BackendJob {
+export interface BackendJob {
   slug: string;
   href: string;
   title: string;
@@ -83,7 +83,7 @@ function formatCompensation(c: BackendJob["compensation"]): string {
   return range ? `${range}${periodLabel}${c.note ? ` · ${c.note}` : ""}` : c.note ?? "Dle dohody";
 }
 
-function backendToJob(j: BackendJob): JobOffer {
+export function backendToJob(j: BackendJob): JobOffer {
   return {
     slug: j.slug,
     title: j.title,

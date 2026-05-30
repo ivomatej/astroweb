@@ -1,0 +1,32 @@
+---
+/**
+ * Admin draft preview for a job offer — SSR, on-demand. Lives outside
+ * src/pages; injected only by astro.config.preview.mjs at /preview/kariera/[slug].
+ * Renders through the same <JobOfferView> as the public page.
+ *
+ * The "Další pozice" footer depends on the build-time published list, which is
+ * empty in the preview deployment — that's fine, the offer itself (the thing
+ * being edited) comes live via the token.
+ */
+export const prerender = false;
+
+import PreviewShell from "../components/preview/PreviewShell.astro";
+import JobOfferView from "../components/job/JobOfferView.astro";
+import { fetchPreview } from "../lib/preview-api";
+import { backendToJob, type BackendJob } from "../data/jobs";
+
+const slug = Astro.params.slug ?? "";
+const token = Astro.url.searchParams.get("token") ?? "";
+
+const result =
+  !slug || !token
+    ? ({ ok: false, status: 400, message: "Chybí parametr slug nebo token." } as const)
+    : await fetchPreview<BackendJob>("jobs", slug, token);
+
+const job = result.ok ? backendToJob(result.data) : null;
+const pageTitle = job ? `Náhled: ${job.title}` : "Náhled pozice";
+---
+
+<PreviewShell pageTitle={pageTitle} error={result.ok ? undefined : result}>
+  {job && <JobOfferView job={job} />}
+</PreviewShell>
