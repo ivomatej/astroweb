@@ -1,25 +1,64 @@
 ---
+/**
+ * Root-level dynamic route. Astro only allows ONE dynamic segment at the root,
+ * so this single resolver serves BOTH:
+ *   • category listing pages (/<category-slug>/) — the original behaviour, and
+ *   • static/editorial pages (/<page-slug>/) managed in the admin Pages module.
+ *
+ * getStaticPaths emits one entry per category and one per published page; the
+ * `type` prop tells the template which to render. Slugs must not collide
+ * (a category and a page with the same slug — category wins by source order).
+ */
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import CategoryHeader from "../../components/category/CategoryHeader.astro";
 import ArticleList from "../../components/category/ArticleList.astro";
+import PageBreadcrumbs from "../../components/page/PageBreadcrumbs.astro";
+import PageView from "../../components/page/PageView.astro";
 import { categories } from "../../data/categories";
 import { getArticleCardsByCategory } from "../../data/featured";
+import { pageList, getPageBySlug, type Page } from "../../data/pages";
+import type { Category } from "../../types/category";
 
-export function getStaticPaths() {
-  return categories.map((category) => ({
+export async function getStaticPaths() {
+  const catParams = categories.map((category) => ({
     params: { category: category.slug },
-    props: { category },
+    props: { type: "category" as const, category },
   }));
+
+  const catSlugs = new Set(categories.map((c) => c.slug));
+  const pageEntries = await Promise.all(
+    pageList
+      .filter((p) => !catSlugs.has(p.slug)) // category wins on collision
+      .map(async (p) => ({
+        params: { category: p.slug },
+        props: { type: "page" as const, page: await getPageBySlug(p.slug) },
+      })),
+  );
+
+  return [...catParams, ...pageEntries];
 }
 
-const { category } = Astro.props;
-const articles = getArticleCardsByCategory(category.slug);
+type Props =
+  | { type: "category"; category: Category }
+  | { type: "page"; page: Page };
+
+const props = Astro.props as Props;
 ---
 
-<BaseLayout
-  title={`${category.name} — recenze, testy a návody | Recenzer`}
-  description={category.description}
->
-  <CategoryHeader category={category} articleCount={articles.length} />
-  <ArticleList articles={articles} />
-</BaseLayout>
+{props.type === "category" ? (
+  <BaseLayout
+    title={`${props.category.name} — recenze, testy a návody | Recenzer`}
+    description={props.category.description}
+  >
+    <CategoryHeader category={props.category} articleCount={getArticleCardsByCategory(props.category.slug).length} />
+    <ArticleList articles={getArticleCardsByCategory(props.category.slug)} />
+  </BaseLayout>
+) : (
+  <BaseLayout
+    title={props.page.seo?.title ?? props.page.title}
+    description={props.page.seo?.description}
+  >
+    <PageBreadcrumbs items={[{ href: "/", label: "Recenzer" }, { label: props.page.title }]} />
+    <PageView page={props.page} />
+  </BaseLayout>
+)}

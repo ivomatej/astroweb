@@ -1,0 +1,65 @@
+---
+/**
+ * Generic static-page composition — title hero + block sections, rendered
+ * identically by the public page route and the admin draft-preview route.
+ * Reuses the article block CSS + <ArticleSection> so block HTML matches
+ * articles exactly. Single source of truth for the page look.
+ */
+import "../../styles/article-content.css";
+
+import type { Page } from "../../data/pages";
+import ArticleSection from "../article/ArticleSection.astro";
+
+interface Props {
+  page: Page;
+}
+
+const { page } = Astro.props;
+---
+
+<div class="page-doc">
+  <header class="page-doc-hero">
+    <h1 class="page-doc-title">{page.title}</h1>
+    {page.perex && <p class="page-doc-perex">{page.perex}</p>}
+  </header>
+
+  <article class="page-doc-body article-body">
+    {page.sections.map((section) => <ArticleSection section={section} />)}
+  </article>
+</div>
+
+<style>
+  .page-doc {
+    max-width: var(--max-w);
+    margin: 0 auto;
+    padding: 0 var(--gutter) 3rem;
+  }
+
+  .page-doc-hero {
+    padding: clamp(2rem, 4vw, 3rem) 0 1.5rem;
+    border-bottom: 1px solid var(--line);
+    margin-bottom: 1.5rem;
+  }
+
+  .page-doc-title {
+    font-family: var(--sans);
+    font-size: clamp(1.9rem, 4.4vw, 2.9rem);
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    line-height: 1.1;
+    color: var(--ink);
+    margin: 0;
+  }
+
+  .page-doc-perex {
+    margin: 1rem 0 0;
+    font-size: 1.15rem;
+    line-height: 1.55;
+    color: var(--ink-soft);
+    max-width: 65ch;
+  }
+
+  .page-doc-body {
+    max-width: 760px;
+  }
+</style>

@@ -31,6 +31,7 @@ function previewRoutes() {
           ['/preview/autor/[slug]', './src/preview-route/autor.astro'],
           ['/preview/znacky/[slug]', './src/preview-route/znacky.astro'],
           ['/preview/kategorie/[slug]', './src/preview-route/kategorie.astro'],
+          ['/preview/stranka/[slug]', './src/preview-route/stranka.astro'],
         ];
         for (const [pattern, entrypoint] of routes) {
           injectRoute({ pattern, entrypoint });

@@ -310,6 +310,39 @@ export async function fetchUpdates(): Promise<unknown[]> {
 }
 
 // ===========================================================================
+// Pages (static/editorial)
+// ===========================================================================
+
+export interface BackendPage {
+  slug: string;
+  status: string;
+  href: string;
+  title: string;
+  perex?: string;
+  sections: Array<{ id: string; num: number | string; title: string; tocLabel?: string; bodyHtml: string }>;
+  dates: { publishedAt?: string; updatedAt?: string };
+  seo?: { title?: string; description?: string; canonical?: string; ogImage?: string; noIndex?: boolean };
+}
+
+export interface BackendPageListItem {
+  slug: string;
+  href: string;
+  title: string;
+  updatedAt: string;
+}
+
+/** Published pages — slug + title only, for getStaticPaths. */
+export async function fetchPages(): Promise<BackendPageListItem[]> {
+  const { data } = await fetchJson<BackendPageListItem[]>('/pages');
+  return data;
+}
+
+export async function fetchPage(slug: string): Promise<BackendPage> {
+  const { data } = await fetchJson<BackendPage>(`/pages/${slug}`);
+  return data;
+}
+
+// ===========================================================================
 // Full Article (detail page)
 // ===========================================================================
 

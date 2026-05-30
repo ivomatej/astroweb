@@ -1,0 +1,29 @@
+---
+/**
+ * Admin draft preview for a static/editorial page — SSR, on-demand. Injected
+ * at /preview/stranka/[slug] by astro.config.preview.mjs. Renders through the
+ * same <PageView> as the public page.
+ */
+export const prerender = false;
+
+import PreviewShell from "../components/preview/PreviewShell.astro";
+import PageView from "../components/page/PageView.astro";
+import { backendToPage } from "../data/pages";
+import { fetchPreview } from "../lib/preview-api";
+import type { BackendPage } from "../lib/contenta-api";
+
+const slug = Astro.params.slug ?? "";
+const token = Astro.url.searchParams.get("token") ?? "";
+
+const result =
+  !slug || !token
+    ? ({ ok: false, status: 400, message: "Chybí parametr slug nebo token." } as const)
+    : await fetchPreview<BackendPage>("pages", slug, token);
+
+const page = result.ok ? backendToPage(result.data) : null;
+const pageTitle = page ? `Náhled: ${page.title}` : "Náhled stránky";
+---
+
+<PreviewShell pageTitle={pageTitle} error={result.ok ? undefined : result}>
+  {page && <PageView page={page} />}
+</PreviewShell>
