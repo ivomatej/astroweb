@@ -87,7 +87,9 @@ export function backendToJob(j: BackendJob): JobOffer {
   return {
     slug: j.slug,
     title: j.title,
-    type: TYPE_MAP[j.jobType] ?? "expert",
+    // jobType je nově volný text → normalizuj na lowercase pro mapu (legacy enum
+    // hodnoty chodí teď raw uppercase). Neznámý/SMB text → fallback "expert".
+    type: TYPE_MAP[j.jobType?.toLowerCase()] ?? "expert",
     shortBadge: [j.employment?.toUpperCase().slice(0, 2), j.location, j.remote ? "Remote" : null]
       .filter(Boolean)
       .join(" · "),
