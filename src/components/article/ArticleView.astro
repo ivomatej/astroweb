@@ -72,7 +72,7 @@ const { article } = Astro.props;
     </details>
 
     <article class="article-body">
-      {article.sections.map((section) => <ArticleSection section={section} />)}
+      {article.sections.map((section, i) => <ArticleSection section={section} cnIndex={i} />)}
     </article>
 
     {article.nextCta && <NextCta cta={article.nextCta} />}

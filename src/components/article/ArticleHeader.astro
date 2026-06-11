@@ -17,8 +17,8 @@ const { kicker, title, perex } = Astro.props;
 
 <header class="article-header">
   {kicker && <div class="kicker">{kicker}</div>}
-  <h1 class="article-title" set:html={title}></h1>
-  <p class="article-perex" set:html={perex}></p>
+  <h1 class="article-title" set:html={title} data-cn-field="title"></h1>
+  <p class="article-perex" set:html={perex} data-cn-field="perex"></p>
 </header>
 
 <style>
