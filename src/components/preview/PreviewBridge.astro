@@ -1,0 +1,69 @@
+---
+// =============================================================================
+// PreviewBridge — živý náhled pro admin Contenta (recenzer Astroweb).
+// =============================================================================
+// Když náhledová stránka běží v <iframe> adminu s ?cnpreview=1, poslouchá
+// postMessage s rozpracovanými poli detailu a patchuje DOM bez rebuildu:
+//   • data-cn-field="<klíč>" → textContent (titulek, perex, nadpis sekce…)
+//   • data-cn-html="<klíč>"  → innerHTML (rich tělo)
+//   • data-cn-src="<klíč>"   → atribut src (obrázek)
+// Mimo iframe / bez flagu se skript fakticky vypne. Patchují se jen existující
+// uzly — přidání/odebrání bloku či položky se projeví až po uložení a rebuildu.
+---
+
+<script is:inline>
+  (function () {
+    if (window === window.parent) return; // jen uvnitř iframu
+    var params = new URLSearchParams(window.location.search);
+    if (params.get("cnpreview") !== "1") return;
+
+    // Přijímáme zprávy jen z adminu (contenta.cz / localhost ve vývoji).
+    function allowed(origin) {
+      return (
+        /^https?:\/\/localhost(:\d+)?$/.test(origin) ||
+        /^https?:\/\/([a-z0-9-]+\.)*contenta\.cz$/.test(origin)
+      );
+    }
+
+    function patchFields(fields) {
+      if (!fields || typeof fields !== "object") return;
+      var n, i, el, k, v;
+      n = document.querySelectorAll("[data-cn-field]");
+      for (i = 0; i < n.length; i++) {
+        el = n[i];
+        k = el.getAttribute("data-cn-field");
+        v = fields[k];
+        if (typeof v === "string" || typeof v === "number") el.textContent = String(v);
+      }
+      n = document.querySelectorAll("[data-cn-html]");
+      for (i = 0; i < n.length; i++) {
+        el = n[i];
+        k = el.getAttribute("data-cn-html");
+        v = fields[k];
+        if (typeof v === "string") el.innerHTML = v;
+      }
+      n = document.querySelectorAll("[data-cn-src]");
+      for (i = 0; i < n.length; i++) {
+        el = n[i];
+        k = el.getAttribute("data-cn-src");
+        v = fields[k];
+        if (typeof v === "string" && v) el.setAttribute("src", v);
+      }
+    }
+
+    window.addEventListener("message", function (e) {
+      if (!allowed(e.origin)) return;
+      var d = e.data;
+      if (!d || d.source !== "contenta-admin" || d.type !== "preview-fields") return;
+      patchFields(d.fields);
+      document.documentElement.setAttribute("data-cn-preview", "1");
+    });
+
+    // Oznam rodiči (adminu), že most je připravený → admin pošle aktuální stav.
+    try {
+      window.parent.postMessage({ source: "contenta-preview", type: "ready" }, "*");
+    } catch (err) {
+      /* cross-origin parent bez listeneru — ignoruj */
+    }
+  })();
+</script>

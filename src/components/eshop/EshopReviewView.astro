@@ -46,7 +46,7 @@ const facts = [
       </div>
     </div>
     <div class="esh-info">
-      <h1>{eshop.name}</h1>
+      <h1 data-cn-field="title">{eshop.name}</h1>
       <a href={eshop.website} rel="noopener" target="_blank" class="esh-domain">
         {eshop.domain}
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
@@ -55,7 +55,7 @@ const facts = [
           <line x1="10" y1="14" x2="21" y2="3" />
         </svg>
       </a>
-      <p class="esh-tagline">{eshop.tagline}</p>
+      <p class="esh-tagline" data-cn-field="perex">{eshop.tagline}</p>
       {
         facts.length > 0 && (
           <dl class="esh-facts">

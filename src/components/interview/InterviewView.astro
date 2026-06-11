@@ -37,8 +37,8 @@ function formatCzechDate(iso: string): string {
 <header class="int-hero">
   <div class="inner">
     <span class="hero-eyebrow">Rozhovor · {interview.category}</span>
-    <h1>{interview.title}</h1>
-    <p class="hero-perex">{interview.perex}</p>
+    <h1 data-cn-field="title">{interview.title}</h1>
+    <p class="hero-perex" data-cn-field="perex">{interview.perex}</p>
 
     <div class="hero-people">
       {expert && (

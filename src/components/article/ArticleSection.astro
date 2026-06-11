@@ -3,13 +3,16 @@ import type { ArticleSectionData } from "../../types/article";
 
 interface Props {
   section: ArticleSectionData;
+  /** Index sekce pro živý náhled (admin patchuje nadpis přes data-cn-field). */
+  cnIndex?: number;
 }
 
-const { section } = Astro.props;
+const { section, cnIndex } = Astro.props;
+const titleKey = typeof cnIndex === "number" ? `section.${cnIndex}.title` : undefined;
 ---
 
 <section class="section" id={section.id}>
-  <h2 data-num={section.num}>{section.title}</h2>
+  <h2 data-num={section.num} data-cn-field={titleKey}>{section.title}</h2>
   <div class="section-body" set:html={section.bodyHtml}></div>
 </section>
 

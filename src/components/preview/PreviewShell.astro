@@ -10,6 +10,7 @@
  *   </PreviewShell>
  */
 import BaseLayout from "../../layouts/BaseLayout.astro";
+import PreviewBridge from "./PreviewBridge.astro";
 
 interface Props {
   pageTitle: string;
@@ -20,6 +21,7 @@ const { pageTitle, error } = Astro.props;
 ---
 
 <BaseLayout title={pageTitle} noIndex>
+  <PreviewBridge />
   <div class="preview-banner" role="status">
     <span class="preview-dot" aria-hidden="true"></span>
     <span class="preview-label">Náhled konceptu</span>

@@ -47,8 +47,8 @@ function formatCzechDate(iso: string): string {
         {article.category && <span class="mag-category">{article.category}</span>}
         <time datetime={article.publishedAt}>{formatCzechDate(article.publishedAt)}</time>
       </div>
-      <h1 class="mag-title">{article.title}</h1>
-      <p class="mag-perex">{article.perex}</p>
+      <h1 class="mag-title" data-cn-field="title">{article.title}</h1>
+      <p class="mag-perex" data-cn-field="perex">{article.perex}</p>
       {author && (
         <div class="hero-author">
           <a href={`/autor/${author.slug}/`} class="author-card">
@@ -66,7 +66,7 @@ function formatCzechDate(iso: string): string {
 
   <section class="mag-body">
     <div class="inner mag-body-inner">
-      <div class="prose" set:html={article.bodyHtml} />
+      <div class="prose" set:html={article.bodyHtml} data-cn-html="body" />
 
       {
         article.sources && article.sources.length > 0 && (
