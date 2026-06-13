@@ -27,6 +27,7 @@ import { site } from "../../config/site";
   class="mn-drawer"
   data-mobile-nav-drawer
   aria-hidden="true"
+  inert
   aria-label="Hlavní menu"
 >
   <header class="mn-head">
@@ -508,6 +509,7 @@ import { site } from "../../config/site";
 
     function open() {
       drawer.setAttribute("aria-hidden", "false");
+      drawer.removeAttribute("inert"); // znovu fokusovatelné
       backdrop.hidden = false;
       document.body.classList.add("mn-locked");
       // Move focus into the drawer for a11y
@@ -521,6 +523,7 @@ import { site } from "../../config/site";
 
     function close() {
       drawer.setAttribute("aria-hidden", "true");
+      drawer.setAttribute("inert", ""); // zavřený panel = mimo fokus i a11y strom
       backdrop.hidden = true;
       document.body.classList.remove("mn-locked");
       document.querySelectorAll("[data-mobile-nav-trigger]").forEach((t) => {
