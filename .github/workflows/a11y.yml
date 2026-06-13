@@ -1,8 +1,8 @@
 name: a11y
 
-# Automatická kontrola přístupnosti (axe / WCAG 2.1 AA) nad vybuilděnými
-# stránkami recenzeru. Build běží ve fallback režimu (bez backendu) → bez tajných
-# klíčů. Práh issues je v .pa11yci.json (threshold) — startovní baseline, snižovat.
+# Automatická kontrola přístupnosti (axe-core / WCAG 2.1 AA) nad vybuilděnými
+# stránkami recenzeru. Build běží ve fallback režimu (bez backendu) → bez klíčů.
+# @axe-core/cli s aktuálním axe-core (zvládá pozadí přes CSS proměnné).
 
 on:
   push:
@@ -10,7 +10,7 @@ on:
   pull_request:
 
 jobs:
-  pa11y:
+  axe:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -26,8 +26,13 @@ jobs:
       - name: Build (fallback, bez backendu)
         run: npm run build
 
-      - name: Accessibility check (pa11y-ci + axe)
+      - name: Accessibility check (axe-core, WCAG 2.1 AA)
         run: |
           npm run preview -- --port 4321 --host &
           npx --yes wait-on -t 60000 http://localhost:4321/
-          npx --yes pa11y-ci@3
+          npx --yes @axe-core/cli@4 \
+            http://localhost:4321/ \
+            http://localhost:4321/hledat/ \
+            http://localhost:4321/kontakt/ \
+            --tags wcag2a,wcag2aa \
+            --exit
