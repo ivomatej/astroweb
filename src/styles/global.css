@@ -66,6 +66,20 @@ select {
   border-radius: 4px;
 }
 
+/* Formulářová pole (text/e-mail/textarea/select): BEZ barevného focus rámečku.
+   Jen jemný NEUTRÁLNÍ focus — kvůli přístupnosti se focus úplně neruší.
+   Odkazy/tlačítka/checkbox/radio si svůj viditelný focus ponechávají. */
+input:not([type="checkbox"]):not([type="radio"]):focus,
+input:not([type="checkbox"]):not([type="radio"]):focus-visible,
+textarea:focus,
+textarea:focus-visible,
+select:focus,
+select:focus-visible {
+  outline: none;
+  box-shadow: none;
+  border-color: color-mix(in srgb, var(--ink) 40%, transparent);
+}
+
 /* Skip-to-content link for accessibility */
 .skip-link {
   position: absolute;
