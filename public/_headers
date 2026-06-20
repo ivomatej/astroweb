@@ -1,0 +1,12 @@
+# Cloudflare Pages — per-cesta hlavičky.
+# https://developers.cloudflare.com/pages/configuration/headers/
+#
+# llms.txt / llms-full.txt (návrh standardu llmstxt.org) jsou markdown.
+# Statické .txt servíruje CDN jako text/plain podle přípony; tady přepneme
+# na text/markdown, aby served Content-Type odpovídal obsahu (header v APIRoute
+# platí jen v dev/SSR, ne u prerenderovaného statického souboru).
+/llms.txt
+  Content-Type: text/markdown; charset=utf-8
+
+/llms-full.txt
+  Content-Type: text/markdown; charset=utf-8

@@ -113,6 +113,13 @@ const umamiScriptUrl = import.meta.env.PUBLIC_UMAMI_SCRIPT_URL;
       href="/aktualizace.xml"
     />
 
+    {/*
+      llms.txt (návrh standardu llmstxt.org) — kurátorský markdown rozcestník
+      obsahu pro AI agenty. Hlavní objevitelnost je samotný soubor na /llms.txt;
+      tento <link> je nepovinný doplněk pro klienty, kteří ho umí číst z <head>.
+    */}
+    <link rel="llms" href="/llms.txt" />
+
     <meta name="color-scheme" content="light" />
 
     {/*
