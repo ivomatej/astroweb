@@ -30,9 +30,15 @@ jobs:
         run: |
           npm run preview -- --port 4321 --host &
           npx --yes wait-on -t 60000 http://localhost:4321/
+          # ChromeDriver musí odpovídat Chrome na runneru (npm balík axe stahuje
+          # novější → „session not created"). Použij chromedriver z runneru.
+          CHROMEDRIVER="${CHROMEWEBDRIVER:+$CHROMEWEBDRIVER/chromedriver}"
+          CHROMEDRIVER="${CHROMEDRIVER:-$(command -v chromedriver || true)}"
+          echo "Using chromedriver: ${CHROMEDRIVER:-<bundled>}"
           npx --yes @axe-core/cli@4 \
             http://localhost:4321/ \
             http://localhost:4321/hledat/ \
             http://localhost:4321/kontakt/ \
+            ${CHROMEDRIVER:+--chromedriver-path "$CHROMEDRIVER"} \
             --tags wcag2a,wcag2aa \
             --exit
